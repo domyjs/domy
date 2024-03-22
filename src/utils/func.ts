@@ -1,6 +1,5 @@
-import { renderElement } from '@core/renderElement';
-import { DOMY } from '@core/DOMY';
 import { VirtualElement } from '@core/VitualDom';
+import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { State } from '@typing/State';
 
 type Props = {
@@ -8,6 +7,7 @@ type Props = {
   $state: State;
   virtualParent: VirtualElement | null;
   virtualElement: VirtualElement;
+  notifier: AttrRendererProps['notifier'];
 
   context?: unknown;
   isAsync?: boolean;
@@ -32,7 +32,7 @@ export function func(props: Props) {
     signal.setCallBackOnCall(() =>
       signal.attach({
         $el: props.virtualElement.$el,
-        fn: () => renderElement(props.virtualParent, props.virtualElement)
+        fn: props.notifier
       })
     );
   }

@@ -7,9 +7,11 @@ import { domies } from './domies';
 import { events } from './events';
 import { State } from '@typing/State';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { data } from './data';
 
 export const $state: State = {
-  $state: [],
+  $state: [], // State of the current scope
+
   $globalState: {},
   $store: {},
   $refs: {}
@@ -39,30 +41,22 @@ export function renderElement(
   const domiesAttributes = virtualElement.domiesAttributes;
 
   for (const attr of Object.keys(domiesAttributes)) {
+    // Check if we have to bypass this attribute or not
     if (byPassAttributes.includes(attr)) continue;
+
+    // If the element is not displayed we don't need to render the differents attributes
+    if (attr !== 'd-if' && !virtualElement.isDisplay) continue;
 
     const props: AttrRendererProps = {
       $state: stateCopy,
       virtualParent,
       virtualElement,
-      attr: { name: attr, value: domiesAttributes[attr] }
+      attr: { name: attr, value: domiesAttributes[attr] },
+      notifier: () => renderElement(props.virtualParent, props.virtualElement)
     };
 
     if (attr === 'd-data') {
-      const obj = func({
-        code: domiesAttributes[attr],
-        $state: stateCopy,
-        returnResult: true,
-        virtualElement,
-        virtualParent
-      });
-
-      // Fixe state scope
-      for (const key of Object.keys(obj)) {
-        $state.$state.push(new Signal(key, obj[key]));
-      }
-
-      virtualElement.$el.removeAttribute('d-data');
+      data(props);
     } else if (isBindAttr(attr)) {
       binding(props);
     } else if (isEventAttr(attr)) {

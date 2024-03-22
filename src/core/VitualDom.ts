@@ -14,9 +14,6 @@ export type VirtualElement = {
   childs: (VirtualElement | string)[];
 };
 
-/**
- * A virtual dom
- */
 export class VirtualDom {
   private root: VirtualElement;
 

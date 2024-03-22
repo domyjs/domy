@@ -17,15 +17,14 @@ export function domies(props: AttrRendererProps) {
 
   props.virtualElement.$el.removeAttribute(domyAttrName);
 
-  if (props.attr.name !== 'd-if' && !props.virtualElement.isDisplay) return;
-
-  function getExecutedValue() {
+  function getExecutedValue(code?: string, returnValue?: boolean) {
     return func({
-      code: props.attr.value,
-      returnResult: true,
+      code: code ?? props.attr.value,
+      returnResult: returnValue ?? true,
       $state: props.$state,
       virtualParent: props.virtualParent,
-      virtualElement: props.virtualElement
+      virtualElement: props.virtualElement,
+      notifier: props.notifier
     });
   }
 
@@ -43,12 +42,7 @@ export function domies(props: AttrRendererProps) {
       props.$state.$refs[props.attr.value] = props.virtualElement.$el;
       break;
     case 'd-effect':
-      func({
-        code: props.attr.value,
-        $state: props.$state,
-        virtualParent: props.virtualParent,
-        virtualElement: props.virtualElement
-      });
+      getExecutedValue(undefined, false);
       break;
     case 'd-if':
       if (!props.virtualParent) break;
@@ -92,13 +86,7 @@ export function domies(props: AttrRendererProps) {
         throw new Error(`Invalide "${props.attr.name}" attribute value: "${props.attr.value}"`);
 
       const isForIn = res.groups!.type === 'in';
-      const executedValue = func({
-        code: res.groups!.org,
-        returnResult: true,
-        $state: props.$state,
-        virtualParent: props.virtualParent,
-        virtualElement: props.virtualElement
-      });
+      const executedValue = getExecutedValue(res.groups!.org);
 
       let index = 0;
 

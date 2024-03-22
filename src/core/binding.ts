@@ -22,7 +22,8 @@ export function binding(props: AttrRendererProps) {
     returnResult: true,
     $state: props.$state,
     virtualParent: props.virtualParent,
-    virtualElement: props.virtualElement
+    virtualElement: props.virtualElement,
+    notifier: props.notifier
   });
 
   props.virtualElement.$el.removeAttribute(domyAttrName);

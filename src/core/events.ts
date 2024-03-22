@@ -25,7 +25,8 @@ export function events(props: AttrRendererProps) {
       returnResult: true,
       $state: props.$state,
       virtualParent: props.virtualParent,
-      virtualElement: props.virtualElement
+      virtualElement: props.virtualElement,
+      notifier: props.notifier
     });
     if (typeof executedValue === 'function') executedValue(event);
   };
