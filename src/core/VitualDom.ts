@@ -88,15 +88,14 @@ export class VirtualDom {
       }
 
       const element = childs.shift() as VirtualElement | string;
+      const shouldBeVisit =
+        typeof element !== 'string' &&
+        typeof element.domiesAttributes['d-ignore'] !== 'string' &&
+        typeof element.domiesAttributes['d-for'] !== 'string';
+      if (!shouldBeVisit) continue;
       cb(parent, element);
 
-      if (
-        typeof element !== 'string' &&
-        !element.domiesAttributes['d-ignore'] &&
-        !element.domiesAttributes['d-for']
-      ) {
-        stack.push({ parent: element, childs: [...element.childs] });
-      }
+      stack.push({ parent: element, childs: [...element.childs] });
     }
   }
 }

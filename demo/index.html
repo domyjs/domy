@@ -26,6 +26,11 @@
       <input type="text" d-model="search" />
     </div>
 
+    <div d-ignore d-data="$state.searchBar">
+      <h1 d-text="search.value"></h1>
+      <input type="text" d-model="search" />
+    </div>
+
     <main d-data="$state.counter">
       <template d-effect="console.log(count.value)"></template>
 
