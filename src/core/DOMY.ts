@@ -2,7 +2,7 @@ import { $state } from './renderElement';
 import { StateObj, Signal } from './Signal';
 
 export const DOMY = {
-  state(name: string, state: StateObj) {
+  data(name: string, state: StateObj) {
     if ($state.$globalState[name]) throw new Error(`A state with the name "${name}" already exist`);
 
     $state.$globalState[name] = state;

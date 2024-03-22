@@ -42,10 +42,12 @@ export function domies(props: AttrRendererProps) {
       props.$state.$refs[props.attr.value] = props.virtualElement.$el;
       break;
     case 'd-effect':
-      getExecutedValue(undefined, false);
+      const executedValueEffect = getExecutedValue(undefined, false);
+      if (typeof executedValueEffect === 'function') executedValueEffect();
       break;
     case 'd-init':
-      getExecutedValue(undefined, false);
+      const executedValueInit = getExecutedValue(undefined, false);
+      if (typeof executedValueInit === 'function') executedValueInit();
       delete props.virtualElement.domiesAttributes['d-init'];
       break;
     case 'd-if':

@@ -1,5 +1,6 @@
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { func } from '@utils/func';
+import { $state } from '@core/renderElement';
 
 /**
  * Handle event applied on an item
@@ -16,9 +17,10 @@ export function events(props: AttrRendererProps) {
     : domyAttrName.slice('d-on:'.length);
 
   props.virtualElement.$el.removeAttribute(domyAttrName);
+  if (!$state.$events[eventName]) $state.$events[eventName] = [];
+  const elIndex = $state.$events[eventName].findIndex(el => props.virtualElement.$el);
+  if (elIndex === -1) $state.$events[eventName].push(props.virtualElement.$el);
 
-  if (props.virtualElement.events[eventName])
-    props.virtualElement.$el.removeEventListener(eventName, props.virtualElement.events[eventName]);
   props.virtualElement.events[eventName] = function (event) {
     const executedValue = func({
       code: props.attr.value,
@@ -30,5 +32,7 @@ export function events(props: AttrRendererProps) {
     });
     if (typeof executedValue === 'function') executedValue(event);
   };
+  if (props.virtualElement.events[eventName])
+    props.virtualElement.$el.removeEventListener(eventName, props.virtualElement.events[eventName]);
   props.virtualElement.$el.addEventListener(eventName, props.virtualElement.events[eventName]);
 }

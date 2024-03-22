@@ -11,6 +11,7 @@ import { data } from './data';
 
 export const $state: State = {
   $state: [], // State of the current scope
+  $events: {},
 
   $globalState: {},
   $store: {},

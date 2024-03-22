@@ -1,6 +1,7 @@
 import { VirtualElement } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { State } from '@typing/State';
+import { $state } from '@core/renderElement';
 
 type Props = {
   code: string;
@@ -15,6 +16,17 @@ type Props = {
 };
 
 const AsyncFunction = async function () {}.constructor;
+
+/**
+ * Allow to dispatch a custom event on all elements attached to it
+ * @param eventName
+ */
+function dispatchCustomEvent(eventName: string) {
+  const attachedElements = $state.$events[eventName] ?? [];
+  for (const attachedElement of attachedElements) {
+    attachedElement.dispatchEvent(new CustomEvent(eventName));
+  }
+}
 
 /**
  * Allow to execute javascript code contained into a string with the current state
@@ -37,12 +49,13 @@ export function func(props: Props) {
     );
   }
 
-  return fn(...stateKeys, '$el', '$refs', '$store', '$state', code).bind(
+  return fn(...stateKeys, '$el', '$refs', '$store', '$state', '$dispatch', code).bind(
     props.context ?? window,
     ...stateValues,
     props.virtualElement.$el,
     props.$state.$refs,
     props.$state.$store,
-    props.$state.$globalState
+    props.$state.$globalState,
+    dispatchCustomEvent
   )();
 }
