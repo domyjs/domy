@@ -36,7 +36,18 @@
       <button @click="$dispatch('notify')">Notify</button>
     </div>
 
+    <div d-data="{ test: 'hello' }">
+      <p d-text="test.value"></p>
+      <div d-data="{ test: 'bye' }">
+        <p d-text="test.value"></p>
+        <button @click="test.set('test2')">Change message2</button>
+      </div>
+      <button @click="test.set('test1')">Change message1</button>
+    </div>
+
     <main d-data="$state.counter">
+      <h1 d-text="search.value"></h1>
+
       <template d-effect="console.log(count.value)"></template>
       <template d-init="console.log('Count initial value:', count.value)"></template>
 
