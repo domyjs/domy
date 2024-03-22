@@ -21,6 +21,8 @@ export function events(props: AttrRendererProps) {
   const elIndex = $state.$events[eventName].findIndex(el => props.virtualElement.$el);
   if (elIndex === -1) $state.$events[eventName].push(props.virtualElement.$el);
 
+  if (props.virtualElement.events[eventName])
+    props.virtualElement.$el.removeEventListener(eventName, props.virtualElement.events[eventName]);
   props.virtualElement.events[eventName] = function (event) {
     const executedValue = func({
       code: props.attr.value,
@@ -32,7 +34,5 @@ export function events(props: AttrRendererProps) {
     });
     if (typeof executedValue === 'function') executedValue(event);
   };
-  if (props.virtualElement.events[eventName])
-    props.virtualElement.$el.removeEventListener(eventName, props.virtualElement.events[eventName]);
   props.virtualElement.$el.addEventListener(eventName, props.virtualElement.events[eventName]);
 }
