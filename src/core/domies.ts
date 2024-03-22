@@ -44,6 +44,10 @@ export function domies(props: AttrRendererProps) {
     case 'd-effect':
       getExecutedValue(undefined, false);
       break;
+    case 'd-init':
+      getExecutedValue(undefined, false);
+      delete props.virtualElement.domiesAttributes['d-init'];
+      break;
     case 'd-if':
       if (!props.virtualParent) break;
 

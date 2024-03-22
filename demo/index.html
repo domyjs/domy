@@ -33,6 +33,7 @@
 
     <main d-data="$state.counter">
       <template d-effect="console.log(count.value)"></template>
+      <template d-init="console.log('Count initial value:', count.value)"></template>
 
       <h1 d-text="count.value"></h1>
 
