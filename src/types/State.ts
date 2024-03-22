@@ -2,6 +2,6 @@ import { Signal } from '@core/Signal';
 
 export type State = {
   $state: Signal[];
-  $store: any;
+  $store: { [name: string]: Signal };
   $refs: Record<string, Element>;
 };

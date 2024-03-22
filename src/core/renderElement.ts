@@ -8,7 +8,7 @@ import { events } from './events';
 import { State } from '@typing/State';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 
-const $state: State = {
+export const $state: State = {
   $state: [],
   $store: {},
   $refs: {}

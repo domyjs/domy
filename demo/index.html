@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DOMY | Demo for domy framework</title>
     <script src="../dist/index.js"></script>
+    <script>
+      window.DOMY.store({
+        count: 0
+      });
+    </script>
   </head>
   <body>
+    <h1 d-text="$store.count.value"></h1>
+    <div>
+      <button @click="$store.count.set((old) => old + 1)">+ global count</button>
+    </div>
     <main d-data="{ count: 0, activeSupperBtn: false }">
       <template d-effect="console.log(count.value)"></template>
 

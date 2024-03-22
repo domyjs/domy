@@ -1,6 +1,6 @@
 type Dependencie = { $el: Element; fn: () => void };
 
-export type StateObj = { [key: string]: StateObj | unknown };
+export type StateObj = { [key: string]: any };
 
 /**
  * Create a signal to spy a variable and notify the observers that need this dependencie

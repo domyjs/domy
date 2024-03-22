@@ -28,7 +28,7 @@ export function func(props: Props) {
   const stateKeys = props.$state.$state.map(state => state.name);
   const stateValues = props.$state.$state;
 
-  for (const signal of stateValues) {
+  for (const signal of [...stateValues, ...Object.values(props.$state.$store)]) {
     signal.setCallBackOnCall(() =>
       signal.attach({
         $el: props.virtualElement.$el,
@@ -37,10 +37,11 @@ export function func(props: Props) {
     );
   }
 
-  return fn(...stateKeys, '$el', '$refs', code).bind(
+  return fn(...stateKeys, '$el', '$refs', '$store', code).bind(
     props.context ?? window,
     ...stateValues,
     props.virtualElement.$el,
-    props.$state.$refs
+    props.$state.$refs,
+    props.$state.$store
   )();
 }
