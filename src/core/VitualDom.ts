@@ -51,7 +51,10 @@ export class VirtualDom {
     return virtualElement;
   }
 
-  public static createElementFromVirtual(virtualElement: VirtualElement): Element {
+  public static createElementFromVirtual(virtualElement: VirtualElement | string): Element | Text {
+    // If it's textContent
+    if (typeof virtualElement === 'string') return document.createTextNode(virtualElement);
+
     const element = document.createElement(virtualElement.tag);
 
     // Set attributes
@@ -61,11 +64,7 @@ export class VirtualDom {
 
     // Add child nodes
     for (const child of virtualElement.childs) {
-      if (typeof child === 'string') {
-        element.appendChild(document.createTextNode(child));
-      } else {
-        element.appendChild(VirtualDom.createElementFromVirtual(child));
-      }
+      element.appendChild(VirtualDom.createElementFromVirtual(child));
     }
 
     return element;

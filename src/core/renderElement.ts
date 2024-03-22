@@ -19,7 +19,7 @@ export function renderElement(
   virtualElement: VirtualElement | string,
   injectState: Signal[] = []
 ) {
-  if (typeof virtualElement === 'string') return; // TODO
+  if (typeof virtualElement === 'string') return; // textContent don't have attributes
 
   const stateCopy: State = {
     ...$state,

@@ -37,7 +37,7 @@ export function domies(props: AttrRendererProps) {
         props.virtualElement.isDisplay = false;
         props.virtualElement.$el.remove();
       } else if (!props.virtualElement.isDisplay && shouldBeDisplay) {
-        const newElement = VirtualDom.createElementFromVirtual(props.virtualElement);
+        const newElement = VirtualDom.createElementFromVirtual(props.virtualElement) as Element;
         const visibleElements = props.virtualParent.childs.filter(
           child => typeof child === 'string' || child.isDisplay || child === props.virtualElement
         );
@@ -55,7 +55,12 @@ export function domies(props: AttrRendererProps) {
       props.$state.$refs[props.attr.value] = props.virtualElement.$el;
       break;
     case 'd-model':
-      // TODO
+      const signalName = props.attr.value;
+      function changeValue() {
+        // TODO
+      }
+      props.virtualElement.$el.addEventListener('input', changeValue);
+      props.virtualElement.$el.addEventListener('change', changeValue);
       break;
     case 'd-for':
       if (!props.virtualParent) break;
@@ -82,15 +87,15 @@ export function domies(props: AttrRendererProps) {
 
       function renderer(value: any) {
         for (const child of props.virtualElement.childs) {
-          if (typeof child === 'string') continue; // TODO
-
           const toInject = res!.groups!.index
             ? [new Signal(res!.groups!.dest, value), new Signal(res!.groups!.index, index)]
             : [new Signal(res!.groups!.dest, value)];
 
           const newElement = VirtualDom.createElementFromVirtual(child);
-          child.$el = newElement;
-          renderElement(props.virtualElement, child, toInject);
+          if (typeof child !== 'string') {
+            child.$el = newElement as Element;
+            renderElement(props.virtualElement, child, toInject);
+          }
           props.virtualElement.$el.appendChild(newElement);
         }
 
