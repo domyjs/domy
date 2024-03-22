@@ -5,6 +5,7 @@ import { restoreElement } from '@utils/restoreElement';
 import { VirtualDom } from './VitualDom';
 import { renderElement } from './renderElement';
 import { Signal } from './Signal';
+import { $state } from '@core/renderElement';
 
 /**
  * Handle attributes starting by d-*
@@ -71,8 +72,9 @@ export function domies(props: AttrRendererProps) {
       break;
     case 'd-model':
       const signalName = props.attr.value;
+      const currentSignal = $state.$state.find(state => state.name === signalName);
       function changeValue() {
-        // TODO
+        currentSignal?.set((props.virtualElement.$el as HTMLInputElement)?.value ?? '');
       }
       props.virtualElement.$el.addEventListener('input', changeValue);
       props.virtualElement.$el.addEventListener('change', changeValue);
