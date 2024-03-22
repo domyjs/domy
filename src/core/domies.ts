@@ -1,7 +1,9 @@
 import { SPECIAL_ATTRIBUTES } from '@constants/specialAttributes';
 import { func } from '@utils/func';
-import { DOMY } from './DOMY';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { restoreElement } from '@utils/restoreElement';
+import { VirtualDom } from './VitualDom';
+import { renderElement } from './renderElement';
 
 export function domies(props: AttrRendererProps) {
   const domyAttrName = props.attr.name as (typeof SPECIAL_ATTRIBUTES)[number];
@@ -26,7 +28,24 @@ export function domies(props: AttrRendererProps) {
       props.virtualElement.$el.innerHTML = getExecutedValue();
       break;
     case 'd-if':
-      // TODO
+      if (!props.virtualParent) break;
+
+      const shouldBeDisplay = getExecutedValue();
+
+      if (props.virtualElement.isDisplay && !shouldBeDisplay) {
+        props.virtualElement.isDisplay = false;
+        props.virtualElement.$el.remove();
+      } else if (!props.virtualElement.isDisplay && shouldBeDisplay) {
+        const newElement = VirtualDom.createElementFromVirtual(props.virtualElement);
+        const visibleElements = props.virtualParent.childs.filter(
+          child => typeof child === 'string' || child.isDisplay || child === props.virtualElement
+        );
+        const indexToInsert = visibleElements.findIndex(child => child === props.virtualElement);
+        props.virtualElement.$el = newElement;
+        props.virtualElement.isDisplay = true;
+        renderElement(props.virtualParent, props.virtualElement);
+        restoreElement(props.virtualParent.$el, newElement, indexToInsert);
+      }
       break;
     case 'd-show':
       (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue() ? '' : 'none';

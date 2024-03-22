@@ -74,15 +74,23 @@ export class VirtualDom {
   visit(
     cb: (virtualParent: VirtualElement | null, virtualElement: VirtualElement | string) => void
   ) {
-    let parent: VirtualElement | null = null;
-    const childs: (VirtualElement | string)[] = [this.root];
+    const stack: { parent: VirtualElement | null; childs: (VirtualElement | string)[] }[] = [
+      { parent: null, childs: [this.root] }
+    ];
 
-    while (childs.length > 0) {
+    while (stack.length > 0) {
+      const { parent, childs } = stack[stack.length - 1];
+
+      if (childs.length === 0) {
+        stack.pop();
+        continue;
+      }
+
       const element = childs.shift() as VirtualElement | string;
       cb(parent, element);
+
       if (typeof element !== 'string') {
-        childs.push(...element.childs);
-        parent = element;
+        stack.push({ parent: element, childs: [...element.childs] });
       }
     }
   }
