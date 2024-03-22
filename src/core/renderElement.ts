@@ -1,4 +1,3 @@
-import { func } from '@utils/func';
 import { Signal } from './Signal';
 import { VirtualElement } from './VitualDom';
 import { isBindAttr, isDomyAttr, isEventAttr } from '@utils/isSpecialAttribute';
@@ -9,15 +8,6 @@ import { State } from '@typing/State';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { data } from './data';
 
-export const $state: State = {
-  $state: [], // State of the current scope
-  $events: {},
-
-  $globalState: {},
-  $store: {},
-  $refs: {}
-};
-
 /**
  * Render every domy attributes of an element
  * @param virtualParent
@@ -27,6 +17,7 @@ export const $state: State = {
  * @returns
  */
 export function renderElement(
+  $state: State,
   virtualParent: VirtualElement | null,
   virtualElement: VirtualElement | string,
   injectState: Signal[] = [],
@@ -34,10 +25,8 @@ export function renderElement(
 ) {
   if (typeof virtualElement === 'string') return; // textContent don't have attributes
 
-  const stateCopy: State = {
-    ...$state,
-    $state: [...$state.$state, ...injectState]
-  };
+  // we inject the state for this rendering
+  $state.$state.push(...injectState);
 
   const domiesAttributes = virtualElement.domiesAttributes;
 
@@ -49,11 +38,11 @@ export function renderElement(
     if (attr !== 'd-if' && !virtualElement.isDisplay) continue;
 
     const props: AttrRendererProps = {
-      $state: stateCopy,
+      $state,
       virtualParent,
       virtualElement,
       attr: { name: attr, value: domiesAttributes[attr] },
-      notifier: () => renderElement(props.virtualParent, props.virtualElement)
+      notifier: () => renderElement($state, props.virtualParent, props.virtualElement)
     };
 
     if (attr === 'd-data') {
@@ -65,5 +54,11 @@ export function renderElement(
     } else if (isDomyAttr(attr)) {
       domies(props);
     }
+  }
+
+  // We remove injected states
+  for (const injectedSignal of injectState) {
+    const index = $state.$state.findIndex(signal => signal === injectedSignal);
+    $state.$state.splice(index, 1);
   }
 }

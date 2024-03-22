@@ -1,7 +1,6 @@
 import { VirtualElement } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { State } from '@typing/State';
-import { $state } from '@core/renderElement';
 
 type Props = {
   code: string;
@@ -19,13 +18,16 @@ const AsyncFunction = async function () {}.constructor;
 
 /**
  * Allow to dispatch a custom event on all elements attached to it
- * @param eventName
+ * @param state
+ * @string
  */
-function dispatchCustomEvent(eventName: string) {
-  const attachedElements = $state.$events[eventName] ?? [];
-  for (const attachedElement of attachedElements) {
-    attachedElement.dispatchEvent(new CustomEvent(eventName));
-  }
+function dispatchCustomEvent($state: State) {
+  return (eventName: string) => {
+    const attachedElements = $state.$events[eventName] ?? [];
+    for (const attachedElement of attachedElements) {
+      attachedElement.dispatchEvent(new CustomEvent(eventName));
+    }
+  };
 }
 
 /**
@@ -56,6 +58,6 @@ export function func(props: Props) {
     props.$state.$refs,
     props.$state.$store,
     props.$state.$globalState,
-    dispatchCustomEvent
+    dispatchCustomEvent(props.$state)
   )();
 }

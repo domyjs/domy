@@ -11,6 +11,7 @@ import { AttrRendererProps } from '@typing/AttrRendererProps';
  * @param props
  */
 export function binding(props: AttrRendererProps) {
+  const $el = props.virtualElement.$el;
   const domyAttrName = props.attr.name;
 
   const attrName = domyAttrName.startsWith(':')
@@ -26,6 +27,6 @@ export function binding(props: AttrRendererProps) {
     notifier: props.notifier
   });
 
-  props.virtualElement.$el.removeAttribute(domyAttrName);
-  props.virtualElement.$el.setAttribute(attrName, executedValue);
+  $el.removeAttribute(domyAttrName);
+  $el.setAttribute(attrName, executedValue);
 }

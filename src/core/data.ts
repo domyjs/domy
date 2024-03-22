@@ -1,5 +1,4 @@
 import { func } from '@utils/func';
-import { $state } from './renderElement';
 import { Signal } from './Signal';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 
@@ -8,6 +7,8 @@ import { AttrRendererProps } from '@typing/AttrRendererProps';
  * @param props
  */
 export function data(props: AttrRendererProps) {
+  const $el = props.virtualElement.$el;
+
   const obj = func({
     code: props.attr.value,
     $state: props.$state,
@@ -17,10 +18,10 @@ export function data(props: AttrRendererProps) {
     notifier: props.notifier
   });
 
-  props.virtualElement.$el.removeAttribute('d-data');
+  $el.removeAttribute('d-data');
 
   // TODO: Fixe state scope
   for (const key of Object.keys(obj)) {
-    $state.$state.push(new Signal(key, obj[key]));
+    props.$state.$state.push(new Signal(key, obj[key]));
   }
 }

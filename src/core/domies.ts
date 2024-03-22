@@ -5,7 +5,6 @@ import { restoreElement } from '@utils/restoreElement';
 import { VirtualDom } from './VitualDom';
 import { renderElement } from './renderElement';
 import { Signal } from './Signal';
-import { $state } from '@core/renderElement';
 
 /**
  * Handle attributes starting by d-*
@@ -13,9 +12,11 @@ import { $state } from '@core/renderElement';
  * @returns
  */
 export function domies(props: AttrRendererProps) {
+  const $el = props.virtualElement.$el;
+  const $state = props.$state;
   const domyAttrName = props.attr.name as (typeof SPECIAL_ATTRIBUTES)[number];
 
-  props.virtualElement.$el.removeAttribute(domyAttrName);
+  $el.removeAttribute(domyAttrName);
 
   function getExecutedValue(code?: string, returnValue?: boolean) {
     return func({
@@ -30,16 +31,16 @@ export function domies(props: AttrRendererProps) {
 
   switch (domyAttrName) {
     case 'd-text':
-      props.virtualElement.$el.textContent = getExecutedValue();
+      $el.textContent = getExecutedValue();
       break;
     case 'd-html':
-      props.virtualElement.$el.innerHTML = getExecutedValue();
+      $el.innerHTML = getExecutedValue();
       break;
     case 'd-show':
-      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue() ? '' : 'none';
+      ($el as HTMLElement).style.display = getExecutedValue() ? '' : 'none';
       break;
     case 'd-ref':
-      props.$state.$refs[props.attr.value] = props.virtualElement.$el;
+      props.$state.$refs[props.attr.value] = $el;
       break;
     case 'd-effect':
       const executedValueEffect = getExecutedValue(undefined, false);
@@ -57,7 +58,7 @@ export function domies(props: AttrRendererProps) {
 
       if (props.virtualElement.isDisplay && !shouldBeDisplay) {
         props.virtualElement.isDisplay = false;
-        props.virtualElement.$el.remove();
+        $el.remove();
       } else if (!props.virtualElement.isDisplay && shouldBeDisplay) {
         const newElement = VirtualDom.createElementFromVirtual(props.virtualElement) as Element;
         const visibleElements = props.virtualParent.childs.filter(
@@ -66,7 +67,7 @@ export function domies(props: AttrRendererProps) {
         const indexToInsert = visibleElements.findIndex(child => child === props.virtualElement);
         props.virtualElement.$el = newElement;
         props.virtualElement.isDisplay = true;
-        renderElement(props.virtualParent, props.virtualElement, [], ['d-if']);
+        renderElement($state, props.virtualParent, props.virtualElement, [], ['d-if']);
         restoreElement(props.virtualParent.$el, newElement, indexToInsert);
       }
       break;
@@ -74,15 +75,15 @@ export function domies(props: AttrRendererProps) {
       const signalName = props.attr.value;
       const currentSignal = $state.$state.find(state => state.name === signalName);
       function changeValue() {
-        currentSignal?.set((props.virtualElement.$el as HTMLInputElement)?.value ?? '');
+        currentSignal?.set(($el as HTMLInputElement)?.value ?? '');
       }
-      props.virtualElement.$el.addEventListener('input', changeValue);
-      props.virtualElement.$el.addEventListener('change', changeValue);
+      $el.addEventListener('input', changeValue);
+      $el.addEventListener('change', changeValue);
       break;
     case 'd-for':
       if (!props.virtualParent) break;
 
-      props.virtualElement.$el.innerHTML = '';
+      $el.innerHTML = '';
 
       const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s*(?<type>in|of)\s*(?<org>.+)/gi;
 
@@ -105,9 +106,9 @@ export function domies(props: AttrRendererProps) {
           const newElement = VirtualDom.createElementFromVirtual(child);
           if (typeof child !== 'string') {
             child.$el = newElement as Element;
-            renderElement(props.virtualElement, child, toInject);
+            renderElement($state, props.virtualElement, child, toInject);
           }
-          props.virtualElement.$el.appendChild(newElement);
+          $el.appendChild(newElement);
         }
 
         ++index;
