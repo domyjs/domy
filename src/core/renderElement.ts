@@ -10,6 +10,7 @@ import { AttrRendererProps } from '@typing/AttrRendererProps';
 
 export const $state: State = {
   $state: [],
+  $globalState: {},
   $store: {},
   $refs: {}
 };

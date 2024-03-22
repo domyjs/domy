@@ -9,6 +9,8 @@
       window.DOMY.store({
         count: 0
       });
+
+      window.DOMY.state('counter', { count: 0, activeSupperBtn: false });
     </script>
   </head>
   <body>
@@ -16,7 +18,7 @@
     <div>
       <button @click="$store.count.set((old) => old + 1)">+ global count</button>
     </div>
-    <main d-data="{ count: 0, activeSupperBtn: false }">
+    <main d-data="counter">
       <template d-effect="console.log(count.value)"></template>
 
       <h1 d-text="count.value"></h1>
