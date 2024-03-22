@@ -27,8 +27,6 @@ export function func(props: Props) {
   const code = props.returnResult ? `return ${props.code};` : props.code;
   const stateKeys = props.$state.$state.map(state => state.name);
   const stateValues = props.$state.$state;
-  const globalStateKeys = Object.keys(props.$state.$globalState);
-  const globalStateValues = Object.values(props.$state.$globalState);
 
   for (const signal of [...stateValues, ...Object.values(props.$state.$store)]) {
     signal.setCallBackOnCall(() =>
@@ -39,12 +37,12 @@ export function func(props: Props) {
     );
   }
 
-  return fn(...stateKeys, ...globalStateKeys, '$el', '$refs', '$store', code).bind(
+  return fn(...stateKeys, '$el', '$refs', '$store', '$state', code).bind(
     props.context ?? window,
     ...stateValues,
-    ...globalStateValues,
     props.virtualElement.$el,
     props.$state.$refs,
-    props.$state.$store
+    props.$state.$store,
+    props.$state.$globalState
   )();
 }

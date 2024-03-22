@@ -21,12 +21,12 @@
       <button @click="$store.count.set((old) => old + 1)">+ global count</button>
     </div>
 
-    <div d-data="searchBar">
+    <div d-data="$state.searchBar">
       <h1 d-text="search.value"></h1>
       <input type="text" d-model="search" />
     </div>
 
-    <main d-data="counter">
+    <main d-data="$state.counter">
       <template d-effect="console.log(count.value)"></template>
 
       <h1 d-text="count.value"></h1>
