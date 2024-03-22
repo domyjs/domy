@@ -89,7 +89,11 @@ export class VirtualDom {
       const element = childs.shift() as VirtualElement | string;
       cb(parent, element);
 
-      if (typeof element !== 'string') {
+      if (
+        typeof element !== 'string' &&
+        !element.domiesAttributes['d-ignore'] &&
+        !element.domiesAttributes['d-for']
+      ) {
         stack.push({ parent: element, childs: [...element.childs] });
       }
     }
