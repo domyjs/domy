@@ -1,9 +1,8 @@
 # TODO
 
+- Handle `<template></template>`
 - Create state
 - Create store ($store)
-- $refs
-- Missing attributes
 - Async
 - Less spagheti code
-- Refactoring (like virtualdom improvement)
+- Refactoring

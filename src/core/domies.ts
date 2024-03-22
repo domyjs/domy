@@ -62,22 +62,14 @@ export function domies(props: AttrRendererProps) {
 
       props.virtualElement.$el.innerHTML = '';
 
-      const forInRegex = /(?<dest>\w+) in (?<org>.+)/gi;
-      const forInWithIndexRegex = /\((?<dest>\w+),\s*(?<index>.+)\) in (?<org>.+)/gi;
-      const forOfRegex = /(?<dest>\w+) of (?<org>.+)/gi;
-      const forOfWithIndexRegex = /\((?<dest>\w+),\s*(?<index>\w+)\) of (?<org>.+)/gi;
+      const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s*(?<type>in|of)\s*(?<org>.+)/gi;
 
-      const forOfRes =
-        forOfRegex.exec(props.attr.value) ?? forOfWithIndexRegex.exec(props.attr.value);
-      const forInRes =
-        forInRegex.exec(props.attr.value) ?? forInWithIndexRegex.exec(props.attr.value);
-
-      const res = forInRes ?? forOfRes;
+      const res = forRegex.exec(props.attr.value);
 
       if (!res)
         throw new Error(`Invalide "${props.attr.name}" attribute value: "${props.attr.value}"`);
 
-      const isIn = !!forInRes;
+      const isForIn = res.groups!.type === 'in';
       const executedValue = func({
         code: res.groups!.org,
         returnResult: true,
@@ -101,17 +93,17 @@ export function domies(props: AttrRendererProps) {
           renderElement(props.virtualElement, child, toInject);
           props.virtualElement.$el.appendChild(newElement);
         }
+
+        ++index;
       }
 
-      if (isIn) {
+      if (isForIn) {
         for (const value in executedValue) {
           renderer(value);
-          ++index;
         }
       } else {
         for (const value of executedValue) {
           renderer(value);
-          ++index;
         }
       }
 
