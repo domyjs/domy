@@ -112,13 +112,9 @@ export function domies(props: AttrRendererProps) {
       }
 
       if (isForIn) {
-        for (const value in executedValue) {
-          renderer(value);
-        }
+        for (const value in executedValue) renderer(value);
       } else {
-        for (const value of executedValue) {
-          renderer(value);
-        }
+        for (const value of executedValue) renderer(value);
       }
 
       break;
