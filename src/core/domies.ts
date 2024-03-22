@@ -85,17 +85,34 @@ export function domies(props: AttrRendererProps) {
         virtualParent: props.virtualParent,
         virtualElement: props.virtualElement
       });
+
       let index = 0;
-      for (const value of executedValue) {
+
+      function renderer(value: any) {
         for (const child of props.virtualElement.childs) {
           if (typeof child === 'string') continue; // TODO
 
+          const toInject = res!.groups!.index
+            ? [new Signal(res!.groups!.dest, value), new Signal(res!.groups!.index, index)]
+            : [new Signal(res!.groups!.dest, value)];
+
           const newElement = VirtualDom.createElementFromVirtual(child);
           child.$el = newElement;
-          renderElement(props.virtualElement, child, [new Signal(res.groups!.dest, value)]);
+          renderElement(props.virtualElement, child, toInject);
           props.virtualElement.$el.appendChild(newElement);
         }
-        ++index;
+      }
+
+      if (isIn) {
+        for (const value in executedValue) {
+          renderer(value);
+          ++index;
+        }
+      } else {
+        for (const value of executedValue) {
+          renderer(value);
+          ++index;
+        }
       }
 
       break;

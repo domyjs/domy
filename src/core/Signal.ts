@@ -8,7 +8,7 @@ export class Signal {
 
   constructor(
     public name: string,
-    private val: StateObj
+    private val: any
   ) {}
 
   public attach(dependencie: Dependencie) {
@@ -27,7 +27,7 @@ export class Signal {
     this.callBackOncall = cb;
   }
 
-  public set(setter: (val: StateObj) => StateObj | StateObj) {
+  public set(setter: ((val: any) => any) | any) {
     this.val = typeof setter === 'function' ? setter(this.val) : setter;
     this.notifyAll();
   }
