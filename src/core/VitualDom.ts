@@ -91,7 +91,7 @@ export class VirtualDom {
       const shouldBeVisit =
         typeof element !== 'string' &&
         typeof element.domiesAttributes['d-ignore'] !== 'string' &&
-        typeof element.domiesAttributes['d-for'] !== 'string';
+        typeof parent?.domiesAttributes['d-for'] !== 'string';
       if (!shouldBeVisit) continue;
       cb(parent, element);
 
