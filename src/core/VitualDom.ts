@@ -2,9 +2,12 @@ import { isNormalAttr } from '@utils/isSpecialAttribute';
 
 export type VirtualElement = {
   $el: Element;
-  $firstState: Omit<VirtualElement, '$el' | '$firstState'>;
   tag: string;
-  attributes: {
+  isDisplay: boolean;
+  domiesAttributes: {
+    [name: string]: string;
+  };
+  normalAttributes: {
     [name: string]: string;
   };
   childs: (VirtualElement | string)[];
@@ -18,15 +21,22 @@ export class VirtualDom {
   }
 
   private init(element: Element): VirtualElement {
-    const virtualElement: Omit<VirtualElement, '$firstState' | '$el'> = {
+    const virtualElement: VirtualElement = {
+      $el: element,
       tag: element.tagName.toLowerCase(),
-      attributes: {},
+      isDisplay: true,
+      domiesAttributes: {},
+      normalAttributes: {},
       childs: []
     };
 
     // Add attributes
     for (const attr of Array.from(element.attributes)) {
-      virtualElement.attributes[attr.name] = attr.value;
+      if (isNormalAttr(attr.name)) {
+        virtualElement.normalAttributes[attr.name] = attr.value;
+      } else {
+        virtualElement.domiesAttributes[attr.name] = attr.value;
+      }
     }
 
     // Add child nodes
@@ -38,26 +48,15 @@ export class VirtualDom {
       }
     }
 
-    // We remove domy attributes like @click, :class, d-data ...
-    const attributesWithoutDomy = Object.keys(virtualElement.attributes)
-      .filter(attrName => isNormalAttr(attrName))
-      .map(attrName => ({ [attrName]: virtualElement.attributes[attrName] }))
-      .reduce((a, b) => ({ ...b, ...a }), {});
-
-    return {
-      $el: element,
-      ...virtualElement,
-      attributes: attributesWithoutDomy,
-      $firstState: { ...virtualElement }
-    };
+    return virtualElement;
   }
 
   public static createElementFromVirtual(virtualElement: VirtualElement): Element {
     const element = document.createElement(virtualElement.tag);
 
     // Set attributes
-    for (const attrName of Object.keys(virtualElement.attributes)) {
-      element.setAttribute(attrName, virtualElement.attributes[attrName]);
+    for (const attrName of Object.keys(virtualElement.normalAttributes)) {
+      element.setAttribute(attrName, virtualElement.normalAttributes[attrName]);
     }
 
     // Add child nodes
@@ -72,12 +71,19 @@ export class VirtualDom {
     return element;
   }
 
-  visit(cb: (el: VirtualElement | string) => void) {
+  visit(
+    cb: (virtualParent: VirtualElement | null, virtualElement: VirtualElement | string) => void
+  ) {
+    let parent: VirtualElement | null = null;
     const childs: (VirtualElement | string)[] = [this.root];
+
     while (childs.length > 0) {
       const element = childs.shift() as VirtualElement | string;
-      cb(element);
-      if (typeof element !== 'string') childs.push(...element.childs);
+      cb(parent, element);
+      if (typeof element !== 'string') {
+        childs.push(...element.childs);
+        parent = element;
+      }
     }
   }
 }
