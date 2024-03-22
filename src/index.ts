@@ -1,7 +1,8 @@
 import { renderElement } from '@core/renderElement';
-import { VirtualDom } from '@core/VitualDom';
+import { VirtualDom, VirtualElement } from '@core/VitualDom';
 import { Signal, StateObj } from '@core/Signal';
 import { State } from '@typing/State';
+import { getDatas } from '@utils/getDatas';
 
 const $state: State = {
   $state: [], // State of the current scope
@@ -33,15 +34,32 @@ const DOMY = {
  */
 function initDomy() {
   const initialDom = new VirtualDom(document.querySelector('*') as Element);
-  initialDom.visit((virtualParent, virtualElement) => {
+  function callback(virtualParent: VirtualElement | null, virtualElement: VirtualElement | string) {
     if (typeof virtualElement === 'string') return;
 
     try {
+      const haveDatas = typeof virtualElement.domiesAttributes['d-data'] === 'string';
       renderElement($state, virtualParent, virtualElement);
+
+      if (haveDatas) {
+        const datas = getDatas({
+          $state,
+          virtualElement,
+          virtualParent,
+          notifier: () => renderElement($state, virtualParent, virtualElement)
+        });
+
+        $state.$state.push(...datas);
+
+        for (const child of virtualElement.childs) {
+          initialDom.visitFrom(child, callback);
+        }
+      }
     } catch (err) {
       console.error(err);
     }
-  });
+  }
+  initialDom.visit(callback);
 }
 
 (window as any).DOMY = DOMY;

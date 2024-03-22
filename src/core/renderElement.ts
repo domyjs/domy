@@ -45,9 +45,7 @@ export function renderElement(
       notifier: () => renderElement($state, props.virtualParent, props.virtualElement)
     };
 
-    if (attr === 'd-data') {
-      data(props);
-    } else if (isBindAttr(attr)) {
+    if (isBindAttr(attr)) {
       binding(props);
     } else if (isEventAttr(attr)) {
       events(props);
