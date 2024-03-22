@@ -1,0 +1,44 @@
+{
+  "name": "domy",
+  "version": "1.0.0",
+  "description": "A lightweight javaScript framework",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "jest --color",
+    "build": "npm run prettier && npm run lint && rollup -c",
+    "lint": "eslint . --ext .ts",
+    "prettier": "prettier --write ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yoannchb-pro/domy.git"
+  },
+  "keywords": [
+    "framework",
+    "javascript",
+    "typescript",
+    "html",
+    "template",
+    "state",
+    "store"
+  ],
+  "author": "yoannchb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yoannchb-pro/domy/issues"
+  },
+  "homepage": "https://github.com/yoannchb-pro/domy#readme",
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/chrome": "^0.0.263",
+    "@typescript-eslint/eslint-plugin": "^7.3.1",
+    "@typescript-eslint/parser": "^7.3.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "rollup": "^4.13.0",
+    "rollup-plugin-ts": "^3.4.5",
+    "typescript": "^5.4.3"
+  }
+}

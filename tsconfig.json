@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": "src",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES6",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "extension",
+    "resolveJsonModule": true,
+    "types": ["node", "chrome"],
+    "typeRoots": ["node_modules/@types"],
+    "strictBindCallApply": true,
+    "paths": {
+      "@typing/*": ["types/*"],
+      "@utils/*": ["utils/*"],
+      "@core/*": ["core/*"],
+      "@questions/*": ["core/question/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}
