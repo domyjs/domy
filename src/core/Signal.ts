@@ -40,7 +40,6 @@ export class Signal {
 
   get value() {
     if (typeof this.callBackOncall === 'function') this.callBackOncall();
-
     return this.val;
   }
 }

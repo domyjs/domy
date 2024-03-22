@@ -2,8 +2,8 @@ import { func } from '@utils/func';
 import { SPECIAL_ATTRIBUTES } from '../constants/specialAttributes';
 import { Signal, StateObj } from './Signal';
 import { VirtualElement, VirtualDom } from './VitualDom';
-import { replaceElement } from '@utils/replaceElement';
 import { isBindAttr, isDomyAttr, isEventAttr } from '@utils/isSpecialAttribute';
+import { replaceElement } from '@utils/replaceElement';
 
 type Props = {
   virtualElement: VirtualElement;
@@ -76,14 +76,10 @@ export function domies(props: Props) {
       props.virtualElement.$el.innerHTML = getExecutedValue();
       break;
     case 'd-if':
-      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue()
-        ? 'block'
-        : 'none';
+      // TODO
       break;
     case 'd-show':
-      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue()
-        ? 'block'
-        : 'none';
+      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue() ? '' : 'none';
       break;
     case 'd-ref':
       DOMY.$refs[props.attr.value] = props.virtualElement.$el;

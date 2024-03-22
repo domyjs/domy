@@ -38,6 +38,7 @@ export class VirtualDom {
       }
     }
 
+    // We remove domy attributes like @click, :class, d-data ...
     const attributesWithoutDomy = Object.keys(virtualElement.attributes)
       .filter(attrName => isNormalAttr(attrName))
       .map(attrName => ({ [attrName]: virtualElement.attributes[attrName] }))
