@@ -42,7 +42,7 @@ export class VirtualDom {
     const attributesWithoutDomy = Object.keys(virtualElement.attributes)
       .filter(attrName => isNormalAttr(attrName))
       .map(attrName => ({ [attrName]: virtualElement.attributes[attrName] }))
-      .reduce((a, b) => ({ ...b }), {});
+      .reduce((a, b) => ({ ...b, ...a }), {});
 
     return {
       $el: element,
