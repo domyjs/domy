@@ -1,11 +1,12 @@
 import { DOMY, renderElement } from '@core/core';
 import { Signal } from '@core/Signal';
+import { VirtualElement } from '@core/VitualDom';
 
 type Props = {
   code: string;
+  $state: Signal[];
+  virtualElement: VirtualElement;
   context?: unknown;
-  $state?: Signal[];
-  $el?: Element;
   isAsync?: boolean;
   returnResult?: boolean;
 };
@@ -25,17 +26,18 @@ export function func(props: Props) {
   const stateValues = props.$state ?? [];
 
   for (const signal of stateValues) {
-    signal.setCallBackOnCall(
-      () =>
-        props.$el &&
-        signal.attach({ $el: props.$el, fn: () => props.$el && renderElement(props.$el) })
+    signal.setCallBackOnCall(() =>
+      signal.attach({
+        $el: props.virtualElement.$el,
+        fn: () => renderElement(props.virtualElement)
+      })
     );
   }
 
   return fn(...stateKeys, '$el', '$state', '$refs', code).bind(
     props.context ?? window,
     ...stateValues,
-    props.$el,
+    props.virtualElement.$el,
     props.$state,
     DOMY.$refs
   )();

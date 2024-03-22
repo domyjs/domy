@@ -1,11 +1,14 @@
 import { func } from '@utils/func';
 import { SPECIAL_ATTRIBUTES } from '../constants/specialAttributes';
 import { Signal, StateObj } from './Signal';
+import { VirtualElement, VirtualDom } from './VitualDom';
+import { replaceElement } from '@utils/replaceElement';
+import { isBindAttr, isDomyAttr, isEventAttr } from '@utils/isSpecialAttribute';
 
 type Props = {
-  $el: Element;
+  virtualElement: VirtualElement;
   $state: Signal[];
-  attr: Attr;
+  attr: { name: string; value: string };
 };
 
 export const DOMY = {
@@ -27,11 +30,11 @@ export function binding(props: Props) {
     code: props.attr.value,
     returnResult: true,
     $state: props.$state,
-    $el: props.$el
+    virtualElement: props.virtualElement
   });
 
-  // props.$el.removeAttribute(domyAttrName);
-  props.$el.setAttribute(attrName, executedValue);
+  props.virtualElement.$el.removeAttribute(domyAttrName);
+  props.virtualElement.$el.setAttribute(attrName, executedValue);
 }
 
 export function events(props: Props) {
@@ -39,46 +42,51 @@ export function events(props: Props) {
 
   const eventName = domyAttrName.slice(1);
 
-  props.$el.removeAttribute(domyAttrName);
-  props.$el.addEventListener(eventName, function (event) {
+  props.virtualElement.$el.removeAttribute(domyAttrName);
+  props.virtualElement.$el.addEventListener(eventName, function (event) {
     const executedValue = func({
       code: props.attr.value,
       returnResult: true,
-      $state: props.$state
+      $state: props.$state,
+      virtualElement: props.virtualElement
     });
     if (typeof executedValue === 'function') executedValue(event);
   });
 }
 
-export function specialAttributes(props: Props) {
+export function domies(props: Props) {
   const domyAttrName = props.attr.name as (typeof SPECIAL_ATTRIBUTES)[number];
 
-  // props.$el.removeAttribute(domyAttrName);
+  props.virtualElement.$el.removeAttribute(domyAttrName);
 
   function getExecutedValue() {
     return func({
       code: props.attr.value,
       returnResult: true,
       $state: props.$state,
-      $el: props.$el
+      virtualElement: props.virtualElement
     });
   }
 
   switch (domyAttrName) {
     case 'd-text':
-      props.$el.textContent = getExecutedValue();
+      props.virtualElement.$el.textContent = getExecutedValue();
       break;
     case 'd-html':
-      props.$el.innerHTML = getExecutedValue();
+      props.virtualElement.$el.innerHTML = getExecutedValue();
       break;
     case 'd-if':
-      (props.$el as HTMLElement).style.display = getExecutedValue() ? 'block' : 'none';
+      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue()
+        ? 'block'
+        : 'none';
       break;
     case 'd-show':
-      (props.$el as HTMLElement).style.display = getExecutedValue() ? 'block' : 'none';
+      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue()
+        ? 'block'
+        : 'none';
       break;
     case 'd-ref':
-      DOMY.$refs[props.attr.value] = props.$el;
+      DOMY.$refs[props.attr.value] = props.virtualElement.$el;
       break;
     case 'd-model':
       // TODO
@@ -91,21 +99,24 @@ export function specialAttributes(props: Props) {
 
 const $state: Signal[] = [];
 
-const isBind = (attr: string) => attr.startsWith(':');
-const isEvent = (attr: string) => attr.startsWith('@');
-const isSpecialAttribute = (attr: string) => SPECIAL_ATTRIBUTES.includes(attr as any);
+export function renderElement(virtualElement: VirtualElement | string) {
+  if (typeof virtualElement === 'string') return;
 
-export function renderElement($el: Element) {
-  const attributes = $el.attributes;
+  const originalAttributes = virtualElement.$firstState.attributes;
 
-  for (const attr of attributes) {
-    const props = { $el, attr, $state };
+  for (const attr of Object.keys(originalAttributes)) {
+    const props: Props = {
+      virtualElement,
+      attr: { name: attr, value: originalAttributes[attr] },
+      $state
+    };
 
-    if (attr.name === 'd-data') {
+    if (attr === 'd-data') {
       const obj = func({
-        code: attr.value,
+        code: originalAttributes[attr],
         $state: $state,
-        returnResult: true
+        returnResult: true,
+        virtualElement
       });
 
       // Fixe state scope
@@ -113,13 +124,13 @@ export function renderElement($el: Element) {
         $state.push(new Signal(key, obj[key]));
       }
 
-      $el.removeAttribute('d-data');
-    } else if (isBind(attr.name)) {
+      virtualElement.$el.removeAttribute('d-data');
+    } else if (isBindAttr(attr)) {
       binding(props);
-    } else if (isEvent(attr.name)) {
+    } else if (isEventAttr(attr)) {
       events(props);
-    } else if (isSpecialAttribute(attr.name)) {
-      specialAttributes(props);
+    } else if (isDomyAttr(attr)) {
+      domies(props);
     }
   }
 }

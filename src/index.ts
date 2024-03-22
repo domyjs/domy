@@ -1,11 +1,12 @@
 import { DOMY, renderElement } from '@core/core';
+import { VirtualDom } from '@core/VitualDom';
 
 function initDomy() {
-  const allDomElements = document.querySelectorAll('*');
+  const virtualDom = new VirtualDom(document.documentElement);
 
-  for (const $el of allDomElements) {
-    renderElement($el);
-  }
+  virtualDom.visit(virtualElement => {
+    renderElement(virtualElement);
+  });
 }
 
 (window as any).DOMY = DOMY;
