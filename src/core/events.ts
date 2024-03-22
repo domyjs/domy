@@ -1,6 +1,13 @@
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { func } from '@utils/func';
 
+/**
+ * Handle event applied on an item
+ * Example:
+ * d-on:click="console.log('hello')"
+ * will add an event listener on the click
+ * @param props
+ */
 export function events(props: AttrRendererProps) {
   const domyAttrName = props.attr.name;
 
@@ -9,7 +16,10 @@ export function events(props: AttrRendererProps) {
     : domyAttrName.slice('d-on:'.length);
 
   props.virtualElement.$el.removeAttribute(domyAttrName);
-  props.virtualElement.$el.addEventListener(eventName, function (event) {
+
+  if (props.virtualElement.events[eventName])
+    props.virtualElement.$el.removeEventListener(eventName, props.virtualElement.events[eventName]);
+  props.virtualElement.events[eventName] = function (event) {
     const executedValue = func({
       code: props.attr.value,
       returnResult: true,
@@ -18,5 +28,6 @@ export function events(props: AttrRendererProps) {
       virtualElement: props.virtualElement
     });
     if (typeof executedValue === 'function') executedValue(event);
-  });
+  };
+  props.virtualElement.$el.addEventListener(eventName, props.virtualElement.events[eventName]);
 }

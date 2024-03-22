@@ -2,6 +2,9 @@ import { renderElement } from '@core/renderElement';
 import { DOMY } from '@core/DOMY';
 import { VirtualDom } from '@core/VitualDom';
 
+/**
+ * Init the virtual dom and Domy
+ */
 function initDomy() {
   const initialDom = new VirtualDom(document.querySelector('*') as Element);
   initialDom.visit((virtualParent, virtualElement) => renderElement(virtualParent, virtualElement));

@@ -2,6 +2,9 @@ type Dependencie = { $el: Element; fn: () => void };
 
 export type StateObj = { [key: string]: StateObj | unknown };
 
+/**
+ * Create a signal to spy a variable and notify the observers that need this dependencie
+ */
 export class Signal {
   private callBackOncall: (() => void) | null = null;
   private dependencies: Dependencie[] = [];

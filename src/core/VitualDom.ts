@@ -4,6 +4,7 @@ export type VirtualElement = {
   $el: Element;
   tag: string;
   isDisplay: boolean;
+  events: Record<string, EventListenerOrEventListenerObject>;
   domiesAttributes: {
     [name: string]: string;
   };
@@ -13,6 +14,9 @@ export type VirtualElement = {
   childs: (VirtualElement | string)[];
 };
 
+/**
+ * A virtual dom
+ */
 export class VirtualDom {
   private root: VirtualElement;
 
@@ -25,6 +29,7 @@ export class VirtualDom {
       $el: element,
       tag: element.tagName.toLowerCase(),
       isDisplay: true,
+      events: {},
       domiesAttributes: {},
       normalAttributes: {},
       childs: []

@@ -7,7 +7,9 @@
     <script src="../dist/index.js"></script>
   </head>
   <body>
-    <main d-data="{ count: 0 }">
+    <main d-data="{ count: 0, activeSupperBtn: false }">
+      <template d-effect="console.log(count.value)"></template>
+
       <h1 d-text="count.value"></h1>
 
       <h2 d-html="new Date().getFullYear()" d-ref="year"></h2>
@@ -16,15 +18,16 @@
         :style="`width: 50px; height: 50px; background-color: ${count.value % 2 === 0 ? 'red' : 'yellow'}`"
       ></div>
 
+      <button d-show="!activeSupperBtn.value" @click="activeSupperBtn.set(!activeSupperBtn.value)">
+        Active supper btn
+      </button>
       <button @click="count.set((old) => old + 1)">+</button>
       <button @click="count.set((old) => old - 1)">-</button>
+      <button d-if="activeSupperBtn.value" d-on:click="count.set((old) => old + 10)">+10</button>
+      <button d-if="activeSupperBtn.value" d-on:click="count.set((old) => old - 10)">-10</button>
 
-      <h2 d-show="count.value % 2 === 0" d-text="$refs.year.textContent"></h2>
-
-      <h2 d-if="count.value % 2 === 0" d-text="$refs.year.textContent"></h2>
-
-      <ul d-for="test, index of Array(count.value).fill('hey')">
-        Sometest
+      <ul d-if="count.value > 0" d-for="test, index of Array(count.value).fill('Click')">
+        Message:
         <li d-text="test.value + ' ' + index.value"></li>
       </ul>
     </main>

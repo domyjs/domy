@@ -6,10 +6,17 @@ import { VirtualDom } from './VitualDom';
 import { renderElement } from './renderElement';
 import { Signal } from './Signal';
 
+/**
+ * Handle attributes starting by d-*
+ * @param props
+ * @returns
+ */
 export function domies(props: AttrRendererProps) {
   const domyAttrName = props.attr.name as (typeof SPECIAL_ATTRIBUTES)[number];
 
   props.virtualElement.$el.removeAttribute(domyAttrName);
+
+  if (props.attr.name !== 'd-if' && !props.virtualElement.isDisplay) return;
 
   function getExecutedValue() {
     return func({
@@ -28,6 +35,20 @@ export function domies(props: AttrRendererProps) {
     case 'd-html':
       props.virtualElement.$el.innerHTML = getExecutedValue();
       break;
+    case 'd-show':
+      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue() ? '' : 'none';
+      break;
+    case 'd-ref':
+      props.$state.$refs[props.attr.value] = props.virtualElement.$el;
+      break;
+    case 'd-effect':
+      func({
+        code: props.attr.value,
+        $state: props.$state,
+        virtualParent: props.virtualParent,
+        virtualElement: props.virtualElement
+      });
+      break;
     case 'd-if':
       if (!props.virtualParent) break;
 
@@ -44,15 +65,9 @@ export function domies(props: AttrRendererProps) {
         const indexToInsert = visibleElements.findIndex(child => child === props.virtualElement);
         props.virtualElement.$el = newElement;
         props.virtualElement.isDisplay = true;
-        renderElement(props.virtualParent, props.virtualElement);
+        renderElement(props.virtualParent, props.virtualElement, [], ['d-if']);
         restoreElement(props.virtualParent.$el, newElement, indexToInsert);
       }
-      break;
-    case 'd-show':
-      (props.virtualElement.$el as HTMLElement).style.display = getExecutedValue() ? '' : 'none';
-      break;
-    case 'd-ref':
-      props.$state.$refs[props.attr.value] = props.virtualElement.$el;
       break;
     case 'd-model':
       const signalName = props.attr.value;

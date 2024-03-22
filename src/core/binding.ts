@@ -1,6 +1,15 @@
 import { func } from '@utils/func';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 
+/**
+ * Handle binding attributes like :class or d-bind:class
+ * It will catch the value into the attribute
+ * Example: with isOpen = true
+ * d-bind:class="isOpen ? 'show' : 'hide'"
+ * will give
+ * class="show"
+ * @param props
+ */
 export function binding(props: AttrRendererProps) {
   const domyAttrName = props.attr.name;
 

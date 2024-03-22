@@ -14,10 +14,19 @@ const $state: State = {
   $refs: {}
 };
 
+/**
+ * Render every domy attributes of an element
+ * @param virtualParent
+ * @param virtualElement
+ * @param injectState Inject a state just for this render
+ * @param byPassAttributes Attrbiutes to do not look
+ * @returns
+ */
 export function renderElement(
   virtualParent: VirtualElement | null,
   virtualElement: VirtualElement | string,
-  injectState: Signal[] = []
+  injectState: Signal[] = [],
+  byPassAttributes: string[] = []
 ) {
   if (typeof virtualElement === 'string') return; // textContent don't have attributes
 
@@ -29,6 +38,8 @@ export function renderElement(
   const domiesAttributes = virtualElement.domiesAttributes;
 
   for (const attr of Object.keys(domiesAttributes)) {
+    if (byPassAttributes.includes(attr)) continue;
+
     const props: AttrRendererProps = {
       $state: stateCopy,
       virtualParent,
