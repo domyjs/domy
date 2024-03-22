@@ -16,15 +16,21 @@ const $state: State = {
 
 export function renderElement(
   virtualParent: VirtualElement | null,
-  virtualElement: VirtualElement | string
+  virtualElement: VirtualElement | string,
+  injectState: Signal[] = []
 ) {
-  if (typeof virtualElement === 'string') return;
+  if (typeof virtualElement === 'string') return; // TODO
+
+  const stateCopy: State = {
+    ...$state,
+    $state: [...$state.$state, ...injectState]
+  };
 
   const domiesAttributes = virtualElement.domiesAttributes;
 
   for (const attr of Object.keys(domiesAttributes)) {
     const props: AttrRendererProps = {
-      $state,
+      $state: stateCopy,
       virtualParent,
       virtualElement,
       attr: { name: attr, value: domiesAttributes[attr] }
@@ -33,7 +39,7 @@ export function renderElement(
     if (attr === 'd-data') {
       const obj = func({
         code: domiesAttributes[attr],
-        $state: $state,
+        $state: stateCopy,
         returnResult: true,
         virtualElement,
         virtualParent

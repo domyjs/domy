@@ -16,11 +16,17 @@
         :style="`width: 50px; height: 50px; background-color: ${count.value % 2 === 0 ? 'red' : 'yellow'}`"
       ></div>
 
-      <button @click="count.set((old) => old + 1)">Increase</button>
+      <button @click="count.set((old) => old + 1)">+</button>
+      <button @click="count.set((old) => old - 1)">-</button>
 
       <h2 d-show="count.value % 2 === 0" d-text="$refs.year.textContent"></h2>
 
       <h2 d-if="count.value % 2 === 0" d-text="$refs.year.textContent"></h2>
+
+      <ul d-for="test of Array(count.value).fill('hey')">
+        Sometest
+        <li d-text="test.value"></li>
+      </ul>
     </main>
   </body>
 </html>
