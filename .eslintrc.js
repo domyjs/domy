@@ -12,7 +12,9 @@ module.exports = {
   overrides: [
     {
       files: ['extension/popup/*.js', 'src/**/*.ts'],
-      rules: {}
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off'
+      }
     }
   ]
 };

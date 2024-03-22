@@ -18,7 +18,7 @@
       "@typing/*": ["types/*"],
       "@utils/*": ["utils/*"],
       "@core/*": ["core/*"],
-      "@questions/*": ["core/question/*"]
+      "@constants/*": ["constants/*"]
     }
   },
   "include": ["src/**/*"]

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DOMY | Demo for domy framework</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <main d-data="{ count: 0 }">
+      <h1 d-text="count.value"></h1>
+
+      <h2 d-html="new Date().getFullYear()" d-ref="year"></h2>
+
+      <h2 d-show="count.value % 2 === 0" d-text="$refs.year.textContent"></h2>
+
+      <div
+        :style="`width: 50px; height: 50px; background-color: ${count.value % 2 === 0 ? 'red' : 'yellow'}`"
+      ></div>
+
+      <button @click="count.set((old) => old + 1)">Increase</button>
+    </main>
+  </body>
+</html>
