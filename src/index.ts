@@ -34,6 +34,8 @@ const DOMY = {
 function initDomy() {
   const initialDom = new VirtualDom(document.querySelector('*') as Element);
   initialDom.visit((virtualParent, virtualElement) => {
+    if (typeof virtualElement === 'string') return;
+
     try {
       renderElement($state, virtualParent, virtualElement);
     } catch (err) {
