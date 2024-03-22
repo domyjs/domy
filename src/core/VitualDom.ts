@@ -1,9 +1,15 @@
 import { isNormalAttr } from '@utils/isSpecialAttribute';
 
+type VisitCallback = (
+  virtualParent: VirtualElement | null,
+  virtualElement: VirtualElement | string
+) => void;
+
 export type VirtualElement = {
   $el: Element;
   tag: string;
   isDisplay: boolean;
+  visited: boolean;
   events: Record<string, EventListenerOrEventListenerObject>;
   domiesAttributes: {
     [name: string]: string;
@@ -26,6 +32,7 @@ export class VirtualDom {
       $el: element,
       tag: element.tagName.toLowerCase(),
       isDisplay: true,
+      visited: false,
       events: {},
       domiesAttributes: {},
       normalAttributes: {},
@@ -72,11 +79,9 @@ export class VirtualDom {
     return element;
   }
 
-  visit(
-    cb: (virtualParent: VirtualElement | null, virtualElement: VirtualElement | string) => void
-  ) {
+  visitFrom(element: VirtualElement | string, cb: VisitCallback) {
     const stack: { parent: VirtualElement | null; childs: (VirtualElement | string)[] }[] = [
-      { parent: null, childs: [this.root] }
+      { parent: null, childs: [element] }
     ];
 
     while (stack.length > 0) {
@@ -93,9 +98,14 @@ export class VirtualDom {
         typeof element.domiesAttributes['d-ignore'] !== 'string' &&
         typeof parent?.domiesAttributes['d-for'] !== 'string';
       if (!shouldBeVisit) continue;
+      element.visited = true;
       cb(parent, element);
 
       stack.push({ parent: element, childs: [...element.childs] });
     }
+  }
+
+  visit(cb: VisitCallback) {
+    this.visitFrom(this.root, cb);
   }
 }
