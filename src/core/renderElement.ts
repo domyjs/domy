@@ -6,8 +6,6 @@ import { domies } from './domies';
 import { events } from './events';
 import { State } from '@typing/State';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
-import { data } from './data';
-
 /**
  * Render every domy attributes of an element
  * @param virtualParent
@@ -26,7 +24,7 @@ export function renderElement(
   if (typeof virtualElement === 'string') return; // textContent don't have attributes
 
   // we inject the state for this rendering
-  $state.$state.push(...injectState);
+  $state.$state.unshift(...injectState);
 
   const domiesAttributes = virtualElement.domiesAttributes;
 
@@ -55,8 +53,5 @@ export function renderElement(
   }
 
   // We remove injected states
-  for (const injectedSignal of injectState) {
-    const index = $state.$state.findIndex(signal => signal === injectedSignal);
-    $state.$state.splice(index, 1);
-  }
+  $state.$state.splice(0, injectState.length);
 }

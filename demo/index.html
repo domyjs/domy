@@ -36,10 +36,11 @@
       <button @click="$dispatch('notify')">Notify</button>
     </div>
 
-    <div d-data="{ test: 'hello' }">
+    <div d-data="{ test: 'hello', other: 'other' }">
       <p d-text="test.value"></p>
       <div d-data="{ test: 'bye' }">
         <p d-text="test.value"></p>
+        <p d-text="other.value"></p>
         <button @click="test.set('test2')">Change message2</button>
       </div>
       <button @click="test.set('test1')">Change message1</button>

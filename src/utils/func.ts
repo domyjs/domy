@@ -39,8 +39,13 @@ export function func(props: Props) {
   const fn = props.isAsync ? AsyncFunction : Function;
 
   const code = props.returnResult ? `return ${props.code};` : props.code;
-  const stateKeys = props.$state.$state.map(state => state.name);
-  const stateValues = props.$state.$state;
+  const alreadyExistingName: string[] = [];
+  const stateKeys = new Set(props.$state.$state.map(state => state.name));
+  const stateValues = props.$state.$state.filter(signal => {
+    if (alreadyExistingName.includes(signal.name)) return false;
+    alreadyExistingName.push(signal.name);
+    return true;
+  });
 
   for (const signal of [...stateValues, ...Object.values(props.$state.$store)]) {
     signal.setCallBackOnCall(() =>
@@ -50,6 +55,8 @@ export function func(props: Props) {
       })
     );
   }
+
+  console.log(props, stateKeys, stateValues);
 
   return fn(...stateKeys, '$el', '$refs', '$store', '$state', '$dispatch', code).bind(
     props.context ?? window,
