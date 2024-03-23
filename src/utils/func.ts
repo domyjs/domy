@@ -56,8 +56,6 @@ export function func(props: Props) {
     );
   }
 
-  console.log(props, stateKeys, stateValues);
-
   return fn(...stateKeys, '$el', '$refs', '$store', '$state', '$dispatch', code).bind(
     props.context ?? window,
     ...stateValues,

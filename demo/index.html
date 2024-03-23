@@ -10,7 +10,7 @@
         count: 0
       });
 
-      window.DOMY.data('counter', { count: 0, activeSupperBtn: false });
+      window.DOMY.data('counter', { count: 0, activeSupperBtn: false, list: [] });
 
       window.DOMY.data('searchBar', { search: '' });
     </script>
@@ -72,6 +72,18 @@
         Message:
         <li d-text="test.value + ' ' + index.value"></li>
       </ul>
+
+      <ul d-for="el of list.value">
+        Message:
+        <li d-text="el.value"></li>
+      </ul>
+
+      <button @click="list.set((old) => [...old, count.value]) && count.set((old) => old + 1)">
+        Add element
+      </button>
+      <button @click="list.set((old) => old.splice(1))  && count.set((old) => old - 1)">
+        Remove element
+      </button>
     </main>
   </body>
 </html>

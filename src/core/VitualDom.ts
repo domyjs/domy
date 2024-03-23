@@ -11,6 +11,7 @@ export type VirtualElement = {
   isDisplay: boolean;
   visited: boolean;
   events: Record<string, EventListenerOrEventListenerObject>;
+  initialised: boolean;
   domiesAttributes: {
     [name: string]: string;
   };
@@ -33,6 +34,7 @@ export class VirtualDom {
       tag: element.tagName.toLowerCase(),
       isDisplay: true,
       visited: false,
+      initialised: false,
       events: {},
       domiesAttributes: {},
       normalAttributes: {},

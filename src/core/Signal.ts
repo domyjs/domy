@@ -33,6 +33,7 @@ export class Signal {
   public set(setter: ((val: any) => any) | any) {
     this.val = typeof setter === 'function' ? setter(this.val) : setter;
     this.notifyAll();
+    return true;
   }
 
   private notifyAll() {

@@ -3,14 +3,15 @@
  * @param oldElement The old element to be replaced
  * @param newElement The new element to replace with
  */
-export function replaceElement(oldElement: Element, newElement: Element) {
-  if (oldElement.tagName.toLowerCase() === 'html') {
+export function replaceElement(oldNode: Node, newNode: Node) {
+  if (oldNode.nodeType === Node.ELEMENT_NODE && oldNode.nodeName.toLowerCase() === 'html') {
+    const oldElement = oldNode as Element;
+    const newElement = newNode as Element;
     oldElement.innerHTML = newElement.innerHTML;
-    Array.from(newElement.attributes).forEach(attr => {
+    for (const attr of newElement.attributes) {
       oldElement.setAttribute(attr.name, attr.value);
-    });
+    }
   } else {
-    // Replace the old element with the new element
-    oldElement.parentNode?.replaceChild(newElement, oldElement);
+    oldNode.parentNode?.replaceChild(newNode, oldNode);
   }
 }
