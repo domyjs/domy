@@ -33,12 +33,6 @@ async function initDomy(app: App) {
 
   initialDom.visit(callback);
 
-  // d-uncloak
-  const uncloakElements = document.querySelectorAll('[d-uncloak]');
-  for (const uncloakElement of uncloakElements) {
-    uncloakElement.removeAttribute('d-uncloak');
-  }
-
   // Mounted
   if (app.$mounted) {
     try {
