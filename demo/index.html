@@ -25,7 +25,7 @@
     <main>
       <h1 d-text="this.search.value"></h1>
 
-      <h1 d-text="this.count.value"></h1>
+      <h1>Count: {{ this.count.value }}</h1>
 
       <h2 d-html="new Date().getFullYear()" d-ref="year"></h2>
 
@@ -35,7 +35,7 @@
 
       <button
         d-show="!this.activeSupperBtn.value"
-        @click="activeSupperBtn.set(!activeSupperBtn.value)"
+        @click="this.activeSupperBtn.set(!this.activeSupperBtn.value)"
       >
         Active supper btn
       </button>

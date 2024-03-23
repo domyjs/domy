@@ -1,4 +1,4 @@
-export type Dependencie = { $el: Element | null; fn: () => void };
+export type Dependencie = { $el: Element | Text | null; fn: () => void };
 
 /**
  * Create a signal to spy a variable and notify the observers that need this dependencie

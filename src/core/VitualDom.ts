@@ -2,8 +2,15 @@ import { isNormalAttr } from '@utils/isSpecialAttribute';
 
 type VisitCallback = (
   virtualParent: VirtualElement | null,
-  virtualElement: VirtualElement | string
+  virtualElement: VirtualElement | VirtualText
 ) => void;
+
+export type VirtualText = {
+  $el: Text;
+  isDisplay: boolean;
+  visited: boolean;
+  content: string;
+};
 
 export type VirtualElement = {
   $el: Element;
@@ -18,22 +25,40 @@ export type VirtualElement = {
   normalAttributes: {
     [name: string]: string;
   };
-  childs: (VirtualElement | string)[];
+  childs: (VirtualElement | VirtualText)[];
 };
 
 export class VirtualDom {
-  private root: VirtualElement[];
+  private root: (VirtualElement | VirtualText)[];
 
   constructor(els: Element[]) {
     this.root = this.init(els);
   }
 
-  init(els: Element[]): VirtualElement[] {
-    const virtualElements: VirtualElement[] = [];
+  init(els: Element[]): (VirtualElement | VirtualText)[] {
+    const virtualElements: (VirtualElement | VirtualText)[] = [];
     for (const el of els) {
-      virtualElements.push(this.getVirtualElement(el));
+      virtualElements.push(this.getVirtual(el));
     }
     return virtualElements;
+  }
+
+  private getVirtual(element: Text | Element): VirtualText | VirtualElement {
+    if (element.nodeType === Node.TEXT_NODE) {
+      return this.getVirtualText(element as Text);
+    }
+
+    return this.getVirtualElement(element as Element);
+  }
+
+  private getVirtualText(element: Text): VirtualText {
+    const virtualText: VirtualText = {
+      $el: element,
+      isDisplay: true,
+      visited: false,
+      content: element.textContent?.trim() ?? ''
+    };
+    return virtualText;
   }
 
   private getVirtualElement(element: Element): VirtualElement {
@@ -60,19 +85,17 @@ export class VirtualDom {
 
     // Add child nodes
     for (const child of element.childNodes) {
-      if (child.nodeType === Node.ELEMENT_NODE) {
-        virtualElement.childs.push(this.getVirtualElement(child as Element));
-      } else if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
-        virtualElement.childs.push(child.textContent.trim());
-      }
+      virtualElement.childs.push(this.getVirtual(child as Text | Element));
     }
 
     return virtualElement;
   }
 
-  public static createElementFromVirtual(virtualElement: VirtualElement | string): Element | Text {
+  public static createElementFromVirtual(
+    virtualElement: VirtualElement | VirtualText
+  ): Element | Text {
     // If it's textContent
-    if (typeof virtualElement === 'string') return document.createTextNode(virtualElement);
+    if ('content' in virtualElement) return document.createTextNode(virtualElement.content);
 
     const element = document.createElement(virtualElement.tag);
 
@@ -89,8 +112,8 @@ export class VirtualDom {
     return element;
   }
 
-  visitFrom(element: VirtualElement | string, cb: VisitCallback) {
-    const stack: { parent: VirtualElement | null; childs: (VirtualElement | string)[] }[] = [
+  visitFrom(element: VirtualElement | VirtualText, cb: VisitCallback) {
+    const stack: { parent: VirtualElement | null; childs: (VirtualElement | VirtualText)[] }[] = [
       { parent: null, childs: [element] }
     ];
 
@@ -102,16 +125,19 @@ export class VirtualDom {
         continue;
       }
 
-      const element = childs.shift() as VirtualElement | string;
+      const element = childs.shift() as VirtualElement | VirtualText;
+      const isText = 'content' in element;
+
       const shouldBeVisit =
-        typeof element !== 'string' &&
+        !isText &&
         typeof element.domiesAttributes['d-ignore'] !== 'string' &&
         typeof parent?.domiesAttributes['d-for'] !== 'string';
-      if (!shouldBeVisit) continue;
+      if (!isText && !shouldBeVisit) continue;
+
       element.visited = true;
       cb(parent, element);
 
-      stack.push({ parent: element, childs: [...element.childs] });
+      if (!isText) stack.push({ parent: element, childs: [...element.childs] });
     }
   }
 

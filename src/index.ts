@@ -1,6 +1,6 @@
-import { renderElement } from '@core/renderElement';
+import { render } from '@core/render';
 import { Dependencie, Signal } from '@core/Signal';
-import { VirtualDom, VirtualElement } from '@core/VitualDom';
+import { VirtualDom, VirtualElement, VirtualText } from '@core/VitualDom';
 import { App } from '@typing/App';
 import { State } from '@typing/State';
 import { getContext } from '@utils/getContext';
@@ -20,12 +20,12 @@ function initDomy() {
 
   const initialDom = new VirtualDom(rootElements);
 
-  function callback(virtualParent: VirtualElement | null, virtualElement: VirtualElement | string) {
-    // We don't need to render textContent
-    if (typeof virtualElement === 'string') return;
-
+  function callback(
+    virtualParent: VirtualElement | null,
+    virtualElement: VirtualElement | VirtualText
+  ) {
     try {
-      renderElement($state, virtualParent, virtualElement);
+      render($state, virtualParent, virtualElement);
     } catch (err) {
       console.error(err);
     }

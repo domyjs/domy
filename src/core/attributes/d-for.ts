@@ -1,4 +1,4 @@
-import { renderElement } from '@core/renderElement';
+import { render } from '@core/render';
 import { Signal } from '@core/Signal';
 import { VirtualDom } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
@@ -42,10 +42,9 @@ export function dFor(props: AttrRendererProps) {
         : [new Signal(res!.groups!.dest, value)];
 
       const newElement = VirtualDom.createElementFromVirtual(child);
-      if (typeof child !== 'string') {
-        child.$el = newElement as Element;
-        renderElement($state, props.virtualElement, child, toInject);
-      }
+
+      child.$el = newElement as Element;
+      render($state, props.virtualElement, child, toInject);
 
       const oldChildIndex = index * props.virtualElement.childs.length + childIndex;
       const oldRender: ChildNode | undefined = $el.childNodes[oldChildIndex];

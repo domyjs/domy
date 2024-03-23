@@ -17,12 +17,10 @@ import { AttrRendererProps } from '@typing/AttrRendererProps';
 export function renderElement(
   $state: State,
   virtualParent: VirtualElement | null,
-  virtualElement: VirtualElement | string,
+  virtualElement: VirtualElement,
   injectState: Signal[] = [],
   byPassAttributes: string[] = []
 ) {
-  if (typeof virtualElement === 'string') return; // textContent don't have attributes
-
   // we inject the state for this rendering
   $state.$state.unshift(...injectState);
 
@@ -40,7 +38,7 @@ export function renderElement(
       virtualParent,
       virtualElement,
       attr: { name: attr, value: domiesAttributes[attr] },
-      notifier: () => renderElement($state, props.virtualParent, props.virtualElement)
+      notifier: () => renderElement($state, virtualParent, virtualElement)
     };
 
     if (isBindAttr(attr)) {
