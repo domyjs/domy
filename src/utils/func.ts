@@ -1,6 +1,7 @@
 import { VirtualElement } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { State } from '@typing/State';
+import { getContext } from './getContext';
 
 type Props = {
   code: string;
@@ -39,15 +40,17 @@ export function func(props: Props) {
   const fn = props.isAsync ? AsyncFunction : Function;
 
   const code = props.returnResult ? `return ${props.code};` : props.code;
+
+  // In case we have multiple signal with same name we keep the last added one
   const alreadyExistingName: string[] = [];
-  const stateKeys = new Set(props.$state.$state.map(state => state.name));
   const stateValues = props.$state.$state.filter(signal => {
     if (alreadyExistingName.includes(signal.name)) return false;
     alreadyExistingName.push(signal.name);
     return true;
   });
 
-  for (const signal of [...stateValues, ...Object.values(props.$state.$store)]) {
+  // We spy every dependencie to attach a listener if needed
+  for (const signal of stateValues) {
     signal.setCallBackOnCall(() =>
       signal.attach({
         $el: props.virtualElement.$el,
@@ -56,13 +59,14 @@ export function func(props: Props) {
     );
   }
 
-  return fn(...stateKeys, '$el', '$refs', '$store', '$state', '$dispatch', code).bind(
-    props.context ?? window,
-    ...stateValues,
+  return fn('$el', '$refs', '$dispatch', code).call(
+    getContext({
+      ...props.$state,
+      $state: stateValues
+    }),
+
     props.virtualElement.$el,
     props.$state.$refs,
-    props.$state.$store,
-    props.$state.$globalState,
     dispatchCustomEvent(props.$state)
-  )();
+  );
 }

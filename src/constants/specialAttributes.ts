@@ -1,7 +1,4 @@
 export const SPECIAL_ATTRIBUTES = [
-  'd-data',
-  'd-effect',
-  'd-init',
   'd-text',
   'd-html',
   'd-model',

@@ -22,13 +22,21 @@ export type VirtualElement = {
 };
 
 export class VirtualDom {
-  private root: VirtualElement;
+  private root: VirtualElement[];
 
-  constructor(el: Element) {
-    this.root = this.init(el);
+  constructor(els: Element[]) {
+    this.root = this.init(els);
   }
 
-  private init(element: Element): VirtualElement {
+  init(els: Element[]): VirtualElement[] {
+    const virtualElements: VirtualElement[] = [];
+    for (const el of els) {
+      virtualElements.push(this.getVirtualElement(el));
+    }
+    return virtualElements;
+  }
+
+  private getVirtualElement(element: Element): VirtualElement {
     const virtualElement: VirtualElement = {
       $el: element,
       tag: element.tagName.toLowerCase(),
@@ -53,7 +61,7 @@ export class VirtualDom {
     // Add child nodes
     for (const child of element.childNodes) {
       if (child.nodeType === Node.ELEMENT_NODE) {
-        virtualElement.childs.push(this.init(child as Element));
+        virtualElement.childs.push(this.getVirtualElement(child as Element));
       } else if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
         virtualElement.childs.push(child.textContent.trim());
       }
@@ -108,6 +116,8 @@ export class VirtualDom {
   }
 
   visit(cb: VisitCallback) {
-    this.visitFrom(this.root, cb);
+    for (const el of this.root) {
+      this.visitFrom(el, cb);
+    }
   }
 }

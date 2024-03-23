@@ -1,9 +1,9 @@
-import { Signal, StateObj } from '@core/Signal';
+import { Signal } from '@core/Signal';
 
 export type State = {
+  isInitialised: boolean;
   $state: Signal[];
+  $fn: { [fnName: string]: (...args: any[]) => any | Promise<any> };
   $events: { [eventName: string]: Element[] };
-  $globalState: { [name: string]: StateObj };
-  $store: { [name: string]: Signal };
   $refs: Record<string, Element>;
 };

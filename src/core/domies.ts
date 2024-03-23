@@ -4,8 +4,6 @@ import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { dFor } from './attributes/d-for';
 import { dModel } from './attributes/d-model';
 import { dIf } from './attributes/d-if';
-import { dInit } from './attributes/d-init';
-import { dEffect } from './attributes/d-effect';
 
 /**
  * Handle attributes starting by d-*
@@ -42,12 +40,6 @@ export function domies(props: AttrRendererProps) {
       break;
     case 'd-ref':
       props.$state.$refs[props.attr.value] = $el;
-      break;
-    case 'd-effect':
-      dEffect(props);
-      break;
-    case 'd-init':
-      dInit(props);
       break;
     case 'd-if':
       dIf(props);

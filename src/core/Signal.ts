@@ -1,13 +1,11 @@
-type Dependencie = { $el: Element; fn: () => void };
-
-export type StateObj = { [key: string]: any };
+export type Dependencie = { $el: Element | null; fn: () => void };
 
 /**
  * Create a signal to spy a variable and notify the observers that need this dependencie
  */
 export class Signal {
   private callBackOncall: (() => void) | null = null;
-  private dependencies: Dependencie[] = [];
+  public dependencies: Dependencie[] = [];
 
   constructor(
     public name: string,
@@ -33,6 +31,11 @@ export class Signal {
   public set(setter: ((val: any) => any) | any) {
     this.val = typeof setter === 'function' ? setter(this.val) : setter;
     this.notifyAll();
+    return true;
+  }
+
+  public setWithoutUpdate(setter: ((val: any) => any) | any) {
+    this.val = typeof setter === 'function' ? setter(this.val) : setter;
     return true;
   }
 

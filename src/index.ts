@@ -1,69 +1,82 @@
 import { renderElement } from '@core/renderElement';
+import { Dependencie, Signal } from '@core/Signal';
 import { VirtualDom, VirtualElement } from '@core/VitualDom';
-import { Signal, StateObj } from '@core/Signal';
+import { App } from '@typing/App';
 import { State } from '@typing/State';
-import { getDatas } from '@utils/getDatas';
-import { copyState } from '@utils/copyState';
+import { getContext } from '@utils/getContext';
 
 const $state: State = {
-  $state: [], // State of the current scope
+  isInitialised: false,
+
+  $state: [],
+  $fn: {},
   $events: {},
-  $globalState: {},
-  $store: {},
   $refs: {}
 };
 
-const DOMY = {
-  data(name: string, state: StateObj) {
-    if ($state.$globalState[name]) throw new Error(`A state with the name "${name}" already exist`);
-
-    $state.$globalState[name] = state;
-  },
-  store(state: StateObj) {
-    if (Object.keys($state.$store).length > 0)
-      throw new Error('You can only create one store by page');
-
-    for (const key in state) {
-      $state.$store[key] = new Signal(key, state[key]);
-    }
-  }
-};
-
-/**
- * Init the virtual dom and Domy
- */
 function initDomy() {
-  const initialDom = new VirtualDom(document.querySelector('*') as Element);
+  const allElements = document.querySelectorAll('*');
+  const rootElements = Array.from(allElements).filter(el => !el.parentElement);
+
+  const initialDom = new VirtualDom(rootElements);
+
   function callback(virtualParent: VirtualElement | null, virtualElement: VirtualElement | string) {
+    // We don't need to render textContent
     if (typeof virtualElement === 'string') return;
 
     try {
-      const stateCopy = $state;
-      const haveDatas = typeof virtualElement.domiesAttributes['d-data'] === 'string';
-      renderElement(stateCopy, virtualParent, virtualElement, [], ['d-data']);
-
-      if (haveDatas) {
-        const datas = getDatas({
-          $state: stateCopy,
-          virtualElement,
-          virtualParent,
-          notifier: () => renderElement(stateCopy, virtualParent, virtualElement, [], ['d-data'])
-        });
-
-        $state.$state.unshift(...datas);
-
-        for (const child of virtualElement.childs) {
-          initialDom.visitFrom(child, callback);
-        }
-
-        // $state.$state.splice(0, datas.length);
-      }
+      renderElement($state, virtualParent, virtualElement);
     } catch (err) {
       console.error(err);
     }
   }
+
   initialDom.visit(callback);
 }
 
-(window as any).DOMY = DOMY;
-document.addEventListener('DOMContentLoaded', initDomy);
+function DOMY(app: App) {
+  if ($state.isInitialised) throw new Error('DOMY as already be initialised');
+
+  // States
+  for (const key in app.$state) {
+    $state.$state.push(new Signal(key, app.$state[key]));
+  }
+
+  // Functions
+  for (const key in app.$fn) {
+    $state.$fn[key] = app.$fn[key];
+  }
+
+  // Watchers
+  for (const watcherName in app.$watch) {
+    const signal = $state.$state.find(s => s.name === watcherName);
+    if (!signal) {
+      console.error(`Invalide watcher name "${watcherName}"`);
+      continue;
+    }
+
+    signal.attach({
+      $el: null,
+      fn: () => {
+        // We remove the watcher too don't trigger it an other time if the user change the value
+        const watcher = signal.dependencies.shift() as Dependencie;
+        app.$watch[watcherName].call(getContext($state));
+        signal.dependencies.unshift(watcher);
+      }
+    });
+  }
+
+  // Init
+  app.$init.call(getContext($state));
+
+  $state.isInitialised = true;
+  document.addEventListener('DOMContentLoaded', initDomy);
+
+  // We display a message if a key doesn't exist
+  const unknowKeys = Object.keys(app).filter(
+    key => !['$state', '$fn', '$init', '$watch'].includes(key)
+  );
+  if (unknowKeys.length > 0) console.error(`Unknown properties "${unknowKeys.join(', ')}"`);
+}
+
+export default DOMY;

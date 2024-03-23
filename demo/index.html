@@ -5,29 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DOMY | Demo for domy framework</title>
     <script src="../dist/index.js"></script>
-    <script>
-      window.DOMY.store({
-        count: 0
-      });
-
-      window.DOMY.data('counter', { count: 0, activeSupperBtn: false, list: [] });
-
-      window.DOMY.data('searchBar', { search: '' });
-    </script>
   </head>
   <body>
-    <h1 d-text="$store.count.value"></h1>
     <div>
-      <button @click="$store.count.set((old) => old + 1)">+ global count</button>
-    </div>
-
-    <div d-data="$state.searchBar">
-      <h1 d-text="search.value"></h1>
+      <h1 d-text="this.search.value"></h1>
       <input type="text" d-model="search" />
     </div>
 
-    <div d-ignore d-data="$state.searchBar">
-      <h1 d-text="search.value"></h1>
+    <div d-ignore>
+      <h1 d-text="this.search.value"></h1>
       <input type="text" d-model="search" />
     </div>
 
@@ -36,54 +22,82 @@
       <button @click="$dispatch('notify')">Notify</button>
     </div>
 
-    <div d-data="{ test: 'hello', other: 'other' }">
-      <p d-text="test.value"></p>
-      <div d-data="{ test: 'bye' }">
-        <p d-text="test.value"></p>
-        <p d-text="other.value"></p>
-        <button @click="test.set('test2')">Change message2</button>
-      </div>
-      <button @click="test.set('test1')">Change message1</button>
-    </div>
+    <main>
+      <h1 d-text="this.search.value"></h1>
 
-    <main d-data="$state.counter">
-      <h1 d-text="search.value"></h1>
-
-      <template d-effect="console.log(count.value)"></template>
-      <template d-init="console.log('Count initial value:', count.value)"></template>
-
-      <h1 d-text="count.value"></h1>
+      <h1 d-text="this.count.value"></h1>
 
       <h2 d-html="new Date().getFullYear()" d-ref="year"></h2>
 
       <div
-        :style="`width: 50px; height: 50px; background-color: ${count.value % 2 === 0 ? 'red' : 'yellow'}`"
+        :style="`width: 50px; height: 50px; background-color: ${this.count.value % 2 === 0 ? 'red' : 'yellow'}`"
       ></div>
 
-      <button d-show="!activeSupperBtn.value" @click="activeSupperBtn.set(!activeSupperBtn.value)">
+      <button
+        d-show="!this.activeSupperBtn.value"
+        @click="activeSupperBtn.set(!activeSupperBtn.value)"
+      >
         Active supper btn
       </button>
-      <button @click="count.set((old) => old + 1)">+</button>
-      <button @click="count.set((old) => old - 1)">-</button>
-      <button d-if="activeSupperBtn.value" d-on:click="count.set((old) => old + 10)">+10</button>
-      <button d-if="activeSupperBtn.value" d-on:click="count.set((old) => old - 10)">-10</button>
+      <button @click="this.incrementCount()">+</button>
+      <button @click="this.count.set((old) => old - 1)">-</button>
+      <button d-if="this.activeSupperBtn.value" d-on:click="this.count.set((old) => old + 10)">
+        +10
+      </button>
+      <button d-if="this.activeSupperBtn.value" d-on:click="this.count.set((old) => old - 10)">
+        -10
+      </button>
 
-      <ul d-if="count.value > 0" d-for="test, index of Array(count.value).fill('Click')">
+      <ul d-if="this.count.value > 0" d-for="test, index of Array(this.count.value).fill('Click')">
         Message:
-        <li d-text="test.value + ' ' + index.value"></li>
+        <li d-text="this.test.value + ' ' + this.index.value"></li>
       </ul>
 
-      <ul d-for="el of list.value">
+      <ul d-for="el of this.list.value">
         Message:
-        <li d-text="el.value"></li>
+        <li d-text="this.el.value"></li>
       </ul>
 
-      <button @click="list.set((old) => [...old, count.value]) && count.set((old) => old + 1)">
+      <button
+        @click="this.list.set((old) => [...old, this.count.value]) && this.count.set((old) => old + 1)"
+      >
         Add element
       </button>
-      <button @click="list.set((old) => old.splice(1))  && count.set((old) => old - 1)">
+      <button @click="this.list.set((old) => old.splice(1))  && this.count.set((old) => old - 1)">
         Remove element
       </button>
     </main>
   </body>
+  <script>
+    window.DOMY({
+      $init() {
+        console.log('Init');
+        this.displayThis();
+      },
+      $watch: {
+        count() {
+          this.displayThis();
+          this.count.set(Math.max(this.count.value, 0));
+        }
+      },
+      $state: {
+        count: 0,
+        activeSupperBtn: false,
+        list: [],
+        search: ''
+      },
+      $fn: {
+        displayThisSupper() {
+          console.log('This', this);
+        },
+        displayThis() {
+          this.displayThisSupper();
+        },
+        incrementCount() {
+          this.displayThis();
+          this.count.set(old => old + 1);
+        }
+      }
+    });
+  </script>
 </html>

@@ -7,6 +7,7 @@ module.exports = {
   input: './src/index.ts',
   output: [
     {
+      name: 'DOMY',
       file: './dist/index.js',
       format: 'umd',
       sourcemap: true
