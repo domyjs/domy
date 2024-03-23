@@ -1,4 +1,4 @@
-import { render } from '@core/render';
+import { deepRender } from '@core/deepRender';
 import { Signal } from '@core/Signal';
 import { VirtualDom } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
@@ -44,7 +44,7 @@ export function dFor(props: AttrRendererProps) {
       const newElement = VirtualDom.createElementFromVirtual(child);
 
       child.$el = newElement as Element;
-      render($state, props.virtualElement, child, toInject);
+      deepRender($state, props.virtualElement, child, toInject);
 
       const oldChildIndex = index * props.virtualElement.childs.length + childIndex;
       const oldRender: ChildNode | undefined = $el.childNodes[oldChildIndex];

@@ -9,5 +9,5 @@
 </div>
 ```
 
-- d-cloak
+- Fixe deep render
 - Async

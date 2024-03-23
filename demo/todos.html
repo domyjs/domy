@@ -24,7 +24,7 @@
 
       .counter {
         min-height: 100%;
-        width: 70%;
+        flex: 1 1;
         border-right: thin solid #121212;
 
         display: flex;
@@ -55,12 +55,43 @@
         outline: none;
         border-bottom: thin solid #121212;
       }
+
+      ul {
+        list-style: none;
+        padding-left: 1rem;
+        margin-top: 1rem;
+      }
+
+      .users {
+        width: 16rem;
+      }
+
+      [d-cloak] {
+        display: none;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      [d-uncloak] {
+        display: block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+
+        font-size: 3rem;
+      }
     </style>
   </head>
   <body>
-    <main>
+    <div d-uncloak class="hide"><p>Loading...</p></div>
+    <main d-cloak>
       <section class="counter">
         <h1>Score: {{ this.count }}</h1>
+        <h2>Rendering took: {{ Math.round(this.perf) }}ms</h2>
+        <h3 d-ignore>Just need to use {{ this.count }} to render variable</h3>
         <div class="btn-container">
           <button @click="this.increment()">+</button>
           <button @click="this.decrement">-</button>
@@ -78,15 +109,22 @@
           <input type="text" d-model="search" placeholder="Search for user..." />
         </div>
         <ul d-for="user, index of this.filteredUsers">
-          <li>{{ this.index + 1}}: {{ this.user }}</li>
+          <li>
+            <p d-text="this.index + 1">{{ this.index + 1}}: {{ this.user }}</p>
+          </li>
         </ul>
       </section>
     </main>
   </body>
   <script>
     window.DOMY({
-      $setup() {
+      async $setup() {
+        await new Promise(r => setTimeout(r, 3000));
+        this.perf = performance.now();
         this.filteredUsers = this.users;
+      },
+      $mounted() {
+        this.perf = performance.now() - this.perf;
       },
       $watch: {
         search() {
@@ -97,6 +135,8 @@
         }
       },
       $state: {
+        perf: null,
+
         count: 0,
         search: '',
         users: ['yoann', 'pierre', 'william', 'lucas', 'yann', 'louis'],

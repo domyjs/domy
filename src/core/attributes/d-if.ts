@@ -1,4 +1,4 @@
-import { renderElement } from '@core/renderElement';
+import { deepRender } from '@core/deepRender';
 import { VirtualDom } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { findElementIndex } from '@utils/findElementIndex';
@@ -28,7 +28,7 @@ export function dIf(props: AttrRendererProps) {
     const indexToInsert = findElementIndex(props.virtualParent, props.virtualElement);
     props.virtualElement.$el = newElement;
     props.virtualElement.isDisplay = true;
-    renderElement($state, props.virtualParent, props.virtualElement, [], ['d-if']);
+    deepRender($state, props.virtualParent, props.virtualElement, [], ['d-if']);
     restoreElement(props.virtualParent.$el, newElement, indexToInsert);
   }
 }

@@ -1,4 +1,5 @@
 export const SPECIAL_ATTRIBUTES = [
+  'd-cloak',
   'd-text',
   'd-html',
   'd-model',

@@ -33,6 +33,12 @@ async function initDomy(app: App) {
 
   initialDom.visit(callback);
 
+  // d-uncloak
+  const uncloakElements = document.querySelectorAll('[d-uncloak]');
+  for (const uncloakElement of uncloakElements) {
+    uncloakElement.removeAttribute('d-uncloak');
+  }
+
   // Mounted
   if (app.$mounted) {
     try {
@@ -89,7 +95,9 @@ async function DOMY(app: App) {
   }
 
   $state.isInitialised = true;
-  document.addEventListener('DOMContentLoaded', () => initDomy(app));
+  if (document.readyState === 'complete') {
+    initDomy(app);
+  } else document.addEventListener('DOMContentLoaded', () => initDomy(app));
 
   // We display a message if a key doesn't exist
   const properties = ['$state', '$fn', '$setup', '$mounted', '$watch'] as (keyof App)[];
