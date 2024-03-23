@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+      }
+
+      main {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .counter {
+        min-height: 100%;
+        width: 70%;
+        border-right: thin solid #121212;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        gap: 1rem;
+      }
+
+      .btn-container {
+        display: flex;
+        gap: 1rem;
+      }
+
+      button {
+        border: none;
+        padding: 1rem;
+        background-color: #121212;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      input {
+        width: 100%;
+        padding: 1rem;
+        border: none;
+        outline: none;
+        border-bottom: thin solid #121212;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="counter">
+        <h1>Score: {{ this.count }}</h1>
+        <div class="btn-container">
+          <button @click="this.increment()">+</button>
+          <button @click="this.decrement">-</button>
+          <button d-if="this.count > 0" @click="this.reset()" @reset="this.count = 0">Reset</button>
+          <button d-show="!this.cheatActivated" @click="this.cheatActivated = !this.cheatActivated">
+            Active cheat
+          </button>
+          <button d-if="this.cheatActivated" @click="this.superIncrement()">+10</button>
+          <button d-if="this.cheatActivated" @click="this.superDecrement">-10</button>
+        </div>
+      </section>
+      <section class="users">
+        <div class="searchbar">
+          <p>{{ this.search }}</p>
+          <input type="text" d-model="search" placeholder="Search for user..." />
+        </div>
+        <ul d-for="user, index of this.filteredUsers">
+          <li>{{ this.index + 1}}: {{ this.user }}</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+  <script>
+    window.DOMY({
+      $setup() {
+        this.filteredUsers = this.users;
+      },
+      $watch: {
+        search() {
+          this.filteredUsers = this.users.filter(user => user.includes(this.search));
+        },
+        count() {
+          this.count = Math.max(this.count, 0);
+        }
+      },
+      $state: {
+        count: 0,
+        search: '',
+        users: ['yoann', 'pierre', 'william', 'lucas', 'yann', 'louis'],
+        filteredUsers: [],
+        cheatActivated: false
+      },
+      $fn: {
+        superIncrement() {
+          for (let i = 0; i < 10; ++i) {
+            this.increment();
+          }
+        },
+        superDecrement() {
+          for (let i = 0; i < 10; ++i) {
+            this.decrement();
+          }
+        },
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        },
+        reset() {
+          this.$dispatch('reset');
+        }
+      }
+    });
+  </script>
+</html>
