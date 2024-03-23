@@ -56,8 +56,14 @@
   </body>
   <script>
     window.DOMY({
-      $init() {
+      $setup() {
         console.log('Init', this.$refs, this.$el);
+        console.log(document.body.innerHTML);
+        this.displayThis();
+      },
+      $mounted() {
+        console.log('Mount', this.$refs, this.$el);
+        console.log(document.body.innerHTML);
         this.displayThis();
       },
       $watch: {

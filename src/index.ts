@@ -14,7 +14,7 @@ const $state: State = {
   $refs: {}
 };
 
-function initDomy() {
+async function initDomy(app: App) {
   const allElements = document.querySelectorAll('*');
   const rootElements = Array.from(allElements).filter(el => !el.parentElement);
 
@@ -32,6 +32,15 @@ function initDomy() {
   }
 
   initialDom.visit(callback);
+
+  // Mounted
+  if (app.$mounted) {
+    try {
+      await app.$mounted.call(getContext(undefined, $state));
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }
 
 async function DOMY(app: App) {
@@ -61,7 +70,7 @@ async function DOMY(app: App) {
         // We remove the watcher too don't trigger it an other time if the user change the value
         const watcher = signal.dependencies.shift() as Dependencie;
         try {
-          await app.$watch[watcherName].call(getContext(undefined, $state));
+          await app.$watch![watcherName].call(getContext(undefined, $state));
         } catch (err) {
           console.error(err);
         }
@@ -71,19 +80,20 @@ async function DOMY(app: App) {
   }
 
   // Init
-  try {
-    await app.$init.call(getContext(undefined, $state));
-  } catch (err) {
-    console.error(err);
+  if (app.$setup) {
+    try {
+      await app.$setup.call(getContext(undefined, $state));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   $state.isInitialised = true;
-  document.addEventListener('DOMContentLoaded', initDomy);
+  document.addEventListener('DOMContentLoaded', () => initDomy(app));
 
   // We display a message if a key doesn't exist
-  const unknowKeys = Object.keys(app).filter(
-    key => !['$state', '$fn', '$init', '$watch'].includes(key)
-  );
+  const properties = ['$state', '$fn', '$setup', '$mounted', '$watch'] as (keyof App)[];
+  const unknowKeys = Object.keys(app).filter(key => !properties.includes(key as any));
   if (unknowKeys.length > 0) console.error(`Unknown properties "${unknowKeys.join(', ')}"`);
 }
 
