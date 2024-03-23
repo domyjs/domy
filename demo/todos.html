@@ -137,8 +137,8 @@
           </button>
         </div>
         <ul d-for="user, index of this.filteredUsers">
-          <li>
-            <p d-text="this.index + 1">{{ this.index + 1}}: {{ this.user }}</p>
+          <li d-text="this.index + ': ' + this.user">
+            <!-- <p d-text="this.index + 1">{{ this.index + 1}}: {{ this.user }}</p> -->
           </li>
         </ul>
       </section>
@@ -147,7 +147,7 @@
   <script>
     window.DOMY({
       async $setup() {
-        await new Promise(r => setTimeout(r, 3000));
+        // await new Promise(r => setTimeout(r, 3000));
         this.perf = performance.now();
         this.filteredUsers = this.users;
       },
