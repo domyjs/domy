@@ -62,9 +62,12 @@ export class VirtualDom {
   }
 
   private getVirtualElement(element: Element): VirtualElement {
+    const tag = element.tagName?.toLocaleLowerCase() ?? 'comment';
+    const isTemplate = tag === 'template';
+
     const virtualElement: VirtualElement = {
       $el: element,
-      tag: element.tagName.toLowerCase(),
+      tag,
       isDisplay: true,
       visited: false,
       initialised: false,
@@ -75,7 +78,7 @@ export class VirtualDom {
     };
 
     // Add attributes
-    for (const attr of Array.from(element.attributes)) {
+    for (const attr of Array.from(element.attributes ?? [])) {
       if (isNormalAttr(attr.name)) {
         virtualElement.normalAttributes[attr.name] = attr.value;
       } else {
@@ -84,7 +87,10 @@ export class VirtualDom {
     }
 
     // Add child nodes
-    for (const child of element.childNodes) {
+    const elementChilds = isTemplate
+      ? (element as HTMLTemplateElement).content.childNodes
+      : element.childNodes;
+    for (const child of elementChilds) {
       virtualElement.childs.push(this.getVirtual(child as Text | Element));
     }
 

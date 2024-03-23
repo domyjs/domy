@@ -40,7 +40,8 @@ export function events(props: AttrRendererProps) {
       virtualElement: props.virtualElement,
       notifier: props.notifier
     });
-    if (typeof executedValue === 'function') executedValue.call(getContext(props.$state), event);
+    if (typeof executedValue === 'function')
+      executedValue.call(getContext($el, props.$state), event);
   };
   $el.addEventListener(eventName, props.virtualElement.events[eventName]);
 }

@@ -1,6 +1,7 @@
 import { renderElement } from '@core/renderElement';
 import { VirtualDom } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { findElementIndex } from '@utils/findElementIndex';
 import { func } from '@utils/func';
 import { restoreElement } from '@utils/restoreElement';
 
@@ -24,10 +25,7 @@ export function dIf(props: AttrRendererProps) {
     $el.remove();
   } else if (!props.virtualElement.isDisplay && shouldBeDisplay) {
     const newElement = VirtualDom.createElementFromVirtual(props.virtualElement) as Element;
-    const visibleElements = props.virtualParent.childs.filter(
-      child => typeof child === 'string' || child.isDisplay || child === props.virtualElement
-    );
-    const indexToInsert = visibleElements.findIndex(child => child === props.virtualElement);
+    const indexToInsert = findElementIndex(props.virtualParent, props.virtualElement);
     props.virtualElement.$el = newElement;
     props.virtualElement.isDisplay = true;
     renderElement($state, props.virtualParent, props.virtualElement, [], ['d-if']);

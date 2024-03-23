@@ -1,6 +1,4 @@
 # TODO
 
-- Implement `{{ count.value }}`
-- Handle `<template></template>`
+- Fixe d-for bug
 - Async
-- Refactoring

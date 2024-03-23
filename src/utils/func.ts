@@ -18,20 +18,6 @@ type Props = {
 const AsyncFunction = async function () {}.constructor;
 
 /**
- * Allow to dispatch a custom event on all elements attached to it
- * @param state
- * @string
- */
-function dispatchCustomEvent($state: State) {
-  return (eventName: string) => {
-    const attachedElements = $state.$events[eventName] ?? [];
-    for (const attachedElement of attachedElements) {
-      attachedElement.dispatchEvent(new CustomEvent(eventName));
-    }
-  };
-}
-
-/**
  * Allow to execute javascript code contained into a string with the current state
  * @param props
  * @returns
@@ -60,14 +46,10 @@ export function func(props: Props) {
     );
   }
 
-  return fn('$el', '$refs', '$dispatch', code).call(
-    getContext({
+  return fn(code).call(
+    getContext($el, {
       ...props.$state,
       $state: stateValues
-    }),
-
-    $el,
-    props.$state.$refs,
-    dispatchCustomEvent(props.$state)
+    })
   );
 }

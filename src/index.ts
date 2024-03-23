@@ -60,14 +60,14 @@ function DOMY(app: App) {
       fn: () => {
         // We remove the watcher too don't trigger it an other time if the user change the value
         const watcher = signal.dependencies.shift() as Dependencie;
-        app.$watch[watcherName].call(getContext($state));
+        app.$watch[watcherName].call(getContext(undefined, $state));
         signal.dependencies.unshift(watcher);
       }
     });
   }
 
   // Init
-  app.$init.call(getContext($state));
+  app.$init.call(getContext(undefined, $state));
 
   $state.isInitialised = true;
   document.addEventListener('DOMContentLoaded', initDomy);
