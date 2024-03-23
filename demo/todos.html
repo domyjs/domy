@@ -35,6 +35,12 @@
         gap: 1rem;
       }
 
+      header {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+      }
+
       .btn-container {
         display: flex;
         gap: 1rem;
@@ -87,10 +93,17 @@
   <body>
     <div d-cloak class="hide loading"><p>Loading...</p></div>
     <main d-cloak>
+      <!-- HEADER -->
+      <header>
+        <h4 d-html="'<p>Year: ' + new Date().getFullYear() + '</p>'"></h4>
+      </header>
+
+      <!-- COUNTER -->
       <section class="counter">
-        <h1>Score: {{ this.count }}</h1>
+        <h1>Score: <span d-text="this.count + ' clicks'"></span></h1>
         <h2>Rendering took: {{ Math.round(this.perf) }}ms</h2>
         <h3 d-ignore>Just need to use {{ this.count }} to render variable</h3>
+
         <div class="btn-container">
           <button @click="this.increment()">+</button>
           <button @click="this.decrement">-</button>
@@ -102,10 +115,26 @@
           <button d-if="this.cheatActivated" @click="this.superDecrement">-10</button>
         </div>
       </section>
+
+      <!-- USERS -->
       <section class="users">
         <div class="searchbar">
           <p>{{ this.search }}</p>
-          <input type="text" d-model="search" placeholder="Search for user..." />
+          <input
+            type="text"
+            d-model="search"
+            placeholder="Search for user..."
+            d-ref="searchInput"
+          />
+          <button
+            style="width: 100%"
+            @click="() => {
+                this.$refs.searchInput.value = '';
+                this.search = '';
+            }"
+          >
+            Reset
+          </button>
         </div>
         <ul d-for="user, index of this.filteredUsers">
           <li>

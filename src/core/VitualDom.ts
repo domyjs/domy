@@ -56,7 +56,7 @@ export class VirtualDom {
       $el: element,
       isDisplay: true,
       visited: false,
-      content: element.textContent?.trim() ?? ''
+      content: element.textContent ?? ''
     };
     return virtualText;
   }

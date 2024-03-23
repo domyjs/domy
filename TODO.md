@@ -11,3 +11,4 @@
 
 - Fixe deep render
 - Async
+- MutationObserver ?
