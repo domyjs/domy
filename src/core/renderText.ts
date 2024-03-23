@@ -32,7 +32,7 @@ export function renderText(
         code,
         returnResult: true,
         $state,
-        notifier: () => renderText($state, virtualParent, virtualElement),
+        notifier: () => renderText($state, virtualParent, virtualElement, injectState),
         virtualElement,
         virtualParent
       });

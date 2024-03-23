@@ -38,7 +38,7 @@ export function renderElement(
       virtualParent,
       virtualElement,
       attr: { name: attr, value: domiesAttributes[attr] },
-      notifier: () => renderElement($state, virtualParent, virtualElement)
+      notifier: () => renderElement($state, virtualParent, virtualElement, injectState)
     };
 
     if (isBindAttr(attr)) {

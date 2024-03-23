@@ -18,8 +18,6 @@ export function events(props: AttrRendererProps) {
     ? domyAttrName.slice(1)
     : domyAttrName.slice('d-on:'.length);
 
-  const $stateObj = props.$state.$state.reduce((a, b) => ({ ...a, [b.name]: b }), {});
-
   // Remove last registered event
   $el.removeAttribute(domyAttrName);
 
