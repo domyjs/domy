@@ -8,12 +8,12 @@
   </head>
   <body>
     <div>
-      <h1 d-text="this.search.value"></h1>
+      <h1 d-text="this.search"></h1>
       <input type="text" d-model="search" />
     </div>
 
     <div d-ignore>
-      <h1 d-text="this.search.value"></h1>
+      <h1 d-text="this.search"></h1>
       <input type="text" d-model="search" />
     </div>
 
@@ -23,47 +23,35 @@
     </div>
 
     <main>
-      <h1 d-text="this.search.value"></h1>
+      <h1 d-text="this.search"></h1>
 
-      <h1>Count: {{ this.count.value }}</h1>
+      <h1>Count: {{ this.count }}</h1>
 
       <h2 d-html="new Date().getFullYear()" d-ref="year"></h2>
 
       <div
-        :style="`width: 50px; height: 50px; background-color: ${this.count.value % 2 === 0 ? 'red' : 'yellow'}`"
+        :style="`width: 50px; height: 50px; background-color: ${this.count % 2 === 0 ? 'red' : 'yellow'}`"
       ></div>
 
-      <button @click="this.activeSupperBtn.set(!this.activeSupperBtn.value)">
-        Active supper btn
-      </button>
+      <button @click="this.activeSupperBtn = !this.activeSupperBtn">Active supper btn</button>
       <button @click="this.incrementCount()">+</button>
-      <button @click="this.count.set((old) => old - 1)">-</button>
+      <button @click="this.count--">-</button>
 
-      <button d-if="this.activeSupperBtn.value" d-on:click="this.count.set((old) => old + 10)">
-        +10
-      </button>
-      <button d-if="this.activeSupperBtn.value" d-on:click="this.count.set((old) => old - 10)">
-        -10
-      </button>
+      <button d-if="this.activeSupperBtn" d-on:click="this.count += 10">+10</button>
+      <button d-if="this.activeSupperBtn" d-on:click="this.count -= 10">-10</button>
 
-      <ul d-if="this.count.value > 0" d-for="test, index of Array(this.count.value).fill('Click')">
+      <ul d-if="this.count > 0" d-for="test, index of Array(this.count).fill('Click')">
         Message:
-        <li d-text="this.test.value + ' ' + this.index.value"></li>
+        <li d-text="this.test + ' ' + this.index"></li>
       </ul>
 
-      <ul d-for="el of this.list.value">
+      <ul d-for="el of this.list">
         Message:
-        <li d-text="this.el.value"></li>
+        <li d-text="this.el"></li>
       </ul>
 
-      <button
-        @click="this.list.set((old) => [...old, this.count.value]) && this.count.set((old) => old + 1)"
-      >
-        Add element
-      </button>
-      <button @click="this.list.set((old) => old.splice(1))  && this.count.set((old) => old - 1)">
-        Remove element
-      </button>
+      <button @click="this.list.push(this.count) && this.count++">Add element</button>
+      <button @click="this.list.shift()  && this.count--">Remove element</button>
     </main>
   </body>
   <script>
@@ -75,7 +63,7 @@
       $watch: {
         count() {
           this.displayThis();
-          this.count.set(Math.max(this.count.value, 0));
+          this.count = Math.max(this.count, 0);
         }
       },
       $state: {
@@ -85,7 +73,7 @@
         search: ''
       },
       $fn: {
-        displayThisSupper() {
+        displayThisSupper: () => {
           console.log('This', this, this.$refs, this.$el);
         },
         displayThis() {
@@ -93,7 +81,7 @@
         },
         incrementCount() {
           this.displayThis();
-          this.count.set(old => old + 1);
+          this.count++;
         }
       }
     });

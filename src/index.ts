@@ -34,7 +34,7 @@ function initDomy() {
   initialDom.visit(callback);
 }
 
-function DOMY(app: App) {
+async function DOMY(app: App) {
   if ($state.isInitialised) throw new Error('DOMY as already be initialised');
 
   // States
@@ -57,17 +57,25 @@ function DOMY(app: App) {
 
     signal.attach({
       $el: null,
-      fn: () => {
+      fn: async () => {
         // We remove the watcher too don't trigger it an other time if the user change the value
         const watcher = signal.dependencies.shift() as Dependencie;
-        app.$watch[watcherName].call(getContext(undefined, $state));
+        try {
+          await app.$watch[watcherName].call(getContext(undefined, $state));
+        } catch (err) {
+          console.error(err);
+        }
         signal.dependencies.unshift(watcher);
       }
     });
   }
 
   // Init
-  app.$init.call(getContext(undefined, $state));
+  try {
+    await app.$init.call(getContext(undefined, $state));
+  } catch (err) {
+    console.error(err);
+  }
 
   $state.isInitialised = true;
   document.addEventListener('DOMContentLoaded', initDomy);
