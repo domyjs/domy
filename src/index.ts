@@ -15,10 +15,8 @@ const $state: State = {
 };
 
 async function initDomy(app: App) {
-  const allElements = document.querySelectorAll('*');
-  const rootElements = Array.from(allElements).filter(el => !el.parentElement);
-
-  const initialDom = new VirtualDom(rootElements);
+  const body = document.body;
+  const initialDom = new VirtualDom([body]);
 
   function callback(
     virtualParent: VirtualElement | null,

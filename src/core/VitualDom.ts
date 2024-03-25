@@ -152,7 +152,7 @@ export class VirtualDom {
       const isText = 'content' in element;
 
       const shouldBeVisit = isText
-        ? parent?.tag !== 'script'
+        ? true
         : typeof element.domiesAttributes['d-ignore'] !== 'string' &&
           typeof parent?.domiesAttributes['d-for'] !== 'string' &&
           element.tag !== 'comment';
