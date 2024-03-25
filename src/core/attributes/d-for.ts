@@ -35,19 +35,16 @@ export function dFor(props: AttrRendererProps) {
     notifier: props.notifier
   });
 
-  let index = 0;
-
-  function renderer(value: any) {
-    let childIndex = 0;
-
-    for (const child of childsWithoutText) {
-      const oldChildIndex = index * props.virtualElement.childs.length + childIndex;
+  function renderer(value: any, valueIndex: number) {
+    for (let childIndex = 0; childIndex < childsWithoutText.length; ++childIndex) {
+      const child = childsWithoutText[childIndex];
+      const currentIndex = valueIndex * props.virtualElement.childs.length + childIndex;
 
       // TODO: We don't need to setup the proxy because the value should be edited ? (try with this.el.test = 'hello')
       const toInject = res!.groups!.index
         ? [
             new Signal(res!.groups!.dest, value, false),
-            new Signal(res!.groups!.index, index, false)
+            new Signal(res!.groups!.index, valueIndex, false)
           ]
         : [new Signal(res!.groups!.dest, value, false)];
 
@@ -65,28 +62,26 @@ export function dFor(props: AttrRendererProps) {
           virtualParent: props.virtualParent
         });
         const elementWithKeyIndex = oldChilds.findIndex(
-          el => el.getAttribute('key') === new String(keyValue).toString()
+          el => el.getAttribute('key') === keyValue.toString()
         );
         if (elementWithKeyIndex !== -1) {
-          if (elementWithKeyIndex !== oldChildIndex) {
+          if (elementWithKeyIndex !== currentIndex) {
             // If the index of the element changed we move it to is new position
             const elementWithKey = oldChilds[elementWithKeyIndex];
-            moveElement(elementWithKey, oldChildIndex);
+            moveElement(elementWithKey, currentIndex);
           }
-          ++index;
           continue;
         }
       }
 
-      console.log('render');
+      console.log('render', value);
 
       // Create and render the new element
       const newElement = VirtualDom.createElementFromVirtual(child);
       child.$el = newElement as Element;
       deepRender($state, props.virtualElement, child, toInject);
 
-      const oldRender: ChildNode | undefined = $el.childNodes[oldChildIndex];
-      ++childIndex;
+      const oldRender: ChildNode | undefined = $el.childNodes[currentIndex];
 
       // We compare if we need to replace the old rendering or not
       if (!oldRender) {
@@ -94,21 +89,28 @@ export function dFor(props: AttrRendererProps) {
         continue;
       }
 
+      // TODO: Fixe this
       const isEqual = oldRender.isEqualNode(newElement);
+      console.log(oldRender, newElement);
       if (!isEqual) replaceElement(oldRender, newElement);
     }
-
-    ++index;
   }
 
+  let valueIndex = 0;
   if (isForIn) {
-    for (const value in executedValue) renderer(value);
+    for (const value in executedValue) {
+      renderer(value, valueIndex);
+      ++valueIndex;
+    }
   } else {
-    for (const value of executedValue) renderer(value);
+    for (const value of executedValue) {
+      renderer(value, valueIndex);
+      ++valueIndex;
+    }
   }
 
   // Remove remaining childs that shouldn't be there
-  const totalChildsRendered = index * props.virtualElement.childs.length;
+  const totalChildsRendered = valueIndex * props.virtualElement.childs.length;
   const totalChilds = $el.childNodes.length;
   if (totalChildsRendered !== totalChilds) {
     const childsToRemove = [];
