@@ -49,7 +49,7 @@ export function dFor(props: AttrRendererProps) {
       const toInject = res!.groups!.index
         ? [
             new Signal(res!.groups!.dest, value, false),
-            new Signal(res!.groups!.index, valueIndex, false)
+            new Signal(res!.groups!.index, valueIndex, false) // Don't need update for sure, we don't update an index
           ]
         : [new Signal(res!.groups!.dest, value, false)];
 
