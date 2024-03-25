@@ -32,14 +32,10 @@
             idEl: ++id,
             name: Math.random().toString(36)
           };
-          const index = Math.floor(Math.random() * (this.list.length + 1));
-          this.list.splice(index, 0, el);
-          // this.list.push(el);
+          this.list.push(el);
         },
         removeElement() {
-          const index = Math.floor(Math.random() * this.list.length);
-          this.list.splice(index, 1);
-          // this.list.pop();
+          this.list.pop();
         }
       }
     });

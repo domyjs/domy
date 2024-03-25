@@ -1,6 +1,6 @@
 import { deepRender } from '@core/deepRender';
 import { Signal } from '@core/Signal';
-import { VirtualDom } from '@core/VitualDom';
+import { VirtualDom, VirtualElement } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { func } from '@utils/func';
 import { moveElement } from '@utils/moveElement';
@@ -12,8 +12,11 @@ export function dFor(props: AttrRendererProps) {
 
   const $el = props.virtualElement.$el;
   const $state = props.$state;
+  const oldChilds = Array.from($el.children ?? []);
   // We remove text because it's to heavy due to the fact we can't put key on it
-  const childsWithoutText = props.virtualElement.childs.filter(el => !('content' in el));
+  const childsWithoutText = props.virtualElement.childs.filter(
+    el => !('content' in el)
+  ) as VirtualElement[];
 
   // Remove the original content
   if (!props.virtualElement.initialised) {
@@ -35,10 +38,12 @@ export function dFor(props: AttrRendererProps) {
     notifier: props.notifier
   });
 
+  const renderedChildrens: (Element | ChildNode)[] = [];
+
   function renderer(value: any, valueIndex: number) {
     for (let childIndex = 0; childIndex < childsWithoutText.length; ++childIndex) {
       const child = childsWithoutText[childIndex];
-      const currentIndex = valueIndex * props.virtualElement.childs.length + childIndex;
+      const currentIndex = valueIndex * childsWithoutText.length + childIndex;
 
       // TODO: We don't need to setup the proxy because the value should be edited ? (try with this.el.test = 'hello')
       const toInject = res!.groups!.index
@@ -50,7 +55,6 @@ export function dFor(props: AttrRendererProps) {
 
       // Check if the key already exist to we can skip render
       if ('key' in child && child.key) {
-        const oldChilds = Array.from($el.children ?? []);
         const keyValue = func({
           code: child.key,
           returnResult: true,
@@ -65,20 +69,19 @@ export function dFor(props: AttrRendererProps) {
           el => el.getAttribute('key') === keyValue.toString()
         );
         if (elementWithKeyIndex !== -1) {
+          const elementWithKey = oldChilds[elementWithKeyIndex];
           if (elementWithKeyIndex !== currentIndex) {
             // If the index of the element changed we move it to is new position
-            const elementWithKey = oldChilds[elementWithKeyIndex];
             moveElement(elementWithKey, currentIndex);
           }
+          renderedChildrens.push(elementWithKey);
           continue;
         }
       }
 
-      console.log('render', value);
-
       // Create and render the new element
-      const newElement = VirtualDom.createElementFromVirtual(child);
-      child.$el = newElement as Element;
+      const newElement = VirtualDom.createElementFromVirtual(child) as Element;
+      child.$el = newElement;
       deepRender($state, props.virtualElement, child, toInject);
 
       const oldRender: ChildNode | undefined = $el.childNodes[currentIndex];
@@ -86,11 +89,17 @@ export function dFor(props: AttrRendererProps) {
       // We compare if we need to replace the old rendering or not
       if (!oldRender) {
         $el.appendChild(newElement);
+        renderedChildrens.push(newElement);
         continue;
       }
 
       const isEqual = oldRender.isEqualNode(newElement);
-      if (!isEqual) oldRender.parentNode!.insertBefore(newElement as Element, oldRender);
+      if (!isEqual) {
+        oldRender.parentNode!.insertBefore(newElement, oldRender);
+        renderedChildrens.push(newElement);
+      } else {
+        renderedChildrens.push(oldRender);
+      }
     }
   }
 
@@ -108,15 +117,10 @@ export function dFor(props: AttrRendererProps) {
   }
 
   // Remove remaining childs that shouldn't be there
-  const totalChildsRendered = valueIndex * props.virtualElement.childs.length;
-  const totalChilds = $el.childNodes.length;
-  if (totalChildsRendered !== totalChilds) {
-    const childsToRemove = [];
-    for (let i = totalChildsRendered; i < totalChilds; ++i) {
-      childsToRemove.push($el.childNodes[i]);
-    }
-    for (const child of childsToRemove) {
-      child.remove();
-    }
+  const childrendsToRemove = Array.from($el.children ?? []).filter(
+    child => !renderedChildrens.includes(child)
+  );
+  for (const child of childrendsToRemove) {
+    child.remove();
   }
 }
