@@ -13,8 +13,7 @@
 - prevValue and newValue for watcher
 - func handle functions
 - Fixe deep render
-- :key and apply change for d-for (likes attributes/textcontent ...)
+
 - Async
 - MutationObserver ?
-
 - Improve speed !!!
