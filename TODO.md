@@ -11,7 +11,7 @@
 
 - Fixe d-for
 - prevValue and newValue for watcher
-- func handle functions
+- func handle functions ?
 - Fixe deep render
 
 - Async
