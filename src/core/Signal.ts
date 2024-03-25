@@ -1,6 +1,6 @@
 import { DeepProxy } from '../utils/DeepProxy';
 
-export type Dependencie = { $el: Element | Text | null; fn: () => void };
+export type Dependencie = { $el: Element | Text | null; fn: () => void; unactive?: boolean };
 
 /**
  * Create a signal to spy a variable and notify the observers that need this dependencie
@@ -53,7 +53,7 @@ export class Signal {
   public notifyAll() {
     console.log('notify called');
     for (const dep of this.dependencies) {
-      dep.fn();
+      if (!dep.unactive) dep.fn();
     }
   }
 

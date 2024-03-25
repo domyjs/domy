@@ -20,9 +20,6 @@ export function renderText(
   virtualElement: VirtualText,
   injectState: Signal[] = []
 ) {
-  // we inject the state for this rendering
-  $state.$state.unshift(...injectState);
-
   const $el = virtualElement.$el;
 
   $el.textContent = virtualElement.content.replace(
@@ -31,14 +28,14 @@ export function renderText(
       return func({
         code,
         returnResult: true,
-        $state,
+        $state: {
+          ...$state,
+          $state: [...$state.$state, ...injectState]
+        },
         notifier: () => renderText($state, virtualParent, virtualElement, injectState),
         virtualElement,
         virtualParent
       });
     }
   );
-
-  // We remove injected states
-  $state.$state.splice(0, injectState.length);
 }

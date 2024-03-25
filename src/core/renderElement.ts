@@ -21,9 +21,6 @@ export function renderElement(
   injectState: Signal[] = [],
   byPassAttributes: string[] = []
 ) {
-  // we inject the state for this rendering
-  $state.$state.unshift(...injectState);
-
   const domiesAttributes = virtualElement.domiesAttributes;
 
   for (const attr of Object.keys(domiesAttributes)) {
@@ -34,7 +31,10 @@ export function renderElement(
     if (attr !== 'd-if' && !virtualElement.isDisplay) continue;
 
     const props: AttrRendererProps = {
-      $state,
+      $state: {
+        ...$state,
+        $state: [...$state.$state, ...injectState]
+      },
       virtualParent,
       virtualElement,
       attr: { name: attr, value: domiesAttributes[attr] },
@@ -49,7 +49,4 @@ export function renderElement(
       domies(props);
     }
   }
-
-  // We remove injected states
-  $state.$state.splice(0, injectState.length);
 }

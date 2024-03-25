@@ -1,14 +1,5 @@
 # TODO
 
-- textContent fixe
-
-```html
-<div class="searchbar">
-  {{ this.search }}
-  <input type="text" d-model="search" placeholder="Search for user..." />
-</div>
-```
-
 - Fixe d-for speed
 
 - Warning for no :key in d-for

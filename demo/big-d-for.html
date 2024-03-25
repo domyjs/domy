@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <p>{{ this.count }}</p>
+
+    <button @click="this.count += 1000">Add</button>
+
+    <ul d-for="el of Array(this.count).fill('heyyyyysdsdsdsdsdsdsdsdsdsd')">
+      <li>heyyyyysdsdsdsdsdsdsdsdsdsd</li>
+    </ul>
+  </body>
+  <script>
+    window.DOMY({
+      $state: {
+        count: 0
+      }
+    });
+  </script>
+</html>

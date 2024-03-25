@@ -1,3 +1,4 @@
+import { Dependencie } from '@core/Signal';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 
 const EVENT_KEY = 'dMdodelEvents';
@@ -13,7 +14,10 @@ export function dModel(props: AttrRendererProps) {
   if (!currentSignal) throw new Error(`Invalide data name in d-model: "${signalName}"`);
 
   function changeValue() {
+    const dep = currentSignal!.dependencies.find(dep => dep.$el === $el) as Dependencie;
+    dep.unactive = true;
     currentSignal!.set($el?.value ?? '');
+    dep.unactive = false;
   }
 
   // Listener handler

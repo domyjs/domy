@@ -68,13 +68,14 @@ async function DOMY(app: App) {
       $el: null,
       fn: async () => {
         // We remove the watcher too don't trigger it an other time if the user change the value
-        const watcher = signal.dependencies.shift() as Dependencie;
+        const watcher = signal.dependencies[0] as Dependencie;
+        watcher.unactive = true;
         try {
           await app.$watch![watcherName].call(getContext(undefined, $state));
         } catch (err) {
           console.error(err);
         }
-        signal.dependencies.unshift(watcher);
+        watcher.unactive = false;
       }
     });
   }

@@ -135,11 +135,13 @@ export class VirtualDom {
       const element = childs.shift() as VirtualElement | VirtualText;
       const isText = 'content' in element;
 
-      const shouldBeVisit =
-        !isText &&
-        typeof element.domiesAttributes['d-ignore'] !== 'string' &&
-        typeof parent?.domiesAttributes['d-for'] !== 'string';
-      if (!isText && !shouldBeVisit) continue;
+      const shouldBeVisit = isText
+        ? parent?.tag !== 'script'
+        : typeof element.domiesAttributes['d-ignore'] !== 'string' &&
+          typeof parent?.domiesAttributes['d-for'] !== 'string' &&
+          element.tag !== 'comment';
+
+      if (!shouldBeVisit) continue;
 
       element.visited = true;
       cb(parent, element);
