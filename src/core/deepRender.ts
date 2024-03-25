@@ -44,6 +44,4 @@ export function deepRender(
       }
     }
   }
-
-  console.log((virtualElement.$el as any).innerHTML);
 }
