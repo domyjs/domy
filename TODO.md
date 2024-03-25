@@ -1,6 +1,6 @@
 # TODO
 
-- textContent
+- textContent fixe
 
 ```html
 <div class="searchbar">
