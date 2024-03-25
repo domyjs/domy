@@ -18,7 +18,12 @@ export class Signal {
   }
 
   public getProxy() {
-    return this.needProxy ? new DeepProxy(this.val, () => this.notifyAll()) : this.val;
+    if (this.needProxy) {
+      const deepProxy = new DeepProxy(this.val, () => this.notifyAll());
+      return deepProxy.getProxy();
+    } else {
+      return this.val;
+    }
   }
 
   public attach(dependencie: Dependencie) {

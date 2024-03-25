@@ -7,12 +7,14 @@ export class DeepProxy {
   constructor(
     private target: any,
     private notifyAll: () => void
-  ) {
+  ) {}
+
+  public getProxy() {
     return this.createProxy(this.target);
   }
 
   private createProxy(target: any): any {
-    if (!(Array.isArray(target) || isObject(target))) {
+    if (!Array.isArray(target) && !isObject(target)) {
       return target;
     }
 
@@ -23,6 +25,7 @@ export class DeepProxy {
         return result;
       }
     };
+
     return new Proxy(target, handler);
   }
 

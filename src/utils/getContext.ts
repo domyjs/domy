@@ -4,8 +4,6 @@ import { Signal } from '@core/Signal';
 
 const proxyHandler: ProxyHandler<any> = {
   get(target, key, receiver) {
-    if (typeof key === 'symbol' || !(key in target)) return;
-
     const typedKey = key as keyof typeof target;
 
     if (target[typedKey] instanceof Signal) {
@@ -15,8 +13,6 @@ const proxyHandler: ProxyHandler<any> = {
     return Reflect.get(target, key, receiver);
   },
   set(target, key, newValue, receiver) {
-    if (typeof key === 'symbol' || !(key in target)) return false;
-
     const typedKey = key as keyof typeof target;
 
     if (target[typedKey] instanceof Signal) {

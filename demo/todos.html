@@ -125,14 +125,14 @@
           <p>{{ this.search }}</p>
           <input
             type="text"
-            d-model="search"
+            d-model="this.search"
             placeholder="Search for user..."
             d-ref="searchInput"
           />
           <button
             style="width: 100%"
             @click="() => {
-                this.$refs.searchInput.value = '';
+                this.$refs.searchInput.placeholder = 'Search for a new user ...';
                 this.search = '';
             }"
           >
@@ -140,8 +140,8 @@
           </button>
         </div>
         <ul d-for="user, index of this.filteredUsers">
-          <li d-text="this.index + ': ' + this.user">
-            <!-- <p d-text="this.index + 1">{{ this.index + 1}}: {{ this.user }}</p> -->
+          <li>
+            <p d-text="this.index + 1">{{ this.index + 1}}: {{ this.user }}</p>
           </li>
         </ul>
       </section>
@@ -150,6 +150,7 @@
   <script>
     window.DOMY({
       async $setup() {
+        console.log(this.perf);
         // await new Promise(r => setTimeout(r, 3000));
         this.perf = performance.now();
         this.filteredUsers = this.users;

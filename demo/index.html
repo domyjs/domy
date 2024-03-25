@@ -41,12 +41,10 @@
       <button d-if="this.activeSupperBtn" d-on:click="this.count -= 10">-10</button>
 
       <ul d-if="this.count > 0" d-for="test, index of Array(this.count).fill('Click')">
-        Message:
         <li d-text="this.test + ' ' + this.index"></li>
       </ul>
 
       <ul d-for="el of this.list">
-        Message:
         <li d-text="this.el"></li>
       </ul>
 
