@@ -4,11 +4,11 @@ import { VirtualDom, VirtualElement } from '@core/VitualDom';
 import { AttrRendererProps } from '@typing/AttrRendererProps';
 import { func } from '@utils/func';
 import { moveElement } from '@utils/moveElement';
-import { replaceElement } from '@utils/replaceElement';
-import { restoreElement } from '@utils/restoreElement';
 
 export function dFor(props: AttrRendererProps) {
   if (!props.virtualParent) return;
+
+  const perf = performance.now();
 
   const $el = props.virtualElement.$el;
   const $state = props.$state;
@@ -82,6 +82,7 @@ export function dFor(props: AttrRendererProps) {
       // Create and render the new element
       const newElement = VirtualDom.createElementFromVirtual(child) as Element;
       child.$el = newElement;
+      // TODO: Fixe because it's really slow
       deepRender($state, props.virtualElement, child, toInject);
 
       const oldRender: ChildNode | undefined = $el.childNodes[currentIndex];
@@ -123,4 +124,6 @@ export function dFor(props: AttrRendererProps) {
   for (const child of childrendsToRemove) {
     child.remove();
   }
+
+  console.log(performance.now() - perf);
 }

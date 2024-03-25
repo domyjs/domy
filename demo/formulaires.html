@@ -12,6 +12,8 @@
 
     <button @click="this.createElement()">Add</button>
     <button @click="this.removeElement()">Remove</button>
+    <button @click="this.screateElement()">Supper add</button>
+    <button @click="this.sremoveElement()">Supper remove</button>
 
     <ul d-for="el of this.list">
       <li :key="this.el.idEl" d-text="'id: ' + this.el.idEl + ' name: ' + this.el.name"></li>
@@ -27,6 +29,16 @@
         list: []
       },
       $fn: {
+        screateElement() {
+          for (let i = 0; i < 1000; ++i) {
+            this.createElement();
+          }
+        },
+        sremoveElement() {
+          for (let i = 0; i < 1000; ++i) {
+            this.removeElement();
+          }
+        },
         createElement() {
           const el = {
             idEl: ++id,
