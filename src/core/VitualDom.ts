@@ -92,7 +92,17 @@ export class VirtualDom {
       ? (element as HTMLTemplateElement).content.childNodes
       : element.childNodes;
     for (const child of elementChilds) {
-      virtualElement.childs.push(this.getVirtual(child as Text | Element));
+      const childElement = this.getVirtual(child as Text | Element);
+      virtualElement.childs.push(childElement);
+
+      // Display warning for child in d-for parent that don't have the :key attribute
+      if (
+        !('content' in childElement) &&
+        virtualElement.domiesAttributes['d-for'] &&
+        !childElement.domiesAttributes[':key']
+      ) {
+        console.warn('Elements inside a d-for parent should be rendered with :key attribute');
+      }
     }
 
     return virtualElement;
@@ -102,7 +112,11 @@ export class VirtualDom {
     virtualElement: VirtualElement | VirtualText
   ): Element | Text {
     // If it's textContent
-    if ('content' in virtualElement) return document.createTextNode(virtualElement.content);
+    if ('content' in virtualElement) {
+      const textElement = document.createTextNode(virtualElement.content);
+      virtualElement.$el = textElement;
+      return textElement;
+    }
 
     const element = document.createElement(virtualElement.tag);
 
@@ -115,6 +129,8 @@ export class VirtualDom {
     for (const child of virtualElement.childs) {
       element.appendChild(VirtualDom.createElementFromVirtual(child));
     }
+
+    virtualElement.$el = element;
 
     return element;
   }

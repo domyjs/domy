@@ -81,7 +81,6 @@ export function dFor(props: AttrRendererProps) {
 
       // Create and render the new element
       const newElement = VirtualDom.createElementFromVirtual(child) as Element;
-      child.$el = newElement;
       // TODO: Fixe because it's really slow
       deepRender($state, props.virtualElement, child, toInject);
 

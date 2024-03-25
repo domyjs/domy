@@ -26,7 +26,6 @@ export function dIf(props: AttrRendererProps) {
   } else if (!props.virtualElement.isDisplay && shouldBeDisplay) {
     const newElement = VirtualDom.createElementFromVirtual(props.virtualElement) as Element;
     const indexToInsert = findElementIndex(props.virtualParent, props.virtualElement);
-    props.virtualElement.$el = newElement;
     props.virtualElement.isDisplay = true;
     deepRender($state, props.virtualParent, props.virtualElement, [], ['d-if']);
     restoreElement(props.virtualParent.$el, newElement, indexToInsert);

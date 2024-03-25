@@ -3,7 +3,11 @@ import { Signal } from './Signal';
 import { VirtualElement, VirtualText } from './VitualDom';
 import { render } from './render';
 
-type Elem = { parent: VirtualElement | null; element: VirtualElement | VirtualText };
+type Elem = {
+  parent: VirtualElement | null;
+  element: VirtualElement | VirtualText;
+  byPassAttributes?: string[];
+};
 
 /**
  * Deep render an element or textContent with hsi childs
@@ -21,12 +25,15 @@ export function deepRender(
   injectState: Signal[] = [],
   byPassAttributes: string[] = []
 ) {
-  const toRenderList: Elem[] = [{ parent: virtualParent, element: virtualElement }];
+  const toRenderList: Elem[] = [
+    { parent: virtualParent, element: virtualElement, byPassAttributes }
+  ];
 
   while (toRenderList.length > 0) {
     const toRender = toRenderList.shift() as Elem;
 
-    render($state, toRender.parent, toRender.element, injectState, byPassAttributes);
+    toRender.element.isDisplay = true;
+    render($state, toRender.parent, toRender.element, injectState, toRender.byPassAttributes);
 
     if ('childs' in toRender.element) {
       for (const child of toRender.element.childs) {
@@ -37,4 +44,6 @@ export function deepRender(
       }
     }
   }
+
+  console.log((virtualElement.$el as any).innerHTML);
 }

@@ -114,7 +114,13 @@
           <button d-show="!this.cheatActivated" @click="this.cheatActivated = !this.cheatActivated">
             Active cheat
           </button>
-          <button d-if="this.cheatActivated" @click="this.superIncrement()">+10</button>
+          <button
+            d-if="this.cheatActivated"
+            @click="this.superIncrement()"
+            :style="'color:' + 'blue'"
+          >
+            <p :style="'color:' + 'red'" d-if="this.count > 1">{{ '+10' }}</p>
+          </button>
           <button d-if="this.cheatActivated" @click="this.superDecrement">-10</button>
         </div>
       </section>
@@ -140,8 +146,8 @@
           </button>
         </div>
         <ul d-for="user, index of this.filteredUsers">
-          <li>
-            <p d-text="this.index + 1">{{ this.index + 1}}: {{ this.user }}</p>
+          <li :key="this.user">
+            <p>{{ this.index + 1}}: {{ this.user }}</p>
           </li>
         </ul>
       </section>
