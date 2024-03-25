@@ -11,7 +11,7 @@ import { AttrRendererProps } from '@typing/AttrRendererProps';
  * @param virtualParent
  * @param virtualElement
  * @param injectState Inject a state just for this render
- * @param byPassAttributes Attrbiutes to do not look
+ * @param byPassAttributes Attributes to do not look
  * @returns
  */
 export function renderElement(

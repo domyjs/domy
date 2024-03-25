@@ -8,8 +8,8 @@ type Props = {
   $state: State;
   virtualParent: VirtualElement | null;
   virtualElement: VirtualElement | VirtualText;
-  notifier: AttrRendererProps['notifier'];
 
+  notifier?: AttrRendererProps['notifier'];
   context?: unknown;
   isAsync?: boolean;
   returnResult?: boolean;
@@ -37,13 +37,15 @@ export function func(props: Props) {
   });
 
   // We spy every dependencie to attach a listener if needed
-  for (const signal of stateValues) {
-    signal.setCallBackOnCall(() =>
-      signal.attach({
-        $el,
-        fn: props.notifier
-      })
-    );
+  if (props.notifier) {
+    for (const signal of stateValues) {
+      signal.setCallBackOnCall(() =>
+        signal.attach({
+          $el,
+          fn: props.notifier as Exclude<Props['notifier'], undefined>
+        })
+      );
+    }
   }
 
   return fn(code).call(

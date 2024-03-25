@@ -12,7 +12,7 @@ import { func } from '@utils/func';
  * @param $state
  * @param virtualParent
  * @param virtualElement
- * @param injectState
+ * @param injectState Inject a state just for this render
  */
 export function renderText(
   $state: State,

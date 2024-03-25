@@ -2,6 +2,31 @@ import { State } from '@typing/State';
 import { dispatchCustomEvent } from './dispatchCustomEvent';
 import { Signal } from '@core/Signal';
 
+const proxyHandler: ProxyHandler<any> = {
+  get(target, key, receiver) {
+    if (typeof key === 'symbol' || !(key in target)) return;
+
+    const typedKey = key as keyof typeof target;
+
+    if (target[typedKey] instanceof Signal) {
+      return target[typedKey].value;
+    }
+
+    return Reflect.get(target, key, receiver);
+  },
+  set(target, key, newValue, receiver) {
+    if (typeof key === 'symbol' || !(key in target)) return false;
+
+    const typedKey = key as keyof typeof target;
+
+    if (target[typedKey] instanceof Signal) {
+      return target[typedKey].set(newValue);
+    }
+
+    return Reflect.set(target, key, newValue, receiver);
+  }
+};
+
 /**
  * Create the context for the application with datas and functions
  * @param $state
@@ -32,30 +57,7 @@ export function getContext($el: Element | Text | undefined, $state: State) {
   // Add a proxy for some magic to turn it like this:
   // this.count.value -> this.count
   // this.count.set((old) => old += 10) -> this.count += 10
-  const context = new Proxy(contextDatas, {
-    get(target, key, receiver) {
-      if (typeof key === 'symbol' || !(key in target)) return;
-
-      const typedKey = key as keyof typeof target;
-
-      if (target[typedKey] instanceof Signal) {
-        return target[typedKey].value;
-      }
-
-      return Reflect.get(target, key, receiver);
-    },
-    set(target, key, newValue, receiver) {
-      if (typeof key === 'symbol' || !(key in target)) return false;
-
-      const typedKey = key as keyof typeof target;
-
-      if (target[typedKey] instanceof Signal) {
-        return target[typedKey].set(newValue);
-      }
-
-      return Reflect.set(target, key, newValue, receiver);
-    }
-  });
+  const context = new Proxy(contextDatas, proxyHandler);
 
   return context;
 }

@@ -95,7 +95,10 @@
     <main d-cloak>
       <!-- HEADER -->
       <header>
-        <h4 d-html="'<p>Year: ' + new Date().getFullYear() + '</p>'"></h4>
+        <h4
+          d-html="'<p>Year: ' + new Date().getFullYear() + '</p>'"
+          :style="'color:' + (this.count % 2 === 0 ? 'red' : 'blue')"
+        ></h4>
       </header>
 
       <!-- COUNTER -->

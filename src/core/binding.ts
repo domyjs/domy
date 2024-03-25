@@ -27,6 +27,14 @@ export function binding(props: AttrRendererProps) {
     notifier: props.notifier
   });
 
+  // Handle key attribute
+  if (attrName === 'key' && !props.virtualElement.key) {
+    if (typeof executedValue !== 'string' && typeof executedValue !== 'number')
+      throw new Error(`Invalide key value: "${executedValue}"`);
+
+    props.virtualElement.key = props.attr.value;
+  }
+
   $el.removeAttribute(domyAttrName);
   $el.setAttribute(attrName, executedValue);
 }

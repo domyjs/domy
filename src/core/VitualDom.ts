@@ -14,6 +14,7 @@ export type VirtualText = {
 
 export type VirtualElement = {
   $el: Element;
+  key?: string;
   tag: string;
   isDisplay: boolean;
   visited: boolean;

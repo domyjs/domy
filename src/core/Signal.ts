@@ -1,3 +1,5 @@
+import { DeepProxy } from '../utils/DeepProxy';
+
 export type Dependencie = { $el: Element | Text | null; fn: () => void };
 
 /**
@@ -9,8 +11,15 @@ export class Signal {
 
   constructor(
     public name: string,
-    private val: any
-  ) {}
+    public val: any,
+    public needProxy = true
+  ) {
+    this.val = this.getProxy();
+  }
+
+  public getProxy() {
+    return this.needProxy ? new DeepProxy(this.val, () => this.notifyAll()) : this.val;
+  }
 
   public attach(dependencie: Dependencie) {
     const $elAlreadyAttach = this.dependencies.some(dep => dep.$el === dependencie.$el);
@@ -29,17 +38,15 @@ export class Signal {
   }
 
   public set(setter: ((val: any) => any) | any) {
+    console.log('setter called');
     this.val = typeof setter === 'function' ? setter(this.val) : setter;
+    this.val = this.getProxy();
     this.notifyAll();
     return true;
   }
 
-  public setWithoutUpdate(setter: ((val: any) => any) | any) {
-    this.val = typeof setter === 'function' ? setter(this.val) : setter;
-    return true;
-  }
-
-  private notifyAll() {
+  public notifyAll() {
+    console.log('notify called');
     for (const dep of this.dependencies) {
       dep.fn();
     }
