@@ -89,10 +89,8 @@ export function dFor(props: AttrRendererProps) {
         continue;
       }
 
-      // TODO: Fixe this
       const isEqual = oldRender.isEqualNode(newElement);
-      console.log(oldRender, newElement);
-      if (!isEqual) replaceElement(oldRender, newElement);
+      if (!isEqual) oldRender.parentNode!.insertBefore(newElement as Element, oldRender);
     }
   }
 

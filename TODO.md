@@ -9,7 +9,7 @@
 </div>
 ```
 
-- Fixe d-for
+- Fixe d-for remove
 - prevValue and newValue for watcher
 - func handle functions ?
 - Fixe deep render
