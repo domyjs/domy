@@ -14,6 +14,7 @@
 - func handle functions ?
 - Fixe deep render
 
-- Async
+- Test class in state
+- Async ?
 - MutationObserver ?
-- Improve speed !!!
+- Improve speed ?
