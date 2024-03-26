@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$fn</title>
+    <script src="/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ this.count }}</h1>
+    <button id="inc" @click="this.increment">+</button>
+    <button id="dec" @click="this.decrement()">-</button>
+    <button id="sinc" @click="this.superIncrement">+10</button>
+    <button id="sdec" @click="this.superDecrement()">-10</button>
+  </body>
+  <script>
+    window.DOMY({
+      $state: {
+        count: 0
+      },
+      $fn: {
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        },
+        superIncrement() {
+          for (let i = 0; i < 10; ++i) {
+            this.increment();
+          }
+        },
+        superDecrement() {
+          for (let i = 0; i < 10; ++i) {
+            this.decrement();
+          }
+        }
+      }
+    });
+  </script>
+</html>

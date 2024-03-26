@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-if</title>
+    <script src="/dist/index.js"></script>
+  </head>
+  <body>
+    <main d-if="this.count > 0">
+      <p d-if="this.count > 2" id="p2">{{ this.count }}</p>
+      <p d-if="this.count > 0" id="p0">{{ this.count }}</p>
+      <p d-if="this.count > 1" id="p1">{{ this.count }}</p>
+    </main>
+    <button id="inc" @click="this.count++">Increment count</button>
+    <button id="dec" @click="this.count--">Decrement count</button>
+  </body>
+  <script>
+    window.DOMY({
+      $state: {
+        count: 0
+      }
+    });
+  </script>
+</html>

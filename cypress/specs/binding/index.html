@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>binding</title>
+    <script src="/dist/index.js"></script>
+  </head>
+  <body>
+    <h1 :style="this.style" :id="this.id">Id: {{ this.id }}</h1>
+    <button @click="this.update()">Update id and color</button>
+  </body>
+  <script>
+    window.DOMY({
+      $state: {
+        id: 0,
+        style: { backgroundColor: 'red' }
+      },
+      $fn: {
+        update() {
+          this.id++;
+          this.style.backgroundColor = 'green';
+        }
+      }
+    });
+  </script>
+</html>

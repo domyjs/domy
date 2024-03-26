@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-cloak</title>
+    <script src="/dist/index.js"></script>
+  </head>
+  <body>
+    <main d-cloak>{{ this.msg }}</main>
+  </body>
+  <script>
+    window.DOMY({
+      async $setup() {
+        await new Promise(r => setTimeout(r, 1000));
+      },
+      $state: {
+        msg: 'Hello World!'
+      }
+    });
+  </script>
+</html>

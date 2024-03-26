@@ -3,17 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>text</title>
+    <title>d-model</title>
     <script src="/dist/index.js"></script>
   </head>
   <body>
-    <h1>{{ this.msg }}</h1>
-    <button @click="this.msg = 'Bye World!'">Change to Bye World!</button>
+    <button @click="this.search = 'Bye World!'">Set to Bye World!</button>
+    <input type="text" d-model="this.search" />
+    <p>{{ this.search }}</p>
   </body>
   <script>
     window.DOMY({
       $state: {
-        msg: 'Hello World!'
+        search: 'Hello World!'
       }
     });
   </script>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$watch</title>
+    <script src="/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>Count: {{ this.count }}</h1>
+    <button id="inc" @click="this.count++">+</button>
+    <button id="dec" @click="this.count--">-</button>
+  </body>
+  <script>
+    window.DOMY({
+      $watch: {
+        count() {
+          this.count = Math.max(0, this.count);
+        }
+      },
+      $state: {
+        count: 0
+      }
+    });
+  </script>
+</html>

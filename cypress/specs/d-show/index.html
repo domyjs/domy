@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-show</title>
+    <script src="/dist/index.js"></script>
+  </head>
+  <body>
+    <modal d-show="this.show"> Hello from a modal </modal>
+    <button @click="this.show = !this.show">Hide/Show modal</button>
+  </body>
+  <script>
+    window.DOMY({
+      $state: {
+        show: false
+      }
+    });
+  </script>
+</html>
