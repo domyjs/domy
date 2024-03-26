@@ -1,3 +1,3 @@
 # domy
 
-A lightweight javaScript framework
+A lightweight and minimal javascript framework

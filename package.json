@@ -1,7 +1,7 @@
 {
   "name": "domy",
   "version": "1.0.0",
-  "description": "A lightweight javaScript framework",
+  "description": "A lightweight and minimal javascript framework",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
