@@ -39,6 +39,8 @@ export function domies(props: AttrRendererProps) {
       ($el as HTMLElement).style.display = getExecutedValue() ? '' : 'none';
       break;
     case 'd-ref':
+      if (props.$state.$refs[props.attr.value])
+        throw new Error(`A ref with the name "${props.attr.value}" already exist.`);
       props.$state.$refs[props.attr.value] = $el;
       break;
     case 'd-if':
