@@ -27,7 +27,6 @@ export type VirtualElement = {
     [name: string]: string;
   };
   childs: (VirtualElement | VirtualText)[];
-  dForRenderedChilds: VirtualElement[];
 };
 
 export class VirtualDom {
@@ -76,8 +75,7 @@ export class VirtualDom {
       events: {},
       domiesAttributes: {},
       normalAttributes: {},
-      childs: [],
-      dForRenderedChilds: []
+      childs: []
     };
 
     // Add attributes

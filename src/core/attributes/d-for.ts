@@ -38,9 +38,11 @@ export function dFor(props: AttrRendererProps) {
   const renderedChildrens: (Element | ChildNode)[] = [];
 
   function renderer(value: any, valueIndex: number) {
-    for (let childIndex = 0; childIndex < props.virtualElement.childs.length; ++childIndex) {
-      const child = props.virtualElement.childs[childIndex] as VirtualElement;
-      const currentIndex = valueIndex * props.virtualElement.childs.length + childIndex;
+    const childsToRender = props.virtualElement.childs;
+
+    for (let childIndex = 0; childIndex < childsToRender.length; ++childIndex) {
+      const child = childsToRender[childIndex] as VirtualElement;
+      const currentIndex = valueIndex * childsToRender.length + childIndex;
 
       const toInject = res!.groups!.index
         ? [
