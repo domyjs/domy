@@ -3,56 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <script src="../dist/index.js"></script>
+    <title>d-for</title>
+    <script src="..//dist/index.js"></script>
   </head>
   <body>
-    <p>{{ this.list.length }}</p>
-    <p>{{ this.list.map((e) => e.idEl).join(', ') }}</p>
-
-    <button
-      :style="{ color: this.isActive ? 'blue' : 'red', cursor: 'pointer' }"
-      @click="() => {
-          this.isActive = !this.isActive;
-          console.log(this.isActive);
-        }"
-    >
-      Test event
-    </button>
-
-    <button @click="this.createElement()">Add</button>
-    <button @click="this.removeElement()">Remove</button>
-
-    <ul d-for="el of this.list">
-      Hello {{ this.el.idEl }}:
+    <ul d-for="user, index of this.list">
+      Some text that shouldn't be rendered
       <li
-        :key="this.el.idEl"
-        :style="{ color: this.el.isActive ? 'blue' : 'red', cursor: 'pointer' }"
-        d-text="'id: ' + this.el.idEl + ' name: ' + this.el.name"
-        @click="() => {
-          this.el.isActive = !this.el.isActive;
-          console.log(this.el.isActive);
-        }"
-      ></li>
-      <!-- d-text="'id: ' + this.el.id + ' name: ' + this.el.name"-->
+        :key="this.user.id"
+        @click="this.user.isClient = !this.user.isClient"
+        :style="{ color: this.user.isClient ? 'blue' : 'red' }"
+      >
+        <p>{{this.index}}: {{ this.user.name }} <span d-ignore>{{ this.index }}</span></p>
+        <ul d-for="car, index of this.user.cars">
+          <li :key="this.car + this.index" @click="this.user.cars.shift()">
+            {{ this.index }}: {{ this.car }}
+          </li>
+        </ul>
+      </li>
+      <!-- Some comment that shouldn't be rendered  -->
     </ul>
+    <button id="add" @click="this.addElement()">Add</button>
+    <button id="rm" @click="this.removeElement()">Remove</button>
   </body>
   <script>
-    let id = 0;
     window.DOMY({
+      $setup() {
+        this.list.push(this.generateElement());
+        console.log(this.list, this.generateElement());
+      },
       $state: {
         id: 0,
-        list: [],
-        isActive: false
+        list: []
       },
       $fn: {
-        createElement() {
-          const el = {
-            idEl: ++id,
-            name: Math.random().toString(36),
-            isActive: true
+        generateElement() {
+          const newEl = {
+            id: ++this.id,
+            name: (Math.random() * 10000).toString(36),
+            cars: ['BMW', 'PEUGEOT', 'MERCEDES'].filter(e => Math.random() > 0.5),
+            isClient: true
           };
-          this.list.push(el);
+          return newEl;
+        },
+        addElement() {
+          this.list.push(this.generateElement());
         },
         removeElement() {
           this.list.pop();
