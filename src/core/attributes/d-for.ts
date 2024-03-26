@@ -51,7 +51,7 @@ export function dFor(props: AttrRendererProps) {
           ]
         : [new Signal(res!.groups!.dest, value)];
 
-      // Check if the key already exist to we can skip render
+      // Check if the key already exist so we can skip render
       if ('key' in child && child.key) {
         const keyValue = func({
           code: child.key,
@@ -69,7 +69,7 @@ export function dFor(props: AttrRendererProps) {
         if (elementWithKeyIndex !== -1) {
           const elementWithKey = oldChilds[elementWithKeyIndex];
           if (elementWithKeyIndex !== currentIndex) {
-            // If the index of the element changed we move it to is new position
+            // If the index of the element changed we move it to the new position
             moveElement($el, elementWithKey, currentIndex);
           }
           renderedChildrens.push(elementWithKey);
