@@ -125,6 +125,7 @@ export class VirtualDom {
     } else {
       return {
         ...virtualElement,
+        events: { ...virtualElement.events },
         childs: virtualElement.childs.map(child => VirtualDom.createCopyOfVirtual(child))
       };
     }
