@@ -1,12 +1,8 @@
 beforeEach(() => {
-  cy.visit('cypress/attributes/d-text/index.html');
+  cy.visit('cypress/attributes/textContent/index.html');
 });
 
-describe('Attribute d-text test', () => {
-  it('Check attribute is removed', () => {
-    cy.get('h1').should('not.have.attr', 'd-text');
-  });
-
+describe('textContent test', () => {
   it('Check the value of the state is inserted into the page', () => {
     cy.get('h1').should('have.text', 'Hello World!');
   });
