@@ -10,7 +10,6 @@ type Props = {
   virtualElement: VirtualElement | VirtualText;
 
   notifier?: AttrRendererProps['notifier'];
-  context?: unknown;
   isAsync?: boolean;
   returnResult?: boolean;
 };
@@ -48,10 +47,12 @@ export function func(props: Props) {
     }
   }
 
-  return fn(code).call(
-    getContext($el, {
-      ...props.$state,
-      $state: stateValues
-    })
-  );
+  const context = getContext($el, {
+    ...props.$state,
+    $state: stateValues
+  });
+
+  const executedValue = fn(code).call(context);
+
+  return executedValue;
 }

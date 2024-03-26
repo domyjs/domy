@@ -2,7 +2,6 @@
 
 - Fixe :key
 - prevValue and newValue for watcher
-- func handle functions ?
 
 - Fixe d-for speed
 
