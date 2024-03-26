@@ -42,7 +42,7 @@ async function initDomy(app: App) {
 }
 
 async function DOMY(app: App) {
-  if ($state.isInitialised) throw new Error('DOMY as already be initialised');
+  if ($state.isInitialised) throw new Error('DOMY as already be initialised.');
 
   // States
   for (const key in app.$state) {

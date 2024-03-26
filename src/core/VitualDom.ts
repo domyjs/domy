@@ -27,6 +27,7 @@ export type VirtualElement = {
     [name: string]: string;
   };
   childs: (VirtualElement | VirtualText)[];
+  dForRenderedChilds: VirtualElement[];
 };
 
 export class VirtualDom {
@@ -75,7 +76,8 @@ export class VirtualDom {
       events: {},
       domiesAttributes: {},
       normalAttributes: {},
-      childs: []
+      childs: [],
+      dForRenderedChilds: []
     };
 
     // Add attributes
@@ -92,6 +94,14 @@ export class VirtualDom {
       ? (element as HTMLTemplateElement).content.childNodes
       : element.childNodes;
     for (const child of elementChilds) {
+      // Skip text element/comments which is a direct child of a d-for element
+      if (
+        virtualElement.domiesAttributes['d-for'] &&
+        (child.nodeType === Node.TEXT_NODE || child.nodeType === Node.COMMENT_NODE)
+      ) {
+        continue;
+      }
+
       const childElement = this.getVirtual(child as Text | Element);
       virtualElement.childs.push(childElement);
 
@@ -101,7 +111,7 @@ export class VirtualDom {
         virtualElement.domiesAttributes['d-for'] &&
         !childElement.domiesAttributes[':key']
       ) {
-        console.warn('Elements inside a d-for parent should be rendered with :key attribute');
+        console.warn('Elements inside a d-for parent should be rendered with :key attribute.');
       }
     }
 

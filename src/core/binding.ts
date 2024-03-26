@@ -30,7 +30,7 @@ export function binding(props: AttrRendererProps) {
   // Handle key attribute
   if (attrName === 'key' && !props.virtualElement.key) {
     if (typeof executedValue !== 'string' && typeof executedValue !== 'number')
-      throw new Error(`Invalide key value: "${executedValue}"`);
+      throw new Error(`Invalide key value: "${executedValue}".`);
 
     props.virtualElement.key = props.attr.value;
   }

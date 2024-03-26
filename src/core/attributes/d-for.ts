@@ -13,10 +13,6 @@ export function dFor(props: AttrRendererProps) {
   const $el = props.virtualElement.$el;
   const $state = props.$state;
   const oldChilds = Array.from($el.children ?? []);
-  // We remove text because it's to heavy due to the fact we can't put key on it
-  const childsWithoutText = props.virtualElement.childs.filter(
-    el => !('content' in el)
-  ) as VirtualElement[];
 
   // Remove the original content
   if (!props.virtualElement.initialised) {
@@ -26,7 +22,8 @@ export function dFor(props: AttrRendererProps) {
 
   const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s*(?<type>in|of)\s*(?<org>.+)/gi;
   const res = forRegex.exec(props.attr.value);
-  if (!res) throw new Error(`Invalide "${props.attr.name}" attribute value: "${props.attr.value}"`);
+  if (!res)
+    throw new Error(`Invalide "${props.attr.name}" attribute value: "${props.attr.value}".`);
 
   const isForIn = res.groups!.type === 'in';
   const executedValue = func({
@@ -41,9 +38,9 @@ export function dFor(props: AttrRendererProps) {
   const renderedChildrens: (Element | ChildNode)[] = [];
 
   function renderer(value: any, valueIndex: number) {
-    for (let childIndex = 0; childIndex < childsWithoutText.length; ++childIndex) {
-      const child = childsWithoutText[childIndex];
-      const currentIndex = valueIndex * childsWithoutText.length + childIndex;
+    for (let childIndex = 0; childIndex < props.virtualElement.childs.length; ++childIndex) {
+      const child = props.virtualElement.childs[childIndex] as VirtualElement;
+      const currentIndex = valueIndex * props.virtualElement.childs.length + childIndex;
 
       const toInject = res!.groups!.index
         ? [

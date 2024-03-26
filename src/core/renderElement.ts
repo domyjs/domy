@@ -21,6 +21,9 @@ export function renderElement(
   injectState: Signal[] = [],
   byPassAttributes: string[] = []
 ) {
+  // We don't render comment
+  if (virtualElement.tag === 'comment') return;
+
   const domiesAttributes = virtualElement.domiesAttributes;
 
   for (const attr of Object.keys(domiesAttributes)) {

@@ -24,6 +24,7 @@
     <button @click="this.removeElement()">Remove</button>
 
     <ul d-for="el of this.list">
+      Hello {{ this.el.idEl }}:
       <li
         :key="this.el.idEl"
         :style="{ color: this.el.isActive ? 'blue' : 'red', cursor: 'pointer' }"
@@ -33,9 +34,8 @@
           console.log(this.el.isActive);
         }"
       ></li>
+      <!-- d-text="'id: ' + this.el.id + ' name: ' + this.el.name"-->
     </ul>
-
-    <!-- d-text="'id: ' + this.el.id + ' name: ' + this.el.name"-->
   </body>
   <script>
     let id = 0;

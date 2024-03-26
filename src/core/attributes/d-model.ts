@@ -11,7 +11,7 @@ export function dModel(props: AttrRendererProps) {
   const signalName = props.attr.value.replace(/^this\./, '');
   const currentSignal = $state.$state.find(state => state.name === signalName);
 
-  if (!currentSignal) throw new Error(`Invalide data name in d-model: "${signalName}"`);
+  if (!currentSignal) throw new Error(`Invalide data name in d-model: "${signalName}".`);
 
   function changeValue() {
     const dep = currentSignal!.dependencies.find(dep => dep.$el === $el) as Dependencie;
