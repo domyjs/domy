@@ -30,8 +30,6 @@ export function events(props: AttrRendererProps) {
   const eventSet = props.virtualElement.events[eventName];
   if (eventSet) $el.removeEventListener(eventName, eventSet);
 
-  console.log('set event');
-
   // Add the new event listener
   const eventListener: EventListenerOrEventListenerObject = event => {
     const executedValue = func({
