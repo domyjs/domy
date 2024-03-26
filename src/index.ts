@@ -78,7 +78,7 @@ async function DOMY(app: App) {
     });
   }
 
-  // Init
+  // Setup
   if (app.$setup) {
     try {
       await app.$setup.call(getContext(undefined, $state));

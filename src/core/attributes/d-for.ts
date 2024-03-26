@@ -58,7 +58,7 @@ export function dFor(props: AttrRendererProps) {
           returnResult: true,
           $state: {
             ...props.$state,
-            $state: [...props.$state.$state, ...toInject]
+            $state: [...toInject, ...props.$state.$state]
           },
           virtualElement: props.virtualElement,
           virtualParent: props.virtualParent

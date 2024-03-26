@@ -40,7 +40,7 @@ export function getContext($el: Element | Text | undefined, $state: State) {
     (a, b) => ({
       ...a,
       [b[0]]: function (...args: any[]) {
-        b[1].call(context, ...args);
+        return b[1].call(context, ...args);
       }
     }),
     {}

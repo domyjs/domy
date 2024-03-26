@@ -22,7 +22,7 @@ export function render(
 ) {
   if ('content' in virtualElement) {
     return renderText($state, virtualParent, virtualElement, injectState);
-  } else {
-    return renderElement($state, virtualParent, virtualElement, injectState, byPassAttributes);
   }
+
+  return renderElement($state, virtualParent, virtualElement, injectState, byPassAttributes);
 }

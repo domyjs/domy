@@ -33,9 +33,19 @@ export function deepRender(
     const toRender = toRenderList.shift() as Elem;
 
     toRender.element.isDisplay = true;
+
+    if (
+      !('content' in toRender.element) &&
+      typeof toRender.element.domiesAttributes['d-ignore'] === 'string'
+    )
+      continue;
+
     render($state, toRender.parent, toRender.element, injectState, toRender.byPassAttributes);
 
-    if ('childs' in toRender.element) {
+    if (
+      'childs' in toRender.element &&
+      typeof toRender.element.domiesAttributes['d-for'] !== 'string'
+    ) {
       for (const child of toRender.element.childs) {
         toRenderList.push({
           parent: toRender.element,

@@ -36,7 +36,7 @@ export function renderElement(
     const props: AttrRendererProps = {
       $state: {
         ...$state,
-        $state: [...$state.$state, ...injectState]
+        $state: [...injectState, ...$state.$state]
       },
       virtualParent,
       virtualElement,

@@ -30,7 +30,7 @@ export function renderText(
         returnResult: true,
         $state: {
           ...$state,
-          $state: [...$state.$state, ...injectState]
+          $state: [...injectState, ...$state.$state]
         },
         notifier: () => renderText($state, virtualParent, virtualElement, injectState),
         virtualElement,
