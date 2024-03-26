@@ -4,20 +4,26 @@ import { Signal } from '@core/Signal';
 
 const proxyHandler: ProxyHandler<any> = {
   get(target, key, receiver) {
-    const typedKey = key as keyof typeof target;
+    try {
+      const typedKey = key as keyof typeof target;
+      const prevValue = target[typedKey];
 
-    if (target[typedKey] instanceof Signal) {
-      return target[typedKey].value;
-    }
+      if (prevValue instanceof Signal) {
+        return target[typedKey].value;
+      }
+    } catch (err) {}
 
     return Reflect.get(target, key, receiver);
   },
   set(target, key, newValue, receiver) {
-    const typedKey = key as keyof typeof target;
+    try {
+      const typedKey = key as keyof typeof target;
+      const prevValue = target[typedKey];
 
-    if (target[typedKey] instanceof Signal) {
-      return target[typedKey].set(newValue);
-    }
+      if (prevValue instanceof Signal) {
+        return target[typedKey].set(newValue);
+      }
+    } catch (err) {}
 
     return Reflect.set(target, key, newValue, receiver);
   }
