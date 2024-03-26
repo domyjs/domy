@@ -11,6 +11,8 @@ const proxyHandler: ProxyHandler<any> = {
       if (prevValue instanceof Signal) {
         return target[typedKey].value;
       }
+
+      // eslint-disable-next-line
     } catch (err) {}
 
     return Reflect.get(target, key, receiver);
@@ -23,6 +25,8 @@ const proxyHandler: ProxyHandler<any> = {
       if (prevValue instanceof Signal) {
         return target[typedKey].set(newValue);
       }
+
+      // eslint-disable-next-line
     } catch (err) {}
 
     return Reflect.set(target, key, newValue, receiver);
