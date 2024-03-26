@@ -36,5 +36,14 @@ export function binding(props: AttrRendererProps) {
   }
 
   $el.removeAttribute(domyAttrName);
-  $el.setAttribute(attrName, executedValue);
+
+  if (attrName === 'style' && typeof executedValue === 'object') {
+    // Handle style attribute if it's an object
+    // { backgroundColor: '#fff', color: 'red' .... }
+    for (const styleName in executedValue) {
+      ($el as HTMLElement).style[styleName as any] = executedValue[styleName];
+    }
+  } else {
+    $el.setAttribute(attrName, executedValue);
+  }
 }
