@@ -10,11 +10,29 @@
     <p>{{ this.list.length }}</p>
     <p>{{ this.list.map((e) => e.idEl).join(', ') }}</p>
 
+    <button
+      :style="{ color: this.isActive ? 'blue' : 'red', cursor: 'pointer' }"
+      @click="() => {
+          this.isActive = !this.isActive;
+          console.log(this.isActive);
+        }"
+    >
+      Test event
+    </button>
+
     <button @click="this.createElement()">Add</button>
     <button @click="this.removeElement()">Remove</button>
 
     <ul d-for="el of this.list">
-      <li :key="this.el.idEl" d-text="'id: ' + this.el.idEl + ' name: ' + this.el.name"></li>
+      <li
+        :key="this.el.idEl"
+        :style="{ color: this.el.isActive ? 'blue' : 'red', cursor: 'pointer' }"
+        d-text="'id: ' + this.el.idEl + ' name: ' + this.el.name"
+        @click="() => {
+          this.el.isActive = !this.el.isActive;
+          console.log(this.el.isActive);
+        }"
+      ></li>
     </ul>
 
     <!-- d-text="'id: ' + this.el.id + ' name: ' + this.el.name"-->
@@ -24,13 +42,15 @@
     window.DOMY({
       $state: {
         id: 0,
-        list: []
+        list: [],
+        isActive: false
       },
       $fn: {
         createElement() {
           const el = {
             idEl: ++id,
-            name: Math.random().toString(36)
+            name: Math.random().toString(36),
+            isActive: true
           };
           this.list.push(el);
         },

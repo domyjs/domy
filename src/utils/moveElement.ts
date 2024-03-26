@@ -4,13 +4,7 @@
  * @param index
  * @returns
  */
-export function moveElement(element: Element, index: number) {
-  const parent = element.parentNode;
-
-  if (!parent) {
-    return;
-  }
-
+export function moveElement(parent: Element, element: Element, index: number) {
   const target = parent.children[index];
 
   if (target === element) {

@@ -30,9 +30,14 @@
       },
       $fn: {
         screateElement() {
+          const l = [];
           for (let i = 0; i < 1000; ++i) {
-            this.createElement();
+            l.push({
+              idEl: ++id,
+              name: Math.random().toString(36)
+            });
           }
+          this.list.push(...l);
         },
         sremoveElement() {
           for (let i = 0; i < 1000; ++i) {

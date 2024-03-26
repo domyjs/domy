@@ -45,13 +45,12 @@ export function dFor(props: AttrRendererProps) {
       const child = childsWithoutText[childIndex];
       const currentIndex = valueIndex * childsWithoutText.length + childIndex;
 
-      // TODO: We don't need to setup the proxy because the value should be edited ? (try with this.el.test = 'hello')
       const toInject = res!.groups!.index
         ? [
-            new Signal(res!.groups!.dest, value, false),
-            new Signal(res!.groups!.index, valueIndex, false) // Don't need update for sure, we don't update an index
+            new Signal(res!.groups!.dest, value),
+            new Signal(res!.groups!.index, valueIndex, false) // Don't need proxy because we don't update an index
           ]
-        : [new Signal(res!.groups!.dest, value, false)];
+        : [new Signal(res!.groups!.dest, value)];
 
       // Check if the key already exist to we can skip render
       if ('key' in child && child.key) {
@@ -72,7 +71,7 @@ export function dFor(props: AttrRendererProps) {
           const elementWithKey = oldChilds[elementWithKeyIndex];
           if (elementWithKeyIndex !== currentIndex) {
             // If the index of the element changed we move it to is new position
-            moveElement(elementWithKey, currentIndex);
+            moveElement($el, elementWithKey, currentIndex);
           }
           renderedChildrens.push(elementWithKey);
           continue;
@@ -80,9 +79,12 @@ export function dFor(props: AttrRendererProps) {
       }
 
       // Create and render the new element
-      const newElement = VirtualDom.createElementFromVirtual(child) as Element;
+      const childCopy = VirtualDom.createCopyOfVirtual(child);
+      const newElement = VirtualDom.createElementFromVirtual(childCopy) as Element;
       // TODO: Fixe because it's really slow
-      deepRender($state, props.virtualElement, child, toInject);
+      deepRender($state, props.virtualElement, childCopy, toInject);
+
+      if ('key' in childCopy) child.key = childCopy.key;
 
       const oldRender: ChildNode | undefined = $el.childNodes[currentIndex];
 
@@ -95,7 +97,7 @@ export function dFor(props: AttrRendererProps) {
 
       const isEqual = oldRender.isEqualNode(newElement);
       if (!isEqual) {
-        oldRender.parentNode!.insertBefore(newElement, oldRender);
+        $el.insertBefore(newElement, oldRender);
         renderedChildrens.push(newElement);
       } else {
         renderedChildrens.push(oldRender);

@@ -26,10 +26,14 @@ export function events(props: AttrRendererProps) {
   const elIndex = $state.$events[eventName].findIndex(el => el === $el);
   if (elIndex === -1) $state.$events[eventName].push($el);
 
-  // Add the event listener
-  if (props.virtualElement.events[eventName])
-    $el.removeEventListener(eventName, props.virtualElement.events[eventName]);
-  props.virtualElement.events[eventName] = function (event) {
+  // Remove the last registered event listener
+  const eventSet = props.virtualElement.events[eventName];
+  if (eventSet) $el.removeEventListener(eventName, eventSet);
+
+  console.log('set event');
+
+  // Add the new event listener
+  const eventListener: EventListenerOrEventListenerObject = event => {
     const executedValue = func({
       code: props.attr.value,
       returnResult: true,
@@ -41,5 +45,6 @@ export function events(props: AttrRendererProps) {
     if (typeof executedValue === 'function')
       executedValue.call(getContext($el, props.$state), event);
   };
-  $el.addEventListener(eventName, props.virtualElement.events[eventName]);
+  props.virtualElement.events[eventName] = eventListener;
+  $el.addEventListener(eventName, eventListener);
 }

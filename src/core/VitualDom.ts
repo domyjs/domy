@@ -107,6 +107,20 @@ export class VirtualDom {
 
     return virtualElement;
   }
+  public static createCopyOfVirtual(
+    virtualElement: VirtualElement | VirtualText
+  ): VirtualElement | VirtualText {
+    if ('content' in virtualElement) {
+      return {
+        ...virtualElement
+      };
+    } else {
+      return {
+        ...virtualElement,
+        childs: virtualElement.childs.map(child => VirtualDom.createCopyOfVirtual(child))
+      };
+    }
+  }
 
   public static createElementFromVirtual(
     virtualElement: VirtualElement | VirtualText

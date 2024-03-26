@@ -9,15 +9,27 @@
   <body>
     <p :style="this.style">Hello</p>
 
+    <button @click="this.reset">Reset</button>
     <button @click="this.style.backgroundColor = 'green'">Green</button>
     <button @click="this.style = 'color: blue'">Blue</button>
   </body>
   <script>
     window.DOMY({
+      $setup() {
+        this.reset();
+      },
       $state: {
-        style: {
+        resetStyle: {
           backgroundColor: 'red',
           color: 'white'
+        },
+        style: null
+      },
+      $fn: {
+        async reset(event) {
+          console.log(event);
+          await new Promise(r => setTimeout(r, 3000));
+          this.style = { ...this.resetStyle };
         }
       }
     });
