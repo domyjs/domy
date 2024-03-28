@@ -8,7 +8,7 @@ const Demo = ({ code, domy }) => {
   useEffect(() => {
     if (ref.current) {
       ref.current.innerHTML = code;
-      DOMY(domy);
+      DOMY(domy, ref.current);
     }
   }, [code, domy]);
 

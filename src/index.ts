@@ -5,19 +5,16 @@ import { App } from '@typing/App';
 import { State } from '@typing/State';
 import { getContext } from '@utils/getContext';
 
-const $state: State = {
-  isInitialised: false,
+/**
+ * Init domy when the dom and state are ready
+ * @param app
+ * @param target
+ * @param $state
+ */
+async function initDomy(app: App, target: Element, $state: State) {
+  const initialDom = new VirtualDom([target]);
 
-  $state: [],
-  $fn: {},
-  $events: {},
-  $refs: {}
-};
-
-async function initDomy(app: App) {
-  const body = document.body;
-  const initialDom = new VirtualDom([body]);
-
+  // Rendering
   function callback(
     virtualParent: VirtualElement | null,
     virtualElement: VirtualElement | VirtualText
@@ -41,8 +38,21 @@ async function initDomy(app: App) {
   }
 }
 
-async function DOMY(app: App) {
-  if ($state.isInitialised) throw new Error('DOMY as already be initialised.');
+/**
+ * Domy instance
+ * @param app
+ * @param target
+ */
+async function DOMY(app: App, target?: Element) {
+  const targetElement = target ?? document.body;
+
+  // State of the app
+  const $state: State = {
+    $state: [],
+    $fn: {},
+    $events: {},
+    $refs: {}
+  };
 
   // States
   for (const key in app.$state) {
@@ -87,10 +97,9 @@ async function DOMY(app: App) {
     }
   }
 
-  $state.isInitialised = true;
   if (document.readyState === 'complete') {
-    initDomy(app);
-  } else document.addEventListener('DOMContentLoaded', () => initDomy(app));
+    initDomy(app, targetElement, $state);
+  } else document.addEventListener('DOMContentLoaded', () => initDomy(app, targetElement, $state));
 
   // We display a message if a key doesn't exist
   const properties = ['$state', '$fn', '$setup', '$mounted', '$watch'] as (keyof App)[];
