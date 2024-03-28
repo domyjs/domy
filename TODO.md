@@ -1,7 +1,12 @@
 # TODO
 
+- Choose domy target
 - Add d-transition for d-for and d-if
 - Add click.once, click.away ...
+- Collapse, anchor, intersect, mutation, persist (localStorage) plugins
+- delete display initial from d-show
+- binding object context ?
+- should save in cache old keys ?
 - prevValue and newValue for watcher
 
 - Fixe d-for speed (improve global speed)
