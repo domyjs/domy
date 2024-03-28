@@ -1,0 +1,10 @@
+.demo {
+  border: thin solid #12121223;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.demo * {
+  margin: 0;
+  box-sizing: border-box;
+}
