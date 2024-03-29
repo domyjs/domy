@@ -1,7 +1,11 @@
 .demo {
-  border: thin solid #12121223;
+  border: thin solid #12121229;
   border-radius: 0.5rem;
   padding: 1rem;
+}
+
+html[data-theme='dark'] .demo {
+  border-color: #ffffff29;
 }
 
 .demo * {
