@@ -9,10 +9,10 @@ import { AttrRendererProps } from '@typing/AttrRendererProps';
 
 type Props = {
   $state: State;
-  attr?: { name: string; value: string };
   virtualParent: VirtualElement | null;
   virtualElement: VirtualElement;
 
+  attr?: { name: string; value: string };
   injectState?: Signal[];
   byPassAttributes?: string[];
 };

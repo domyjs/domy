@@ -43,7 +43,7 @@ export function func(props: Props) {
         signal.attach({
           $el,
           attrName: props.attrName,
-          dontRemoveOnDisconnect: props.attrName === 'd-if',
+          dontRemoveOnDisconnect: props.attrName === 'd-if', // We don't want to unattach the dependencie if the element doesnt exist anymore for a d-if
           fn: props.notifier as Exclude<Props['notifier'], undefined>
         })
       );
