@@ -4,6 +4,7 @@ import { VirtualDom, VirtualElement, VirtualText } from '@core/VitualDom';
 import { App } from '@typing/App';
 import { State } from '@typing/State';
 import { getContext } from '@utils/getContext';
+import { toRegularFn } from './utils/toRegularFn';
 
 /**
  * Init domy when the dom and state are ready
@@ -31,7 +32,8 @@ async function initDomy(app: App, target: Element, $state: State) {
   // Mounted
   if (app.$mounted) {
     try {
-      await app.$mounted.call(getContext(undefined, $state));
+      const mountedFn = toRegularFn(app.$mounted);
+      await mountedFn.call(getContext(undefined, $state));
     } catch (err) {
       console.error(err);
     }
@@ -61,16 +63,19 @@ async function DOMY(app: App, target?: Element) {
 
   // Functions
   for (const key in app.$fn) {
-    $state.$fn[key] = app.$fn[key];
+    $state.$fn[key] = toRegularFn(app.$fn[key]);
   }
 
   // Watchers
   for (const watcherName in app.$watch) {
     const signal = $state.$state.find(s => s.name === watcherName);
+
     if (!signal) {
       console.error(`Invalide watcher name "${watcherName}"`);
       continue;
     }
+
+    const watcherfn = toRegularFn(app.$watch[watcherName]);
 
     signal.attach({
       fn: async () => {
@@ -78,7 +83,7 @@ async function DOMY(app: App, target?: Element) {
         const watcher = signal.dependencies[0] as Dependencie;
         watcher.unactive = true;
         try {
-          await app.$watch![watcherName].call(getContext(undefined, $state));
+          await watcherfn.call(getContext(undefined, $state));
         } catch (err) {
           console.error(err);
         }
@@ -90,7 +95,8 @@ async function DOMY(app: App, target?: Element) {
   // Setup
   if (app.$setup) {
     try {
-      await app.$setup.call(getContext(undefined, $state));
+      const setupFn = toRegularFn(app.$setup);
+      await setupFn.call(getContext(undefined, $state));
     } catch (err) {
       console.error(err);
     }
