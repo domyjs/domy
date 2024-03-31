@@ -18,16 +18,16 @@ module.exports = [
       }
     ],
     plugins: [ts(config), terser()]
-  },
+  }
   // Plugins auto genration
-  ...fs.readdirSync('./src/plugins').map(file => ({
-    input: `./src/plugins/${file}`,
-    output: {
-      name: file.split('.')[0],
-      file: `./dist/plugins/${path.basename(file, '.ts')}.js`,
-      format: 'umd',
-      sourcemap: true
-    },
-    plugins: [ts(config), terser()]
-  }))
+  // ...fs.readdirSync('./src/plugins').map(file => ({
+  //   input: `./src/plugins/${file}`,
+  //   output: {
+  //     name: file.split('.')[0],
+  //     file: `./dist/plugins/${path.basename(file, '.ts')}.js`,
+  //     format: 'umd',
+  //     sourcemap: true
+  //   },
+  //   plugins: [ts(config), terser()]
+  // }))
 ];
