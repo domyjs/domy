@@ -131,3 +131,4 @@ dist
 
 # cypress
 cypress/downloads
+cypress/screenshots
