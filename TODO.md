@@ -1,7 +1,7 @@
 # TODO
 
 - benchmark
-- Add d-transition for d-for and d-if
+- Add d-transition for d-show and d-if
 - Collapse, anchor, intersect, mutation, persist (localStorage) plugins
 - prevValue/newValue for watcher and avoid two call
 
