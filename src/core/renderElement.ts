@@ -38,7 +38,6 @@ export function renderElement(props: Props) {
    * @returns
    */
   function renderAttribute(name: string, value: string) {
-    console.log(name, value);
     // Check if we have to bypass this attribute or not
     if (props.byPassAttributes && props.byPassAttributes.includes(name)) return;
 

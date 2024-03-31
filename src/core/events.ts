@@ -1,4 +1,5 @@
 import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { attachClickAway } from '@utils/attachClickAway';
 import { func } from '@utils/func';
 import { getContext } from '@utils/getContext';
 
@@ -18,12 +19,17 @@ export function events(props: AttrRendererProps) {
     ? domyAttrName.slice(1)
     : domyAttrName.slice('d-on:'.length);
 
-  const [eventName, ...variants] = event.split('.');
+  const [defaultEventName, ...variants] = event.split('.');
 
-  // Variants check
+  // Variants handling
   const isOnce = variants.includes('once');
+  const isClickAway = defaultEventName === 'click' && variants.includes('away');
+  const isKeyDownEnter = defaultEventName === 'keydown' && variants.includes('enter');
 
-  // Remove last registered event
+  if (isClickAway) attachClickAway($el);
+
+  const eventName = isClickAway ? 'clickAway' : defaultEventName;
+
   $el.removeAttribute(domyAttrName);
 
   // Register the event for the $dispatch function
@@ -37,8 +43,18 @@ export function events(props: AttrRendererProps) {
 
   // Add the new event listener
   const eventListener: EventListenerOrEventListenerObject = event => {
+    // If the element is not present in the dom anymore we remove the event listener
+    if (!$el.isConnected) {
+      $el.removeEventListener(eventName, eventListener);
+      delete props.virtualElement.events[eventName];
+      return;
+    }
+
     // We remove the events from the virtual dom once it's executed
     if (isOnce) delete props.virtualElement.domiesAttributes[props.attr.name];
+
+    // Keydown enter logic
+    if (isKeyDownEnter && (event as any).keyCode !== 13) return;
 
     const executedValue = func({
       code: props.attr.value,
