@@ -1,6 +1,13 @@
 import { DeepProxy } from '../utils/DeepProxy';
 
-export type Dependencie = { $el: Element | Text | null; fn: () => void; unactive?: boolean };
+export type Dependencie = {
+  $el?: Element | Text;
+  attrName?: string;
+  fn: () => void;
+
+  dontRemoveOnDisconnect?: boolean;
+  unactive?: boolean;
+};
 
 /**
  * Create a signal to spy a variable and notify the observers that need this dependencie
@@ -27,15 +34,10 @@ export class Signal {
   }
 
   public attach(dependencie: Dependencie) {
-    const $elAlreadyAttach = this.dependencies.some(dep => dep.$el === dependencie.$el);
-    if (!$elAlreadyAttach) this.dependencies.push(dependencie);
-  }
-
-  public unattach($el: Element): boolean {
-    const index = this.dependencies.findIndex(dep => dep.$el === $el);
-    if (index === -1) return false;
-    this.dependencies.splice(index, 1);
-    return true;
+    const depAlreadyAttach = this.dependencies.some(
+      dep => dep.$el === dependencie.$el && dependencie.attrName === dep.attrName
+    );
+    if (!depAlreadyAttach) this.dependencies.push(dependencie);
   }
 
   public setCallBackOnCall(cb: (() => void) | null) {
@@ -52,7 +54,15 @@ export class Signal {
 
   public notifyAll() {
     console.log('notify called');
-    for (const dep of this.dependencies) {
+    for (let i = 0; i < this.dependencies.length; ++i) {
+      const dep = this.dependencies[i];
+
+      // If the element is not in the dom anymore we remove the dependencie
+      if (dep.$el && !dep.$el.isConnected && !dep.dontRemoveOnDisconnect) {
+        this.dependencies.splice(i, 1);
+        continue;
+      }
+
       if (!dep.unactive) dep.fn();
     }
   }

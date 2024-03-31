@@ -1,6 +1,5 @@
 # TODO
 
-- Changements seulement pour attribut en particulier
 - Add d-transition for d-for and d-if
 - Add click.away, click.double, keydown.enter ...
 - Collapse, anchor, intersect, mutation, persist (localStorage) plugins

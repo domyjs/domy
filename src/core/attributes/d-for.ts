@@ -28,6 +28,7 @@ export function dFor(props: AttrRendererProps) {
   const isForIn = res.groups!.type === 'in';
   const executedValue = func({
     code: res.groups!.org,
+    attrName: props.attr.name,
     returnResult: true,
     $state: props.$state,
     virtualParent: props.virtualParent,
@@ -81,7 +82,12 @@ export function dFor(props: AttrRendererProps) {
       const childCopy = VirtualDom.createCopyOfVirtual(child);
       const newElement = VirtualDom.createElementFromVirtual(childCopy) as Element;
       // TODO: Fixe because it's really slow
-      deepRender($state, props.virtualElement, childCopy, toInject);
+      deepRender({
+        $state,
+        virtualParent: props.virtualElement,
+        virtualElement: childCopy,
+        injectState: toInject
+      });
 
       if ('key' in childCopy) child.key = childCopy.key;
 

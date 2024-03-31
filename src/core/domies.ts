@@ -20,6 +20,7 @@ export function domies(props: AttrRendererProps) {
   function getExecutedValue() {
     return func({
       code: props.attr.value,
+      attrName: props.attr.name,
       returnResult: true,
       $state: props.$state,
       virtualParent: props.virtualParent,

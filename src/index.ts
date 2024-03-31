@@ -20,7 +20,7 @@ async function initDomy(app: App, target: Element, $state: State) {
     virtualElement: VirtualElement | VirtualText
   ) {
     try {
-      render($state, virtualParent, virtualElement);
+      render({ $state, virtualParent, virtualElement });
     } catch (err) {
       console.error(err);
     }
@@ -73,7 +73,6 @@ async function DOMY(app: App, target?: Element) {
     }
 
     signal.attach({
-      $el: null,
       fn: async () => {
         // We remove the watcher too don't trigger it an other time if the user change the value
         const watcher = signal.dependencies[0] as Dependencie;
@@ -101,10 +100,10 @@ async function DOMY(app: App, target?: Element) {
     initDomy(app, targetElement, $state);
   } else document.addEventListener('DOMContentLoaded', () => initDomy(app, targetElement, $state));
 
-  // We display a message if a key doesn't exist
+  // We display a warn message if a key doesn't exist
   const properties = ['$state', '$fn', '$setup', '$mounted', '$watch'] as (keyof App)[];
   const unknowKeys = Object.keys(app).filter(key => !properties.includes(key as any));
-  if (unknowKeys.length > 0) console.error(`Unknown properties "${unknowKeys.join(', ')}"`);
+  if (unknowKeys.length > 0) console.warn(`Unknown properties "${unknowKeys.join(', ')}"`);
 }
 
 export default DOMY;

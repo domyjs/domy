@@ -42,15 +42,17 @@ export function events(props: AttrRendererProps) {
 
     const executedValue = func({
       code: props.attr.value,
+      attrName: props.attr.name,
       returnResult: true,
       $state: props.$state,
       virtualParent: props.virtualParent,
       virtualElement: props.virtualElement,
-      notifier: props.notifier
+      notifier: isOnce ? undefined : props.notifier
     });
     if (typeof executedValue === 'function')
       executedValue.call(getContext($el, props.$state), event);
   };
+
   props.virtualElement.events[eventName] = eventListener;
   $el.addEventListener(eventName, eventListener, { once: isOnce });
 }

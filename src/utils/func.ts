@@ -9,6 +9,7 @@ type Props = {
   virtualParent: VirtualElement | null;
   virtualElement: VirtualElement | VirtualText;
 
+  attrName?: string;
   notifier?: AttrRendererProps['notifier'];
   isAsync?: boolean;
   returnResult?: boolean;
@@ -36,11 +37,13 @@ export function func(props: Props) {
   });
 
   // We spy every dependencie to attach a listener if needed
-  if (props.notifier) {
+  if (typeof props.notifier === 'function') {
     for (const signal of stateValues) {
       signal.setCallBackOnCall(() =>
         signal.attach({
           $el,
+          attrName: props.attrName,
+          dontRemoveOnDisconnect: props.attrName === 'd-if',
           fn: props.notifier as Exclude<Props['notifier'], undefined>
         })
       );

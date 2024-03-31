@@ -13,6 +13,7 @@ export function dIf(props: AttrRendererProps) {
 
   const shouldBeDisplay = func({
     code: props.attr.value,
+    attrName: props.attr.name,
     returnResult: true,
     $state: props.$state,
     virtualParent: props.virtualParent,
@@ -27,7 +28,12 @@ export function dIf(props: AttrRendererProps) {
     const newElement = VirtualDom.createElementFromVirtual(props.virtualElement) as Element;
     const indexToInsert = findElementIndex(props.virtualParent, props.virtualElement);
     props.virtualElement.isDisplay = true;
-    deepRender($state, props.virtualParent, props.virtualElement, [], ['d-if']);
+    deepRender({
+      $state,
+      virtualParent: props.virtualParent,
+      virtualElement: props.virtualElement,
+      byPassAttributes: ['d-if']
+    });
     restoreElement(props.virtualParent.$el, newElement, indexToInsert);
   }
 }

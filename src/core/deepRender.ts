@@ -9,6 +9,15 @@ type Elem = {
   byPassAttributes?: string[];
 };
 
+type Props = {
+  $state: State;
+  virtualParent: VirtualElement | null;
+  virtualElement: VirtualElement | VirtualText;
+
+  injectState?: Signal[];
+  byPassAttributes?: string[];
+};
+
 /**
  * Deep render an element or textContent with hsi childs
  * @param $state
@@ -18,15 +27,13 @@ type Elem = {
  * @param byPassAttributes
  * @returns
  */
-export function deepRender(
-  $state: State,
-  virtualParent: VirtualElement | null,
-  virtualElement: VirtualElement | VirtualText,
-  injectState: Signal[] = [],
-  byPassAttributes: string[] = []
-) {
+export function deepRender(props: Props) {
   const toRenderList: Elem[] = [
-    { parent: virtualParent, element: virtualElement, byPassAttributes }
+    {
+      parent: props.virtualParent,
+      element: props.virtualElement,
+      byPassAttributes: props.byPassAttributes
+    }
   ];
 
   while (toRenderList.length > 0) {
@@ -34,14 +41,22 @@ export function deepRender(
 
     toRender.element.isDisplay = true;
 
+    // We don't render d-ignore elements
     if (
       !('content' in toRender.element) &&
       typeof toRender.element.domiesAttributes['d-ignore'] === 'string'
     )
       continue;
 
-    render($state, toRender.parent, toRender.element, injectState, toRender.byPassAttributes);
+    render({
+      $state: props.$state,
+      virtualParent: toRender.parent,
+      virtualElement: toRender.element,
+      injectState: props.injectState,
+      byPassAttributes: toRender.byPassAttributes
+    });
 
+    // We don't render child if it's a d-for because d-for handle his childs by his self
     if (
       'childs' in toRender.element &&
       typeof toRender.element.domiesAttributes['d-for'] !== 'string'

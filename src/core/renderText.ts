@@ -3,6 +3,14 @@ import { Signal } from './Signal';
 import { VirtualElement, VirtualText } from './VitualDom';
 import { func } from '@utils/func';
 
+type Props = {
+  $state: State;
+  virtualParent: VirtualElement | null;
+  virtualElement: VirtualText;
+
+  injectState?: Signal[];
+};
+
 /**
  * Render a textContent
  * Example with count = 5:
@@ -14,27 +22,28 @@ import { func } from '@utils/func';
  * @param virtualElement
  * @param injectState Inject a state just for this render
  */
-export function renderText(
-  $state: State,
-  virtualParent: VirtualElement | null,
-  virtualElement: VirtualText,
-  injectState: Signal[] = []
-) {
-  const $el = virtualElement.$el;
+export function renderText(props: Props) {
+  const $el = props.virtualElement.$el;
 
-  $el.textContent = virtualElement.content.replace(
+  $el.textContent = props.virtualElement.content.replace(
     /\{\{\s*(?<org>.+?)\s*\}\}/gi,
     function (_, code) {
       return func({
         code,
         returnResult: true,
         $state: {
-          ...$state,
-          $state: [...injectState, ...$state.$state]
+          ...props.$state,
+          $state: [...(props.injectState ?? []), ...props.$state.$state]
         },
-        notifier: () => renderText($state, virtualParent, virtualElement, injectState),
-        virtualElement,
-        virtualParent
+        virtualParent: props.virtualParent,
+        virtualElement: props.virtualElement,
+        notifier: () =>
+          renderText({
+            $state: props.$state,
+            virtualParent: props.virtualParent,
+            virtualElement: props.virtualElement,
+            injectState: props.injectState
+          })
       });
     }
   );

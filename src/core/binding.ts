@@ -20,6 +20,7 @@ export function binding(props: AttrRendererProps) {
 
   const executedValue = func({
     code: props.attr.value,
+    attrName: props.attr.name,
     returnResult: true,
     $state: props.$state,
     virtualParent: props.virtualParent,
