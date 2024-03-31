@@ -14,9 +14,14 @@ export function events(props: AttrRendererProps) {
   const $state = props.$state;
   const domyAttrName = props.attr.name;
 
-  const eventName = domyAttrName.startsWith('@')
+  const event = domyAttrName.startsWith('@')
     ? domyAttrName.slice(1)
     : domyAttrName.slice('d-on:'.length);
+
+  const [eventName, ...variants] = event.split('.');
+
+  // Variants check
+  const isOnce = variants.includes('once');
 
   // Remove last registered event
   $el.removeAttribute(domyAttrName);
@@ -32,6 +37,9 @@ export function events(props: AttrRendererProps) {
 
   // Add the new event listener
   const eventListener: EventListenerOrEventListenerObject = event => {
+    // We remove the events from the virtual dom once it's executed
+    if (isOnce) delete props.virtualElement.domiesAttributes[props.attr.name];
+
     const executedValue = func({
       code: props.attr.value,
       returnResult: true,
@@ -44,5 +52,5 @@ export function events(props: AttrRendererProps) {
       executedValue.call(getContext($el, props.$state), event);
   };
   props.virtualElement.events[eventName] = eventListener;
-  $el.addEventListener(eventName, eventListener);
+  $el.addEventListener(eventName, eventListener, { once: isOnce });
 }
