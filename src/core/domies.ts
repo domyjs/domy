@@ -30,6 +30,8 @@ export function domies(props: AttrRendererProps) {
   }
 
   switch (domyAttrName) {
+    case 'd-once':
+      props.virtualElement.domiesAttributes = {};
     case 'd-text':
       $el.textContent = getExecutedValue();
       break;

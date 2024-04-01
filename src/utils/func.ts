@@ -36,8 +36,13 @@ export function func(props: Props) {
     return true;
   });
 
+  const needSpy =
+    'content' in props.virtualElement
+      ? true
+      : typeof props.virtualElement.domiesAttributes['d-once'] !== 'string';
+
   // We spy every dependencie to attach a listener if needed
-  if (typeof props.notifier === 'function') {
+  if (typeof props.notifier === 'function' && needSpy) {
     for (const signal of stateValues) {
       signal.setCallBackOnCall(() =>
         signal.attach({

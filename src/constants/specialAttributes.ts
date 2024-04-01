@@ -7,5 +7,6 @@ export const SPECIAL_ATTRIBUTES = [
   'd-for',
   'd-ref',
   'd-ignore',
-  'd-transition'
+  'd-transition',
+  'd-once'
 ] as const;
