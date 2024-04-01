@@ -1,5 +1,6 @@
 # TODO
 
+- d-else / d-else-if ?
 - benchmark
 - Collapse, anchor, intersect, mutation, persist (localStorage) plugins
 - prevValue/newValue for watcher and avoid two call
