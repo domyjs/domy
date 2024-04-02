@@ -1,5 +1,6 @@
 # TODO
 
+- $computed
 - $nextTick
 - components
 - exclude attributes / elements
