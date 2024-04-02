@@ -11,7 +11,7 @@ module.exports = {
   ignorePatterns: ['node_modules/'],
   overrides: [
     {
-      files: ['extension/popup/*.js', 'src/**/*.ts'],
+      files: ['packages/**/*.ts', 'scripts/**/*.ts'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off'
       }
