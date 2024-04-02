@@ -12,8 +12,8 @@ See the code of conduct [here](./CODE_OF_CONDUCT.md)
 ## Pull Request Process
 
 1. Update the README.md with details of changes to the extension and update the screens.
-2. Build the project.
-3. Select `dev` as the target branch to prepare the futur version.
+2. Test, lint and format your code before committing.
+3. Update the version.
 4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you
    do not have permission to do that, you may request the second reviewer to merge it for you.
 
