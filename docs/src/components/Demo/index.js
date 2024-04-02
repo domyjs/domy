@@ -8,9 +8,9 @@ const Demo = ({ code, domy }) => {
   useEffect(() => {
     if (ref.current) {
       ref.current.innerHTML = code;
-      DOMY(domy, ref.current);
+      DOMY.createApp(domy, ref.current);
     }
-  }, [code, domy]);
+  }, []);
 
   return (
     <>

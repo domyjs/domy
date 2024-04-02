@@ -12,7 +12,7 @@
     <button id="dec" @click="this.count--">-</button>
   </body>
   <script>
-    window.DOMY({
+    DOMY.createApp({
       $watch: {
         count() {
           this.count = Math.max(0, this.count);

@@ -31,7 +31,7 @@
     <button id="rm" @click="this.removeElement()">Remove</button>
   </body>
   <script>
-    window.DOMY({
+    DOMY.createApp({
       $setup() {
         this.list.push(this.generateElement());
       },

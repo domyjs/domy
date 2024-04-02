@@ -10,7 +10,7 @@
     <main d-cloak>{{ this.msg }}</main>
   </body>
   <script>
-    window.DOMY({
+    DOMY.createApp({
       async $setup() {
         await new Promise(r => setTimeout(r, 1000));
       },
