@@ -31,7 +31,10 @@ function HomepageHeader() {
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout title={`Home`} description="A lightweight and minimal javascript framework">
+    <Layout
+      title={`Home`}
+      description="A lightweight and minimal javascript framework for your frontend"
+    >
       <HomepageHeader />
     </Layout>
   );

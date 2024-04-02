@@ -9,7 +9,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Domy',
-  tagline: 'A lightweight and minimal javascript framework',
+  tagline: 'A lightweight and minimal javascript framework for your frontend',
   favicon: 'img/domy.png',
 
   // Set the production url of your site here
