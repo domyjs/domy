@@ -52,7 +52,6 @@ export function getContext($el: Element | Text | undefined, $state: State) {
 
   // The context
   const contextDatas = {
-    ...window,
     ...$stateDatas,
     ...$stateFn,
     $el,
