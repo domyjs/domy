@@ -5,7 +5,7 @@ const maskPlugin: Plugin = [
   {
     type: 'attribute',
     name: 'd-mask',
-    fn: props => {}
+    fn: () => {}
   }
 ];
 

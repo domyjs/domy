@@ -5,7 +5,7 @@ const anchorPlugin: Plugin = [
   {
     type: 'attribute',
     name: 'd-anchor',
-    fn: props => {}
+    fn: () => {}
   }
 ];
 

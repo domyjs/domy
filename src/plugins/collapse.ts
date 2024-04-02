@@ -5,7 +5,7 @@ const collapsePlugin: Plugin = [
   {
     type: 'attribute',
     name: 'd-collapse',
-    fn: props => {}
+    fn: () => {}
   }
 ];
 

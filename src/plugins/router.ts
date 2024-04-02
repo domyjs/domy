@@ -1,12 +1,12 @@
 // TODO
 import { Plugin } from '@typing/Plugin';
 
-const mutationPlugin: Plugin = [
+const routerPlugin: Plugin = [
   {
     type: 'attribute',
-    name: 'd-mutation',
+    name: 'd-link',
     fn: () => {}
   }
 ];
 
-export default mutationPlugin;
+export default routerPlugin;
