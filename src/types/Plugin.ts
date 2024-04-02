@@ -10,8 +10,16 @@ export type PluginProps = {
   notifier: Exclude<Signal['callBackOncall'], null>;
 };
 
-export type Plugin = {
-  type: 'attribute';
-  name: string;
-  fn: (props: PluginProps) => void | Promise<void>;
-};
+export type PluginType =
+  | {
+      type: 'attribute';
+      name: string;
+      fn: (props: PluginProps) => void | Promise<void>;
+    }
+  | {
+      type: 'function';
+      name: string;
+      fn: (props: PluginProps) => void | Promise<void>;
+    };
+
+export type Plugin = PluginType[];
