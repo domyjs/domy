@@ -2,7 +2,7 @@ import { isObject } from '@utils/isObject';
 
 export class DeepProxy {
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
-  private debounceDelay = 50;
+  private debounceDelay = 10;
 
   constructor(
     private target: any,
