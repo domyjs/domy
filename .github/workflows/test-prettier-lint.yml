@@ -5,8 +5,11 @@ on:
   pull_request:
 
 jobs:
-  lint-and-format:
+  test-lint-and-format:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
