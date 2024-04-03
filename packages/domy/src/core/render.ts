@@ -1,13 +1,12 @@
-import { State } from '@domy/types';
 import { Signal } from './Signal';
-import { VirtualElement, VirtualText } from './VitualDom';
 import { renderText } from './renderText';
 import { renderElement } from './renderElement';
+import { State } from '../types/State';
 
 type Props = {
   $state: State;
-  virtualParent: VirtualElement | null;
-  virtualElement: VirtualElement | VirtualText;
+  parent: Element | null;
+  element: Element;
 
   injectState?: Signal[];
   byPassAttributes?: string[];
@@ -23,19 +22,19 @@ type Props = {
  * @returns
  */
 export function render(props: Props) {
-  if ('content' in props.virtualElement) {
+  if (props.element.nodeType === Node.TEXT_NODE) {
     return renderText({
       $state: props.$state,
-      virtualParent: props.virtualParent,
-      virtualElement: props.virtualElement,
+      parent: props.parent,
+      element: props.element,
       injectState: props.injectState
     });
   }
 
   return renderElement({
     $state: props.$state,
-    virtualParent: props.virtualParent,
-    virtualElement: props.virtualElement,
+    parent: props.parent,
+    element: props.element,
     injectState: props.injectState,
     byPassAttributes: props.byPassAttributes
   });

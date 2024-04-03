@@ -1,15 +1,5 @@
-import { State } from '@domy/types';
-import { Signal } from './Signal';
-import { VirtualElement, VirtualText } from './VitualDom';
-import { func } from '../utils/func';
-
-type Props = {
-  $state: State;
-  virtualParent: VirtualElement | null;
-  virtualElement: VirtualText;
-
-  injectState?: Signal[];
-};
+import { evaluate } from '../utils/evaluate';
+import { DomyProps } from '../types/Domy';
 
 /**
  * Render a textContent
@@ -22,29 +12,35 @@ type Props = {
  * @param virtualElement
  * @param injectState Inject a state just for this render
  */
-export function renderText(props: Props) {
-  const $el = props.virtualElement.$el;
+export function renderText(domy: DomyProps) {
+  let originalTextContent = domy.el.textContent ?? '';
 
-  $el.textContent = props.virtualElement.content.replace(
-    /\{\{\s*(?<org>.+?)\s*\}\}/gi,
-    function (_, code) {
-      return func({
-        code,
-        returnResult: true,
-        $state: {
-          ...props.$state,
-          $state: [...(props.injectState ?? []), ...props.$state.$state]
-        },
-        virtualParent: props.virtualParent,
-        virtualElement: props.virtualElement,
-        notifier: () =>
-          renderText({
-            $state: props.$state,
-            virtualParent: props.virtualParent,
-            virtualElement: props.virtualElement,
-            injectState: props.injectState
-          })
-      });
-    }
-  );
+  domy.effect(() => {
+    domy.el.textContent = originalTextContent.replace(
+      /\{\{\s*(?<org>.+?)\s*\}\}/gi,
+      function (_, code) {
+        return evaluate({
+          code,
+          returnResult: true,
+          $state: {
+            ...domy.$state,
+            $state: [...(props.injectState ?? []), ...props.$state.$state]
+          },
+          context: null
+        });
+      }
+    );
+  });
 }
+
+/**
+ * virtualParent: props.virtualParent,
+          virtualElement: props.virtualElement,
+          notifier: () =>
+            renderText({
+              $state: props.$state,
+              virtualParent: props.virtualParent,
+              virtualElement: props.virtualElement,
+              injectState: props.injectState
+            })
+ */

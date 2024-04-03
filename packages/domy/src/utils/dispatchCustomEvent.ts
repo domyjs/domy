@@ -5,9 +5,9 @@ import { State } from '../types/State';
  * @param state
  * @string
  */
-export function dispatchCustomEvent($state: State) {
+export function dispatchCustomEvent(state: State) {
   return (eventName: string) => {
-    const attachedElements = $state.$events[eventName] ?? [];
+    const attachedElements = state.events[eventName] ?? [];
     for (const attachedElement of attachedElements) {
       attachedElement.dispatchEvent(new CustomEvent(eventName));
     }

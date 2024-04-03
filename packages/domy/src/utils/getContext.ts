@@ -1,6 +1,6 @@
-import { State } from '@domyjs/types';
 import { dispatchCustomEvent } from './dispatchCustomEvent';
 import { Signal } from '../core/Signal';
+import { State } from '../types/State';
 
 const proxyHandler: ProxyHandler<any> = {
   get(target, key, receiver) {
@@ -11,9 +11,9 @@ const proxyHandler: ProxyHandler<any> = {
       if (prevValue instanceof Signal) {
         return target[typedKey].value;
       }
-
-      // eslint-disable-next-line
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
 
     return Reflect.get(target, key, receiver);
   },
@@ -25,9 +25,9 @@ const proxyHandler: ProxyHandler<any> = {
       if (prevValue instanceof Signal) {
         return target[typedKey].set(newValue);
       }
-
-      // eslint-disable-next-line
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
 
     return Reflect.set(target, key, newValue, receiver);
   }
@@ -38,9 +38,9 @@ const proxyHandler: ProxyHandler<any> = {
  * @param $state
  * @returns
  */
-export function getContext($el: Element | Text | undefined, $state: State) {
-  const $stateDatas = $state.$state.reduce((a, b) => ({ ...a, [b.name]: b }), {});
-  const $stateFn = Object.entries($state.$fn).reduce(
+export function getContext(el: Element | Text | undefined, state: State) {
+  const $stateDatas = state.data.reduce((a, b) => ({ ...a, [b.name]: b }), {});
+  const $stateFn = Object.entries(state.methods).reduce(
     (a, b) => ({
       ...a,
       [b[0]]: function (...args: any[]) {
@@ -54,9 +54,9 @@ export function getContext($el: Element | Text | undefined, $state: State) {
   const contextDatas = {
     ...$stateDatas,
     ...$stateFn,
-    $el,
-    $refs: $state.$refs,
-    $dispatch: dispatchCustomEvent($state)
+    $el: el,
+    $refs: state.refs,
+    $dispatch: dispatchCustomEvent(state)
   };
 
   // Add a proxy for some magic to turn it like this:

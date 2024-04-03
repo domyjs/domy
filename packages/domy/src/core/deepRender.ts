@@ -1,18 +1,17 @@
-import { State } from '@domy/types';
+import { State } from '../types/State';
 import { Signal } from './Signal';
-import { VirtualElement, VirtualText } from './VitualDom';
 import { render } from './render';
 
 type Elem = {
-  parent: VirtualElement | null;
-  element: VirtualElement | VirtualText;
+  parent: Element | null;
+  element: Element;
   byPassAttributes?: string[];
 };
 
 type Props = {
   $state: State;
-  virtualParent: VirtualElement | null;
-  virtualElement: VirtualElement | VirtualText;
+  parent: Element | null;
+  element: Element;
 
   injectState?: Signal[];
   byPassAttributes?: string[];
@@ -30,8 +29,8 @@ type Props = {
 export function deepRender(props: Props) {
   const toRenderList: Elem[] = [
     {
-      parent: props.virtualParent,
-      element: props.virtualElement,
+      parent: props.parent,
+      element: props.element,
       byPassAttributes: props.byPassAttributes
     }
   ];
@@ -39,14 +38,12 @@ export function deepRender(props: Props) {
   while (toRenderList.length > 0) {
     const toRender = toRenderList.shift() as Elem;
 
-    toRender.element.isDisplay = true;
-
     // We don't render d-ignore elements
-    if (
-      !('content' in toRender.element) &&
-      typeof toRender.element.domiesAttributes['d-ignore'] === 'string'
-    )
-      continue;
+    // if (
+    //   !('content' in toRender.element) &&
+    //   typeof toRender.element.domiesAttributes['d-ignore'] === 'string'
+    // )
+    //   continue;
 
     render({
       $state: props.$state,
@@ -56,15 +53,11 @@ export function deepRender(props: Props) {
       byPassAttributes: toRender.byPassAttributes
     });
 
-    // We don't render child if it's a d-for because d-for handle his childs by his self
-    if (
-      'childs' in toRender.element &&
-      typeof toRender.element.domiesAttributes['d-for'] !== 'string'
-    ) {
-      for (const child of toRender.element.childs) {
+    if ('childs' in toRender.element) {
+      for (const child of toRender.element.childNodes) {
         toRenderList.push({
           parent: toRender.element,
-          element: child
+          element: child as Element
         });
       }
     }

@@ -1,4 +1,4 @@
-import { func } from '../utils/func';
+import { func } from '../utils/evaluate';
 import { AttrRendererProps } from '@domyjs/types';
 
 /**

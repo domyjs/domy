@@ -1,9 +1,9 @@
 import { SPECIAL_ATTRIBUTES } from '../constants/specialAttributes';
-import { func } from '../utils/func';
+import { func } from '../utils/evaluate';
 import { AttrRendererProps } from '@domy/types';
-import { dFor } from './attributes/d-for';
-import { dModel } from './attributes/d-model';
-import { dIf } from './attributes/d-if';
+import { dFor } from './attributes/for';
+import { dModel } from './attributes/model';
+import { dIf } from './attributes/if';
 
 /**
  * Handle attributes starting by d-*

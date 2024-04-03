@@ -1,6 +1,6 @@
 import { deepRender } from '../deepRender';
 import { findElementIndex } from '../../utils/findElementIndex';
-import { func } from '../../utils/func';
+import { func } from '../../utils/evaluate';
 import { restoreElement } from '../../utils/restoreElement';
 import { Domy, DomyProps } from '../../types/Domy';
 
