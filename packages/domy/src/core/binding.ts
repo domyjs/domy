@@ -1,5 +1,5 @@
 import { func } from '../utils/func';
-import { AttrRendererProps } from '@domy/types';
+import { AttrRendererProps } from '@domyjs/types';
 
 /**
  * Handle binding attributes like :class or d-bind:class

@@ -1,65 +1,56 @@
 import { deepRender } from '../deepRender';
-import { VirtualDom } from '../VitualDom';
-import { AttrRendererProps } from '@domy/types';
 import { findElementIndex } from '../../utils/findElementIndex';
 import { func } from '../../utils/func';
 import { restoreElement } from '../../utils/restoreElement';
+import { Domy, DomyProps } from '../../types/Domy';
 
-export function dIf(props: AttrRendererProps) {
-  if (!props.virtualParent) return;
+export function dIf(domy: DomyProps) {
+  const el = domy.el;
 
-  const $el = props.virtualElement.$el;
-  const $state = props.$state;
+  const shouldBeDisplay = domy.utils.evaluate();
 
-  const shouldBeDisplay = func({
-    code: props.attr.value,
-    attrName: props.attr.name,
-    returnResult: true,
-    $state: props.$state,
-    virtualParent: props.virtualParent,
-    virtualElement: props.virtualElement,
-    notifier: props.notifier
-  });
+  let initialised = false;
 
-  const transitionName = props.virtualElement.domiesAttributes['d-transition'];
-  const hasTransition = typeof transitionName === 'string';
+  domy.effect(() => {
+    const transitionName = el.getAttribute('d-transition');
+    const hasTransition = typeof transitionName === 'string';
 
-  const transitionOutListener: EventListenerOrEventListenerObject = () => {
-    $el.remove();
-    $el.removeEventListener('transitionend', transitionOutListener);
-    $el.removeEventListener('animationend', transitionOutListener);
-  };
+    const transitionOutListener: EventListenerOrEventListenerObject = () => {
+      el.remove();
+      el.removeEventListener('transitionend', transitionOutListener);
+      el.removeEventListener('animationend', transitionOutListener);
+    };
 
-  if (props.virtualElement.isDisplay && !shouldBeDisplay) {
-    props.virtualElement.isDisplay = false;
+    if (el.isConnected && !shouldBeDisplay) {
+      // Handle out transition
+      if (hasTransition && initialised) {
+        el.classList.add(`${transitionName}-out`);
+        el.addEventListener('animationend', transitionOutListener);
+        el.addEventListener('transition', transitionOutListener);
+      } else {
+        el.remove();
+      }
+    } else if (shouldBeDisplay) {
+      const indexToInsert = findElementIndex(el.parentNode, el);
 
-    // Handle out transition
-    if (hasTransition && props.virtualElement.initialised) {
-      $el.classList.add(`${transitionName}-out`);
-      $el.addEventListener('animationend', transitionOutListener);
-      $el.addEventListener('transition', transitionOutListener);
-    } else {
-      $el.remove();
+      // Handle enter transition
+      if (hasTransition) el.classList.add(`${transitionName}-enter`);
+
+      /*
+      TODO:
+      {
+        byPassAttributes: ['d-if']
+      }
+      */
+      domy.utils.deepRender(el);
+
+      domy.utils.restoreElement(el.parentNode as Element, el, indexToInsert);
     }
-  } else if (!props.virtualElement.isDisplay && shouldBeDisplay) {
-    const newElement = VirtualDom.createElementFromVirtual(props.virtualElement) as Element;
-    const indexToInsert = findElementIndex(props.virtualParent, props.virtualElement);
-    props.virtualElement.isDisplay = true;
 
-    // Handle enter transition
-    if (hasTransition) newElement.classList.add(`${transitionName}-enter`);
+    initialised = true;
+  });
+}
 
-    // Handle the case the old element is not remove yet because of the out animation for example
-    if ($el.isConnected) $el.remove();
-
-    deepRender({
-      $state,
-      virtualParent: props.virtualParent,
-      virtualElement: props.virtualElement,
-      byPassAttributes: ['d-if']
-    });
-    restoreElement(props.virtualParent.$el, newElement, indexToInsert);
-  }
-
-  props.virtualElement.initialised = true;
+export function dIfPlugin(domy: Domy) {
+  domy.registerAttribute('if', dIf);
 }
