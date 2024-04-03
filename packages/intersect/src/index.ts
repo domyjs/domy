@@ -1,5 +1,5 @@
 // TODO
-import { Plugin } from '@typing/Plugin';
+import { Plugin } from '@domyjs/types';
 
 const intersectPlugin: Plugin = [
   {
