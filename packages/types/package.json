@@ -1,0 +1,27 @@
+{
+  "name": "@domyjs/types",
+  "version": "1.0.0",
+  "description": "Domyjs types declaration",
+  "main": "./dist/index.d.ts",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yoannchb-pro/domy.git"
+  },
+  "keywords": [
+    "types",
+    "domyjs",
+    "framework",
+    "typescript",
+    "javascript"
+  ],
+  "author": "yoannchb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yoannchb-pro/domy/issues"
+  },
+  "homepage": "https://github.com/yoannchb-pro/domy#readme"
+}

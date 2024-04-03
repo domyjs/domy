@@ -1,5 +1,5 @@
 import { VirtualElement } from '@core/VitualDom';
-import { State } from './State';
+import { State } from '../../domy/src/types/State';
 import { Signal } from '@core/Signal';
 
 export type AttrRendererProps = {

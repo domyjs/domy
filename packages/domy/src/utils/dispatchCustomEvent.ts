@@ -1,4 +1,4 @@
-import { State } from '@typing/State';
+import { State } from '@domy/types';
 
 /**
  * Allow to dispatch a custom event on all elements attached to it
