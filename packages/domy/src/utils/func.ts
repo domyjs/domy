@@ -1,6 +1,6 @@
 import { VirtualElement, VirtualText } from '../core/VitualDom';
-import { AttrRendererProps } from '@domy/types';
-import { State } from '@domy/types';
+import { AttrRendererProps } from '@domyjs/types';
+import { State } from '@domyjs/types';
 import { getContext } from './getContext';
 
 type Props = {
