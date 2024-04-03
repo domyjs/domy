@@ -1,7 +1,7 @@
-import { AttrRendererProps } from '@typing/AttrRendererProps';
-import { attachClickAway } from '@utils/attachClickAway';
-import { func } from '@utils/func';
-import { getContext } from '@utils/getContext';
+import { AttrRendererProps } from '@domy/types';
+import { attachClickAway } from '../utils/attachClickAway';
+import { func } from '../utils/func';
+import { getContext } from '../utils/getContext';
 
 /**
  * Handle event applied on an item

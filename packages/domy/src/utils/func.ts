@@ -1,6 +1,6 @@
-import { VirtualElement, VirtualText } from '@core/VitualDom';
-import { AttrRendererProps } from '@typing/AttrRendererProps';
-import { State } from '@typing/State';
+import { VirtualElement, VirtualText } from '../core/VitualDom';
+import { AttrRendererProps } from '@domy/types';
+import { State } from '@domy/types';
 import { getContext } from './getContext';
 
 type Props = {
@@ -44,14 +44,13 @@ export function func(props: Props) {
   // We spy every dependencie to attach a listener if needed
   if (typeof props.notifier === 'function' && needSpy) {
     for (const signal of stateValues) {
-      signal.setCallBackOnCall(() =>
+      signal.callBackOncall = () =>
         signal.attach({
           $el,
           attrName: props.attrName,
           dontRemoveOnDisconnect: props.attrName === 'd-if', // We don't want to unattach the dependencie if the element doesnt exist anymore for a d-if
           fn: props.notifier as Exclude<Props['notifier'], undefined>
-        })
-      );
+        });
     }
   }
 

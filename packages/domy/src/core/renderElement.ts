@@ -1,11 +1,11 @@
 import { Signal } from './Signal';
 import { VirtualElement } from './VitualDom';
-import { isBindAttr, isDomyAttr, isEventAttr } from '@utils/isSpecialAttribute';
+import { isBindAttr, isDomyAttr, isEventAttr } from '../utils/isSpecialAttribute';
 import { binding } from './binding';
 import { domies } from './domies';
 import { events } from './events';
-import { State } from '@typing/State';
-import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { State } from '@domy/types';
+import { AttrRendererProps } from '@domy/types';
 
 type Props = {
   $state: State;

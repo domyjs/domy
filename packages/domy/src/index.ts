@@ -1,4 +1,4 @@
-import { createApp } from '@core/createApp';
+import { createApp } from './core/createApp';
 
 const DOMY = {
   createApp,

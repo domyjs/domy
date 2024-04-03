@@ -1,4 +1,4 @@
-import { SPECIAL_ATTRIBUTES } from '@constants/specialAttributes';
+import { SPECIAL_ATTRIBUTES } from '../constants/specialAttributes';
 
 export const isBindAttr = (attr: string) => attr.startsWith(':') || attr.startsWith('d-bind:');
 export const isEventAttr = (attr: string) => attr.startsWith('@') || attr.startsWith('d-on:');

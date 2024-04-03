@@ -1,6 +1,6 @@
-import { State } from '@typing/State';
+import { State } from '@domyjs/types';
 import { dispatchCustomEvent } from './dispatchCustomEvent';
-import { Signal } from '@core/Signal';
+import { Signal } from '../core/Signal';
 
 const proxyHandler: ProxyHandler<any> = {
   get(target, key, receiver) {

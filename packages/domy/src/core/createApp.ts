@@ -1,7 +1,7 @@
-import { App } from '@typing/App';
-import { State } from '@typing/State';
-import { getContext } from '@utils/getContext';
-import { toRegularFn } from '@utils/toRegularFn';
+import { App } from '@domy/types';
+import { State } from '@domy/types';
+import { getContext } from '../utils/getContext';
+import { toRegularFn } from '../utils/toRegularFn';
 import { Signal, Dependencie } from './Signal';
 import { initDomy } from './initDomy';
 

@@ -12,7 +12,8 @@
     "resolveJsonModule": true,
     "types": ["node"],
     "typeRoots": ["node_modules/@types"],
-    "strictBindCallApply": true
+    "strictBindCallApply": true,
+    "declaration": true
   },
   "include": ["packages/**/*"]
 }

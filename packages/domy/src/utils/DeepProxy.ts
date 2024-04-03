@@ -1,4 +1,4 @@
-import { isObject } from '@utils/isObject';
+import { isObject } from './isObject';
 
 export class DeepProxy {
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;

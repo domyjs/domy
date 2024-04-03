@@ -1,5 +1,5 @@
-import { func } from '@utils/func';
-import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { func } from '../utils/func';
+import { AttrRendererProps } from '@domy/types';
 
 /**
  * Handle binding attributes like :class or d-bind:class

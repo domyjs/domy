@@ -1,4 +1,4 @@
-import { isNormalAttr } from '@utils/isSpecialAttribute';
+import { isNormalAttr } from '../utils/isSpecialAttribute';
 
 type VisitCallback = (
   virtualParent: VirtualElement | null,

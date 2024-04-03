@@ -1,4 +1,4 @@
-import { State } from '@typing/State';
+import { State } from '@domy/types';
 import { Signal } from './Signal';
 import { VirtualElement, VirtualText } from './VitualDom';
 import { renderText } from './renderText';

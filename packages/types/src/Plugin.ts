@@ -1,6 +1,6 @@
-import { State } from '../../domy/src/types/State';
-import { VirtualElement, VirtualText } from '../../domy/src/core/VitualDom';
-import { Signal } from '@core/Signal';
+import { Signal } from './Signal';
+import { State } from './State';
+import { VirtualElement, VirtualText } from './VirtualElement';
 
 export type PluginProps = {
   $state: State;

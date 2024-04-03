@@ -6,28 +6,28 @@ const terser = require('@rollup/plugin-terser');
 
 const config = require('./tsconfig.json');
 
-module.exports = [
-  {
-    input: './src/index.ts',
+const filters = ['docs'];
+
+const packages = fs.readdirSync('./packages').filter(dir => {
+  if (filters.includes(dir)) return false;
+  return fs.statSync(path.join('./packages', dir)).isDirectory();
+});
+
+const packageConfigs = packages.map(packageName => {
+  return {
+    input: `./packages/${packageName}/src/index.ts`,
     output: [
       {
-        name: 'DOMY',
-        file: './dist/index.js',
+        name:
+          JSON.parse(fs.readFileSync(`./packages/${packageName}/package.json`)).buildName ??
+          packageName,
+        file: `./packages/${packageName}/dist/index.js`,
         format: 'umd',
         sourcemap: true
       }
     ],
     plugins: [ts(config), terser()]
-  }
-  // Plugins auto genration
-  // ...fs.readdirSync('./src/plugins').map(file => ({
-  //   input: `./src/plugins/${file}`,
-  //   output: {
-  //     name: file.split('.')[0],
-  //     file: `./dist/plugins/${path.basename(file, '.ts')}.js`,
-  //     format: 'umd',
-  //     sourcemap: true
-  //   },
-  //   plugins: [ts(config), terser()]
-  // }))
-];
+  };
+});
+
+module.exports = packageConfigs;

@@ -1,9 +1,9 @@
-import { State } from '@typing/State';
-import { getContext } from '@utils/getContext';
-import { toRegularFn } from '@utils/toRegularFn';
+import { State } from '@domy/types';
+import { getContext } from '../utils/getContext';
+import { toRegularFn } from '../utils/toRegularFn';
 import { render } from './render';
 import { VirtualDom, VirtualElement, VirtualText } from './VitualDom';
-import { App } from '@typing/App';
+import { App } from '@domy/types';
 
 /**
  * Init domy when the dom and state are ready

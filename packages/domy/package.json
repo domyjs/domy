@@ -1,5 +1,6 @@
 {
   "name": "@domy/core",
+  "buildName": "DOMY",
   "version": "1.0.0",
   "description": "A lightweight and minimal javascript framework for your frontend",
   "main": "./dist/index.js",
@@ -23,6 +24,6 @@
   },
   "homepage": "https://github.com/yoannchb-pro/domy#readme",
   "devDependencies": {
-    "@domy/types": "*"
+    "@domyjs/types": "file:../types"
   }
 }

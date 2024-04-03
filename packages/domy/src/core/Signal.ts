@@ -1,4 +1,5 @@
 import { DeepProxy } from '../utils/DeepProxy';
+import { Signal as SignalInterface } from '@domyjs/types';
 
 export type Dependencie = {
   $el?: Element | Text;
@@ -12,8 +13,8 @@ export type Dependencie = {
 /**
  * Create a signal to spy a variable and notify the observers that need this dependencie
  */
-export class Signal {
-  private callBackOncall: (() => void) | null = null;
+export class Signal implements SignalInterface {
+  public callBackOncall: (() => void) | null = null;
   public dependencies: Dependencie[] = [];
 
   constructor(
@@ -38,10 +39,6 @@ export class Signal {
       dep => dep.$el === dependencie.$el && dependencie.attrName === dep.attrName
     );
     if (!depAlreadyAttach) this.dependencies.push(dependencie);
-  }
-
-  public setCallBackOnCall(cb: (() => void) | null) {
-    this.callBackOncall = cb;
   }
 
   public set(setter: ((val: any) => any) | any) {

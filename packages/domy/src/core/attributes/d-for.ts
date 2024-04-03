@@ -1,9 +1,9 @@
-import { deepRender } from '@core/deepRender';
-import { Signal } from '@core/Signal';
-import { VirtualDom, VirtualElement } from '@core/VitualDom';
-import { AttrRendererProps } from '@typing/AttrRendererProps';
-import { func } from '@utils/func';
-import { moveElement } from '@utils/moveElement';
+import { deepRender } from '../deepRender';
+import { Signal } from '../Signal';
+import { VirtualDom, VirtualElement } from '../VitualDom';
+import { AttrRendererProps } from '@domy/types';
+import { func } from '../../utils/func';
+import { moveElement } from '../../utils/moveElement';
 
 export function dFor(props: AttrRendererProps) {
   if (!props.virtualParent) return;

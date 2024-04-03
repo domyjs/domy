@@ -1,4 +1,4 @@
-import { Signal } from '../../domy/src/core/Signal';
+import { Signal } from './Signal';
 
 export type State = {
   $state: Signal[];

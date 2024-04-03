@@ -1,9 +1,9 @@
-import { deepRender } from '@core/deepRender';
-import { VirtualDom } from '@core/VitualDom';
-import { AttrRendererProps } from '@typing/AttrRendererProps';
-import { findElementIndex } from '@utils/findElementIndex';
-import { func } from '@utils/func';
-import { restoreElement } from '@utils/restoreElement';
+import { deepRender } from '../deepRender';
+import { VirtualDom } from '../VitualDom';
+import { AttrRendererProps } from '@domy/types';
+import { findElementIndex } from '../../utils/findElementIndex';
+import { func } from '../../utils/func';
+import { restoreElement } from '../../utils/restoreElement';
 
 export function dIf(props: AttrRendererProps) {
   if (!props.virtualParent) return;

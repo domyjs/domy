@@ -1,5 +1,5 @@
-import { Dependencie } from '@core/Signal';
-import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { Dependencie } from '../Signal';
+import { AttrRendererProps } from '@domy/types';
 
 const EVENT_KEY = 'dMdodelEvents';
 

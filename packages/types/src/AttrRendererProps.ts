@@ -1,6 +1,6 @@
-import { VirtualElement } from '@core/VitualDom';
-import { State } from '../../domy/src/types/State';
-import { Signal } from '@core/Signal';
+import { Signal } from './Signal';
+import { State } from './State';
+import { VirtualElement } from './VirtualElement';
 
 export type AttrRendererProps = {
   $state: State;

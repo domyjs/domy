@@ -1,4 +1,4 @@
-import { VirtualElement, VirtualText } from '@core/VitualDom';
+import { VirtualElement, VirtualText } from '../core/VitualDom';
 
 /**
  * Find the current position of a virtual element into his parent

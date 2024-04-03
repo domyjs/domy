@@ -1,6 +1,6 @@
-import { SPECIAL_ATTRIBUTES } from '@constants/specialAttributes';
-import { func } from '@utils/func';
-import { AttrRendererProps } from '@typing/AttrRendererProps';
+import { SPECIAL_ATTRIBUTES } from '../constants/specialAttributes';
+import { func } from '../utils/func';
+import { AttrRendererProps } from '@domy/types';
 import { dFor } from './attributes/d-for';
 import { dModel } from './attributes/d-model';
 import { dIf } from './attributes/d-if';
