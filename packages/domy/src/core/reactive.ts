@@ -7,13 +7,13 @@ type OnSetListener = {
 
 type Listener = OnGetListener | OnSetListener;
 
+const isProxySymbol = Symbol('isProxy');
+
 class DeepProxy {
   private proxy: any = null;
 
   private onSetListeners: OnSetListener['fn'][] = [];
   private onGetListeners: OnGetListener['fn'][] = [];
-
-  private objectDone: Set<any> = new Set();
 
   constructor(private target: any) {}
 
@@ -120,8 +120,8 @@ class DeepProxy {
             // If the new value is not a proxy we declare a proxy for it
             const isNewObj = ['add', 'set'].includes(property as string);
             const obj = args[args.length - 1]; // In case of a set(key, obj) and add(obj)
-            if (isNewObj && !ctx.objectDone.has(obj) && ctx.canAttachProxy(obj)) {
-              args[args.length - 1] = ctx.createProxy(newValue, fullPath);
+            if (isNewObj && !obj[isProxySymbol]) {
+              args[args.length - 1] = ctx.createProxy(obj, fullPath);
             }
 
             const result = value.apply(target, args);
@@ -154,7 +154,7 @@ class DeepProxy {
         const fullPath = [...path, p as string];
 
         // If the new value is not a proxy we declare a proxy for it
-        if (!ctx.objectDone.has(newValue) && ctx.canAttachProxy(newValue)) {
+        if (!newValue[isProxySymbol]) {
           newValue = ctx.createProxy(newValue, fullPath);
         }
 
@@ -169,18 +169,19 @@ class DeepProxy {
   }
 
   private createProxy(target: any, path: string[] = []): any {
-    if (!this.canAttachProxy(target)) return target;
+    if (!this.canAttachProxy(target) || target[isProxySymbol]) return target;
 
     try {
       for (const key in target) {
-        target[key] = this.createProxy(target[key], [...path, key]);
+        if (!target[key][isProxySymbol])
+          target[key] = this.createProxy(target[key], [...path, key]);
       }
       const isCollection = this.isCollection(target);
       const prox = new Proxy(
         target,
         isCollection ? this.createCollectionHandler(path) : this.createHandler(path)
       );
-      this.objectDone.add(prox);
+      prox[isProxySymbol] = true;
       return prox;
     } catch (err) {
       return target;
