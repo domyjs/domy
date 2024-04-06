@@ -9,6 +9,10 @@ type Listener = OnGetListener | OnSetListener;
 
 const isProxySymbol = Symbol('isProxy');
 
+/**
+ * Allow to create a DeepProxy to listen to any change into an object
+ * @author yoannchb-pro
+ */
 class DeepProxy {
   private proxy: any = null;
 
@@ -22,6 +26,18 @@ class DeepProxy {
     return this.proxy;
   }
 
+  /**
+   * Check if a path match a certain rule
+   * Example:
+   * path: todos.0.isComplete
+   * reg: todos.*.isComplete or todos, todos.* or todos.*.*
+   * Will give true
+   * reg: todos.1.isComplete, todos.*.name, todos.*.*.id
+   * Will give false
+   * @param reg
+   * @param path
+   * @returns
+   */
   public static matchPath(reg: string, path: string) {
     const rules = reg.split('.');
     const paths = path.split('.');
@@ -201,11 +217,11 @@ class DeepProxy {
   }
 }
 
-export function reactive(obj: Record<string, any>) {
+export function reactive<T extends Record<string, any>>(obj: T) {
   const deepProxy = new DeepProxy(obj);
   return {
     originalObj: obj,
-    reactiveObj: deepProxy.getProxy() as Record<string, any>,
+    reactiveObj: deepProxy.getProxy() as T,
     matchPath: DeepProxy.matchPath,
     attachListener: deepProxy.attachListener.bind(deepProxy),
     removeListener: deepProxy.removeEventListener.bind(deepProxy)
