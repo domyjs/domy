@@ -1,6 +1,7 @@
-import { Domy, DomyProps } from '../../types/Domy';
+import { DomyPluginHelper } from '../../types/Domy';
+import { moveElement } from '../../utils/moveElement';
 
-function dFor(domy: DomyProps) {
+export function forImplementation(domy: DomyPluginHelper) {
   const el = domy.el;
   const initialChilds = el.childNodes;
 
@@ -18,7 +19,7 @@ function dFor(domy: DomyProps) {
       throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
 
     const isForIn = res.groups!.type === 'in';
-    const executedValue = domy.utils.evaluate();
+    const executedValue = domy.evaluate(res.groups!.org);
 
     const renderedChildrens: (Element | ChildNode | Node)[] = [];
 
@@ -27,24 +28,18 @@ function dFor(domy: DomyProps) {
         const child = initialChilds[childIndex] as Element;
         const currentIndex = valueIndex * initialChilds.length + childIndex;
 
-        const toInject = res!.groups!.index
-          ? domy.utils.reactive({
-              [res!.groups!.dest]: value,
-              [res!.groups!.index]: valueIndex
-            })
-          : domy.utils.reactive({
-              [res!.groups!.dest]: value
-            });
-
-        // Check if the key already exist so we can skip render
-        if ('key' in child && child.key) {
-          const keyValue = domy.utils.evaluate({
-            code: child.key,
-            $state: {
-              ...domy.$state,
-              $state: [...toInject, ...domy.$state.$state]
-            }
+        domy.addScopeToNode({
+          [res!.groups!.dest]: value
+        });
+        if (res!.groups?.index)
+          domy.addScopeToNode({
+            [res!.groups.index]: value
           });
+
+        // TODO
+        if ('key' in child && child.key) {
+          // Check if the key already exist so we can skip render
+          const keyValue = domy.evaluate(child.key);
           const elementWithKeyIndex = currentChildrends.findIndex(
             el => el.getAttribute('key') === keyValue.toString()
           );
@@ -52,7 +47,7 @@ function dFor(domy: DomyProps) {
             const elementWithKey = currentChildrends[elementWithKeyIndex];
             if (elementWithKeyIndex !== currentIndex) {
               // If the index of the element changed we move it to the new position
-              domy.utils.moveElement(el, elementWithKey, currentIndex);
+              moveElement(el, elementWithKey, currentIndex);
             }
             renderedChildrens.push(elementWithKey);
             continue;
@@ -62,7 +57,7 @@ function dFor(domy: DomyProps) {
         // Create and render the new element
         const newChild = child.cloneNode(true);
         // TODO: Fixe because it's really slow
-        domy.utils.deepRender(newChild as Element);
+        domy.deepRender(newChild as Element);
 
         const oldRender: ChildNode | undefined = el.childNodes[currentIndex];
 
@@ -106,8 +101,4 @@ function dFor(domy: DomyProps) {
 
     console.log(performance.now() - perf);
   });
-}
-
-export function dForPlugin(domy: Domy) {
-  domy.registerAttribute('for', dFor);
 }

@@ -1,35 +1,33 @@
-import { Signal, State } from '@domyjs/types';
-import { moveElement } from '../utils/moveElement';
-import { restoreElement } from '../utils/restoreElement';
-import { replaceElement } from '../utils/replaceElement';
+import { evaluate } from '../utils/evaluate';
+import { deepRender } from '../core/deepRender';
+import { render } from '../core/render';
+import { State } from './State';
+import { reactive } from '../core/reactive';
+import { getContext } from '../utils/getContext';
 
-export type DomyProps = {
+export type DomyPluginHelper = {
   el: Element;
-  attr: { name: string; value: string };
-  effect: (cb: () => void | Promise<void>) => void | Promise<void>;
-  cleanup: (cb: () => void | Promise<void>) => void | Promise<void>;
-  $state: State;
+  state: State;
+  directive: string;
   variants: string[];
-
-  utils: {
-    reactive: (obj: Record<string, any>) => Signal[];
-    evaluate: (...args: any[]) => any;
-    deepRender: (el: Element) => void;
-    render: (el: Element) => void;
-    moveElement: typeof moveElement;
-    restoreElement: typeof restoreElement;
-    replaceElement: typeof replaceElement;
-  };
+  attr: { name: string; value: string };
+  effect: (cb: () => void | Promise<void>) => void;
+  cleanup: (cb: () => void | Promise<void>) => void;
+  reactive: typeof reactive;
+  evaluate: (code: string) => any;
+  deepRender: typeof deepRender;
+  render: typeof render;
+  addScopeToNode(obj: Record<string, any>): void;
+  getContext: typeof getContext;
 };
 
-export type DomyFn = (domy: DomyProps) => void | Promise<void>;
+export type DomyFn = (domy: DomyPluginHelper) => void | Promise<void>;
 
-export type Domy = {
+export type DomyPluginDefinition = {
   registerAttribute(name: string, fn: DomyFn): void;
   registerSpecial(name: string, fn: DomyFn): void;
   registerVariant(name: string, fn: DomyFn): void;
-
-  notifyOnDataChange(name: string, fn: DomyFn): void;
+  registerWatcher(path: string, fn: DomyFn): void;
 };
 
-export type DomyPlugin = (domy: Domy) => void;
+export type DomyPlugin = (domy: DomyPluginDefinition) => void;

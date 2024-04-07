@@ -1,41 +1,30 @@
-import { Signal } from './Signal';
 import { renderText } from './renderText';
-import { renderElement } from './renderElement';
 import { State } from '../types/State';
+import { isNormalAttr } from '../utils/isSpecialAttribute';
+import { renderAttribute } from './renderAttribute';
+import { DomyHelper } from './DomyHelper';
 
 type Props = {
-  $state: State;
-  parent: Element | null;
+  state: State;
   element: Element;
-
-  injectState?: Signal[];
-  byPassAttributes?: string[];
 };
 
-/**
- * Render a virtual element of a textContent
- * @param $state
- * @param virtualParent
- * @param virtualElement
- * @param injectState
- * @param byPassAttributes
- * @returns
- */
 export function render(props: Props) {
+  const domyHelper = new DomyHelper(props.element, props.state);
+
+  // Rendering text content
   if (props.element.nodeType === Node.TEXT_NODE) {
-    return renderText({
-      $state: props.$state,
-      parent: props.parent,
-      element: props.element,
-      injectState: props.injectState
-    });
+    return renderText(domyHelper.getPluginHelper());
   }
 
-  return renderElement({
-    $state: props.$state,
-    parent: props.parent,
-    element: props.element,
-    injectState: props.injectState,
-    byPassAttributes: props.byPassAttributes
-  });
+  // Rendering attributes
+  for (const attr of props.element.attributes ?? []) {
+    if (!isNormalAttr(attr.name)) {
+      const [attrName, ...variants] = attr.name.split('.');
+      domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
+      domyHelper.attr.name = attrName;
+      domyHelper.variants = variants;
+      renderAttribute(domyHelper.getPluginHelper());
+    }
+  }
 }

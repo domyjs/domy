@@ -2,6 +2,7 @@ type Props = {
   code: string;
   context: any;
 
+  contextAsGlobal?: boolean;
   isAsync?: boolean;
   returnResult?: boolean;
 };
@@ -16,7 +17,8 @@ const AsyncFunction = async function () {}.constructor;
 export function evaluate(props: Props) {
   const fn = props.isAsync ? AsyncFunction : Function;
 
-  const code = props.returnResult ? `return ${props.code};` : props.code;
+  let code = props.returnResult ? `return ${props.code};` : props.code;
+  code = props.contextAsGlobal ? `with(this){ ${code} }` : code;
 
   // In case we have multiple signal with same name we keep the last added one
   // const alreadyExistingName: string[] = [];

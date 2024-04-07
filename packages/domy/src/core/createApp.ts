@@ -2,29 +2,23 @@ import { App } from '../types/App';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
 import { toRegularFn } from '../utils/toRegularFn';
-import { Signal, Dependencie } from './Signal';
-import { initDomy } from './initDomy';
+import { deepRender } from './deepRender';
+import { reactive } from './reactive';
 
 /**
  * Initialise domy state on a target (by default the body)
  * @param app
  * @param target
  */
-export async function createApp(app: App, target?: Element) {
-  const targetElement = target ?? document.body;
-
+export async function createApp(app: App = {}, target?: Element) {
   // State of the app
   const state: State = {
-    data: [],
+    data: reactive(app.data ?? {}),
     methods: {},
     events: {},
-    refs: {}
+    refs: {},
+    global: {}
   };
-
-  // States
-  for (const key in app.data) {
-    state.data.push(new Signal(key, app.data[key]));
-  }
 
   // Functions
   for (const key in app.data) {
@@ -33,26 +27,20 @@ export async function createApp(app: App, target?: Element) {
 
   // Watchers
   for (const watcherName in app.watch) {
-    const signal = state.data.find(s => s.name === watcherName);
-
-    if (!signal) {
-      console.error(`Invalide watcher name "${watcherName}"`);
-      continue;
-    }
-
     const watcherfn = toRegularFn(app.watch[watcherName]);
 
-    signal.attach({
-      fn: async () => {
-        // We remove the watcher too don't trigger it an other time if the user change the value
-        const watcher = signal.dependencies[0] as Dependencie;
-        watcher.unactive = true;
-        try {
-          await watcherfn.call(getContext(undefined, state));
-        } catch (err) {
-          console.error(err);
+    state.data.attachListener({
+      type: 'onSet',
+      fn: async ({ path, prevValue, newValue }) => {
+        if (state.data.matchPath(watcherName, path)) {
+          try {
+            // TODO: Fix other dep called
+            // Maybe something like prevent()
+            await watcherfn.call(getContext(undefined, state), prevValue, newValue);
+          } catch (err) {
+            console.error(err);
+          }
         }
-        watcher.unactive = false;
       }
     });
   }
@@ -67,7 +55,25 @@ export async function createApp(app: App, target?: Element) {
     }
   }
 
+  // Init domy
   if (document.readyState === 'complete') {
-    initDomy(app, targetElement, state);
-  } else document.addEventListener('DOMContentLoaded', () => initDomy(app, targetElement, state));
+    await mountApp();
+  } else document.addEventListener('DOMContentLoaded', mountApp);
+
+  async function mountApp() {
+    deepRender({
+      element: target ?? document.body,
+      state
+    });
+
+    // Mounted
+    if (app.mounted) {
+      try {
+        const mountedFn = toRegularFn(app.mounted);
+        await mountedFn.call(getContext(undefined, state));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
 }

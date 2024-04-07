@@ -4,6 +4,8 @@ const AsyncFunction = async function () {}.constructor;
  * Transform an arrow function to a regular function to bind the context
  * @param arrowFn
  * @returns
+ *
+ * @author yoannchb-pro
  */
 export function toRegularFn<T extends (...args: any[]) => any>(arrowFn: T): T {
   try {

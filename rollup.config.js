@@ -8,8 +8,10 @@ const config = require('./tsconfig.json');
 
 const filters = ['docs'];
 
+const toBuild = process.argv[3];
+
 const packages = fs.readdirSync('./packages').filter(dir => {
-  if (filters.includes(dir)) return false;
+  if (filters.includes(dir) || (toBuild && toBuild !== dir)) return false;
   return fs.statSync(path.join('./packages', dir)).isDirectory();
 });
 

@@ -1,43 +1,18 @@
-type Props = {};
+import { DomyPluginHelper } from '../types/Domy';
+import { isBindAttr, isDomyAttr, isEventAttr } from '../utils/isSpecialAttribute';
+import { binding } from './binding';
+import { domies } from './domies';
+import { events } from './events';
 
-/**
- * Render an attribute
- * @param name
- * @param value
- * @returns
- */
-function renderAttribute(props: Props) {
-  // Check if we have to bypass this attribute or not
-  if (props.byPassAttributes && props.byPassAttributes.includes(name)) return;
+export function renderAttribute(domy: DomyPluginHelper) {
+  //   // Check if we have to bypass this attribute or not
+  //   if (props.byPassAttributes && props.byPassAttributes.includes(name)) return;
 
-  // If the element is not displayed we don't need to render the differents attributes (except if it's d-if)
-  if (name !== 'd-if' && !props.virtualElement.isDisplay) return;
-
-  const attr = { name, value };
-
-  const propsFn: AttrRendererProps = {
-    $state: {
-      ...props.$state,
-      $state: [...(props.injectState ?? []), ...props.$state.$state]
-    },
-    virtualParent: props.virtualParent,
-    virtualElement: props.virtualElement,
-    attr,
-    notifier: () =>
-      renderElement({
-        $state: props.$state,
-        attr,
-        virtualParent: props.virtualParent,
-        virtualElement: props.virtualElement,
-        injectState: props.injectState
-      })
-  };
-
-  if (isBindAttr(name)) {
-    binding(propsFn);
-  } else if (isEventAttr(name)) {
-    events(propsFn);
-  } else if (isDomyAttr(name)) {
-    domies(propsFn);
+  if (isBindAttr(domy.attr.name)) {
+    binding(domy);
+  } else if (isEventAttr(domy.attr.name)) {
+    events(domy);
+  } else if (isDomyAttr(domy.attr.name)) {
+    domies(domy);
   }
 }
