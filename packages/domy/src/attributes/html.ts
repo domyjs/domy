@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../../types/Domy';
+import { DomyPluginHelper } from '../types/Domy';
 
 export function dHtmlImplementation(domy: DomyPluginHelper) {
   domy.effect(() => {

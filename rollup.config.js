@@ -18,7 +18,7 @@ const packages = fs.readdirSync('./packages').filter(dir => {
 // We compile "types" package first because other package depends from it
 const sortedPackages = ['types', ...packages.filter(pkg => pkg !== 'types')];
 
-const packageConfigs = sortedPackages.map(packageName => {
+const packageConfigs = ['domy'].map(packageName => {
   return {
     input: `./packages/${packageName}/src/index.ts`,
     output: [

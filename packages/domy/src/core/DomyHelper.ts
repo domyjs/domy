@@ -72,6 +72,13 @@ export class DomyHelper {
   }
 
   callEffect() {
+    this.state.data.attachListener({
+      type: 'onSet',
+      fn: () => {
+        console.log('set');
+        this.callEffect();
+      }
+    });
     if (typeof this.effectFn === 'function') this.effectFn();
   }
 }

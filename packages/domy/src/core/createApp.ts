@@ -21,8 +21,8 @@ export async function createApp(app: App = {}, target?: Element) {
   };
 
   // Functions
-  for (const key in app.data) {
-    state.methods[key] = toRegularFn(app.data[key]);
+  for (const key in app.methods) {
+    state.methods[key] = toRegularFn(app.methods[key]);
   }
 
   // Watchers

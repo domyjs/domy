@@ -1,5 +1,5 @@
-import { DomyPluginHelper } from '../../types/Domy';
-import { moveElement } from '../../utils/moveElement';
+import { DomyPluginHelper } from '../types/Domy';
+import { moveElement } from '../utils/moveElement';
 
 export function dForImplementation(domy: DomyPluginHelper) {
   const el = domy.el;

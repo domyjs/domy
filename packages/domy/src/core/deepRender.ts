@@ -35,12 +35,10 @@ export function deepRender(props: Props) {
       state: props.state
     });
 
-    if ('childs' in toRender.element) {
-      for (const child of toRender.element.childNodes) {
-        toRenderList.push({
-          element: child as Element
-        });
-      }
+    for (const child of toRender.element.childNodes) {
+      toRenderList.push({
+        element: child as Element
+      });
     }
   }
 }

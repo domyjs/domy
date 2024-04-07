@@ -9,7 +9,7 @@
   <body>
     <p>Count: {{ count }}</p>
     <button @click="increment()">+</button>
-    <button @click="decrement">-</button>
+    <button d-on:click="decrement">-</button>
   </body>
   <script>
     window.DOMY.createApp({
@@ -23,9 +23,11 @@
       },
       methods: {
         increment() {
+          console.log('inc');
           this.count++;
         },
         decrement() {
+          console.log('dec');
           this.count--;
         }
       }

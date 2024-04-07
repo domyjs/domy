@@ -1,5 +1,5 @@
-import { DomyPluginHelper } from '../../types/Domy';
-import { restoreElement } from '../../utils/restoreElement';
+import { DomyPluginHelper } from '../types/Domy';
+import { restoreElement } from '../utils/restoreElement';
 
 export function dIfImplementation(domy: DomyPluginHelper) {
   const el = domy.el;

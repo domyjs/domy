@@ -14,7 +14,9 @@ export function render(props: Props) {
 
   // Rendering text content
   if (props.element.nodeType === Node.TEXT_NODE) {
-    return renderText(domyHelper.getPluginHelper());
+    renderText(domyHelper.getPluginHelper());
+    domyHelper.callEffect();
+    return;
   }
 
   // Rendering attributes
@@ -25,6 +27,7 @@ export function render(props: Props) {
       domyHelper.attr.name = attrName;
       domyHelper.variants = variants;
       renderAttribute(domyHelper.getPluginHelper());
+      domyHelper.callEffect();
     }
   }
 }

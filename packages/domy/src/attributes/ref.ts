@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../../types/Domy';
+import { DomyPluginHelper } from '../types/Domy';
 
 export function dRefImplementation(domy: DomyPluginHelper) {
   if (domy.state.refs[domy.attr.value])

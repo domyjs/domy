@@ -2,6 +2,7 @@ import { DomyPluginHelper } from '../types/Domy';
 import { isBindAttr, isDomyAttr, isEventAttr } from '../utils/isSpecialAttribute';
 import { binding } from './binding';
 import { events } from './events';
+import { DIRECTIVES } from './registerPlugin';
 
 export function renderAttribute(domy: DomyPluginHelper) {
   //   // Check if we have to bypass this attribute or not
@@ -12,6 +13,8 @@ export function renderAttribute(domy: DomyPluginHelper) {
   } else if (isEventAttr(domy.attr.name)) {
     events(domy);
   } else if (isDomyAttr(domy.attr.name)) {
-    domies(domy);
+    for (const attr of DIRECTIVES.attributes) {
+      attr(domy);
+    }
   }
 }
