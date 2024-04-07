@@ -1,5 +1,4 @@
-import { func } from '../utils/evaluate';
-import { AttrRendererProps } from '@domyjs/types';
+import { DomyPluginHelper } from '../types/Domy';
 
 /**
  * Handle binding attributes like :class or d-bind:class
@@ -8,43 +7,44 @@ import { AttrRendererProps } from '@domyjs/types';
  * d-bind:class="isOpen ? 'show' : 'hide'"
  * will give
  * class="show"
- * @param props
+ * @param domy
  */
-export function binding(props: AttrRendererProps) {
-  const $el = props.virtualElement.$el;
-  const domyAttrName = props.attr.name;
+export function binding(domy: DomyPluginHelper) {
+  const orignalAttrName = domy.attr.name;
+  const attrName = orignalAttrName.startsWith(':')
+    ? orignalAttrName.slice(1)
+    : orignalAttrName.slice('d-bind:'.length);
 
-  const attrName = domyAttrName.startsWith(':')
-    ? domyAttrName.slice(1)
-    : domyAttrName.slice('d-bind:'.length);
+  domy.el.removeAttribute(orignalAttrName);
 
-  const executedValue = func({
-    code: props.attr.value,
-    attrName: props.attr.name,
-    returnResult: true,
-    $state: props.$state,
-    virtualParent: props.virtualParent,
-    virtualElement: props.virtualElement,
-    notifier: props.notifier
-  });
+  domy.effect(() => {
+    const executedValue = domy.evaluate(domy.attr.value);
 
-  // Handle key attribute
-  if (attrName === 'key' && !props.virtualElement.key) {
-    if (typeof executedValue !== 'string' && typeof executedValue !== 'number')
-      throw new Error(`Invalide key value: "${executedValue}".`);
-
-    props.virtualElement.key = props.attr.value;
-  }
-
-  $el.removeAttribute(domyAttrName);
-
-  if (attrName === 'style' && typeof executedValue === 'object') {
-    // Handle style attribute if it's an object
-    // { backgroundColor: '#fff', color: 'red' .... }
-    for (const styleName in executedValue) {
-      ($el as HTMLElement).style[styleName as any] = executedValue[styleName];
+    if (attrName === 'style' && typeof executedValue === 'object') {
+      // Handle style attribute if it's an object
+      // { backgroundColor: '#fff', color: 'red' .... }
+      domy.el.removeAttribute('style');
+      for (const styleName in executedValue) {
+        (domy.el as HTMLElement).style[styleName as any] = executedValue[styleName];
+      }
+    } else if (attrName === 'class' && typeof executedValue === 'object') {
+      // Handle class attribute if it's an object like
+      // { show: true }
+      // or
+      // ["show"]
+      domy.el.removeAttribute('class');
+      if (Array.isArray(executedValue)) {
+        for (const className of executedValue) {
+          domy.el.classList.add(className);
+        }
+      } else {
+        for (const [className, shouldBeSet] of Object.entries(executedValue)) {
+          if (shouldBeSet) domy.el.classList.add(className);
+        }
+      }
+    } else {
+      // Handle any other kind of attribute
+      domy.el.setAttribute(attrName, executedValue);
     }
-  } else {
-    $el.setAttribute(attrName, executedValue);
-  }
+  });
 }

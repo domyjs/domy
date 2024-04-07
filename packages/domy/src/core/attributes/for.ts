@@ -1,7 +1,7 @@
 import { DomyPluginHelper } from '../../types/Domy';
 import { moveElement } from '../../utils/moveElement';
 
-export function forImplementation(domy: DomyPluginHelper) {
+export function dForImplementation(domy: DomyPluginHelper) {
   const el = domy.el;
   const initialChilds = el.childNodes;
 
@@ -28,6 +28,7 @@ export function forImplementation(domy: DomyPluginHelper) {
         const child = initialChilds[childIndex] as Element;
         const currentIndex = valueIndex * initialChilds.length + childIndex;
 
+        // Inject the new datas like index
         domy.addScopeToNode({
           [res!.groups!.dest]: value
         });
@@ -37,9 +38,9 @@ export function forImplementation(domy: DomyPluginHelper) {
           });
 
         // TODO
-        if ('key' in child && child.key) {
+        if (child.getAttribute('key')) {
           // Check if the key already exist so we can skip render
-          const keyValue = domy.evaluate(child.key);
+          const keyValue = domy.evaluate(child.getAttribute('key')!);
           const elementWithKeyIndex = currentChildrends.findIndex(
             el => el.getAttribute('key') === keyValue.toString()
           );
@@ -57,7 +58,10 @@ export function forImplementation(domy: DomyPluginHelper) {
         // Create and render the new element
         const newChild = child.cloneNode(true);
         // TODO: Fixe because it's really slow
-        domy.deepRender(newChild as Element);
+        domy.deepRender({
+          element: newChild as Element,
+          state: domy.state
+        });
 
         const oldRender: ChildNode | undefined = el.childNodes[currentIndex];
 

@@ -1,17 +1,25 @@
-import { deepRender } from '../deepRender';
-import { findElementIndex } from '../../utils/findElementIndex';
-import { func } from '../../utils/evaluate';
+import { DomyPluginHelper } from '../../types/Domy';
 import { restoreElement } from '../../utils/restoreElement';
-import { Domy, DomyProps } from '../../types/Domy';
 
-export function dIf(domy: DomyProps) {
+export function dIfImplementation(domy: DomyPluginHelper) {
   const el = domy.el;
-
-  const shouldBeDisplay = domy.utils.evaluate();
+  const parent = domy.el.parentNode as Element;
+  const parentChilds = parent.childNodes;
 
   let initialised = false;
 
+  function findElementIndex(): number {
+    let index = 0;
+    for (const child of Array.from(parentChilds)) {
+      if (child === el) break;
+      if (child.isConnected) ++index;
+    }
+    return index;
+  }
+
   domy.effect(() => {
+    const shouldBeDisplay = domy.evaluate(domy.attr.value);
+
     const transitionName = el.getAttribute('d-transition');
     const hasTransition = typeof transitionName === 'string';
 
@@ -31,7 +39,7 @@ export function dIf(domy: DomyProps) {
         el.remove();
       }
     } else if (shouldBeDisplay) {
-      const indexToInsert = findElementIndex(el.parentNode, el);
+      const indexToInsert = findElementIndex();
 
       // Handle enter transition
       if (hasTransition) el.classList.add(`${transitionName}-enter`);
@@ -42,15 +50,14 @@ export function dIf(domy: DomyProps) {
         byPassAttributes: ['d-if']
       }
       */
-      domy.utils.deepRender(el);
+      domy.deepRender({
+        element: el,
+        state: domy.state
+      });
 
-      domy.utils.restoreElement(el.parentNode as Element, el, indexToInsert);
+      restoreElement(parent, el, indexToInsert);
     }
 
     initialised = true;
   });
-}
-
-export function dIfPlugin(domy: Domy) {
-  domy.registerAttribute('if', dIf);
 }

@@ -1,11 +1,7 @@
-import { Domy, DomyProps } from '../../types/Domy';
+import { DomyPluginHelper } from '../../types/Domy';
 
-function htmlImplementation(domy: DomyProps) {
+export function dHtmlImplementation(domy: DomyPluginHelper) {
   domy.effect(() => {
-    domy.el.innerHTML = domy.utils.evaluate({ code: domy.attr.value, context: null });
+    domy.el.innerHTML = domy.evaluate(domy.attr.value);
   });
-}
-
-export function htmlAttribute(domy: Domy) {
-  domy.registerAttribute('html', htmlImplementation);
 }

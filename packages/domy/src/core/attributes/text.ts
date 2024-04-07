@@ -1,11 +1,7 @@
-import { Domy, DomyProps } from '../../types/Domy';
+import { DomyPluginHelper } from '../../types/Domy';
 
-function textImplementation(domy: DomyProps) {
+export function dTextImplementation(domy: DomyPluginHelper) {
   domy.effect(() => {
-    domy.el.textContent = domy.utils.evaluate({ code: domy.attr.value, context: null });
+    domy.el.textContent = domy.evaluate(domy.attr.value);
   });
-}
-
-export function textAttribute(domy: Domy) {
-  domy.registerAttribute('text', textImplementation);
 }

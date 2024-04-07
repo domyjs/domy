@@ -1,42 +1,19 @@
-import { Dependencie } from '../Signal';
-import { AttrRendererProps } from '../../types';
+import { DomyPluginHelper } from '../../types/Domy';
+import { get, set } from '../../utils/getAndSet';
 
-const EVENT_KEY = 'dMdodelEvents';
+export function dModelImplementation(domy: DomyPluginHelper) {
+  const el = domy.el as HTMLInputElement;
 
-export function dModel(props: AttrRendererProps) {
-  const $el = props.virtualElement.$el as HTMLInputElement;
-  const $state = props.$state;
-  const eventSet = props.virtualElement.events[EVENT_KEY];
-
-  const signalName = props.attr.value.replace(/^this\./, '');
-  const currentSignal = $state.$state.find(state => state.name === signalName);
-
-  if (!currentSignal) throw new Error(`Invalide data name in d-model: "${signalName}".`);
+  const objPath = domy.attr.value.replace(/^this\./, '');
 
   function changeValue() {
-    const dep = currentSignal!.dependencies.find(dep => dep.$el === $el) as Dependencie;
-    dep.unactive = true;
-    currentSignal!.set($el?.value ?? '');
-    dep.unactive = false;
+    set(domy.state.data, objPath, el.value);
   }
 
-  // Listener handler
-  if (eventSet) {
-    $el.removeEventListener('input', eventSet);
-    $el.removeEventListener('change', eventSet);
-  }
+  el.addEventListener('input', changeValue);
+  el.addEventListener('change', changeValue);
 
-  $el.addEventListener('input', changeValue);
-  $el.addEventListener('change', changeValue);
-
-  props.virtualElement.events[EVENT_KEY] = changeValue;
-
-  // Set the current value of the variable to the input
-  if ('value' in $el) $el.value = currentSignal.val;
-
-  // Attach the listener to change the value if the variable is changed
-  currentSignal?.attach({
-    $el,
-    fn: props.notifier
+  domy.effect(() => {
+    el.value = get(domy.state.data, objPath) ?? '';
   });
 }

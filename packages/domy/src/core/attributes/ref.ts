@@ -1,11 +1,8 @@
-import { Domy, DomyProps } from '../../types/Domy';
+import { DomyPluginHelper } from '../../types/Domy';
 
-function refImplementation(domy: DomyProps) {
+export function dRefImplementation(domy: DomyPluginHelper) {
   if (domy.state.refs[domy.attr.value])
     throw new Error(`A ref with the name "${domy.attr.value}" already exist.`);
-  domy.state.refs[domy.attr.value] = domy.el;
-}
 
-export function refAttribute(domy: Domy) {
-  domy.registerAttribute('ref', refImplementation);
+  domy.state.refs[domy.attr.value] = domy.el;
 }
