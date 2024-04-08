@@ -5,32 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="../dist/index.js"></script>
+    <script>
+      window.DOMY.createApp({
+        //   watch: {
+        //     count(prevValue, newValue) {
+        //       if (newValue < 0) this.count = prevValue;
+        //     }
+        //   },
+        data: {
+          count: 0,
+          count2: { count: 0 }
+        },
+        methods: {
+          increment() {
+            console.log('inc', this.count, this);
+            this.count++;
+          },
+          decrement() {
+            console.log('dec', this.count);
+            this.count--;
+          }
+        }
+      });
+    </script>
   </head>
   <body>
     <p>Count: {{ count }}</p>
     <button @click="increment()">+</button>
     <button d-on:click="decrement">-</button>
+    <p>Count2: {{ count2.count }}</p>
+    <button @click="count2.count++">+</button>
+    <button d-on:click="count2.count--">-</button>
   </body>
-  <script>
-    window.DOMY.createApp({
-      watch: {
-        count(prevValue, newValue) {
-          if (newValue < 0) this.count = prevValue;
-        }
-      },
-      data: {
-        count: 0
-      },
-      methods: {
-        increment() {
-          console.log('inc');
-          this.count++;
-        },
-        decrement() {
-          console.log('dec');
-          this.count--;
-        }
-      }
-    });
-  </script>
 </html>

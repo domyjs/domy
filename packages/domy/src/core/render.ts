@@ -25,6 +25,7 @@ export function render(props: Props) {
       const [attrName, ...variants] = attr.name.split('.');
       domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
       domyHelper.attr.name = attrName;
+      domyHelper.attr.value = attr.value;
       domyHelper.variants = variants;
       renderAttribute(domyHelper.getPluginHelper());
       domyHelper.callEffect();

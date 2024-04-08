@@ -5,7 +5,7 @@ type OnSetListener = {
   fn: (props: { path: string; prevValue: any; newValue: any }) => void;
 };
 
-type Listener = OnGetListener | OnSetListener;
+export type Listener = OnGetListener | OnSetListener;
 
 const isProxySymbol = Symbol('isProxy');
 
@@ -94,6 +94,10 @@ class DeepProxy {
     const ctx = this;
     const collectionHandler: ProxyHandler<any> = {
       get(target, property, receiver) {
+        if (typeof property === 'symbol') {
+          return Reflect.get(target, property, receiver);
+        }
+
         const value = Reflect.get(target, property, receiver);
         const fullPath = [...path, property as string];
 
@@ -161,11 +165,19 @@ class DeepProxy {
     const ctx = this;
     const handler: ProxyHandler<any> = {
       get(target, p, receiver) {
+        if (typeof p === 'symbol') {
+          return Reflect.get(target, p, receiver);
+        }
+
         ctx.callOnGetListeners([...path, p as string]);
         return Reflect.get(target, p, receiver);
       },
 
       set(target, p, newValue, receiver) {
+        if (typeof p === 'symbol') {
+          return Reflect.set(target, p, newValue, receiver);
+        }
+
         const prevValue = Reflect.get(target, p, receiver);
         const fullPath = [...path, p as string];
 
@@ -178,6 +190,7 @@ class DeepProxy {
         if (result) {
           if (prevValue !== newValue) ctx.callOnSetListeners(fullPath, prevValue, newValue);
         }
+
         return result;
       }
     };
@@ -189,8 +202,8 @@ class DeepProxy {
 
     try {
       for (const key in target) {
-        if (!target[key][isProxySymbol])
-          target[key] = this.createProxy(target[key], [...path, key]);
+        const isAlreadyProxy = target[key][isProxySymbol];
+        if (!isAlreadyProxy) target[key] = this.createProxy(target[key], [...path, key]);
       }
       const isCollection = this.isCollection(target);
       const prox = new Proxy(
@@ -220,7 +233,6 @@ class DeepProxy {
 export function reactive<T extends Record<string, any>>(obj: T) {
   const deepProxy = new DeepProxy(obj);
   return {
-    originalObj: obj,
     reactiveObj: deepProxy.getProxy() as T,
     matchPath: DeepProxy.matchPath,
     attachListener: deepProxy.attachListener.bind(deepProxy),

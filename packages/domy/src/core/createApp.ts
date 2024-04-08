@@ -17,12 +17,16 @@ export async function createApp(app: App = {}, target?: Element) {
     methods: {},
     events: {},
     refs: {},
+
     global: {}
   };
 
   // Functions
   for (const key in app.methods) {
-    state.methods[key] = toRegularFn(app.methods[key]);
+    const method = toRegularFn(app.methods[key]);
+    state.methods[key] = function (...args: any[]) {
+      return method.call(getContext(undefined, state), ...args);
+    };
   }
 
   // Watchers

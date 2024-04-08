@@ -3,7 +3,7 @@ import { State } from '../types/State';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import { deepRender } from './deepRender';
-import { reactive } from './reactive';
+import { Listener, reactive } from './reactive';
 import { render } from './render';
 
 export class DomyHelper {
@@ -15,10 +15,23 @@ export class DomyHelper {
   public attr: { name: string; value: string } = { name: '', value: '' };
   public variants: string[] = [];
 
+  private paths = new Set<string>();
+
   constructor(
     public el: Element,
     public state: State
-  ) {}
+  ) {
+    this.state.data.attachListener({
+      type: 'onSet',
+      fn: ({ path, prevValue, newValue }) => {
+        if (this.paths.has(path)) {
+          console.log('set', path, prevValue, newValue);
+          this.callCleanup();
+          this.callEffect();
+        }
+      }
+    });
+  }
 
   getPluginHelper(): DomyPluginHelper {
     return {
@@ -47,12 +60,27 @@ export class DomyHelper {
   }
 
   evaluate(code: string) {
-    return evaluate({
+    this.paths = new Set<string>();
+    const listener: Listener = {
+      type: 'onGet',
+      fn: ({ path }) => {
+        console.log('get', path, this.el);
+        this.paths.add(path);
+      }
+    };
+
+    this.state.data.attachListener(listener);
+
+    const executedValued = evaluate({
       code: code,
+      contextAsGlobal: true,
       context: getContext(this.el, this.state, this.dataToInject),
-      returnResult: true,
-      contextAsGlobal: true
+      returnResult: true
     });
+
+    this.state.data.removeListener(listener);
+
+    return executedValued;
   }
 
   addScopeToNode(obj: Record<string, any>) {
@@ -72,13 +100,6 @@ export class DomyHelper {
   }
 
   callEffect() {
-    this.state.data.attachListener({
-      type: 'onSet',
-      fn: () => {
-        console.log('set');
-        this.callEffect();
-      }
-    });
     if (typeof this.effectFn === 'function') this.effectFn();
   }
 }

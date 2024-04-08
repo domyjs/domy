@@ -32,10 +32,11 @@ export function dForImplementation(domy: DomyPluginHelper) {
         domy.addScopeToNode({
           [res!.groups!.dest]: value
         });
-        if (res!.groups?.index)
+        if (res!.groups?.index) {
           domy.addScopeToNode({
             [res!.groups.index]: value
           });
+        }
 
         // TODO
         if (child.getAttribute('key')) {

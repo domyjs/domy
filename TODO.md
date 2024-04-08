@@ -1,5 +1,6 @@
 # TODO
 
+- remove get listener for function call
 - $computed
 - $nextTick
 - components
