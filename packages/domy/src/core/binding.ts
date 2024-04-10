@@ -15,8 +15,6 @@ export function binding(domy: DomyPluginHelper) {
     ? orignalAttrName.slice(1)
     : orignalAttrName.slice('d-bind:'.length);
 
-  domy.el.removeAttribute(orignalAttrName);
-
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);
 

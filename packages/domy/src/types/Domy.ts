@@ -1,6 +1,5 @@
 import { evaluate } from '../utils/evaluate';
 import { deepRender } from '../core/deepRender';
-import { render } from '../core/render';
 import { State } from './State';
 import { reactive } from '../core/reactive';
 import { getContext } from '../utils/getContext';
@@ -8,6 +7,7 @@ import { getContext } from '../utils/getContext';
 export type DomyPluginHelper = {
   el: Element;
   state: State;
+  scopedNodeData: Record<string, any>[];
   directive: string;
   variants: string[];
   attr: { name: string; value: string };
@@ -15,8 +15,8 @@ export type DomyPluginHelper = {
   cleanup: (cb: () => void | Promise<void>) => void;
   reactive: typeof reactive;
   evaluate: (code: string) => any;
+  evaluateWithoutListening: (code: string) => any;
   deepRender: typeof deepRender;
-  render: typeof render;
   addScopeToNode(obj: Record<string, any>): void;
   getContext: typeof getContext;
 };

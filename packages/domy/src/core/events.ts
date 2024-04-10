@@ -29,7 +29,7 @@ export function events(domy: DomyPluginHelper) {
 
     const executedValue = domy.evaluate(domy.attr.value);
     if (typeof executedValue === 'function')
-      executedValue.call(domy.getContext(domy.el, domy.state), event); // TODO FIX injected datas
+      executedValue.call(domy.getContext(domy.el, domy.state, domy.scopedNodeData), event);
   };
 
   domy.el.addEventListener(eventName, eventListener);

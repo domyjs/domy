@@ -1,6 +1,6 @@
 # TODO
 
-- remove get listener for function call
+- remove get listener for function call / smae for watch
 - $computed
 - $nextTick
 - components

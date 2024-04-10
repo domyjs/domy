@@ -44,15 +44,10 @@ export function dIfImplementation(domy: DomyPluginHelper) {
       // Handle enter transition
       if (hasTransition) el.classList.add(`${transitionName}-enter`);
 
-      /*
-      TODO:
-      {
-        byPassAttributes: ['d-if']
-      }
-      */
       domy.deepRender({
         element: el,
-        state: domy.state
+        state: domy.state,
+        byPassAttributes: ['d-if']
       });
 
       restoreElement(parent, el, indexToInsert);

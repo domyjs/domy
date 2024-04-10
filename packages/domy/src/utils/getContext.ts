@@ -8,7 +8,7 @@ function createFakeData(obj: Record<string, any>) {
 export function getContext(
   el: Element | Text | undefined,
   state: State,
-  injectableDatas: Record<string, any>[] = []
+  scopedNodeData: Record<string, any>[] = []
 ) {
   const stateDatas = state.data.reactiveObj;
 
@@ -20,7 +20,7 @@ export function getContext(
       if (property in stateDatas) {
         return stateDatas[property];
       } else {
-        for (const injectableData of injectableDatas) {
+        for (const injectableData of scopedNodeData) {
           if (property in injectableData) {
             return injectableData[property];
           }
@@ -36,7 +36,7 @@ export function getContext(
       if (property in stateDatas) {
         return (stateDatas[property] = newValue);
       } else {
-        for (const injectableData of injectableDatas) {
+        for (const injectableData of scopedNodeData) {
           if (property in injectableData) {
             return (injectableData[property] = newValue);
           }
@@ -49,10 +49,7 @@ export function getContext(
 
   // We create fake key with a null value because otherwise we have a reference error in the with(){ }
   const fakeDatas = createFakeData(stateDatas);
-  const fakeInjectableDatas = injectableDatas.reduce(
-    (a, b) => ({ ...a, ...createFakeData(b) }),
-    {}
-  );
+  const fakeInjectableDatas = scopedNodeData.reduce((a, b) => ({ ...a, ...createFakeData(b) }), {});
 
   const context = new Proxy(
     {

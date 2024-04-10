@@ -6,13 +6,13 @@ import { dTextImplementation } from '../attributes/text';
 import { DomyPlugin } from '../types/Domy';
 
 export const DIRECTIVES = {
-  attributes: [
-    dIfImplementation,
-    dForImplementation,
-    dHtmlImplementation,
-    dTextImplementation,
-    dModelImplementation
-  ]
+  attributes: {
+    if: dIfImplementation,
+    for: dForImplementation,
+    html: dHtmlImplementation,
+    text: dTextImplementation,
+    model: dModelImplementation
+  }
 };
 
 export function registerPlugin(plugin: DomyPlugin) {}

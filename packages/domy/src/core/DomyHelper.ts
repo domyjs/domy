@@ -3,14 +3,14 @@ import { State } from '../types/State';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import { deepRender } from './deepRender';
-import { Listener, reactive } from './reactive';
-import { render } from './render';
+import { Listener, OnSetListener, reactive } from './reactive';
 
 export class DomyHelper {
-  private dataToInject: Record<string, any>[] = [];
+  private onSetListener: OnSetListener | null = null;
 
   private cleanupFn: (() => Promise<void> | void) | null = null;
   private effectFn: (() => Promise<void> | void) | null = null;
+
   public directive: string = '';
   public attr: { name: string; value: string } = { name: '', value: '' };
   public variants: string[] = [];
@@ -19,24 +19,15 @@ export class DomyHelper {
 
   constructor(
     public el: Element,
-    public state: State
-  ) {
-    this.state.data.attachListener({
-      type: 'onSet',
-      fn: ({ path, prevValue, newValue }) => {
-        if (this.paths.has(path)) {
-          console.log('set', path, prevValue, newValue);
-          this.callCleanup();
-          this.callEffect();
-        }
-      }
-    });
-  }
+    public state: State,
+    public scopedNodeData: Record<string, any>[] = []
+  ) {}
 
   getPluginHelper(): DomyPluginHelper {
     return {
       el: this.el,
       state: this.state,
+      scopedNodeData: this.scopedNodeData,
       directive: this.directive,
       variants: this.variants,
       attr: this.attr,
@@ -44,11 +35,29 @@ export class DomyHelper {
       cleanup: this.cleanup.bind(this),
       reactive,
       evaluate: this.evaluate.bind(this),
+      evaluateWithoutListening: this.evaluateWithoutListening.bind(this),
       deepRender: deepRender,
-      render: render,
       addScopeToNode: this.addScopeToNode.bind(this),
       getContext
     };
+  }
+
+  attachOnSetListener() {
+    if (this.onSetListener) return;
+    this.onSetListener = {
+      type: 'onSet',
+      fn: ({ path, prevValue, newValue }) => {
+        for (const registeredPath of this.paths) {
+          if (this.state.data.matchPath(registeredPath, path)) {
+            // console.log('set', this.paths, path, prevValue, newValue);
+            this.callCleanup();
+            this.callEffect();
+            break;
+          }
+        }
+      }
+    };
+    this.state.data.attachListener(this.onSetListener);
   }
 
   effect(cb: () => void | Promise<void>) {
@@ -61,10 +70,12 @@ export class DomyHelper {
 
   evaluate(code: string) {
     this.paths = new Set<string>();
+
     const listener: Listener = {
       type: 'onGet',
       fn: ({ path }) => {
-        console.log('get', path, this.el);
+        // console.log('get', path, this.el);
+        this.attachOnSetListener();
         this.paths.add(path);
       }
     };
@@ -74,7 +85,7 @@ export class DomyHelper {
     const executedValued = evaluate({
       code: code,
       contextAsGlobal: true,
-      context: getContext(this.el, this.state, this.dataToInject),
+      context: getContext(this.el, this.state, this.scopedNodeData),
       returnResult: true
     });
 
@@ -83,8 +94,18 @@ export class DomyHelper {
     return executedValued;
   }
 
+  evaluateWithoutListening(code: string) {
+    const executedValued = evaluate({
+      code: code,
+      contextAsGlobal: true,
+      context: getContext(this.el, this.state, this.scopedNodeData),
+      returnResult: true
+    });
+    return executedValued;
+  }
+
   addScopeToNode(obj: Record<string, any>) {
-    this.dataToInject.push(obj);
+    this.scopedNodeData.unshift(obj);
   }
 
   createGlobal(name: string, defaultValue: any) {

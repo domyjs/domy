@@ -5,16 +5,15 @@ import { events } from './events';
 import { DIRECTIVES } from './registerPlugin';
 
 export function renderAttribute(domy: DomyPluginHelper) {
-  //   // Check if we have to bypass this attribute or not
-  //   if (props.byPassAttributes && props.byPassAttributes.includes(name)) return;
+  domy.el.removeAttribute(domy.attr.name);
 
   if (isBindAttr(domy.attr.name)) {
     binding(domy);
   } else if (isEventAttr(domy.attr.name)) {
     events(domy);
   } else if (isDomyAttr(domy.attr.name)) {
-    for (const attr of DIRECTIVES.attributes) {
-      attr(domy);
+    for (const [directive, implementation] of Object.entries(DIRECTIVES.attributes)) {
+      if (domy.directive === directive) implementation(domy);
     }
   }
 }

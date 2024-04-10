@@ -1,6 +1,6 @@
-type OnGetListener = { type: 'onGet'; fn: (props: { path: string }) => void };
+export type OnGetListener = { type: 'onGet'; fn: (props: { path: string }) => void };
 
-type OnSetListener = {
+export type OnSetListener = {
   type: 'onSet';
   fn: (props: { path: string; prevValue: any; newValue: any }) => void;
 };

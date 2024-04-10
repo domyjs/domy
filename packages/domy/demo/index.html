@@ -7,22 +7,20 @@
     <script src="../dist/index.js"></script>
     <script>
       window.DOMY.createApp({
-        //   watch: {
-        //     count(prevValue, newValue) {
-        //       if (newValue < 0) this.count = prevValue;
-        //     }
-        //   },
+        watch: {
+          count(prevValue, newValue) {
+            if (newValue < 0) this.count = prevValue;
+          }
+        },
         data: {
           count: 0,
           count2: { count: 0 }
         },
         methods: {
           increment() {
-            console.log('inc', this.count, this);
             this.count++;
           },
           decrement() {
-            console.log('dec', this.count);
             this.count--;
           }
         }
