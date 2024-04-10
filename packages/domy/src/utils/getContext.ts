@@ -1,5 +1,6 @@
 import { dispatchCustomEvent } from './dispatchCustomEvent';
 import { State } from '../types/State';
+import { nextTick } from '../specials/$nextTick';
 
 function createFakeData(obj: Record<string, any>) {
   return Object.keys(obj).reduce((a, b) => ({ ...a, [b]: null }), {});
@@ -58,7 +59,8 @@ export function getContext(
       ...state.methods,
       $el: el,
       $refs: state.refs,
-      $dispatch: dispatchCustomEvent(state)
+      $dispatch: dispatchCustomEvent(state),
+      $nextTick: nextTick
     },
     contextProxyHandler
   );

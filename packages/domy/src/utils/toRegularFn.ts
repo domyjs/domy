@@ -1,3 +1,5 @@
+import { error } from './logs';
+
 const AsyncFunction = async function () {}.constructor;
 
 /**
@@ -20,8 +22,8 @@ export function toRegularFn<T extends (...args: any[]) => any>(arrowFn: T): T {
       const code = match.groups!.code;
       return fn(...params, isAsync ? `return (async () => { ${code} })()` : code) as T;
     }
-  } catch (err) {
-    console.error(err);
+  } catch (err: any) {
+    error(err);
   }
 
   return arrowFn;

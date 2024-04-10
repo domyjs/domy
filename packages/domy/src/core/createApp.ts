@@ -1,6 +1,7 @@
 import { App } from '../types/App';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
+import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { deepRender } from './deepRender';
 import { reactive } from './reactive';
@@ -41,8 +42,8 @@ export async function createApp(app: App = {}, target?: Element) {
             // TODO: Fix other dep called
             // Maybe something like prevent()
             await watcherfn.call(getContext(undefined, state), prevValue, newValue);
-          } catch (err) {
-            console.error(err);
+          } catch (err: any) {
+            error(err);
           }
         }
       }
@@ -54,8 +55,8 @@ export async function createApp(app: App = {}, target?: Element) {
     try {
       const setupFn = toRegularFn(app.setup);
       await setupFn.call(getContext(undefined, state));
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      error(err);
     }
   }
 
@@ -75,8 +76,8 @@ export async function createApp(app: App = {}, target?: Element) {
       try {
         const mountedFn = toRegularFn(app.mounted);
         await mountedFn.call(getContext(undefined, state));
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        error(err);
       }
     }
   }

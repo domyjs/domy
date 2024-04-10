@@ -9,12 +9,11 @@ export function dForImplementation(domy: DomyPluginHelper) {
   el.innerHTML = '';
 
   domy.effect(() => {
-    const perf = performance.now();
-
     const currentChildrens = Array.from(el.children);
 
-    const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s*(?<type>in|of)\s*(?<org>.+)/gi;
+    const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)/gi;
     const res = forRegex.exec(domy.attr.value);
+
     if (!res)
       throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
 
@@ -29,10 +28,21 @@ export function dForImplementation(domy: DomyPluginHelper) {
         const currentIndex = valueIndex * initialChilds.length + childIndex;
 
         // Inject the new datas like index
-        // TODO: Fixe value reactivity with [1, 2, 3] for example (maybe a method isProxy ?)
-        domy.addScopeToNode({
-          [res!.groups!.dest]: value
-        });
+
+        const isValueReactive = domy.state.data.isReactive(value);
+        if (!isValueReactive) {
+          console.log('Not reactive');
+          const reactiveValue = domy.reactive(value);
+          domy.addScopeToNode({
+            [res!.groups!.dest]: reactiveValue.reactiveObj
+          });
+          // TODO: Fixe value reactivity with [1, 2, 3] for example (maybe a method isProxy ?)
+        } else {
+          domy.addScopeToNode({
+            [res!.groups!.dest]: value
+          });
+        }
+
         if (res!.groups?.index) {
           domy.addScopeToNode({
             [res!.groups.index]: valueIndex
@@ -107,7 +117,5 @@ export function dForImplementation(domy: DomyPluginHelper) {
     for (const child of childrendsToRemove) {
       child.remove();
     }
-
-    console.log(performance.now() - perf);
   });
 }

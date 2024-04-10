@@ -4,6 +4,7 @@ import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import { deepRender } from './deepRender';
 import { Listener, OnSetListener, reactive } from './reactive';
+import { queueJob } from './scheduler';
 
 export class DomyHelper {
   private onSetListener: OnSetListener | null = null;
@@ -48,9 +49,11 @@ export class DomyHelper {
     this.onSetListener = {
       type: 'onSet',
       fn: ({ path, prevValue, newValue }) => {
-        if (this.paths.has(path)) {
-          this.callCleanup();
-          this.callEffect();
+        for (const listenedPath of this.paths) {
+          if (this.state.data.matchPath(listenedPath, path)) {
+            this.callCleanup();
+            this.callEffect();
+          }
         }
       }
     };
@@ -106,10 +109,10 @@ export class DomyHelper {
   }
 
   callCleanup() {
-    if (typeof this.cleanupFn === 'function') this.cleanupFn();
+    if (typeof this.cleanupFn === 'function') queueJob(this.cleanupFn.bind(this));
   }
 
   callEffect() {
-    if (typeof this.effectFn === 'function') this.effectFn();
+    if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
   }
 }

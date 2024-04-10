@@ -51,6 +51,15 @@ class DeepProxy {
     return true;
   }
 
+  /**
+   * Check if the current target is already a proxy
+   * @param target
+   * @returns
+   */
+  public static isReactive(target: any) {
+    return !!target[isProxySymbol];
+  }
+
   public attachListener(l: Listener) {
     switch (l.type) {
       case 'onGet':
@@ -140,7 +149,7 @@ class DeepProxy {
             // If the new value is not a proxy we declare a proxy for it
             const isNewObj = ['add', 'set'].includes(property as string);
             const obj = args[args.length - 1]; // In case of a set(key, obj) and add(obj)
-            if (isNewObj && !obj[isProxySymbol]) {
+            if (isNewObj && !DeepProxy.isReactive(obj)) {
               args[args.length - 1] = ctx.createProxy(obj, fullPath);
             }
 
@@ -182,7 +191,7 @@ class DeepProxy {
         const fullPath = [...path, p as string];
 
         // If the new value is not a proxy we declare a proxy for it
-        const isNewObj = !newValue[isProxySymbol];
+        const isNewObj = !DeepProxy.isReactive(newValue);
         if (isNewObj) {
           newValue = ctx.createProxy(newValue, fullPath);
         }
@@ -191,7 +200,6 @@ class DeepProxy {
         const isSameValue = prevValue === newValue;
         if (result && !isSameValue) {
           ctx.callOnSetListeners(fullPath, prevValue, newValue);
-          if (Array.isArray(target) && isNewObj) ctx.callOnSetListeners(path, prevValue, newValue); // We are adding a new element to the array
         }
 
         return result;
@@ -201,11 +209,11 @@ class DeepProxy {
   }
 
   private createProxy(target: any, path: string[] = []): any {
-    if (!this.canAttachProxy(target) || target[isProxySymbol]) return target;
+    if (!this.canAttachProxy(target) || DeepProxy.isReactive(target)) return target;
 
     try {
       for (const key in target) {
-        const isAlreadyProxy = target[key][isProxySymbol];
+        const isAlreadyProxy = DeepProxy.isReactive(target[key]);
         if (!isAlreadyProxy) target[key] = this.createProxy(target[key], [...path, key]);
       }
       const isCollection = this.isCollection(target);
@@ -238,6 +246,7 @@ export function reactive<T extends Record<string, any>>(obj: T) {
   return {
     reactiveObj: deepProxy.getProxy() as T,
     matchPath: DeepProxy.matchPath,
+    isReactive: DeepProxy.isReactive,
     attachListener: deepProxy.attachListener.bind(deepProxy),
     removeListener: deepProxy.removeEventListener.bind(deepProxy)
   };

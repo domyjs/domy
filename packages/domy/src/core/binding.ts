@@ -15,17 +15,24 @@ export function binding(domy: DomyPluginHelper) {
     ? orignalAttrName.slice(1)
     : orignalAttrName.slice('d-bind:'.length);
 
+  if (domy.el.getAttribute(attrName))
+    throw new Error(`Binding failed. The attribute "${attrName}" already exist on the element`);
+
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);
 
-    if (attrName === 'style' && typeof executedValue === 'object') {
+    if (attrName === 'style' && typeof executedValue === 'object' && executedValue !== null) {
       // Handle style attribute if it's an object
       // { backgroundColor: '#fff', color: 'red' .... }
       domy.el.removeAttribute('style');
       for (const styleName in executedValue) {
         (domy.el as HTMLElement).style[styleName as any] = executedValue[styleName];
       }
-    } else if (attrName === 'class' && typeof executedValue === 'object') {
+    } else if (
+      attrName === 'class' &&
+      typeof executedValue === 'object' &&
+      executedValue !== null
+    ) {
       // Handle class attribute if it's an object like
       // { show: true }
       // or
