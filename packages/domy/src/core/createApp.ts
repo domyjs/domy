@@ -16,9 +16,7 @@ export async function createApp(app: App = {}, target?: Element) {
     data: reactive(app.data ?? {}),
     methods: {},
     events: {},
-    refs: {},
-
-    global: {}
+    refs: {}
   };
 
   // Functions

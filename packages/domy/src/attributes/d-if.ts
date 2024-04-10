@@ -6,7 +6,8 @@ export function dIfImplementation(domy: DomyPluginHelper) {
   const parent = domy.el.parentNode as Element;
   const parentChilds = parent.childNodes;
 
-  let initialised = false;
+  const transitionName = el.getAttribute('d-transition');
+  const hasTransition = typeof transitionName === 'string';
 
   function findElementIndex(): number {
     let index = 0;
@@ -17,24 +18,26 @@ export function dIfImplementation(domy: DomyPluginHelper) {
     return index;
   }
 
+  function executeActionAfterAnimation(action: () => void) {
+    const actionAfterAnimation: EventListenerOrEventListenerObject = () => {
+      action();
+    };
+
+    el.addEventListener('animationend', actionAfterAnimation, { once: true });
+    el.addEventListener('transition', actionAfterAnimation, { once: true });
+  }
+
+  let initialised = false;
+
   domy.effect(() => {
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
-
-    const transitionName = el.getAttribute('d-transition');
-    const hasTransition = typeof transitionName === 'string';
-
-    const transitionOutListener: EventListenerOrEventListenerObject = () => {
-      el.remove();
-      el.removeEventListener('transitionend', transitionOutListener);
-      el.removeEventListener('animationend', transitionOutListener);
-    };
 
     if (el.isConnected && !shouldBeDisplay) {
       // Handle out transition
       if (hasTransition && initialised) {
+        el.classList.remove(`${transitionName}-enter`);
         el.classList.add(`${transitionName}-out`);
-        el.addEventListener('animationend', transitionOutListener);
-        el.addEventListener('transition', transitionOutListener);
+        executeActionAfterAnimation(() => el.remove());
       } else {
         el.remove();
       }
@@ -42,7 +45,11 @@ export function dIfImplementation(domy: DomyPluginHelper) {
       const indexToInsert = findElementIndex();
 
       // Handle enter transition
-      if (hasTransition) el.classList.add(`${transitionName}-enter`);
+      if (hasTransition) {
+        el.classList.remove(`${transitionName}-out`);
+        el.classList.add(`${transitionName}-enter`);
+        executeActionAfterAnimation(() => el.classList.remove(`${transitionName}-enter`));
+      }
 
       domy.deepRender({
         element: el,

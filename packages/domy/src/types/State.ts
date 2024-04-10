@@ -5,6 +5,4 @@ export type State = {
   methods: { [fnName: string]: (...args: any[]) => any | Promise<any> };
   events: { [eventName: string]: Element[] };
   refs: Record<string, Element>;
-
-  global: Record<string, any>;
 };

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-transition</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <style>
+    @keyframes enter {
+      0% {
+        opacity: 0;
+        transform: translateX(3rem);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0rem);
+      }
+    }
+
+    @keyframes out {
+      0% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-3rem);
+      }
+    }
+
+    .transition-enter {
+      animation: enter 0.3s ease-out;
+    }
+
+    .transition-out {
+      animation: out 0.3s ease-in;
+    }
+  </style>
+  <body>
+    <div d-if="show" @click.away="show = false" d-transition="transition">Modal Content...</div>
+    <button @click="show = !show">Show/Hide modal</button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        show: false
+      }
+    });
+  </script>
+</html>

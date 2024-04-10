@@ -105,14 +105,6 @@ export class DomyHelper {
     this.scopedNodeData.unshift(obj);
   }
 
-  createGlobal(name: string, defaultValue: any) {
-    this.state.global[name] = defaultValue;
-  }
-
-  getGlobal(name: string) {
-    return this.state.global[name];
-  }
-
   callCleanup() {
     if (typeof this.cleanupFn === 'function') this.cleanupFn();
   }

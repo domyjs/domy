@@ -1,7 +1,6 @@
 import { DomyPluginHelper } from '../types/Domy';
-import { attachClickAway } from '../utils/attachClickAway';
 
-import { getContext } from '../utils/getContext';
+// TODO: Implements variants
 
 /**
  * Handle event applied on an item

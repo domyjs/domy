@@ -47,6 +47,7 @@ export function deepRender(props: Props) {
     const shouldBeRenderedOnlyOnce = attributes.findIndex(({ name }) => name === 'd-once') !== -1;
 
     // Rendering attributes if it's an element
+    const attrToRemove: string[] = [];
     for (const attr of attributes) {
       domyHelper = new DomyHelper(toRender.element, props.state, [...domyHelper.scopedNodeData]);
 
@@ -63,10 +64,14 @@ export function deepRender(props: Props) {
 
         renderAttribute(domyHelper.getPluginHelper(shouldBeRenderedOnlyOnce));
 
-        toRender.element.removeAttribute(attr.name);
-
         domyHelper.callEffect();
+
+        attrToRemove.push(attr.name);
       }
+    }
+
+    for (const attrName of attrToRemove) {
+      toRender.element.removeAttribute(attrName);
     }
 
     for (const child of toRender.element.childNodes) {
