@@ -4,14 +4,14 @@ import { restoreElement } from '../utils/restoreElement';
 export function dIfImplementation(domy: DomyPluginHelper) {
   const el = domy.el;
   const parent = domy.el.parentNode as Element;
-  const parentChilds = parent.childNodes;
+  const parentChilds = Array.from(parent.childNodes);
 
   const transitionName = el.getAttribute('d-transition');
   const hasTransition = typeof transitionName === 'string';
 
   function findElementIndex(): number {
     let index = 0;
-    for (const child of Array.from(parentChilds)) {
+    for (const child of parentChilds) {
       if (child === el) break;
       if (child.isConnected) ++index;
     }
@@ -58,6 +58,29 @@ export function dIfImplementation(domy: DomyPluginHelper) {
       });
 
       restoreElement(parent, el, indexToInsert);
+    }
+
+    // TODO: We handle d-else and d-else-if here
+    if (!shouldBeDisplay) {
+      let currentIndex = parentChilds.indexOf(el);
+      let currentEl = parentChilds[parentChilds.indexOf(el)] as Element;
+
+      while (currentEl) {
+        if (currentEl.nodeType === Node.TEXT_NODE) break;
+
+        const isElse = currentEl.getAttribute('d-else');
+        const isElseIf = currentEl.getAttribute('d-else-if');
+
+        if (!isElse || !isElseIf) break;
+
+        if (isElse) {
+          // Handle d-else
+        } else {
+          // Handler d-else-if
+        }
+
+        currentEl = parentChilds[++currentIndex] as Element;
+      }
     }
 
     initialised = true;

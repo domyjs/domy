@@ -1,3 +1,5 @@
+type MatchingResult = { isMatching: boolean; params: Record<string, string> };
+
 export type OnGetListener = { type: 'onGet'; fn: (props: { path: string }) => void };
 
 export type OnSetListener = {
@@ -38,17 +40,30 @@ class DeepProxy {
    * @param path
    * @returns
    */
-  public static matchPath(reg: string, path: string) {
+  public static matchPath(reg: string, path: string): MatchingResult {
+    const defaultRes: MatchingResult = {
+      isMatching: false,
+      params: {}
+    };
+
     const rules = reg.split('.');
     const paths = path.split('.');
 
-    for (let i = 0; i < rules.length; ++i) {
-      if (rules[i] === '*') continue;
+    const params: Record<string, string> = {};
 
-      if (!paths[i] || paths[i] !== rules[i]) return false;
+    for (let i = 0; i < rules.length; ++i) {
+      if (!path[i]) return defaultRes;
+
+      const isParam = rules[i].match(/\{\w+\}/);
+      if (rules[i] === '*' || isParam) {
+        if (isParam) params[isParam[0]] = paths[i];
+        continue;
+      }
+
+      if (paths[i] !== rules[i]) return defaultRes;
     }
 
-    return true;
+    return { isMatching: true, params };
   }
 
   /**

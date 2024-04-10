@@ -2,9 +2,8 @@
 
 - handle template (so no more d-cloak)
 - more variants like debounce/away/once/enter ...
-- remove get listener for function call / smae for watch
+- remove get listener for function call / same for watch
 - $computed
-- $nextTick
 - components
 - script auto build, release ...
 - d-else / d-else-if ?
