@@ -28,7 +28,7 @@ export function deepRender(props: Props) {
 
   while (toRenderList.length > 0) {
     const toRender = toRenderList.shift() as Elem;
-    const domyHelper = new DomyHelper(toRender.element, props.state, toRender.scopedNodeData);
+    let domyHelper = new DomyHelper(toRender.element, props.state, toRender.scopedNodeData);
 
     // Rendering text content
     if (toRender.element.nodeType === Node.TEXT_NODE) {
@@ -38,14 +38,25 @@ export function deepRender(props: Props) {
     }
 
     // Rendering attributes if it's an element
-    for (const attr of toRender.element.attributes ?? []) {
-      if (!isNormalAttr(attr.name) && !toRender.byPassAttributes?.includes(attr.name)) {
+    const attributes = Array.from(toRender.element.attributes ?? []);
+    for (const attr of attributes) {
+      domyHelper = new DomyHelper(toRender.element, props.state, [...domyHelper.scopedNodeData]);
+
+      const shouldByPassAttribute =
+        toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
+
+      if (!shouldByPassAttribute && !isNormalAttr(attr.name)) {
         const [attrName, ...variants] = attr.name.split('.');
+
         domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
         domyHelper.attr.name = attrName;
         domyHelper.attr.value = attr.value;
         domyHelper.variants = variants;
+
         renderAttribute(domyHelper.getPluginHelper());
+
+        toRender.element.removeAttribute(attr.name);
+
         domyHelper.callEffect();
       }
     }
@@ -53,7 +64,7 @@ export function deepRender(props: Props) {
     for (const child of toRender.element.childNodes) {
       toRenderList.push({
         element: child as Element,
-        scopedNodeData: [...domyHelper.scopedNodeData]
+        scopedNodeData: domyHelper.scopedNodeData
       });
     }
   }

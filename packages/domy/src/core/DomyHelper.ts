@@ -47,13 +47,9 @@ export class DomyHelper {
     this.onSetListener = {
       type: 'onSet',
       fn: ({ path, prevValue, newValue }) => {
-        for (const registeredPath of this.paths) {
-          if (this.state.data.matchPath(registeredPath, path)) {
-            // console.log('set', this.paths, path, prevValue, newValue);
-            this.callCleanup();
-            this.callEffect();
-            break;
-          }
+        if (this.paths.has(path)) {
+          this.callCleanup();
+          this.callEffect();
         }
       }
     };

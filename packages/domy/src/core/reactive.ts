@@ -182,13 +182,16 @@ class DeepProxy {
         const fullPath = [...path, p as string];
 
         // If the new value is not a proxy we declare a proxy for it
-        if (!newValue[isProxySymbol]) {
+        const isNewObj = !newValue[isProxySymbol];
+        if (isNewObj) {
           newValue = ctx.createProxy(newValue, fullPath);
         }
 
         const result = Reflect.set(target, p, newValue, receiver);
-        if (result) {
-          if (prevValue !== newValue) ctx.callOnSetListeners(fullPath, prevValue, newValue);
+        const isSameValue = prevValue === newValue;
+        if (result && !isSameValue) {
+          ctx.callOnSetListeners(fullPath, prevValue, newValue);
+          if (Array.isArray(target) && isNewObj) ctx.callOnSetListeners(path, prevValue, newValue); // We are adding a new element to the array
         }
 
         return result;

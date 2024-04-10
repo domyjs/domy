@@ -10,6 +10,9 @@
         watch: {
           count(prevValue, newValue) {
             if (newValue < 0) this.count = prevValue;
+          },
+          'count2.count'(prevValue, newValue) {
+            if (newValue < 0) this.count2.count = prevValue;
           }
         },
         data: {

@@ -5,8 +5,6 @@ import { events } from './events';
 import { DIRECTIVES } from './registerPlugin';
 
 export function renderAttribute(domy: DomyPluginHelper) {
-  domy.el.removeAttribute(domy.attr.name);
-
   if (isBindAttr(domy.attr.name)) {
     binding(domy);
   } else if (isEventAttr(domy.attr.name)) {
