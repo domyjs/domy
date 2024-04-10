@@ -23,7 +23,8 @@ export class DomyHelper {
     public scopedNodeData: Record<string, any>[] = []
   ) {}
 
-  getPluginHelper(): DomyPluginHelper {
+  getPluginHelper(renderOnce = false): DomyPluginHelper {
+    const evaluateWithoutListening = this.evaluateWithoutListening.bind(this);
     return {
       el: this.el,
       state: this.state,
@@ -34,8 +35,8 @@ export class DomyHelper {
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
       reactive,
-      evaluate: this.evaluate.bind(this),
-      evaluateWithoutListening: this.evaluateWithoutListening.bind(this),
+      evaluate: renderOnce ? evaluateWithoutListening : this.evaluate.bind(this),
+      evaluateWithoutListening,
       deepRender: deepRender,
       addScopeToNode: this.addScopeToNode.bind(this),
       getContext

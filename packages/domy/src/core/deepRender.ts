@@ -37,8 +37,16 @@ export function deepRender(props: Props) {
       continue;
     }
 
-    // Rendering attributes if it's an element
     const attributes = Array.from(toRender.element.attributes ?? []);
+
+    // Skipping element with d-ignore attribute
+    const shouldBeIngored = attributes.findIndex(({ name }) => name === 'd-ignore') !== -1;
+    if (shouldBeIngored) continue;
+
+    // Should be rendered only once
+    const shouldBeRenderedOnlyOnce = attributes.findIndex(({ name }) => name === 'd-once') !== -1;
+
+    // Rendering attributes if it's an element
     for (const attr of attributes) {
       domyHelper = new DomyHelper(toRender.element, props.state, [...domyHelper.scopedNodeData]);
 
@@ -53,7 +61,7 @@ export function deepRender(props: Props) {
         domyHelper.attr.value = attr.value;
         domyHelper.variants = variants;
 
-        renderAttribute(domyHelper.getPluginHelper());
+        renderAttribute(domyHelper.getPluginHelper(shouldBeRenderedOnlyOnce));
 
         toRender.element.removeAttribute(attr.name);
 
