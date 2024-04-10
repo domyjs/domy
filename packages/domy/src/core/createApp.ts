@@ -23,6 +23,7 @@ export async function createApp(app: App = {}, target?: Element) {
   for (const key in app.methods) {
     const method = toRegularFn(app.methods[key]);
     state.methods[key] = function (...args: any[]) {
+      // TODO: Fixe get call
       const res = method.call(getContext(undefined, state), ...args);
       return res;
     };

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-model</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <button @click="search = 'Bye World!'">Set to Bye World!</button>
+    <input type="text" d-model="search" />
+    <p>{{ search }}</p>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        search: 'Hello World!'
+      }
+    });
+  </script>
+</html>

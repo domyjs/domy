@@ -29,7 +29,7 @@ export function dForImplementation(domy: DomyPluginHelper) {
         const currentIndex = valueIndex * initialChilds.length + childIndex;
 
         // Inject the new datas like index
-        // TODO: Fixe value reactivity
+        // TODO: Fixe value reactivity with [1, 2, 3] for example (maybe a method isProxy ?)
         domy.addScopeToNode({
           [res!.groups!.dest]: value
         });
