@@ -9,7 +9,7 @@ export type DomyPluginHelper = {
   state: State;
   scopedNodeData: Record<string, any>[];
   directive: string;
-  variants: string[];
+  modifiers: string[];
   attr: { name: string; value: string };
   effect: (cb: () => void | Promise<void>) => void;
   cleanup: (cb: () => void | Promise<void>) => void;

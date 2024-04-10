@@ -61,12 +61,12 @@ export function deepRender(props: Props) {
         toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
 
       if (!shouldByPassAttribute && !isNormalAttr(attr.name)) {
-        const [attrName, ...variants] = attr.name.split('.');
+        const [attrName, ...modifiers] = attr.name.split('.');
 
         domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
         domyHelper.attr.name = attrName;
         domyHelper.attr.value = attr.value;
-        domyHelper.variants = variants;
+        domyHelper.modifiers = modifiers;
 
         renderAttribute(domyHelper.getPluginHelper(shouldBeRenderedOnlyOnce));
 

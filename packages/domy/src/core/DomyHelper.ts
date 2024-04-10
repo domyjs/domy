@@ -14,7 +14,7 @@ export class DomyHelper {
 
   public directive: string = '';
   public attr: { name: string; value: string } = { name: '', value: '' };
-  public variants: string[] = [];
+  public modifiers: string[] = [];
 
   private paths = new Set<string>();
 
@@ -31,7 +31,7 @@ export class DomyHelper {
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       directive: this.directive,
-      variants: this.variants,
+      modifiers: this.modifiers,
       attr: this.attr,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
