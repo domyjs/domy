@@ -3,6 +3,8 @@
  * @param element
  * @param index
  * @returns
+ *
+ * @author yoannchb-pro
  */
 export function moveElement(parent: Element, element: Element, index: number) {
   const target = parent.children[index];

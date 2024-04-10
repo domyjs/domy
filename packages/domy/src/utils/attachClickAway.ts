@@ -1,6 +1,8 @@
 /**
  * Dispatch clickAway event when a click away from the element is triggered
  * @param element
+ *
+ * @author yoannchb-pro
  */
 export function attachClickAway(element: Element) {
   const clickAwayListener: EventListenerOrEventListenerObject = event => {

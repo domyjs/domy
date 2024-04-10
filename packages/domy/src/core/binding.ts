@@ -8,6 +8,8 @@ import { DomyPluginHelper } from '../types/Domy';
  * will give
  * class="show"
  * @param domy
+ *
+ * @author yoannchb-pro
  */
 export function binding(domy: DomyPluginHelper) {
   const orignalAttrName = domy.attr.name;

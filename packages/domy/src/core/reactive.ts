@@ -39,6 +39,8 @@ class DeepProxy {
    * @param reg
    * @param path
    * @returns
+   *
+   * @author yoannchb-pro
    */
   public static matchPath(reg: string, path: string): MatchingResult {
     const defaultRes: MatchingResult = {
@@ -256,6 +258,13 @@ class DeepProxy {
   }
 }
 
+/**
+ * Transform an object into a reactive object to listen to any change
+ * @param obj
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
 export function reactive<T extends Record<string, any>>(obj: T) {
   const deepProxy = new DeepProxy(obj);
   return {

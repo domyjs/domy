@@ -21,6 +21,12 @@ function flushJobs() {
   queued = false;
 }
 
+/**
+ * Scheduler function to add a job to the queue
+ * @param job
+ *
+ * @author yoannchb-pro
+ */
 export function queueJob(job: QueueElement) {
   if (!queue.includes(job)) queue.push(job);
 

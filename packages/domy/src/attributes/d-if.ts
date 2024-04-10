@@ -1,6 +1,12 @@
 import { DomyPluginHelper } from '../types/Domy';
 import { restoreElement } from '../utils/restoreElement';
 
+/**
+ * d-if implementation
+ * @param domy
+ *
+ * @author yoannchb-pro
+ */
 export function dIfImplementation(domy: DomyPluginHelper) {
   const el = domy.el;
   const parent = domy.el.parentNode as Element;

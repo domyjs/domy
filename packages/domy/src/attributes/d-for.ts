@@ -1,6 +1,12 @@
 import { DomyPluginHelper } from '../types/Domy';
 import { moveElement } from '../utils/moveElement';
 
+/**
+ * d-for implementation
+ * @param domy
+ *
+ * @author yoannchb-pro
+ */
 export function dForImplementation(domy: DomyPluginHelper) {
   const el = domy.el;
   const initialChilds = Array.from(el.children);

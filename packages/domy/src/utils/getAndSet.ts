@@ -2,6 +2,15 @@ function splitPath(path: string): string[] {
   return path.replace(/\[(\w+)\]/g, '.$1').split('.');
 }
 
+/**
+ * Get function (like get in lodash)
+ * @param object
+ * @param path
+ * @param defaultValue
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
 export function get<T, R>(object: T, path: string, defaultValue?: R): R | undefined {
   const keys = splitPath(path);
   let result: any = object;
@@ -14,6 +23,15 @@ export function get<T, R>(object: T, path: string, defaultValue?: R): R | undefi
   return result;
 }
 
+/**
+ * Set function (like set in lodash)
+ * @param object
+ * @param path
+ * @param value
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
 export function set<T>(object: T, path: string, value: any): T {
   const keys = splitPath(path);
   let temp: any = object;

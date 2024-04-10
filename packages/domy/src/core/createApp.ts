@@ -10,6 +10,8 @@ import { reactive } from './reactive';
  * Initialise domy state on a target (by default the body)
  * @param app
  * @param target
+ *
+ * @author yoannchb-pro
  */
 export async function createApp(app: App = {}, target?: Element) {
   // State of the app

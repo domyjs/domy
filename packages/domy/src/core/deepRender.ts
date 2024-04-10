@@ -17,6 +17,12 @@ type Props = {
   scopedNodeData?: Record<string, any>[];
 };
 
+/**
+ * Deep render an element (with the childs and textContent)
+ * @param props
+ *
+ * @author yoannchb-pro
+ */
 export function deepRender(props: Props) {
   const toRenderList: Elem[] = [
     {

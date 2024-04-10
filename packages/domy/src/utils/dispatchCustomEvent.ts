@@ -4,6 +4,8 @@ import { State } from '../types/State';
  * Allow to dispatch a custom event on all elements attached to it
  * @param state
  * @string
+ *
+ * @author yoannchb-pro
  */
 export function dispatchCustomEvent(state: State) {
   return (eventName: string) => {

@@ -7,6 +7,7 @@ import { DomyPluginHelper } from '../types/Domy';
  * Will give
  * Count: 5
  * @param domy
+ *
  * @author yoannchb-pro
  */
 export function renderText(domy: DomyPluginHelper) {

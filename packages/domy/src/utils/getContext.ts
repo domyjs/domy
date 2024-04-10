@@ -2,10 +2,27 @@ import { dispatchCustomEvent } from './dispatchCustomEvent';
 import { State } from '../types/State';
 import { nextTick } from '../specials/$nextTick';
 
+/**
+ * Create fake data to provide an object with the same keys but a null value
+ * @param obj
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
 function createFakeData(obj: Record<string, any>) {
   return Object.keys(obj).reduce((a, b) => ({ ...a, [b]: null }), {});
 }
 
+/**
+ * Return a context with all what domy need to render
+ * Like variables, methods, specials ...
+ * @param el
+ * @param state
+ * @param scopedNodeData
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
 export function getContext(
   el: Element | Text | undefined,
   state: State,

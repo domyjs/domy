@@ -10,9 +10,11 @@ type Props = {
 const AsyncFunction = async function () {}.constructor;
 
 /**
- * Allow to execute javascript code contained into a string with the current state
+ * Allow to execute javascript code contained into a string with a context
  * @param props
  * @returns
+ *
+ * @author yoannchb-pro
  */
 export function evaluate(props: Props) {
   const fn = props.isAsync ? AsyncFunction : Function;

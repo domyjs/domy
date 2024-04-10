@@ -7,7 +7,9 @@ import { DomyPluginHelper } from '../types/Domy';
  * Example:
  * d-on:click="console.log('hello')"
  * will add an event listener on the click
- * @param props
+ * @param domy
+ *
+ * @author yoannchb-pro
  */
 export function events(domy: DomyPluginHelper) {
   const domyAttrName = domy.attr.name;

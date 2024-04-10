@@ -3,6 +3,8 @@
  * @param parent
  * @param element
  * @param index
+ *
+ * @author yoannchb-pro
  */
 export function restoreElement(parent: Element, element: Element, index: number) {
   const referenceElement = parent.childNodes[index];

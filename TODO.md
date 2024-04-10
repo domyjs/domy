@@ -1,5 +1,6 @@
 # TODO
 
+- Cache some content from evaluate ?
 - handle template (so no more d-cloak)
 - more variants like debounce/away/once/enter ...
 - remove get listener for function call / same for watch

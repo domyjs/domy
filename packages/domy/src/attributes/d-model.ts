@@ -1,6 +1,12 @@
 import { DomyPluginHelper } from '../types/Domy';
 import { set } from '../utils/getAndSet';
 
+/**
+ * d-model implementation
+ * @param domy
+ *
+ * @author yoannchb-pro
+ */
 export function dModelImplementation(domy: DomyPluginHelper) {
   const el = domy.el as HTMLInputElement;
 
