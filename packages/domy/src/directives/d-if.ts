@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 import { restoreElement } from '../utils/restoreElement';
 
 /**
@@ -7,7 +7,7 @@ import { restoreElement } from '../utils/restoreElement';
  *
  * @author yoannchb-pro
  */
-export function dIfImplementation(domy: DomyPluginHelper) {
+export function dIfImplementation(domy: DomyDirectiveHelper) {
   const el = domy.el;
   const parent = domy.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
@@ -66,28 +66,34 @@ export function dIfImplementation(domy: DomyPluginHelper) {
       restoreElement(parent, el, indexToInsert);
     }
 
-    // TODO: We handle d-else and d-else-if here
-    if (!shouldBeDisplay) {
-      let currentIndex = parentChilds.indexOf(el);
-      let currentEl = parentChilds[parentChilds.indexOf(el)] as Element;
+    // We handle d-else and d-else-if here
+    // let currentIndex = parentChilds.indexOf(el);
+    // let currentEl = parentChilds[parentChilds.indexOf(el)] as Element;
+    // while (currentEl) {
+    //   if (currentEl.nodeType === Node.TEXT_NODE) break;
 
-      while (currentEl) {
-        if (currentEl.nodeType === Node.TEXT_NODE) break;
+    //   const isElse = currentEl.getAttribute('d-else');
+    //   const isElseIf = currentEl.getAttribute('d-else-if');
 
-        const isElse = currentEl.getAttribute('d-else');
-        const isElseIf = currentEl.getAttribute('d-else-if');
+    //   if (!isElse || !isElseIf) break;
 
-        if (!isElse || !isElseIf) break;
+    //   if (isElse) {
+    //     // TODO: Handle d-else
+    //     if (!shouldBeDisplay) {
+    //       domy.deepRender({
+    //         element: currentEl,
+    //         state: domy.state
+    //       });
+    //     } else {
+    //       currentEl.remove();
+    //     }
+    //   } else {
+    //     // TODO: Handler d-else-if
+    //   }
 
-        if (isElse) {
-          // Handle d-else
-        } else {
-          // Handler d-else-if
-        }
-
-        currentEl = parentChilds[++currentIndex] as Element;
-      }
-    }
+    //   currentEl = parentChilds[++currentIndex] as Element;
+    // }
+    // END
 
     initialised = true;
   });

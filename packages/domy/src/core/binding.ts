@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * Handle binding attributes like :class or d-bind:class
@@ -11,7 +11,7 @@ import { DomyPluginHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function binding(domy: DomyPluginHelper) {
+export function binding(domy: DomyDirectiveHelper) {
   const orignalAttrName = domy.attr.name;
   const attrName = orignalAttrName.startsWith(':')
     ? orignalAttrName.slice(1)

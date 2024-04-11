@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 import { set } from '../utils/getAndSet';
 
 type Value = string | number | boolean | string[] | undefined;
@@ -9,7 +9,7 @@ type Value = string | number | boolean | string[] | undefined;
  *
  * @author yoannchb-pro
  */
-export function dModelImplementation(domy: DomyPluginHelper) {
+export function dModelImplementation(domy: DomyDirectiveHelper) {
   const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
   const objPath = domy.attr.value.replace(/^this\./, '');
 

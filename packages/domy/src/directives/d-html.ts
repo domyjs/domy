@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * d-html implementation
@@ -6,7 +6,7 @@ import { DomyPluginHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function dHtmlImplementation(domy: DomyPluginHelper) {
+export function dHtmlImplementation(domy: DomyDirectiveHelper) {
   domy.effect(() => {
     domy.el.innerHTML = domy.evaluate(domy.attr.value);
   });

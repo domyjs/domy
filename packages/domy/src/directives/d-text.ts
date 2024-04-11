@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * d-text implementation
@@ -6,7 +6,7 @@ import { DomyPluginHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function dTextImplementation(domy: DomyPluginHelper) {
+export function dTextImplementation(domy: DomyDirectiveHelper) {
   domy.effect(() => {
     domy.el.textContent = domy.evaluate(domy.attr.value);
   });

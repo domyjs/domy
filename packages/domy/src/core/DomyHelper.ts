@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 import { State } from '../types/State';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
@@ -24,7 +24,7 @@ export class DomyHelper {
     public scopedNodeData: Record<string, any>[] = []
   ) {}
 
-  getPluginHelper(renderOnce = false): DomyPluginHelper {
+  getPluginHelper(renderOnce = false): DomyDirectiveHelper {
     const evaluateWithoutListening = this.evaluateWithoutListening.bind(this);
     return {
       el: this.el,

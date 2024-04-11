@@ -1,6 +1,5 @@
-import { dispatchCustomEvent } from './dispatchCustomEvent';
+import { PLUGINS } from '../core/registerPlugin';
 import { State } from '../types/State';
-import { nextTick } from '../specials/$nextTick';
 
 /**
  * Create fake data to provide an object with the same keys but a null value
@@ -69,15 +68,24 @@ export function getContext(
   const fakeDatas = createFakeData(stateDatas);
   const fakeInjectableDatas = scopedNodeData.reduce((a, b) => ({ ...a, ...createFakeData(b) }), {});
 
+  // we init the specials
+  const specials: any = {};
+  for (const [name, fn] of Object.entries(PLUGINS.specials)) {
+    specials['$' + name] = fn({
+      el,
+      state,
+      scopedNodeData
+    });
+  }
+
   const context = new Proxy(
     {
       ...fakeDatas,
       ...fakeInjectableDatas,
+
       ...state.methods,
-      $el: el,
-      $refs: state.refs,
-      $dispatch: dispatchCustomEvent(state),
-      $nextTick: nextTick
+
+      ...specials
     },
     contextProxyHandler
   );

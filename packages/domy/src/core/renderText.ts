@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * Render a textContent
@@ -10,7 +10,7 @@ import { DomyPluginHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function renderText(domy: DomyPluginHelper) {
+export function renderText(domy: DomyDirectiveHelper) {
   const originalTextContent = domy.el.textContent ?? '';
 
   domy.effect(() => {

@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 import on from '../utils/on';
 
 // TODO: Implements variants
@@ -12,7 +12,7 @@ import on from '../utils/on';
  *
  * @author yoannchb-pro
  */
-export function events(domy: DomyPluginHelper) {
+export function events(domy: DomyDirectiveHelper) {
   const domyAttrName = domy.attr.name;
 
   const eventName = domyAttrName.startsWith('@')

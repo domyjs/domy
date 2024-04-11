@@ -1,4 +1,4 @@
-import { DomyPluginHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 import { warn } from '../utils/logs';
 import { moveElement } from '../utils/moveElement';
 
@@ -8,7 +8,7 @@ import { moveElement } from '../utils/moveElement';
  *
  * @author yoannchb-pro
  */
-export function dForImplementation(domy: DomyPluginHelper) {
+export function dForImplementation(domy: DomyDirectiveHelper) {
   const el = domy.el;
   const initialChilds = Array.from(el.children);
 

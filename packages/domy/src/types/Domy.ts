@@ -1,10 +1,15 @@
-import { evaluate } from '../utils/evaluate';
 import { deepRender } from '../core/deepRender';
 import { State } from './State';
 import { reactive } from '../core/reactive';
 import { getContext } from '../utils/getContext';
 
-export type DomyPluginHelper = {
+export type DomySpecialHelper = {
+  el: Element | Text | undefined;
+  state: State;
+  scopedNodeData: Record<string, any>[];
+};
+
+export type DomyDirectiveHelper = {
   el: Element;
   state: State;
   scopedNodeData: Record<string, any>[];
@@ -22,13 +27,15 @@ export type DomyPluginHelper = {
   getContext: typeof getContext;
 };
 
-export type DomyFn = (domy: DomyPluginHelper) => void | Promise<void>;
+export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => void | Promise<void>;
+export type DomySpecialFn = (domy: DomySpecialHelper) => void | Promise<void>;
 
 export type DomyPluginDefinition = {
-  registerAttribute(name: string, fn: DomyFn): void;
-  registerSpecial(name: string, fn: DomyFn): void;
-  registerVariant(name: string, fn: DomyFn): void;
-  registerWatcher(path: string, fn: DomyFn): void;
+  registerDirective(name: string, fn: DomyDirectiveFn): void;
+  registerSpecial(name: string, fn: DomySpecialFn): void;
+
+  // registerVariant(name: string, fn: DomyFn): void;
+  // registerWatcher(path: string, fn: DomyFn): void;
 };
 
 export type DomyPlugin = (domy: DomyPluginDefinition) => void;
