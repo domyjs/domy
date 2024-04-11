@@ -8,12 +8,12 @@
   </head>
   <body>
     <div d-ignore d-if="count > 0">
-      <p>{{ this.msg }}</p>
+      <p>{{ msg }}</p>
     </div>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         count: 0,
         msg: 'Hello World!'
       }

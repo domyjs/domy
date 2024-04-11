@@ -7,16 +7,16 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <h1 :style="this.style" :id="this.id">Id: {{ this.id }}</h1>
-    <button @click="this.update()">Update id and color</button>
+    <h1 :style="style" :id="id">Id: {{ id }}</h1>
+    <button @click="update()">Update id and color</button>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         id: 0,
         style: { backgroundColor: 'red' }
       },
-      $fn: {
+      methods: {
         update() {
           this.id++;
           this.style.backgroundColor = 'green';

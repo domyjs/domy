@@ -2,6 +2,7 @@ import { dForImplementation } from '../directives/d-for';
 import { dHtmlImplementation } from '../directives/d-html';
 import { dIfImplementation } from '../directives/d-if';
 import { dModelImplementation } from '../directives/d-model';
+import { dRefImplementation } from '../directives/d-ref';
 import { dTextImplementation } from '../directives/d-text';
 import { $dispatch } from '../specials/$dispatch';
 import { $el } from '../specials/$el';
@@ -16,7 +17,8 @@ export const PLUGINS = {
     for: dForImplementation,
     html: dHtmlImplementation,
     text: dTextImplementation,
-    model: dModelImplementation
+    model: dModelImplementation,
+    ref: dRefImplementation
   },
   specials: {
     el: $el,

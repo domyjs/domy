@@ -3,19 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>d-cloak</title>
+    <title>$watch</title>
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <main d-cloak>{{ this.msg }}</main>
+    <h1>Count: {{ count }}</h1>
+    <button id="inc" @click="count++">+</button>
+    <button id="dec" @click="count--">-</button>
   </body>
   <script>
     DOMY.createApp({
-      async $setup() {
-        await new Promise(r => setTimeout(r, 1000));
+      watch: {
+        count() {
+          this.count = Math.max(0, this.count);
+        }
       },
-      $state: {
-        msg: 'Hello World!'
+      data: {
+        count: 0
       }
     });
   </script>

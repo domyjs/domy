@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('variants test', () => {
+describe('modifiers test', () => {
   it('Once: Check the value change one time', () => {
     cy.get('h1').should('have.text', 'Count: 0');
     cy.get('#once button').click();

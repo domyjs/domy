@@ -7,12 +7,12 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <h1 d-html="this.html"></h1>
-    <button @click="this.html = '<p>Bye World!</p>'">Change to Bye World!</button>
+    <h1 d-html="html"></h1>
+    <button @click="html = '<p>Bye World!</p>'">Change to Bye World!</button>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         html: '<p>Hello World!</p>'
       }
     });

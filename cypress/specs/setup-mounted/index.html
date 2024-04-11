@@ -7,19 +7,17 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <h1>
-      Rendering took: {{ typeof this.perf === "number" ? Math.round(this.perf) : this.perf }}ms
-    </h1>
+    <h1>Rendering took: {{ typeof perf === "number" ? Math.round(perf) : perf }}ms</h1>
   </body>
   <script>
     DOMY.createApp({
-      async $setup() {
+      async setup() {
         this.perf = performance.now();
       },
-      async $mounted() {
+      async mounted() {
         this.perf = performance.now() - this.perf;
       },
-      $state: {
+      data: {
         perf: null
       }
     });

@@ -7,18 +7,18 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <h1>{{ this.count }}</h1>
-    <button id="inc" @click="this.increment">+</button>
-    <button id="dec" @click="this.decrement()">-</button>
-    <button id="sinc" @click="this.superIncrement">+10</button>
-    <button id="sdec" @click="this.superDecrement()">-10</button>
+    <h1>{{ count }}</h1>
+    <button id="inc" @click="increment">+</button>
+    <button id="dec" @click="decrement()">-</button>
+    <button id="sinc" @click="superIncrement">+10</button>
+    <button id="sdec" @click="superDecrement()">-10</button>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         count: 0
       },
-      $fn: {
+      methods: {
         increment() {
           this.count++;
         },

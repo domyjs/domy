@@ -3,29 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>variants</title>
+    <title>modifiers</title>
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
     <div id="once">
-      <h1>Count: {{ this.count }}</h1>
-      <button @click.once="this.count++">Increment</button>
+      <h1>Count: {{ count }}</h1>
+      <button @click.once="count++">Increment</button>
     </div>
 
     <div id="enter">
-      <h2>Username: {{ this.submitedName }}</h2>
-      <input type="text" d-model="this.name" @keydown.enter="this.submit()" />
+      <h2>Username: {{ submitedName }}</h2>
+      <input type="text" d-model="name" @keydown.enter="submit()" />
     </div>
 
     <div id="away">
-      <modal d-if="this.show" @click.away="this.show = false"><p>Modal Content...</p></modal>
-      <button @click="this.show = true">Show modal</button>
+      <modal d-if="show" @click.away="show = false"><p>Modal Content...</p></modal>
+      <button @click="show = true">Show modal</button>
     </div>
   </body>
   <script>
     DOMY.createApp(
       {
-        $state: {
+        data: {
           count: 0
         }
       },
@@ -34,11 +34,11 @@
 
     DOMY.createApp(
       {
-        $state: {
+        data: {
           name: '',
           submitedName: ''
         },
-        $fn: {
+        methods: {
           submit() {
             this.submitedName = this.name;
             this.name = '';
@@ -50,7 +50,7 @@
 
     DOMY.createApp(
       {
-        $state: {
+        data: {
           show: false
         }
       },

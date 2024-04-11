@@ -7,13 +7,13 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <button @click="this.search = 'Bye World!'">Set to Bye World!</button>
-    <input type="text" d-model="this.search" />
-    <p>{{ this.search }}</p>
+    <button @click="search = 'Bye World!'">Set to Bye World!</button>
+    <input type="text" d-model="search" />
+    <p>{{ search }}</p>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         search: 'Hello World!'
       }
     });
