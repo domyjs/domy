@@ -18,6 +18,7 @@ export type DomyPluginHelper = {
   evaluateWithoutListening: (code: string) => any;
   deepRender: typeof deepRender;
   addScopeToNode(obj: Record<string, any>): void;
+  removeScopeToNode(obj: Record<string, any>): void;
   getContext: typeof getContext;
 };
 

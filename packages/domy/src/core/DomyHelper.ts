@@ -40,6 +40,7 @@ export class DomyHelper {
       evaluateWithoutListening,
       deepRender: deepRender,
       addScopeToNode: this.addScopeToNode.bind(this),
+      removeScopeToNode: this.removeScopeToNode.bind(this),
       getContext
     };
   }
@@ -48,7 +49,7 @@ export class DomyHelper {
     if (this.onSetListener) return;
     this.onSetListener = {
       type: 'onSet',
-      fn: ({ path, prevValue, newValue }) => {
+      fn: ({ path }) => {
         for (const listenedPath of this.paths) {
           if (this.state.data.matchPath(listenedPath, path).isMatching) {
             this.callCleanup();
@@ -74,7 +75,6 @@ export class DomyHelper {
     const listener: Listener = {
       type: 'onGet',
       fn: ({ path }) => {
-        // console.log('get', path, this.el);
         this.attachOnSetListener();
         this.paths.add(path);
       }
@@ -106,6 +106,11 @@ export class DomyHelper {
 
   addScopeToNode(obj: Record<string, any>) {
     this.scopedNodeData.unshift(obj);
+  }
+
+  removeScopeToNode(obj: Record<string, any>) {
+    const index = this.scopedNodeData.findIndex(o => o === obj);
+    if (index !== -1) this.scopedNodeData.splice(index, 1);
   }
 
   callCleanup() {

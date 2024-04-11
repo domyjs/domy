@@ -39,11 +39,15 @@ export async function createApp(app: App = {}, target?: Element) {
     state.data.attachListener({
       type: 'onSet',
       fn: async ({ path, prevValue, newValue }) => {
-        if (state.data.matchPath(watcherName, path).isMatching) {
+        const match = state.data.matchPath(watcherName, path);
+        if (match.isMatching) {
           try {
             // TODO: Fix other dep called
             // Maybe something like prevent()
-            await watcherfn.call(getContext(undefined, state), prevValue, newValue);
+            await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
+              path,
+              params: match.params
+            });
           } catch (err: any) {
             error(err);
           }

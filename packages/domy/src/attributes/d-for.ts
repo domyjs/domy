@@ -1,4 +1,5 @@
 import { DomyPluginHelper } from '../types/Domy';
+import { warn } from '../utils/logs';
 import { moveElement } from '../utils/moveElement';
 
 /**
@@ -34,25 +35,20 @@ export function dForImplementation(domy: DomyPluginHelper) {
         const currentIndex = valueIndex * initialChilds.length + childIndex;
 
         // Inject the new datas like index
-
-        const isValueReactive = domy.state.data.isReactive(value);
-        if (!isValueReactive) {
-          console.log('Not reactive');
-          const reactiveValue = domy.reactive(value);
-          domy.addScopeToNode({
-            [res!.groups!.dest]: reactiveValue.reactiveObj
-          });
-          // TODO: Fixe value reactivity with [1, 2, 3] for example (maybe a method isProxy ?)
-        } else {
-          domy.addScopeToNode({
+        const scopes: Record<string, any>[] = [
+          {
             [res!.groups!.dest]: value
+          }
+        ];
+
+        if (res!.groups?.index) {
+          scopes.push({
+            [res!.groups.index]: valueIndex
           });
         }
 
-        if (res!.groups?.index) {
-          domy.addScopeToNode({
-            [res!.groups.index]: valueIndex
-          });
+        for (const scope of scopes) {
+          domy.addScopeToNode(scope);
         }
 
         const keyAttr = initialChild.getAttribute(':key');
@@ -73,7 +69,7 @@ export function dForImplementation(domy: DomyPluginHelper) {
             continue;
           }
         } else {
-          console.warn('Elements inside a d-for parent should be rendered with :key attribute.');
+          warn('Elements inside a d-for parent should be rendered with :key attribute.');
         }
 
         // Create and render the new element
@@ -83,6 +79,10 @@ export function dForImplementation(domy: DomyPluginHelper) {
           state: domy.state,
           scopedNodeData: domy.scopedNodeData
         });
+
+        for (const scope of scopes) {
+          domy.removeScopeToNode(scope);
+        }
 
         const oldRender: ChildNode | undefined = el.childNodes[currentIndex];
 
