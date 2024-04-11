@@ -1,4 +1,5 @@
 import { DomyPluginHelper } from '../types/Domy';
+import on from '../utils/on';
 
 // TODO: Implements variants
 
@@ -33,5 +34,10 @@ export function events(domy: DomyPluginHelper) {
       executedValue.call(domy.getContext(domy.el, domy.state, domy.scopedNodeData), event);
   };
 
-  domy.el.addEventListener(eventName, eventListener);
+  on({
+    el: domy.el,
+    eventName,
+    listener: eventListener,
+    modifiers: domy.modifiers
+  });
 }
