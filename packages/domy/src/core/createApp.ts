@@ -19,7 +19,8 @@ export async function createApp(app: App = {}, target?: Element) {
     data: reactive(app.data ?? {}),
     methods: {},
     events: {},
-    refs: {}
+    refs: {},
+    transitions: new Map()
   };
 
   // Functions

@@ -16,7 +16,7 @@ export function renderAttribute(domy: DomyDirectiveHelper) {
   } else if (isEventAttr(domy.attr.name)) {
     events(domy);
   } else if (isDomyAttr(domy.attr.name)) {
-    for (const [directive, implementation] of Object.entries(PLUGINS.sortedDirectives)) {
+    for (const [directive, implementation] of Object.entries(PLUGINS.directives)) {
       if (domy.directive === directive) implementation(domy);
     }
   }

@@ -4,6 +4,7 @@ import { dIfImplementation } from '../directives/d-if';
 import { dModelImplementation } from '../directives/d-model';
 import { dRefImplementation } from '../directives/d-ref';
 import { dTextImplementation } from '../directives/d-text';
+import { dTransitionImplementation } from '../directives/d-transition';
 import { $dispatch } from '../specials/$dispatch';
 import { $el } from '../specials/$el';
 import { $nextTick } from '../specials/$nextTick';
@@ -12,13 +13,14 @@ import { $root } from '../specials/$root';
 import { DomyPlugin } from '../types/Domy';
 
 export const PLUGINS = {
-  sortedDirectives: {
+  directives: {
     if: dIfImplementation,
     for: dForImplementation,
     html: dHtmlImplementation,
     text: dTextImplementation,
     model: dModelImplementation,
-    ref: dRefImplementation
+    ref: dRefImplementation,
+    transition: dTransitionImplementation
   },
   specials: {
     el: $el,

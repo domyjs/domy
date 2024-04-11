@@ -12,9 +12,6 @@ export function dIfImplementation(domy: DomyDirectiveHelper) {
   const parent = domy.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
-  const transitionName = el.getAttribute('d-transition');
-  const hasTransition = typeof transitionName === 'string';
-
   function findElementIndex(): number {
     let index = 0;
     for (const child of parentChilds) {
@@ -36,13 +33,15 @@ export function dIfImplementation(domy: DomyDirectiveHelper) {
   let initialised = false;
 
   domy.effect(() => {
+    const transition = domy.state.transitions.get(domy.el);
+
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
 
     if (el.isConnected && !shouldBeDisplay) {
       // Handle out transition
-      if (hasTransition && initialised) {
-        el.classList.remove(`${transitionName}-enter`);
-        el.classList.add(`${transitionName}-out`);
+      if (transition && initialised) {
+        el.classList.remove(`${transition}-enter`);
+        el.classList.add(`${transition}-out`);
         executeActionAfterAnimation(() => el.remove());
       } else {
         el.remove();
@@ -51,10 +50,10 @@ export function dIfImplementation(domy: DomyDirectiveHelper) {
       const indexToInsert = findElementIndex();
 
       // Handle enter transition
-      if (hasTransition) {
-        el.classList.remove(`${transitionName}-out`);
-        el.classList.add(`${transitionName}-enter`);
-        executeActionAfterAnimation(() => el.classList.remove(`${transitionName}-enter`));
+      if (transition) {
+        el.classList.remove(`${transition}-out`);
+        el.classList.add(`${transition}-enter`);
+        executeActionAfterAnimation(() => el.classList.remove(`${transition}-enter`));
       }
 
       domy.deepRender({

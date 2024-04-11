@@ -54,7 +54,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper) {
     if (isValueArray && el.tagName === 'SELECT' && (el as HTMLSelectElement).multiple) {
       // TODO Fixe: wait child rendered before applying effect (maybe wait the on mount)
       // Handle select multiple
-      const options = el.querySelectorAll(':scope>option') as NodeListOf<HTMLOptionElement>;
+      const options = el.querySelectorAll('option') as NodeListOf<HTMLOptionElement>;
 
       for (const option of options) {
         option.selected = false;
