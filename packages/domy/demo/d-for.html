@@ -29,6 +29,9 @@
     </ul>
     <button id="add" @click="addElement()">Add</button>
     <button id="rm" @click="removeElement()">Remove</button>
+    <ul d-for="color of [{ name: 'red' }, { name: 'blue' }, { name: 'green' }]">
+      <li :key="color.name" @click="color.name = 'yellow'">{{ color.name }}</li>
+    </ul>
   </body>
   <script>
     DOMY.createApp({

@@ -50,7 +50,7 @@ export class DomyHelper {
       type: 'onSet',
       fn: ({ path, prevValue, newValue }) => {
         for (const listenedPath of this.paths) {
-          if (this.state.data.matchPath(listenedPath, path)) {
+          if (this.state.data.matchPath(listenedPath, path).isMatching) {
             this.callCleanup();
             this.callEffect();
           }
