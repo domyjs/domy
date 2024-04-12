@@ -38,7 +38,10 @@
     }
   </style>
   <body>
-    <div d-if="show" d-transition="transition">Modal Content...</div>
+    <div id="if" d-if="show" d-transition="transition">Modal Content... (by d-if)</div>
+    <div id="show" style="display: flex" d-show="show" d-transition="transition">
+      Modal Content... (by d-show)
+    </div>
     <button @click="show = !show">Show modal</button>
   </body>
   <script>

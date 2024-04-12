@@ -5,6 +5,7 @@ import { dIgnoreImplementation } from '../directives/d-ignore';
 import { dModelImplementation } from '../directives/d-model';
 import { dOnceImplementation } from '../directives/d-once';
 import { dRefImplementation } from '../directives/d-ref';
+import { dShowImplementation } from '../directives/d-show';
 import { dTextImplementation } from '../directives/d-text';
 import { dTransitionImplementation } from '../directives/d-transition';
 import { $dispatch } from '../specials/$dispatch';
@@ -24,7 +25,8 @@ export const PLUGINS = {
     ref: dRefImplementation,
     transition: dTransitionImplementation,
     ignore: dIgnoreImplementation,
-    once: dOnceImplementation
+    once: dOnceImplementation,
+    show: dShowImplementation
   },
   specials: {
     el: $el,

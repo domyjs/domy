@@ -1,4 +1,5 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
+import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimation';
 import { restoreElement } from '../utils/restoreElement';
 
 /**
@@ -25,21 +26,9 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
     return index;
   }
 
-  /**
-   * Execute a function after the animation on an element is finish
-   * @param action
-   */
-  function executeActionAfterAnimation(action: () => void) {
-    const actionAfterAnimation: EventListenerOrEventListenerObject = () => {
-      action();
-    };
-
-    el.addEventListener('animationend', actionAfterAnimation, { once: true });
-    el.addEventListener('transition', actionAfterAnimation, { once: true });
-  }
-
-  // Check if the element is already initialised to avoid making a useless transition at first
-  let initialised = false;
+  let isInitialised = false;
+  let hasBeenRender = false;
+  let cleanupTransition: null | (() => void) = null;
 
   domy.effect(() => {
     let transition: string | undefined | null = domy.state.transitions.get(domy.el);
@@ -48,37 +37,46 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
 
     if (el.isConnected && !shouldBeDisplay) {
       // Handle out transition
-      if (transition && initialised) {
+      if (transition && isInitialised) {
+        if (cleanupTransition) cleanupTransition();
         el.classList.remove(`${transition}-enter`);
         el.classList.add(`${transition}-out`);
-        executeActionAfterAnimation(() => el.remove());
+        cleanupTransition = executeActionAfterAnimation(el, () => el.remove());
       } else {
         el.remove();
       }
     } else if (shouldBeDisplay) {
       const indexToInsert = findElementIndex();
 
-      // because we skip other attributes rendering sometimes d-if don't know it have a transition
-      // so here we do a check
+      // Because we skip other attributes rendering sometimes d-if don't know it have a transition
+      // It happen when the d-transition is positioned after the d-if
+      // So here we do a check
       if (!transition) transition = el.getAttribute('d-transition');
 
       // Handle enter transition
-      if (transition && initialised) {
+      if (transition && isInitialised) {
+        if (cleanupTransition) cleanupTransition();
         el.classList.remove(`${transition}-out`);
         el.classList.add(`${transition}-enter`);
-        executeActionAfterAnimation(() => el.classList.remove(`${transition}-enter`));
+        cleanupTransition = executeActionAfterAnimation(el, () =>
+          el.classList.remove(`${transition}-enter`)
+        );
       }
 
-      domy.deepRender({
-        element: el,
-        state: domy.state,
-        byPassAttributes: ['d-if']
-      });
+      if (!hasBeenRender) {
+        // If it's the first time we display the element then we have to render it
+        domy.deepRender({
+          element: el,
+          state: domy.state,
+          byPassAttributes: ['d-if']
+        });
+        hasBeenRender = true;
+      }
 
       restoreElement(parent, el, indexToInsert);
     }
 
-    initialised = true;
+    isInitialised = true;
   });
 
   return { skipChildsRendering: true, skipOtherAttributesRendering: true };
