@@ -4,7 +4,7 @@ export function $nextTick() {
   return (cb: () => void | Promise<void>) => {
     return new Promise(resolve => {
       queueJob(() => {
-        cb();
+        if (typeof cb === 'function') cb();
         resolve(undefined);
       });
     });

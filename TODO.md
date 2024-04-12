@@ -1,5 +1,7 @@
 # TODO
 
+- nextTick not working
+
 - Cache some content from evaluate ?
 - handle template (so no more d-cloak)
 - more variants like debounce/away/once/enter ...

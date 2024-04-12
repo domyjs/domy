@@ -12,9 +12,8 @@ const AsyncFunction = async function () {}.constructor;
 export function toRegularFn<T extends (...args: any[]) => any>(arrowFn: T): T {
   try {
     const fnString = arrowFn.toString();
-    const match = /(?<isAsync>async)?\s*\((?<params>[^)]*?)\)\s*=>\s*\{?(?<code>[\s\S]*?)\}?$/.exec(
-      fnString
-    );
+    const match =
+      /^(?<isAsync>async)?\s*\((?<params>[^)]*?)\)\s*=>\s*\{?(?<code>[\s\S]*?)\}?$/.exec(fnString);
     if (match) {
       const isAsync = match.groups?.isAsync === 'async';
       const fn = isAsync ? AsyncFunction : Function;
