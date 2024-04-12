@@ -24,8 +24,9 @@ export class DomyHelper {
     public scopedNodeData: Record<string, any>[] = []
   ) {}
 
-  getPluginHelper(renderOnce = false): DomyDirectiveHelper {
+  getPluginHelper(renderWithoutListeningToChange = false): DomyDirectiveHelper {
     const evaluateWithoutListening = this.evaluateWithoutListening.bind(this);
+
     return {
       el: this.el,
       state: this.state,
@@ -36,7 +37,9 @@ export class DomyHelper {
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
       reactive,
-      evaluate: renderOnce ? evaluateWithoutListening : this.evaluate.bind(this),
+      evaluate: renderWithoutListeningToChange
+        ? evaluateWithoutListening
+        : this.evaluate.bind(this),
       evaluateWithoutListening,
       deepRender: deepRender,
       addScopeToNode: this.addScopeToNode.bind(this),

@@ -64,7 +64,6 @@ export function deepRender(props: Props) {
         domyHelper.attr.value = attr.value;
         domyHelper.modifiers = modifiers;
 
-        // TODO: Fixe the wait we change the evaluator (maybe something in common with csp)
         const options: DomyDirectiveReturn = renderAttribute(
           domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
         );
