@@ -1,6 +1,5 @@
 import { DomyDirectiveHelper } from '../types/Domy';
 import on from '../utils/on';
-import { queueJob } from './scheduler';
 
 // TODO: Implements modifiers
 // TODO: Implement $event
@@ -33,7 +32,7 @@ export function events(domy: DomyDirectiveHelper) {
 
     const executedValue = domy.evaluate(domy.attr.value);
     if (typeof executedValue === 'function')
-      queueJob(() =>
+      domy.queueJob(() =>
         executedValue.call(domy.getContext(domy.el, domy.state, domy.scopedNodeData), event)
       );
   };

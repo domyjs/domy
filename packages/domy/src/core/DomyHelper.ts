@@ -34,6 +34,7 @@ export class DomyHelper {
       directive: this.directive,
       modifiers: this.modifiers,
       attr: this.attr,
+      queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
       reactive,

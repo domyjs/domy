@@ -2,6 +2,7 @@ import { deepRender } from '../core/deepRender';
 import { State } from './State';
 import { reactive } from '../core/reactive';
 import { getContext } from '../utils/getContext';
+import { queueJob } from '../core/scheduler';
 
 export type DomyDirectiveReturn = {
   skipChildsRendering?: boolean;
@@ -21,6 +22,7 @@ export type DomyDirectiveHelper = {
   directive: string;
   modifiers: string[];
   attr: { name: string; value: string };
+  queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;
   cleanup: (cb: () => void | Promise<void>) => void;
   reactive: typeof reactive;
