@@ -6,10 +6,14 @@ beforeEach(() => {
 
 describe('$nextTick test', () => {
   it('Check nextTick wait dependencie update', () => {
-    cy.get('button').should('have.text', 'Say hi');
+    cy.window().then(win => {
+      cy.stub(win.console, 'log').as('consoleLog');
+    });
+
+    cy.get('button p').should('have.text', 'Say hi');
     cy.get('button').click();
     cy.get('@consoleLog').should('have.been.calledWith', 'Say hi');
-    cy.get('button').should('have.text', 'Hello World!');
+    cy.get('button p').should('have.text', 'Hello World!');
     cy.get('@consoleLog').should('have.been.calledWith', 'Hello World!');
   });
 });

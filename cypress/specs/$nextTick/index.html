@@ -9,13 +9,14 @@
   <body>
     <button
       @click="async () => {
-      msg = 'Hello World!';
-      console.log($el.textContent);
-      await $nextTick();
-      console.log($el.textContent)
+        const p = $el.querySelector('p');
+        msg = 'Hello World!';
+        console.log(p.textContent);
+        await $nextTick();
+        console.log(p.textContent)
     }"
     >
-      {{ msg }}
+      <p>{{ msg }}</p>
     </button>
   </body>
   <script>
