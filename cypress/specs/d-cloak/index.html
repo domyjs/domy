@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-cloak</title>
+    <script src="/packages/domy/dist/index.js"></script>
+    <style>
+      [d-cloak] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main d-cloak>{{ msg }}</main>
+  </body>
+  <script>
+    DOMY.createApp({
+      async setup() {
+        await new Promise(r => setTimeout(r, 1000));
+      },
+      data: {
+        msg: 'Hello World!'
+      }
+    });
+  </script>
+</html>

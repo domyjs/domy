@@ -1,3 +1,4 @@
+import { dCloakImplementation } from '../directives/d-cloak';
 import { dForImplementation } from '../directives/d-for';
 import { dHtmlImplementation } from '../directives/d-html';
 import { dIfImplementation } from '../directives/d-if';
@@ -26,7 +27,8 @@ export const PLUGINS = {
     transition: dTransitionImplementation,
     ignore: dIgnoreImplementation,
     once: dOnceImplementation,
-    show: dShowImplementation
+    show: dShowImplementation,
+    cloak: dCloakImplementation
   },
   specials: {
     el: $el,
