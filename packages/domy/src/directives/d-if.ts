@@ -12,6 +12,10 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
   const parent = domy.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
+  /**
+   * Find where to insert the element
+   * @returns
+   */
   function findElementIndex(): number {
     let index = 0;
     for (const child of parentChilds) {
@@ -21,6 +25,10 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
     return index;
   }
 
+  /**
+   * Execute a function after the animation on an element is finish
+   * @param action
+   */
   function executeActionAfterAnimation(action: () => void) {
     const actionAfterAnimation: EventListenerOrEventListenerObject = () => {
       action();
@@ -30,10 +38,11 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
     el.addEventListener('transition', actionAfterAnimation, { once: true });
   }
 
+  // Check if the element is already initialised to avoid making a useless transition at first
   let initialised = false;
 
   domy.effect(() => {
-    const transition = domy.state.transitions.get(domy.el);
+    let transition: string | undefined | null = domy.state.transitions.get(domy.el);
 
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
 
@@ -49,8 +58,12 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
     } else if (shouldBeDisplay) {
       const indexToInsert = findElementIndex();
 
+      // because we skip other attributes rendering sometimes d-if don't know it have a transition
+      // so here we do a check
+      if (!transition) transition = el.getAttribute('d-transition');
+
       // Handle enter transition
-      if (transition) {
+      if (transition && initialised) {
         el.classList.remove(`${transition}-out`);
         el.classList.add(`${transition}-enter`);
         executeActionAfterAnimation(() => el.classList.remove(`${transition}-enter`));
