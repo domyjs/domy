@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('$watch test', () => {
+describe('watch test', () => {
   it('Check watcher is called', () => {
     cy.get('h1').should('have.text', 'Count: 0');
 
