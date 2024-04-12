@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { set } from '../utils/getAndSet';
 
 type Value = string | number | boolean | string[] | undefined;
@@ -9,10 +9,21 @@ type Value = string | number | boolean | string[] | undefined;
  *
  * @author yoannchb-pro
  */
-export function dModelImplementation(domy: DomyDirectiveHelper) {
+export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
   const objPath = domy.attr.value.replace(/^this\./, '');
 
+  // We ensure to render the childs first so we can access to their value
+  for (const child of domy.el.childNodes) {
+    domy.deepRender({
+      element: child as Element,
+      state: domy.state
+    });
+  }
+
+  /**
+   * Trigger a change to the data when the value on input change
+   */
   function changeValue() {
     let value: Value = el.value;
 
@@ -52,7 +63,6 @@ export function dModelImplementation(domy: DomyDirectiveHelper) {
     const isValueArray = Array.isArray(executedValue);
 
     if (isValueArray && el.tagName === 'SELECT' && (el as HTMLSelectElement).multiple) {
-      // TODO Fixe: wait child rendered before applying effect (maybe wait the on mount)
       // Handle select multiple
       const options = el.querySelectorAll('option') as NodeListOf<HTMLOptionElement>;
 
@@ -79,4 +89,6 @@ export function dModelImplementation(domy: DomyDirectiveHelper) {
       el.value = executedValue;
     }
   });
+
+  return { skipChildsRendering: true };
 }
