@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { restoreElement } from '../utils/restoreElement';
 
 /**
@@ -7,7 +7,7 @@ import { restoreElement } from '../utils/restoreElement';
  *
  * @author yoannchb-pro
  */
-export function dIfImplementation(domy: DomyDirectiveHelper) {
+export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.el;
   const parent = domy.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
@@ -65,35 +65,8 @@ export function dIfImplementation(domy: DomyDirectiveHelper) {
       restoreElement(parent, el, indexToInsert);
     }
 
-    // We handle d-else and d-else-if here
-    // let currentIndex = parentChilds.indexOf(el);
-    // let currentEl = parentChilds[parentChilds.indexOf(el)] as Element;
-    // while (currentEl) {
-    //   if (currentEl.nodeType === Node.TEXT_NODE) break;
-
-    //   const isElse = currentEl.getAttribute('d-else');
-    //   const isElseIf = currentEl.getAttribute('d-else-if');
-
-    //   if (!isElse || !isElseIf) break;
-
-    //   if (isElse) {
-    //     // TODO: Handle d-else
-    //     if (!shouldBeDisplay) {
-    //       domy.deepRender({
-    //         element: currentEl,
-    //         state: domy.state
-    //       });
-    //     } else {
-    //       currentEl.remove();
-    //     }
-    //   } else {
-    //     // TODO: Handler d-else-if
-    //   }
-
-    //   currentEl = parentChilds[++currentIndex] as Element;
-    // }
-    // END
-
     initialised = true;
   });
+
+  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
 }

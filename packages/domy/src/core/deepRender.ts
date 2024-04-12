@@ -1,3 +1,4 @@
+import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { DomyHelper } from './DomyHelper';
@@ -15,6 +16,7 @@ type Props = {
   element: Element;
   byPassAttributes?: string[];
   scopedNodeData?: Record<string, any>[];
+  renderWithoutListeningToChange?: boolean;
 };
 
 /**
@@ -45,14 +47,8 @@ export function deepRender(props: Props) {
 
     const attributes = Array.from(toRender.element.attributes ?? []);
 
-    // Skipping element with d-ignore attribute
-    const shouldBeIngored = attributes.findIndex(({ name }) => name === 'd-ignore') !== -1;
-    if (shouldBeIngored) continue;
-
-    // Should be rendered only once
-    const shouldBeRenderedOnlyOnce = attributes.findIndex(({ name }) => name === 'd-once') !== -1;
-
     // Rendering attributes if it's an element
+    let skipChildRendering = false;
     const attrToRemove: string[] = [];
     for (const attr of attributes) {
       domyHelper = new DomyHelper(toRender.element, props.state, [...domyHelper.scopedNodeData]);
@@ -68,11 +64,20 @@ export function deepRender(props: Props) {
         domyHelper.attr.value = attr.value;
         domyHelper.modifiers = modifiers;
 
-        renderAttribute(domyHelper.getPluginHelper(shouldBeRenderedOnlyOnce));
+        // TODO: Fixe the wait we change the evaluator (maybe something in common with csp)
+        const options: DomyDirectiveReturn = renderAttribute(
+          domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
+        );
 
         domyHelper.callEffect();
 
         attrToRemove.push(attr.name);
+
+        // Handling options return by the attribute
+        if (options) {
+          if (options.skipChildsRendering) skipChildRendering = true;
+          if (options.skipOtherAttributesRendering) break;
+        }
       }
     }
 
@@ -80,11 +85,16 @@ export function deepRender(props: Props) {
       toRender.element.removeAttribute(attrName);
     }
 
-    for (const child of toRender.element.childNodes) {
-      toRenderList.push({
-        element: child as Element,
-        scopedNodeData: domyHelper.scopedNodeData
-      });
+    // We reverse the child because in the case of d-if, d-else-if, d-else
+    // the element need to know if is previousSibling is displayed or not and to access to the d-if or d-else-if content
+    if (!skipChildRendering) {
+      const reversedChild = Array.from(toRender.element.childNodes).reverse();
+      for (const child of reversedChild) {
+        toRenderList.push({
+          element: child as Element,
+          scopedNodeData: domyHelper.scopedNodeData
+        });
+      }
     }
   }
 }

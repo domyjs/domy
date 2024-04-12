@@ -1,7 +1,9 @@
 import { dForImplementation } from '../directives/d-for';
 import { dHtmlImplementation } from '../directives/d-html';
 import { dIfImplementation } from '../directives/d-if';
+import { dIgnoreImplementation } from '../directives/d-ignore';
 import { dModelImplementation } from '../directives/d-model';
+import { dOnceImplementation } from '../directives/d-once';
 import { dRefImplementation } from '../directives/d-ref';
 import { dTextImplementation } from '../directives/d-text';
 import { dTransitionImplementation } from '../directives/d-transition';
@@ -20,7 +22,9 @@ export const PLUGINS = {
     text: dTextImplementation,
     model: dModelImplementation,
     ref: dRefImplementation,
-    transition: dTransitionImplementation
+    transition: dTransitionImplementation,
+    ignore: dIgnoreImplementation,
+    once: dOnceImplementation
   },
   specials: {
     el: $el,

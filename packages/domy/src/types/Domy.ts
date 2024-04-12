@@ -3,6 +3,11 @@ import { State } from './State';
 import { reactive } from '../core/reactive';
 import { getContext } from '../utils/getContext';
 
+export type DomyDirectiveReturn = {
+  skipChildsRendering?: boolean;
+  skipOtherAttributesRendering?: boolean;
+} | void;
+
 export type DomySpecialHelper = {
   el: Element | Text | undefined;
   state: State;

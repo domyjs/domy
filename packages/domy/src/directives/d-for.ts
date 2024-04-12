@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { warn } from '../utils/logs';
 import { moveElement } from '../utils/moveElement';
 
@@ -8,7 +8,7 @@ import { moveElement } from '../utils/moveElement';
  *
  * @author yoannchb-pro
  */
-export function dForImplementation(domy: DomyDirectiveHelper) {
+export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.el;
   const initialChilds = Array.from(el.children);
 
@@ -124,4 +124,6 @@ export function dForImplementation(domy: DomyDirectiveHelper) {
       child.remove();
     }
   });
+
+  return { skipChildsRendering: true };
 }
