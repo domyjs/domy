@@ -15,6 +15,7 @@ import { $nextTick } from '../specials/$nextTick';
 import { $refs } from '../specials/$refs';
 import { $root } from '../specials/$root';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
+import { error } from '../utils/logs';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -48,9 +49,15 @@ export const PLUGINS: Plugins = {
 
 const pluginDefintiion: DomyPluginDefinition = {
   registerDirective(name, fn) {
+    if (name in PLUGINS.directives) {
+      throw new Error(`A directive with the name "${name}" already exist.`);
+    }
     PLUGINS.directives[name] = fn;
   },
   registerSpecial(name, fn) {
+    if (name in PLUGINS.specials) {
+      throw new Error(`A special with the name "${name}" already exist.`);
+    }
     PLUGINS.specials[name] = fn;
   }
 };
@@ -62,5 +69,9 @@ const pluginDefintiion: DomyPluginDefinition = {
  * @author yoannchb-pro
  */
 export function registerPlugin(plugin: DomyPlugin) {
-  plugin(pluginDefintiion);
+  try {
+    plugin(pluginDefintiion);
+  } catch (err: any) {
+    error(err);
+  }
 }

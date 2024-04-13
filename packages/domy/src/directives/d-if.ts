@@ -12,6 +12,11 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
   const el = domy.el;
   const parent = domy.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
+  const transition = domy.state.transitions.get(domy.el);
+
+  let isInitialised = false;
+  let hasBeenRender = false;
+  let cleanupTransition: null | (() => void) = null;
 
   /**
    * Find where to insert the element
@@ -26,13 +31,7 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
     return index;
   }
 
-  let isInitialised = false;
-  let hasBeenRender = false;
-  let cleanupTransition: null | (() => void) = null;
-
   domy.effect(() => {
-    let transition: string | undefined | null = domy.state.transitions.get(domy.el);
-
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
 
     if (el.isConnected && !shouldBeDisplay) {
@@ -47,11 +46,6 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
       }
     } else if (shouldBeDisplay) {
       const indexToInsert = findElementIndex();
-
-      // Because we skip other attributes rendering sometimes d-if don't know it have a transition
-      // It happen when the d-transition is positioned after the d-if
-      // So here we do a check
-      if (!transition) transition = el.getAttribute('d-transition');
 
       // Handle enter transition
       if (transition && isInitialised) {
