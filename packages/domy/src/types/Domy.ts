@@ -34,8 +34,8 @@ export type DomyDirectiveHelper = {
   getContext: typeof getContext;
 };
 
-export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => void | Promise<void>;
-export type DomySpecialFn = (domy: DomySpecialHelper) => void | Promise<void>;
+export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
+export type DomySpecialFn = (domy: DomySpecialHelper) => any;
 
 export type DomyPluginDefinition = {
   registerDirective(name: string, fn: DomyDirectiveFn): void;

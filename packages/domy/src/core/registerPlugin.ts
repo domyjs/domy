@@ -14,9 +14,15 @@ import { $el } from '../specials/$el';
 import { $nextTick } from '../specials/$nextTick';
 import { $refs } from '../specials/$refs';
 import { $root } from '../specials/$root';
-import { DomyPlugin } from '../types/Domy';
+import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 
-export const PLUGINS = {
+type Plugins = {
+  sortedDirectives: string[];
+  directives: Record<string, DomyDirectiveFn>;
+  specials: Record<string, DomySpecialFn>;
+};
+
+export const PLUGINS: Plugins = {
   sortedDirectives: ['ignore', 'once', 'cloak', 'transition', 'ref', 'if'],
   directives: {
     if: dIfImplementation,
@@ -40,4 +46,21 @@ export const PLUGINS = {
   }
 };
 
-export function registerPlugin(plugin: DomyPlugin) {}
+const pluginDefintiion: DomyPluginDefinition = {
+  registerDirective(name, fn) {
+    PLUGINS.directives[name] = fn;
+  },
+  registerSpecial(name, fn) {
+    PLUGINS.specials[name] = fn;
+  }
+};
+
+/**
+ * Allow the user to register a custom directive or special
+ * @param plugin
+ *
+ * @author yoannchb-pro
+ */
+export function registerPlugin(plugin: DomyPlugin) {
+  plugin(pluginDefintiion);
+}
