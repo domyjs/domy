@@ -12,6 +12,14 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   const el = domy.el;
   const initialChilds = Array.from(el.children);
 
+  // Display a warning message if the childrens don't have a :key attribute
+  for (const child of initialChilds) {
+    if (!child.getAttribute(':key')) {
+      warn('Elements inside a d-for parent should be rendered with :key attribute.');
+      break;
+    }
+  }
+
   // Remove the original content
   el.innerHTML = '';
 
@@ -68,8 +76,6 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
             renderedChildrens.push(elementWithKey);
             continue;
           }
-        } else {
-          warn('Elements inside a d-for parent should be rendered with :key attribute.');
         }
 
         // Create and render the new element

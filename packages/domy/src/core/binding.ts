@@ -18,7 +18,7 @@ export function binding(domy: DomyDirectiveHelper) {
     : orignalAttrName.slice('d-bind:'.length);
 
   if (domy.el.getAttribute(attrName))
-    throw new Error(`Binding failed. The attribute "${attrName}" already exist on the element`);
+    throw new Error(`Binding failed. The attribute "${attrName}" already exist on the element.`);
 
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);
