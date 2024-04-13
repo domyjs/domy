@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>modifiers</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <div id="once">
+      <h1>Count: {{ count }}</h1>
+      <button @click.once="count++">Increment</button>
+    </div>
+
+    <div id="enter">
+      <h2>Username: {{ submitedName }}</h2>
+      <input type="text" d-model="name" @keydown.enter="submit()" />
+    </div>
+
+    <div id="away">
+      <modal
+        d-if="show"
+        @click.away="() => {
+        console.log('oh no')
+        show = false
+      }"
+        ><p>Modal Content...</p></modal
+      >
+      <button @click="show = true">Show modal</button>
+    </div>
+  </body>
+  <script>
+    DOMY.createApp(
+      {
+        data: {
+          count: 0
+        }
+      },
+      document.querySelector('#once')
+    );
+
+    DOMY.createApp(
+      {
+        data: {
+          name: '',
+          submitedName: ''
+        },
+        methods: {
+          submit() {
+            this.submitedName = this.name;
+            this.name = '';
+          }
+        }
+      },
+      document.querySelector('#enter')
+    );
+
+    DOMY.createApp(
+      {
+        data: {
+          show: false
+        }
+      },
+      document.querySelector('#away')
+    );
+  </script>
+</html>
