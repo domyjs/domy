@@ -17,4 +17,14 @@ describe('watch test', () => {
     cy.get('#dec').click();
     cy.get('h1').should('have.text', 'Count: 0');
   });
+
+  it('Check path and params work', () => {
+    cy.get('#path').should('have.text', '');
+    cy.get('#index').should('have.text', '');
+
+    cy.get('#todo1').click();
+
+    cy.get('#path').should('have.text', 'todos.1.isComplete');
+    cy.get('#index').should('have.text', '1');
+  });
 });

@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-this-alias: "off" */
+
 type MatchingResult = { isMatching: boolean; params: Record<string, string> };
 
 export type OnGetListener = { type: 'onGet'; fn: (props: { path: string }) => void };
@@ -58,7 +60,10 @@ class DeepProxy {
 
       const isParam = rules[i].match(/\{\w+\}/);
       if (rules[i] === '*' || isParam) {
-        if (isParam) params[isParam[0]] = paths[i];
+        if (isParam) {
+          const paramName = isParam[0];
+          params[paramName.substring(1, paramName.length - 1)] = paths[i];
+        }
         continue;
       }
 
@@ -74,7 +79,7 @@ class DeepProxy {
    * @returns
    */
   public static isReactive(target: any) {
-    return !!target[isProxySymbol];
+    return !!target?.[isProxySymbol];
   }
 
   public attachListener(l: Listener) {

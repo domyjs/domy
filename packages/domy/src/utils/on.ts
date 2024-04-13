@@ -1,4 +1,3 @@
-// TODO: away, enter and other touch but what about throttle and debounce ?
 /**
  * Wrap a function
  * @param listener

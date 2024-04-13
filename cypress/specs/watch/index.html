@@ -10,16 +10,30 @@
     <h1>Count: {{ count }}</h1>
     <button id="inc" @click="count++">+</button>
     <button id="dec" @click="count--">-</button>
+    <button id="todo1" @click="todos[1].isComplete = true">Change todo1</button>
+    <p id="path">{{ path }}</p>
+    <p id="index">{{ index }}</p>
   </body>
   <script>
     DOMY.createApp({
       watch: {
-        count() {
-          this.count = Math.max(0, this.count);
+        count(prevValue, newValue) {
+          if (newValue < 0) this.count = prevValue;
+        },
+        'todos.{index}'(prevValue, newValue, { path, params }) {
+          this.path = path;
+          this.index = params.index;
+          console.log(params);
         }
       },
       data: {
-        count: 0
+        todos: [
+          { name: 'cleanning', isComplete: false },
+          { name: 'homework', isComplete: false }
+        ],
+        count: 0,
+        path: '',
+        index: ''
       }
     });
   </script>
