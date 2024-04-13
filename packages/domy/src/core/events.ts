@@ -35,7 +35,7 @@ export function events(domy: DomyDirectiveHelper) {
     };
     domy.addScopeToNode($event);
 
-    const executedValue = domy.evaluate(domy.attr.value);
+    const executedValue = domy.evaluateWithoutListening(domy.attr.value);
     if (typeof executedValue === 'function') {
       domy.queueJob(() =>
         executedValue.call(domy.getContext(domy.el, domy.state, domy.scopedNodeData), event)

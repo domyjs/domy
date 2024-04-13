@@ -44,15 +44,7 @@ export default function on(props: {
 
   if (modifiers.includes('passive')) options.passive = true;
   if (modifiers.includes('capture')) options.capture = true;
-
-  if (modifiers.includes('away')) {
-    listenerTarget = document.body;
-    listener = wrapListener(listener, (next, event) => {
-      if (el.isConnected && event.target !== el && !el.contains(event.target as Node)) {
-        next(event);
-      }
-    });
-  }
+  if (modifiers.includes('once')) options.once = true;
 
   if (modifiers.includes('enter')) {
     listener = wrapListener(listener, (next, event) => {
@@ -62,11 +54,12 @@ export default function on(props: {
     });
   }
 
-  if (modifiers.includes('once')) {
+  if (modifiers.includes('away')) {
+    listenerTarget = document.body;
     listener = wrapListener(listener, (next, event) => {
-      next(event);
-
-      listenerTarget.removeEventListener(eventName, listener, options);
+      if (el.isConnected && event.target !== el && !el.contains(event.target as Node)) {
+        next(event);
+      }
     });
   }
 
