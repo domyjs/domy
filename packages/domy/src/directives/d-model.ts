@@ -13,13 +13,12 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
   const objPath = domy.attr.value.replace(/^this\./, '');
 
-  // We ensure to render the childs first so we can access to their value
-  for (const child of domy.el.childNodes) {
-    domy.deepRender({
-      element: child as Element,
-      state: domy.state
-    });
-  }
+  // We ensure to render the element/childs first so we can access to their value
+  domy.deepRender({
+    element: domy.el,
+    state: domy.state,
+    byPassAttributes: ['d-model']
+  });
 
   /**
    * Trigger a change to the data when the value on input change
@@ -90,5 +89,5 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     }
   });
 
-  return { skipChildsRendering: true };
+  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
 }

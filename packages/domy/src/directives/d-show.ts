@@ -10,13 +10,12 @@ import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimatio
 export function dShowImplementation(domy: DomyDirectiveHelper) {
   const el = domy.el as HTMLElement;
   const originalDisplay = el.style.display ?? '';
+  const transition = domy.state.transitions.get(el);
 
   let isInitialised = false;
   let cleanupTransition: null | (() => void) = null;
 
   domy.effect(() => {
-    const transition = domy.state.transitions.get(el);
-
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
 
     if (shouldBeDisplay) {

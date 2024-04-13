@@ -17,6 +17,7 @@ import { $root } from '../specials/$root';
 import { DomyPlugin } from '../types/Domy';
 
 export const PLUGINS = {
+  sortedDirectives: ['ignore', 'once', 'cloak', 'transition', 'ref', 'if'],
   directives: {
     if: dIfImplementation,
     for: dForImplementation,

@@ -2,6 +2,7 @@ import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { DomyHelper } from './DomyHelper';
+import { PLUGINS } from './registerPlugin';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
 
@@ -46,6 +47,18 @@ export function deepRender(props: Props) {
     }
 
     const attributes = Array.from(toRender.element.attributes ?? []);
+    // We ensure some attributes are rendered first like d-ingore, d-once, ...
+    attributes.sort((a, b) => {
+      const iA = PLUGINS.sortedDirectives.indexOf(a.name.slice(2));
+      const iB = PLUGINS.sortedDirectives.indexOf(b.name.slice(2));
+      if (iA === -1) {
+        return 1;
+      } else if (iB === -1) {
+        return -1;
+      } else {
+        return iA - iB;
+      }
+    });
 
     // Rendering attributes if it's an element
     let skipChildRendering = false;
