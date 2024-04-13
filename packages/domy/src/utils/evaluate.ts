@@ -19,7 +19,7 @@ const AsyncFunction = async function () {}.constructor;
 export function evaluate(props: Props) {
   const fn = props.isAsync ? AsyncFunction : Function;
 
-  let code = props.returnResult ? `return ${props.code};` : props.code;
+  let code = props.returnResult ? `return (${props.code});` : props.code;
   code = props.contextAsGlobal ? `with(this){ ${code} }` : code;
 
   const executedValue = fn(code).call(props.context);
