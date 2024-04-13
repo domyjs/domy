@@ -30,11 +30,19 @@ export function events(domy: DomyDirectiveHelper) {
       return;
     }
 
+    const $event = {
+      $event: event
+    };
+    domy.addScopeToNode($event);
+
     const executedValue = domy.evaluate(domy.attr.value);
-    if (typeof executedValue === 'function')
+    if (typeof executedValue === 'function') {
       domy.queueJob(() =>
         executedValue.call(domy.getContext(domy.el, domy.state, domy.scopedNodeData), event)
       );
+    }
+
+    domy.removeScopeToNode($event);
   };
 
   on({

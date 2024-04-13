@@ -62,7 +62,7 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
         domy.deepRender({
           element: el,
           state: domy.state,
-          byPassAttributes: ['d-if']
+          byPassAttributes: [domy.attr.name]
         });
         hasBeenRender = true;
       }

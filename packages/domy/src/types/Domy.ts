@@ -40,9 +40,6 @@ export type DomySpecialFn = (domy: DomySpecialHelper) => any;
 export type DomyPluginDefinition = {
   registerDirective(name: string, fn: DomyDirectiveFn): void;
   registerSpecial(name: string, fn: DomySpecialFn): void;
-
-  // registerVariant(name: string, fn: DomyFn): void;
-  // registerWatcher(path: string, fn: DomyFn): void;
 };
 
 export type DomyPlugin = (domy: DomyPluginDefinition) => void;
