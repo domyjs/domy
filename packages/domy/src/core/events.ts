@@ -1,9 +1,6 @@
 import { DomyDirectiveHelper } from '../types/Domy';
 import on from '../utils/on';
 
-// TODO: Implements modifiers
-// TODO: Implement $event
-
 /**
  * Handle event applied on an item
  * Example:
@@ -14,7 +11,7 @@ import on from '../utils/on';
  * @author yoannchb-pro
  */
 export function events(domy: DomyDirectiveHelper) {
-  const domyAttrName = domy.attr.name;
+  const domyAttrName = domy.attrName;
 
   const eventName = domyAttrName.startsWith('@')
     ? domyAttrName.slice(1)

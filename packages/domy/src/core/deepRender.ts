@@ -73,7 +73,8 @@ export function deepRender(props: Props) {
         const [attrName, ...modifiers] = attr.name.split('.');
 
         domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
-        domyHelper.attr.name = attrName;
+        domyHelper.attrName = attrName;
+        domyHelper.attr.name = attr.name;
         domyHelper.attr.value = attr.value;
         domyHelper.modifiers = modifiers;
 

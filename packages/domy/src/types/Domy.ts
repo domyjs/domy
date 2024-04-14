@@ -20,6 +20,7 @@ export type DomyDirectiveHelper = {
   state: State;
   scopedNodeData: Record<string, any>[];
   directive: string;
+  attrName: string;
   modifiers: string[];
   attr: { name: string; value: string };
   queueJob: typeof queueJob;

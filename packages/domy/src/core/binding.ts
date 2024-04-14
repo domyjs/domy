@@ -12,7 +12,7 @@ import { DomyDirectiveHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function binding(domy: DomyDirectiveHelper) {
-  const orignalAttrName = domy.attr.name;
+  const orignalAttrName = domy.attrName;
   const attrName = orignalAttrName.startsWith(':')
     ? orignalAttrName.slice(1)
     : orignalAttrName.slice('d-bind:'.length);

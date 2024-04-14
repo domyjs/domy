@@ -17,7 +17,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   domy.deepRender({
     element: domy.el,
     state: domy.state,
-    byPassAttributes: ['d-model']
+    byPassAttributes: [domy.attr.name]
   });
 
   /**

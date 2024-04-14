@@ -13,6 +13,7 @@ export class DomyHelper {
   private effectFn: (() => Promise<void> | void) | null = null;
 
   public directive: string = '';
+  public attrName: string = '';
   public attr: { name: string; value: string } = { name: '', value: '' };
   public modifiers: string[] = [];
 
@@ -32,6 +33,7 @@ export class DomyHelper {
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       directive: this.directive,
+      attrName: this.attrName,
       modifiers: this.modifiers,
       attr: this.attr,
       queueJob,
