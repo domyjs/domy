@@ -70,7 +70,6 @@ export function deepRender(props: Props) {
 
       if (!shouldByPassAttribute && !isNormalAttr(attr.name)) {
         const [attrName, ...modifiers] = attr.name.split('.');
-        console.log(domyHelper.el, attrName, [...domyHelper.scopedNodeData]);
 
         domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
         domyHelper.attrName = attrName;
