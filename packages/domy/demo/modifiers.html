@@ -21,12 +21,11 @@
       <modal
         d-if="show"
         @click.away="() => {
-        console.log('oh no')
         show = false
       }"
         ><p>Modal Content...</p></modal
       >
-      <button @click="show = true">Show modal</button>
+      <button @click.stop="show = true">Show modal</button>
     </div>
   </body>
   <script>

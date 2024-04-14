@@ -70,10 +70,5 @@ export default function on(props: {
     });
   }
 
-  // In come case we want to add a listener to an element after a click append
-  // For example d-if render the other attributes after it will be display
-  // So if we click on a button to show the modal then the d-if will render the @click.away
-  // The problem is that the click.away will be catch because the click will be bubble to the body
-  // So to ensure all events are propaged before adding the new event we make it async
-  setTimeout(() => listenerTarget.addEventListener(eventName, listener, options), 0);
+  listenerTarget.addEventListener(eventName, listener, options);
 }

@@ -21,9 +21,8 @@ export function events(domy: DomyDirectiveHelper) {
   domy.state.events[eventName].push(domy.el);
 
   const eventListener: EventListenerOrEventListenerObject = event => {
-    // If the element is not present in the dom anymore we remove the event listener
+    // If the element is not present in the dom we don't execute the event
     if (!domy.el.isConnected) {
-      domy.el.removeEventListener(eventName, eventListener);
       return;
     }
 
@@ -34,6 +33,7 @@ export function events(domy: DomyDirectiveHelper) {
 
     const executedValue = domy.evaluateWithoutListening(domy.attr.value);
 
+    // ensure nextTick is called after changing variable state
     if (typeof executedValue === 'function') {
       domy.queueJob(() =>
         executedValue.call(domy.getContext(domy.el, domy.state, domy.scopedNodeData), event)

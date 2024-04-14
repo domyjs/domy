@@ -1,4 +1,5 @@
 import { createApp } from './core/createApp';
+import { registerPlugin } from './core/registerPlugin';
 
 const DOMY = {
   configure(config: { csp: boolean }) {
@@ -7,7 +8,7 @@ const DOMY = {
     }
   },
   createApp,
-  registerPlugin: () => null // TODO
+  registerPlugin
 } as const;
 
 export default DOMY;
