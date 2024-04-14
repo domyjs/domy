@@ -62,7 +62,6 @@ export function deepRender(props: Props) {
 
     // Rendering attributes if it's an element
     let skipChildRendering = false;
-    const attrToRemove: string[] = [];
     for (const attr of attributes) {
       domyHelper = new DomyHelper(toRender.element, props.state, [...domyHelper.scopedNodeData]);
 
@@ -71,6 +70,7 @@ export function deepRender(props: Props) {
 
       if (!shouldByPassAttribute && !isNormalAttr(attr.name)) {
         const [attrName, ...modifiers] = attr.name.split('.');
+        console.log(domyHelper.el, attrName, [...domyHelper.scopedNodeData]);
 
         domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
         domyHelper.attrName = attrName;
@@ -84,7 +84,7 @@ export function deepRender(props: Props) {
 
         domyHelper.callEffect();
 
-        attrToRemove.push(attr.name);
+        toRender.element.removeAttribute(attr.name);
 
         // Handling options return by the attribute
         if (options) {
@@ -92,10 +92,6 @@ export function deepRender(props: Props) {
           if (options.skipOtherAttributesRendering) break;
         }
       }
-    }
-
-    for (const attrName of attrToRemove) {
-      toRender.element.removeAttribute(attrName);
     }
 
     // We reverse the child because in the case of d-if, d-else-if, d-else
