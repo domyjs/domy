@@ -46,9 +46,16 @@ export default function on(props: {
   if (modifiers.includes('capture')) options.capture = true;
   if (modifiers.includes('once')) options.once = true;
 
-  if (modifiers.includes('enter')) {
+  const keyReg = /^\{(?<keys>.+?)\}$/gi;
+  const keyModifier = modifiers.find(modifier => !!modifier.match(keyReg));
+  if (keyModifier) {
+    const keys = keyReg
+      .exec(keyModifier)!
+      .groups!.keys.split(',')
+      .map(key => key.toLocaleLowerCase());
+
     listener = wrapListener(listener, (next, event) => {
-      if ('key' in event && event.key === 'Enter') {
+      if ('key' in event && keys.find(key => key === (event.key as string).toLowerCase())) {
         next(event);
       }
     });

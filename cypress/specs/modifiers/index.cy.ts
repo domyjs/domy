@@ -19,6 +19,11 @@ describe('modifiers test', () => {
     cy.get('h2').should('have.text', 'Username: ');
     cy.get('#enter input').type('{enter}');
     cy.get('h2').should('have.text', 'Username: Yoann');
+
+    cy.get('#enter input').type('Pierre');
+    cy.get('h2').should('have.text', 'Username: Yoann');
+    cy.get('#enter input').type('+');
+    cy.get('h2').should('have.text', 'Username: Pierre');
   });
 
   it('Click away: Check the event is triggered only if a click is made away from the element', () => {

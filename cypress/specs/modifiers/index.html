@@ -14,7 +14,7 @@
 
     <div id="enter">
       <h2>Username: {{ submitedName }}</h2>
-      <input type="text" d-model="name" @keydown.enter="submit()" />
+      <input type="text" d-model="name" @keydown.{enter,+}="submit()" />
     </div>
 
     <div id="away">
