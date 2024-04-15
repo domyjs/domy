@@ -2,6 +2,12 @@ import { error } from './logs';
 
 type Callback = () => void;
 
+/**
+ * Utility class that create just one mutation oberserver
+ * To notify a callback when the visibility of a watched element change
+ *
+ * @author yoannchb-pro
+ */
 export class IsConnectedWatcher {
   private observer: MutationObserver;
   private elements: Map<Element, { lastIsConnected: boolean; callbacks: Callback[] }> = new Map();

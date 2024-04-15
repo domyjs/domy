@@ -2,6 +2,7 @@ import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * d-ref implementation
+ * Reference an element to be use later
  * @param domy
  *
  * @author yoannchb-pro

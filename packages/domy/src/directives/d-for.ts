@@ -4,6 +4,8 @@ import { moveElement } from '../utils/moveElement';
 
 /**
  * d-for implementation
+ * Allow to render a list of element
+ * It act like a for in javascript
  * @param domy
  *
  * @author yoannchb-pro

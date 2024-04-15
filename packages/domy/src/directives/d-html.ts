@@ -2,6 +2,7 @@ import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * d-html implementation
+ * Allow to dynamically change the innerHTML of an element
  * @param domy
  *
  * @author yoannchb-pro

@@ -1,10 +1,12 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
-import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimation';
+import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandler';
 import { IsConnectedWatcher } from '../utils/IsConnectedWatcher';
-import { restoreElement } from '../utils/restoreElement';
 
 /**
  * d-else-if implementation
+ * Like like a } else if(condition) { in javascript
+ * The element is only rendered when displayed
+ * It also handle animation
  * @param domy
  *
  * @author yoannchb-pro
@@ -35,81 +37,15 @@ export function dElseIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     allPreviousConditions.push(currentPreviousSibling as Element);
   }
 
-  const el = domy.el;
-  const parent = domy.el.parentNode as Element;
-  const parentChilds = Array.from(parent.childNodes);
-  const transition = domy.state.transitions.get(domy.el);
-
-  let isInitialised = false;
-  let hasBeenRender = false;
-  let cleanupTransition: null | (() => void) = null;
-
-  /**
-   * Find where to insert the element
-   * @returns
-   */
-  function findElementIndex(): number {
-    let index = 0;
-    for (const child of parentChilds) {
-      if (child === el) break;
-      if (child.isConnected) ++index;
-    }
-    return index;
-  }
-
-  /**
-   * Check if all the previous sibling are connected or not
-   * If the previous sibling are all disconnected and the element should be display then we display it
-   *
-   * @author yoannchb-pro
-   */
-  function handleVisibility() {
-    const isConnected = el.isConnected;
+  const visibilityHandler = getElementVisibilityHandler(() => {
     const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(el => el.isConnected);
     const shouldBeDisplay = allPreviousConditionsAreDisconnected && domy.evaluate(domy.attr.value);
+    return shouldBeDisplay;
+  }, domy);
 
-    if (isConnected && !shouldBeDisplay) {
-      // Handle out transition
-      if (transition && isInitialised) {
-        if (cleanupTransition) cleanupTransition();
-        el.classList.remove(`${transition}-enter`);
-        el.classList.add(`${transition}-out`);
-        cleanupTransition = executeActionAfterAnimation(el, () => el.remove());
-      } else {
-        el.remove();
-      }
-    } else if (shouldBeDisplay && !isConnected) {
-      const indexToInsert = findElementIndex();
+  IsConnectedWatcher.getInstance().watch(allPreviousConditions, visibilityHandler);
 
-      // Handle enter transition
-      if (transition && isInitialised) {
-        if (cleanupTransition) cleanupTransition();
-        el.classList.remove(`${transition}-out`);
-        el.classList.add(`${transition}-enter`);
-        cleanupTransition = executeActionAfterAnimation(el, () =>
-          el.classList.remove(`${transition}-enter`)
-        );
-      }
-
-      if (!hasBeenRender) {
-        // If it's the first time we display the element then we have to render it
-        domy.deepRender({
-          element: el,
-          state: domy.state,
-          byPassAttributes: [domy.attr.name]
-        });
-        hasBeenRender = true;
-      }
-
-      restoreElement(parent, el, indexToInsert);
-    }
-
-    isInitialised = true;
-  }
-
-  IsConnectedWatcher.getInstance().watch(allPreviousConditions, handleVisibility);
-
-  domy.effect(handleVisibility);
+  domy.effect(visibilityHandler);
 
   return { skipChildsRendering: true, skipOtherAttributesRendering: true };
 }

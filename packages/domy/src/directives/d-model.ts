@@ -5,6 +5,7 @@ type Value = string | number | boolean | string[] | undefined;
 
 /**
  * d-model implementation
+ * Handle input, select and checkbox
  * @param domy
  *
  * @author yoannchb-pro

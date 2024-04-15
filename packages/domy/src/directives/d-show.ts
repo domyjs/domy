@@ -3,6 +3,8 @@ import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimatio
 
 /**
  * d-show implementation
+ * It's like a d-if but the element is fully rendered
+ * We just hide it with a display none
  * @param domy
  *
  * @author yoannchb-pro

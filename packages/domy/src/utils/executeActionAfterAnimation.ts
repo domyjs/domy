@@ -2,6 +2,7 @@
  * Execute a function after the animation/transition on an element is finish
  * @param el
  * @param action
+ * @returns
  */
 export function executeActionAfterAnimation(el: Element, action: () => void) {
   const actionAfterAnimation: EventListenerOrEventListenerObject = () => {

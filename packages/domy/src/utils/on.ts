@@ -13,6 +13,12 @@ function wrapListener(
   return (event: Event) => wrapper(listener, event);
 }
 
+/**
+ * Add some directives to a listener, customise options ...
+ * @param props
+ *
+ * @author yoannchb-pro
+ */
 export default function on(props: {
   el: Element;
   eventName: string;
