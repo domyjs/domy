@@ -13,7 +13,8 @@ module.exports = {
     {
       files: ['packages/**/*.ts', 'scripts/**/*.ts'],
       rules: {
-        '@typescript-eslint/no-explicit-any': 'off'
+        '@typescript-eslint/no-explicit-any': 'off',
+        'no-constant-condition': 'off'
       }
     }
   ]
