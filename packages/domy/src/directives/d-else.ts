@@ -64,10 +64,11 @@ export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
    * @author yoannchb-pro
    */
   function handleVisibility() {
+    const isConnected = el.isConnected;
     const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(el => el.isConnected);
     const shouldBeDisplay = allPreviousConditionsAreDisconnected;
 
-    if (el.isConnected && !shouldBeDisplay) {
+    if (isConnected && !shouldBeDisplay) {
       // Handle out transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
@@ -77,7 +78,7 @@ export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
       } else {
         el.remove();
       }
-    } else if (shouldBeDisplay) {
+    } else if (shouldBeDisplay && !isConnected) {
       const indexToInsert = findElementIndex();
 
       // Handle enter transition
