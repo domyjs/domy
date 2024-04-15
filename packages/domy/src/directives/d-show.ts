@@ -17,8 +17,9 @@ export function dShowImplementation(domy: DomyDirectiveHelper) {
 
   domy.effect(() => {
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
+    const isAlreadyShow = el.style.display !== 'none';
 
-    if (shouldBeDisplay) {
+    if (shouldBeDisplay && !isAlreadyShow) {
       if (cleanupTransition) cleanupTransition();
 
       el.style.display = originalDisplay;
@@ -27,11 +28,14 @@ export function dShowImplementation(domy: DomyDirectiveHelper) {
         el.classList.remove(`${transition}-out`);
         el.classList.add(`${transition}-enter`);
       }
-    } else {
+    } else if (isAlreadyShow) {
       if (transition && isInitialised) {
         el.classList.remove(`${transition}-enter`);
         el.classList.add(`${transition}-out`);
-        cleanupTransition = executeActionAfterAnimation(el, () => (el.style.display = 'none'));
+        cleanupTransition = executeActionAfterAnimation(el, () => {
+          console.log('removed');
+          el.style.display = 'none';
+        });
       } else {
         el.style.display = 'none';
       }
