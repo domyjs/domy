@@ -1,3 +1,5 @@
+import { PLUGINS } from '../core/registerPlugin';
+
 /**
  * Check if the current attribute is a binding attribute
  * @param attr
@@ -28,7 +30,16 @@ export function isEventAttr(attr: string) {
  * @author yoannchb-pro
  */
 export function isDomyAttr(attr: string) {
-  return attr.startsWith('d-');
+  const [attrName] = attr.split(/[.:]/gi);
+
+  if (!attrName.startsWith('d-')) return false;
+
+  const currentDirective = attrName.slice(2);
+  for (const directive of Object.keys(PLUGINS.directives)) {
+    if (directive === currentDirective) return true;
+  }
+
+  return false;
 }
 
 /**

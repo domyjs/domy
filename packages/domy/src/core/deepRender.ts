@@ -37,7 +37,12 @@ export function deepRender(props: Props) {
 
   while (toRenderList.length > 0) {
     const toRender = toRenderList.shift() as Elem;
-    let domyHelper = new DomyHelper(toRender.element, props.state, toRender.scopedNodeData);
+    let domyHelper = new DomyHelper(
+      deepRender,
+      toRender.element,
+      props.state,
+      toRender.scopedNodeData
+    );
 
     // Rendering text content
     if (toRender.element.nodeType === Node.TEXT_NODE) {
@@ -63,7 +68,9 @@ export function deepRender(props: Props) {
     // Rendering attributes if it's an element
     let skipChildRendering = false;
     for (const attr of attributes) {
-      domyHelper = new DomyHelper(toRender.element, props.state, [...domyHelper.scopedNodeData]);
+      domyHelper = new DomyHelper(deepRender, toRender.element, props.state, [
+        ...domyHelper.scopedNodeData
+      ]);
 
       const shouldByPassAttribute =
         toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);

@@ -6,6 +6,11 @@ import { deepRender } from './deepRender';
 import { Listener, OnSetListener, reactive } from './reactive';
 import { queueJob } from './scheduler';
 
+/**
+ * Domy helper class that handle dependencie change and give everything we need
+ *
+ * @author yoannchb-pro
+ */
 export class DomyHelper {
   private onSetListener: OnSetListener | null = null;
 
@@ -20,6 +25,7 @@ export class DomyHelper {
   private paths = new Set<string>();
 
   constructor(
+    private deepRenderFn: typeof deepRender, // It allow us to avoir circular dependencie (deepRender -> DomyHelper -> deepRender)
     public el: Element,
     public state: State,
     public scopedNodeData: Record<string, any>[] = []
@@ -44,7 +50,7 @@ export class DomyHelper {
         ? evaluateWithoutListening
         : this.evaluate.bind(this),
       evaluateWithoutListening,
-      deepRender: deepRender,
+      deepRender: this.deepRenderFn,
       addScopeToNode: this.addScopeToNode.bind(this),
       removeScopeToNode: this.removeScopeToNode.bind(this),
       getContext

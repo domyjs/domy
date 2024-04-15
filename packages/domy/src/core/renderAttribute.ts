@@ -6,6 +6,7 @@ import { PLUGINS } from './registerPlugin';
 
 /**
  * Render a special attribute
+ * It can be an event, a binding or a domy attribute
  * @param domy
  *
  * @author yoannchb-pro

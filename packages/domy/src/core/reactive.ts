@@ -280,39 +280,3 @@ export function reactive<T extends Record<string, any>>(obj: T) {
     removeListener: deepProxy.removeEventListener.bind(deepProxy)
   };
 }
-
-// const obs = reactive({
-//   count: 0,
-//   mapTest: new Map(),
-//   clients: new Set(['Pierre', 'Lucas']),
-//   todos: [{ id: 0, name: 'Clean computer', isComplete: false }],
-//   user: {
-//     name: 'Yoann',
-//     lastName: 'Chb'
-//   }
-// });
-
-// const data = obs.reactiveObj;
-
-// obs.attachListener({
-//   type: 'onGet',
-//   fn: ({ path }) => {
-//     console.log('get', path);
-//   }
-// });
-
-// obs.attachListener({
-//   type: 'onSet',
-//   fn: ({ path, prevValue, newValue }) => {
-//     console.log('set', path, prevValue, newValue);
-//   }
-// });
-
-// data.todos[0].isComplete = true;
-// data.todos.push({ id: 2, name: 'Testing app', isComplete: false });
-// data.todos[1].isComplete = true;
-// data.user;
-// data.user.adresse = { city: 'France' };
-// data.user.adresse = { city: 'Montréal' };
-// data.user.adresse.city = 'Unknown';
-// data.clients.add('Jean');
