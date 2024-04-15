@@ -18,7 +18,7 @@ export class DomyHelper {
   private effectFn: (() => Promise<void> | void) | null = null;
 
   public directive: string = '';
-  public attrName: string = '';
+  public attrName: string = ''; // The attribute name without the modifiers
   public attr: { name: string; value: string } = { name: '', value: '' };
   public modifiers: string[] = [];
 
