@@ -1,4 +1,5 @@
 import { dCloakImplementation } from '../directives/d-cloak';
+import { dElseIfImplementation } from '../directives/d-else-if';
 import { dForImplementation } from '../directives/d-for';
 import { dHtmlImplementation } from '../directives/d-html';
 import { dIfImplementation } from '../directives/d-if';
@@ -16,6 +17,7 @@ import { $refs } from '../specials/$refs';
 import { $root } from '../specials/$root';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 import { error } from '../utils/logs';
+import { dElseImplementation } from '../directives/d-else';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -24,9 +26,11 @@ type Plugins = {
 };
 
 export const PLUGINS: Plugins = {
-  sortedDirectives: ['ignore', 'once', 'cloak', 'transition', 'ref', 'if'],
+  sortedDirectives: ['ignore', 'once', 'cloak', 'transition', 'ref', 'if', 'else-if', 'else'],
   directives: {
     if: dIfImplementation,
+    'else-if': dElseIfImplementation,
+    else: dElseImplementation,
     for: dForImplementation,
     html: dHtmlImplementation,
     text: dTextImplementation,

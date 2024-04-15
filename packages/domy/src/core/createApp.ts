@@ -28,8 +28,12 @@ export async function createApp(app: App = {}, target?: Element) {
     const method = toRegularFn(app.methods[key]);
     state.methods[key] = function (...args: any[]) {
       // TODO: Fixe get call
-      const res = method.call(getContext(undefined, state), ...args);
-      return res;
+      try {
+        const res = method.call(getContext(undefined, state), ...args);
+        return res;
+      } catch (err: any) {
+        error(err);
+      }
     };
   }
 
@@ -73,10 +77,14 @@ export async function createApp(app: App = {}, target?: Element) {
   } else document.addEventListener('DOMContentLoaded', mountApp);
 
   async function mountApp() {
-    deepRender({
-      element: target ?? document.body,
-      state
-    });
+    try {
+      deepRender({
+        element: target ?? document.body,
+        state
+      });
+    } catch (err: any) {
+      error(err);
+    }
 
     // Mounted
     if (app.mounted) {
