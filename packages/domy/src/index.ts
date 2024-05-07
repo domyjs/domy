@@ -10,7 +10,10 @@ const DOMY = {
     // Handle CSP: Content Security Policy
     if (config.csp) {
       DomyHelper.setEvaluator(evaluatorConf => {
-        const value = get(evaluatorConf.context, evaluatorConf.code);
+        const path = evaluatorConf.contextAsGlobal
+          ? evaluatorConf.code.replace(/^this\./g, '')
+          : evaluatorConf.code;
+        const value = get(evaluatorConf.context, path);
         if (evaluatorConf.returnResult) return value;
       });
     }
