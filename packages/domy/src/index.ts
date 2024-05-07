@@ -1,11 +1,21 @@
+import { configuration } from './config';
 import { createApp } from './core/createApp';
+import { DomyHelper } from './core/DomyHelper';
 import { registerPlugin } from './core/registerPlugin';
+import { Config } from './types/Config';
+import { get } from './utils/getAndSet';
 
 const DOMY = {
-  configure(config: { csp: boolean }) {
+  configure(config: Config) {
+    // Handle CSP: Content Security Policy
     if (config.csp) {
-      // TODO: Domy.setEvaluator((path) => get(app.state.data.reactiveObj, path))
+      DomyHelper.setEvaluator(evaluatorConf => {
+        const value = get(evaluatorConf.context, evaluatorConf.code);
+        if (evaluatorConf.returnResult) return value;
+      });
     }
+
+    configuration.setConfig(config);
   },
   createApp,
   plugin: registerPlugin

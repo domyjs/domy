@@ -24,6 +24,8 @@ export class DomyHelper {
 
   private paths = new Set<string>();
 
+  private static evaluator = evaluate;
+
   constructor(
     private deepRenderFn: typeof deepRender, // It allow us to avoir circular dependencie (deepRender -> DomyHelper -> deepRender)
     public el: Element,
@@ -94,7 +96,7 @@ export class DomyHelper {
 
     this.state.data.attachListener(listener);
 
-    const executedValued = evaluate({
+    const executedValued = DomyHelper.evaluator({
       code: code,
       contextAsGlobal: true,
       context: getContext(this.el, this.state, this.scopedNodeData),
@@ -107,13 +109,17 @@ export class DomyHelper {
   }
 
   evaluateWithoutListening(code: string) {
-    const executedValued = evaluate({
+    const executedValued = DomyHelper.evaluator({
       code: code,
       contextAsGlobal: true,
       context: getContext(this.el, this.state, this.scopedNodeData),
       returnResult: true
     });
     return executedValued;
+  }
+
+  static setEvaluator(evaluator: typeof DomyHelper.evaluator) {
+    DomyHelper.evaluator = evaluator;
   }
 
   addScopeToNode(obj: Record<string, any>) {

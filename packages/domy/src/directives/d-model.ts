@@ -1,4 +1,6 @@
+import { configuration } from '../config';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
+import { set } from '../utils/getAndSet';
 
 type Value = string | number | boolean | string[] | undefined;
 
@@ -68,8 +70,15 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
       }
     }
 
-    const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);
-    setter(value);
+    const isCsp = configuration.getConfig().csp;
+
+    if (isCsp) {
+      const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);
+      setter(value);
+    } else {
+      const objPath = domy.attr.value;
+      set(domy.state.data.reactiveObj, objPath, value);
+    }
   }
 
   // We look at change made by the user
