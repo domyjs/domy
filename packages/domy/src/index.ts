@@ -8,7 +8,7 @@ const DOMY = {
     }
   },
   createApp,
-  registerPlugin
+  plugin: registerPlugin
 } as const;
 
 export default DOMY;
