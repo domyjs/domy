@@ -16,7 +16,7 @@ import { $nextTick } from '../helpers/$nextTick';
 import { $refs } from '../helpers/$refs';
 import { $root } from '../helpers/$root';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
-import { error } from '../utils/logs';
+import { error, warn } from '../utils/logs';
 import { dElseImplementation } from '../directives/d-else';
 
 type Plugins = {
@@ -63,6 +63,15 @@ const pluginDefinition: DomyPluginDefinition = {
       throw new Error(`A special with the name "${name}" already exist.`);
     }
     PLUGINS.helpers[name] = fn;
+  },
+  prioritise(directives) {
+    for (const directive of directives) {
+      if (PLUGINS.sortedDirectives.includes(directive)) {
+        warn(`The directive "${directive}" is already prioritise.`);
+        continue;
+      }
+      PLUGINS.sortedDirectives.push(directive);
+    }
   }
 };
 
