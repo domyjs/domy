@@ -39,6 +39,7 @@ export async function createApp(app: App = {}, target?: Element) {
 
   // Watchers
   for (const watcherName in app.watch) {
+    let isWatcherLocked = false; // We ensure the watcher can't call it self (act like a lock)
     const watcherfn = toRegularFn(app.watch[watcherName]);
 
     state.data.attachListener({
@@ -46,16 +47,18 @@ export async function createApp(app: App = {}, target?: Element) {
       fn: async ({ path, prevValue, newValue }) => {
         const match = state.data.matchPath(watcherName, path);
         if (match.isMatching) {
-          try {
-            // TODO: Fix other dep called
-            // Maybe something like prevent()
-            await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
-              path,
-              params: match.params
-            });
-          } catch (err: any) {
-            error(err);
+          if (!isWatcherLocked) {
+            isWatcherLocked = true;
+            try {
+              await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
+                path,
+                params: match.params
+              });
+            } catch (err: any) {
+              error(err);
+            }
           }
+          isWatcherLocked = false;
         }
       }
     });
