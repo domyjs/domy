@@ -10,11 +10,11 @@ import { dRefImplementation } from '../directives/d-ref';
 import { dShowImplementation } from '../directives/d-show';
 import { dTextImplementation } from '../directives/d-text';
 import { dTransitionImplementation } from '../directives/d-transition';
-import { $dispatch } from '../specials/$dispatch';
-import { $el } from '../specials/$el';
-import { $nextTick } from '../specials/$nextTick';
-import { $refs } from '../specials/$refs';
-import { $root } from '../specials/$root';
+import { $dispatch } from '../helpers/$dispatch';
+import { $el } from '../helpers/$el';
+import { $nextTick } from '../helpers/$nextTick';
+import { $refs } from '../helpers/$refs';
+import { $root } from '../helpers/$root';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 import { error } from '../utils/logs';
 import { dElseImplementation } from '../directives/d-else';
@@ -22,7 +22,7 @@ import { dElseImplementation } from '../directives/d-else';
 type Plugins = {
   sortedDirectives: string[];
   directives: Record<string, DomyDirectiveFn>;
-  specials: Record<string, DomySpecialFn>;
+  helpers: Record<string, DomySpecialFn>;
 };
 
 export const PLUGINS: Plugins = {
@@ -42,7 +42,7 @@ export const PLUGINS: Plugins = {
     show: dShowImplementation,
     cloak: dCloakImplementation
   },
-  specials: {
+  helpers: {
     el: $el,
     refs: $refs,
     root: $root,
@@ -58,11 +58,11 @@ const pluginDefintiion: DomyPluginDefinition = {
     }
     PLUGINS.directives[name] = fn;
   },
-  registerSpecial(name, fn) {
-    if (name in PLUGINS.specials) {
+  registerHelper(name, fn) {
+    if (name in PLUGINS.helpers) {
       throw new Error(`A special with the name "${name}" already exist.`);
     }
-    PLUGINS.specials[name] = fn;
+    PLUGINS.helpers[name] = fn;
   }
 };
 

@@ -70,7 +70,7 @@ export function getContext(
 
   // we init the specials
   const specials: any = {};
-  for (const [name, fn] of Object.entries(PLUGINS.specials)) {
+  for (const [name, fn] of Object.entries(PLUGINS.helpers)) {
     specials['$' + name] = fn({
       el,
       state,

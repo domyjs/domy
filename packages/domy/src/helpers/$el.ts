@@ -1,7 +1,7 @@
 import { DomySpecialHelper } from '../types/Domy';
 
 /**
- * give the current element
+ * Give the current element
  * @param domy
  * @returns
  *
