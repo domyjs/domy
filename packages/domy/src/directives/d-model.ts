@@ -13,6 +13,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
   // We ensure to render the element/childs first so we can access to their value
+  // For example select need to know the options value so we ensure to render the child(s) first
   domy.deepRender({
     element: domy.el,
     state: domy.state,
@@ -71,8 +72,8 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     setter(value);
   }
 
-  el.addEventListener('input', changeValue);
-  el.addEventListener('change', changeValue);
+  // We look at change made by the user
+  el.addEventListener(domy.modifiers.includes('lazy') ? 'change' : 'input', changeValue);
 
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);

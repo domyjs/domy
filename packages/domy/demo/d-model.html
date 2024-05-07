@@ -14,6 +14,12 @@
     </div>
 
     <div>
+      <p>Lazy: {{ searchLazy }}</p>
+      <button @click="searchLazy = 'Bye World!'">Set to Bye World!</button>
+      <input type="text" d-model.lazy="searchLazy" />
+    </div>
+
+    <div>
       <p>{{ search2 }}</p>
       <textarea d-model="search2"></textarea>
     </div>
@@ -72,6 +78,7 @@
     DOMY.createApp({
       data: {
         search: 'Hello World!',
+        searchLazy: 'Hello World!',
         search2: 'Hello World!',
 
         age: 0,
