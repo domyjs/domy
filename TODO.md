@@ -1,8 +1,9 @@
 # TODO
 
 - d-model tests
+- Watchers not called two times test
 - Handle class with :class (and same for style)
-- handle template
+- Handle template
 
 - Separate reactive and utils in other package
 - script auto build, release ...
