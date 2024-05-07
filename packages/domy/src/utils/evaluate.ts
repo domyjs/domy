@@ -6,8 +6,6 @@ type Props = {
   returnResult?: boolean;
 };
 
-const AsyncFunction = async function () {}.constructor;
-
 /**
  * Allow to execute javascript code contained into a string with a context
  * @param props
