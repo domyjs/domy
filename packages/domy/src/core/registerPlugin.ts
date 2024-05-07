@@ -51,7 +51,7 @@ export const PLUGINS: Plugins = {
   }
 };
 
-const pluginDefintiion: DomyPluginDefinition = {
+const pluginDefinition: DomyPluginDefinition = {
   registerDirective(name, fn) {
     if (name in PLUGINS.directives) {
       throw new Error(`A directive with the name "${name}" already exist.`);
@@ -74,7 +74,7 @@ const pluginDefintiion: DomyPluginDefinition = {
  */
 export function registerPlugin(plugin: DomyPlugin) {
   try {
-    plugin(pluginDefintiion);
+    plugin(pluginDefinition);
   } catch (err: any) {
     error(err);
   }
