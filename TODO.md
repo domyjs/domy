@@ -2,6 +2,7 @@
 
 - d-model tests
 - Watchers not called two times test
+- CSP test
 - Handle class with :class (and same for style)
 - Handle template
 
