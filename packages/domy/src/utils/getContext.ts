@@ -14,7 +14,7 @@ function createFakeData(obj: Record<string, any>) {
 
 /**
  * Return a context with all what domy need to render
- * Like variables, methods, specials ...
+ * Like variables, methods, helpers ...
  * @param el
  * @param state
  * @param scopedNodeData
@@ -68,10 +68,10 @@ export function getContext(
   const fakeDatas = createFakeData(stateDatas);
   const fakeInjectableDatas = scopedNodeData.reduce((a, b) => ({ ...a, ...createFakeData(b) }), {});
 
-  // we init the specials
-  const specials: any = {};
+  // we init the helpers
+  const helpers: any = {};
   for (const [name, fn] of Object.entries(PLUGINS.helpers)) {
-    specials['$' + name] = fn({
+    helpers['$' + name] = fn({
       el,
       state,
       scopedNodeData
@@ -85,7 +85,7 @@ export function getContext(
 
       ...state.methods,
 
-      ...specials
+      ...helpers
     },
     contextProxyHandler
   );
