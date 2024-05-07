@@ -1,6 +1,6 @@
 # TODO
 
-- Finish d-model
+- d-model tests
 - Handle class with :class (and same for style)
 - handle template
 - Cache some content from evaluate ?

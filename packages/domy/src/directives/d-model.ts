@@ -1,5 +1,4 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
-import { set } from '../utils/getAndSet';
 
 type Value = string | number | boolean | string[] | undefined;
 
@@ -12,7 +11,6 @@ type Value = string | number | boolean | string[] | undefined;
  */
 export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-  const objPath = domy.attr.value.replace(/^this\./, '');
 
   // We ensure to render the element/childs first so we can access to their value
   domy.deepRender({
@@ -26,12 +24,14 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
    */
   function changeValue() {
     let value: Value = el.value;
+    const prevValue = domy.evaluateWithoutListening(domy.attr.value);
+    const isPrevValueArray = Array.isArray(prevValue);
 
     if (el.tagName === 'SELECT') {
       // Select handling
-      const selectEl = el as HTMLSelectElement;
-      const isMultiple = selectEl.multiple;
-      const selectedOptions = selectEl.selectedOptions;
+      const select = el as HTMLSelectElement;
+      const isMultiple = select.multiple;
+      const selectedOptions = select.selectedOptions;
 
       if (isMultiple) {
         value = [];
@@ -44,15 +44,31 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     } else if ((el.type === 'number' || domy.modifiers.includes('number')) && value) {
       // Number handling
       value = Number(value);
+      value = isNaN(value) ? 0 : value;
     } else if (el.type === 'radio') {
       // Radio handling
-      if ((el as HTMLInputElement).checked) value = el.value;
+      const radio = el as HTMLInputElement;
+      if (radio.checked) value = el.value;
     } else if (el.type === 'checkbox') {
-      // TODO: Checkbox handling
-      value = (el as HTMLInputElement).checked;
+      // Checkbox handling
+      const checkbox = el as HTMLInputElement;
+      const isChecked = checkbox.checked;
+
+      if (!isPrevValueArray) {
+        value = isChecked;
+      } else {
+        if (isChecked && !prevValue.includes(value)) {
+          value = [...prevValue, value];
+        } else if (!isChecked && prevValue.includes(value)) {
+          value = prevValue.filter(e => e !== value);
+        } else {
+          value = prevValue;
+        }
+      }
     }
 
-    set(domy.state.data.reactiveObj, objPath, value);
+    const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);
+    setter(value);
   }
 
   el.addEventListener('input', changeValue);
@@ -63,27 +79,24 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     const isValueArray = Array.isArray(executedValue);
 
     if (isValueArray && el.tagName === 'SELECT' && (el as HTMLSelectElement).multiple) {
-      // Handle select multiple
+      // Handle multiple select
       const options = el.querySelectorAll('option') as NodeListOf<HTMLOptionElement>;
 
       for (const option of options) {
-        option.selected = false;
-      }
-
-      for (const value of executedValue) {
-        for (const option of options) {
-          if (option.value === value) option.selected = true;
-        }
+        option.selected = executedValue.includes(option.value);
       }
     } else if (isValueArray && el.type === 'checkbox') {
       // Handling multiple checkbox
-      if (executedValue.includes(el.value)) (el as HTMLInputElement).checked = true;
+      const checkbox = el as HTMLInputElement;
+      checkbox.checked = executedValue.includes(checkbox.value);
     } else if (el.type === 'checkbox') {
-      // Handling checkbox btn
-      if (executedValue) (el as HTMLInputElement).checked = true;
+      // Handling checkbox
+      const checkbox = el as HTMLInputElement;
+      checkbox.checked = executedValue;
     } else if (el.type === 'radio') {
-      // Handling radio btn
-      if (el.value === executedValue) (el as HTMLInputElement).checked = true;
+      // Handling radio
+      const radio = el as HTMLInputElement;
+      radio.checked = radio.value === executedValue;
     } else {
       // Handling other kind of element
       el.value = executedValue;
