@@ -8,8 +8,14 @@
   </head>
   <body>
     <h1>Count: {{ count }}</h1>
+    <h2>Count by 2: {{ countby2 }}</h2>
+
     <button id="inc" @click="count++">+</button>
     <button id="dec" @click="count--">-</button>
+
+    <button id="inc2" @click="countby2++">+2</button>
+    <button id="dec2" @click="countby2--">-2</button>
+
     <button id="todo1" @click="todos[1].isComplete = true">Change todo1</button>
     <p id="path">{{ path }}</p>
     <p id="index">{{ index }}</p>
@@ -17,13 +23,19 @@
   <script>
     DOMY.createApp({
       watch: {
+        countby2(prevValue, newValue) {
+          if (newValue < prevValue) {
+            this.countby2--;
+          } else {
+            this.countby2++;
+          }
+        },
         count(prevValue, newValue) {
           if (newValue < 0) this.count = prevValue;
         },
         'todos.{index}'(prevValue, newValue, { path, params }) {
           this.path = path;
           this.index = params.index;
-          console.log(params);
         }
       },
       data: {
@@ -31,6 +43,7 @@
           { name: 'cleanning', isComplete: false },
           { name: 'homework', isComplete: false }
         ],
+        countby2: 0,
         count: 0,
         path: '',
         index: ''
