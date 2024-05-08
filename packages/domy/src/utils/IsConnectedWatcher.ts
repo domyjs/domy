@@ -13,16 +13,16 @@ export class IsConnectedWatcher {
   private elements: Map<Element, { lastIsConnected: boolean; callbacks: Callback[] }> = new Map();
   private static instance: IsConnectedWatcher;
 
-  constructor() {
+  private constructor() {
     this.observer = new MutationObserver(this.handleMutations.bind(this));
     this.observer.observe(document.body, { childList: true, subtree: true });
   }
 
   public static getInstance() {
-    if (!this.instance) {
-      this.instance = new IsConnectedWatcher();
+    if (!IsConnectedWatcher.instance) {
+      IsConnectedWatcher.instance = new IsConnectedWatcher();
     }
-    return this.instance;
+    return IsConnectedWatcher.instance;
   }
 
   private handleMutations(mutations: MutationRecord[]) {
