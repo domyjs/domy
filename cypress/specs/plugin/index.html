@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plugin</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <p id="uppercase" d-uppercase>Hello World!</p>
+    <p id="helper">{{ $sayHello }}</p>
+    <p id="prioritise" d-after d-before="Hello World!"></p>
+  </body>
+  <script>
+    DOMY.plugin(function (domy) {
+      let msg = '';
+
+      domy.directive('before', domy => {
+        msg = domy.attr.value;
+      });
+
+      domy.directive('after', domy => {
+        domy.el.textContent = msg;
+      });
+
+      domy.directive('uppercase', domy => {
+        domy.el.textContent = domy.el.textContent.toUpperCase();
+      });
+
+      domy.helper('sayHello', () => 'Hello World!');
+
+      domy.prioritise(['before', 'after']);
+    });
+
+    DOMY.createApp();
+  </script>
+</html>

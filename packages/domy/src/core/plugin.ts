@@ -52,13 +52,13 @@ export const PLUGINS: Plugins = {
 };
 
 const pluginDefinition: DomyPluginDefinition = {
-  registerDirective(name, fn) {
+  directive(name, fn) {
     if (name in PLUGINS.directives) {
       throw new Error(`A directive with the name "${name}" already exist.`);
     }
     PLUGINS.directives[name] = fn;
   },
-  registerHelper(name, fn) {
+  helper(name, fn) {
     if (name in PLUGINS.helpers) {
       throw new Error(`A special with the name "${name}" already exist.`);
     }
