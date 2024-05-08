@@ -37,21 +37,19 @@ export function deepRender(props: Props) {
 
   while (toRenderList.length > 0) {
     const toRender = toRenderList.shift() as Elem;
-    let domyHelper = new DomyHelper(
-      deepRender,
-      toRender.element,
-      props.state,
-      toRender.scopedNodeData
-    );
+    // const isTemplate = toRender.element instanceof HTMLTemplateElement;
+    const element = toRender.element;
+
+    let domyHelper = new DomyHelper(deepRender, element, props.state, toRender.scopedNodeData);
 
     // Rendering text content
-    if (toRender.element.nodeType === Node.TEXT_NODE) {
+    if (element.nodeType === Node.TEXT_NODE) {
       renderText(domyHelper.getPluginHelper());
       domyHelper.callEffect();
       continue;
     }
 
-    const attributes = Array.from(toRender.element.attributes ?? []);
+    const attributes = Array.from(element.attributes ?? []);
     // We ensure some attributes are rendered first like d-ingore, d-once, ...
     attributes.sort((a, b) => {
       const iA = PLUGINS.sortedDirectives.indexOf(a.name.slice(2));
@@ -68,9 +66,7 @@ export function deepRender(props: Props) {
     // Rendering attributes if it's an element
     let skipChildRendering = false;
     for (const attr of attributes) {
-      domyHelper = new DomyHelper(deepRender, toRender.element, props.state, [
-        ...domyHelper.scopedNodeData
-      ]);
+      domyHelper = new DomyHelper(deepRender, element, props.state, [...domyHelper.scopedNodeData]);
 
       const shouldByPassAttribute =
         toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
@@ -90,7 +86,7 @@ export function deepRender(props: Props) {
 
         domyHelper.callEffect();
 
-        toRender.element.removeAttribute(attr.name);
+        element.removeAttribute(attr.name);
 
         // Handling options return by the attribute
         if (options) {
@@ -103,7 +99,7 @@ export function deepRender(props: Props) {
     // We reverse the child because in the case of d-if, d-else-if, d-else
     // the element need to know if is previousSibling is displayed or not and to access to the d-if or d-else-if content
     if (!skipChildRendering) {
-      const reversedChild = Array.from(toRender.element.childNodes).reverse();
+      const reversedChild = Array.from(element.childNodes).reverse();
       for (const child of reversedChild) {
         toRenderList.push({
           element: child as Element,
