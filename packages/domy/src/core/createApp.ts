@@ -1,7 +1,6 @@
 import { App } from '../types/App';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
-import { isFnAsync } from '../utils/isFnAsync';
 import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { deepRender } from './deepRender';
@@ -27,27 +26,14 @@ export async function createApp(app: App = {}, target?: Element) {
   // Functions
   for (const key in app.methods) {
     const method = toRegularFn(app.methods[key]);
-    const isAsync = isFnAsync(method);
-
-    if (isAsync) {
-      state.methods[key] = async function (...args: any[]) {
-        try {
-          const res = await method.call(getContext(undefined, state), ...args);
-          return res;
-        } catch (err: any) {
-          error(err);
-        }
-      };
-    } else {
-      state.methods[key] = function (...args: any[]) {
-        try {
-          const res = method.call(getContext(undefined, state), ...args);
-          return res;
-        } catch (err: any) {
-          error(err);
-        }
-      };
-    }
+    state.methods[key] = function (...args: any[]) {
+      try {
+        const res = method.call(getContext(undefined, state), ...args);
+        return res;
+      } catch (err: any) {
+        error(err);
+      }
+    };
   }
 
   // Watchers
