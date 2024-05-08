@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'nonce-a23gbfz9e'"
+    />
+    <title>csp</title>
+    <script nonce="a23gbfz9e" src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>Count: {{ count }}</h1>
+
+    <button id="inc" @click="increment">+</button>
+    <button id="dec" @click="decrement">-</button>
+
+    <p>Search: {{ search }}</p>
+    <input type="text" d-model="search" placeholder="Search something..." />
+  </body>
+  <script nonce="a23gbfz9e">
+    DOMY.configure({
+      csp: true
+    });
+
+    DOMY.createApp({
+      watch: {
+        count(prevValue, newValue) {
+          if (newValue < 0) this.count = prevValue;
+        }
+      },
+      data: {
+        count: 0,
+        search: ''
+      },
+      methods: {
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        }
+      }
+    });
+  </script>
+</html>

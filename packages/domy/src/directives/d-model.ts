@@ -73,11 +73,11 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     const isCsp = configuration.getConfig().csp;
 
     if (isCsp) {
-      const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);
-      setter(value);
-    } else {
       const objPath = domy.attr.value;
       set(domy.state.data.reactiveObj, objPath, value);
+    } else {
+      const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);
+      setter(value);
     }
   }
 
