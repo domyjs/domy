@@ -1,9 +1,7 @@
 # TODO
 
-- d-model tests
-- Watchers not called two times test
-- CSP test
 - Handle class with :class (and same for style)
+- Handle prefix
 - Handle template
 
 - Separate reactive and utils in other package
