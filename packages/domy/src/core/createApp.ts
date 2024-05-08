@@ -14,6 +14,12 @@ import { reactive } from './reactive';
  * @author yoannchb-pro
  */
 export async function createApp(app: App = {}, target?: Element) {
+  const domTarget = target ?? document.body;
+
+  document.dispatchEvent(
+    new CustomEvent('domy:ready', { bubbles: true, detail: { app, target: domTarget } })
+  );
+
   // State of the app
   const state: State = {
     data: reactive(app.data ?? {}),
@@ -81,7 +87,7 @@ export async function createApp(app: App = {}, target?: Element) {
   async function mountApp() {
     try {
       deepRender({
-        element: target ?? document.body,
+        element: domTarget,
         state
       });
     } catch (err: any) {
@@ -97,5 +103,9 @@ export async function createApp(app: App = {}, target?: Element) {
         error(err);
       }
     }
+
+    document.dispatchEvent(
+      new CustomEvent('domy:mounted', { bubbles: true, detail: { app, state, target: domTarget } })
+    );
   }
 }

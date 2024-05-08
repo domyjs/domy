@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lifecycle</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <p id="res" d-text="'Hello World!'"></p>
+    <p id="ready"></p>
+    <p id="mounted"></p>
+  </body>
+  <script>
+    const domyEl = document.querySelector('#res');
+    const readyEl = document.querySelector('#ready');
+    const mountedEl = document.querySelector('#mounted');
+
+    document.addEventListener('domy:ready', function () {
+      console.log('ready', domyEl.getAttribute('d-text'));
+      readyEl.textContent = domyEl.getAttribute('d-text');
+    });
+
+    document.addEventListener('domy:mounted', function () {
+      mountedEl.textContent = domyEl.getAttribute('d-text') ?? '';
+    });
+
+    DOMY.createApp();
+  </script>
+</html>

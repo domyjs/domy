@@ -1,6 +1,5 @@
 # TODO
 
-- Add events (domy:ready, domy:mounted)
 - Handle prefix
 - Handle template
 
