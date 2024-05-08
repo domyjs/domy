@@ -2,7 +2,7 @@ import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { DomyHelper } from './DomyHelper';
-import { PLUGINS } from './registerPlugin';
+import { PLUGINS } from './plugin';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
 

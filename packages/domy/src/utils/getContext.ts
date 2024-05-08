@@ -1,4 +1,4 @@
-import { PLUGINS } from '../core/registerPlugin';
+import { PLUGINS } from '../core/plugin';
 import { State } from '../types/State';
 
 /**

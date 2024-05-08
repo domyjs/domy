@@ -2,7 +2,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { isBindAttr, isDomyAttr, isEventAttr } from '../utils/isSpecialAttribute';
 import { binding } from './binding';
 import { events } from './events';
-import { PLUGINS } from './registerPlugin';
+import { PLUGINS } from './plugin';
 
 /**
  * Render a special attribute

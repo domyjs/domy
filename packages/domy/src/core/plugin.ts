@@ -81,9 +81,9 @@ const pluginDefinition: DomyPluginDefinition = {
  *
  * @author yoannchb-pro
  */
-export function registerPlugin(plugin: DomyPlugin) {
+export function plugin(pluginMaker: DomyPlugin) {
   try {
-    plugin(pluginDefinition);
+    pluginMaker(pluginDefinition);
   } catch (err: any) {
     error(err);
   }

@@ -1,4 +1,4 @@
-import { PLUGINS } from '../core/registerPlugin';
+import { PLUGINS } from '../core/plugin';
 
 /**
  * Check if the current attribute is a binding attribute
