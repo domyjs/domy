@@ -5,7 +5,7 @@ beforeEach(() => {
 });
 
 describe('Computed test', () => {
-  it('Check the moethod is called again when a dep change', () => {
+  it('Check the method is called again when a dep change', () => {
     cy.get('h1').should('have.text', 'Count: 0');
     cy.get('p').should('have.text', 'Is odd: false');
 
