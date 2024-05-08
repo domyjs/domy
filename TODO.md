@@ -1,6 +1,5 @@
 # TODO
 
-- Handle class with :class (and same for style)
 - Handle prefix
 - Handle template
 
