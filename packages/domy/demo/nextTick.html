@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$nextTick</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <button
+      @click="() => {
+        msg = 'Hello World!';
+        console.log($el.textContent);
+        $nextTick(() => {
+          console.log($el.textContent);
+        })
+    }"
+    >
+      {{ msg }}
+    </button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        msg: 'Say hi'
+      },
+      methods: {
+        test() {
+          this.msg = 'Hello World!';
+          console.log(this.$refs.btn.textContent);
+          this.$nextTick(() => {
+            console.log(this.$refs.btn.textContent);
+          });
+        }
+      }
+    });
+  </script>
+</html>

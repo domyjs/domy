@@ -1,25 +1,19 @@
 {
   "compilerOptions": {
     "strict": true,
-    "baseUrl": "src",
     "module": "CommonJS",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES6",
+    "target": "ES2018",
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "extension",
+    "outDir": "dist",
     "resolveJsonModule": true,
-    "types": ["node", "chrome"],
+    "types": ["node"],
     "typeRoots": ["node_modules/@types"],
     "strictBindCallApply": true,
-    "paths": {
-      "@typing/*": ["types/*"],
-      "@utils/*": ["utils/*"],
-      "@core/*": ["core/*"],
-      "@constants/*": ["constants/*"]
-    }
+    "declaration": true
   },
-  "include": ["src/**/*"]
+  "include": ["packages/**/*"]
 }

@@ -4,32 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>arrowFn</title>
-    <script src="/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <h1>Count: {{ this.count }}</h1>
-    <button id="inc" @click="this.increment">Increment</button>
-    <button id="dec" @click="this.decrement">Decrement</button>
+    <h1>Count: {{ count }}</h1>
+    <button id="inc" @click="increment">Increment</button>
+    <button id="dec" @click="decrement">Decrement</button>
   </body>
   <script>
     DOMY.createApp({
-      $setup: async () => {
+      setup: async () => {
         await new Promise(r => setTimeout(r, 500));
         this.count++;
       },
-      $mounted: async () => {
+      mounted: async () => {
         await new Promise(r => setTimeout(r, 500));
         this.count++;
       },
-      $watch: {
+      watch: {
         count: () => {
           this.count = Math.max(this.count, 0);
         }
       },
-      $state: {
+      data: {
         count: 0
       },
-      $fn: {
+      methods: {
         increment: () => {
           this.count++;
         },

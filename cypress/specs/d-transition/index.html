@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>d-transition</title>
-    <script src="/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
   </head>
   <style>
     @keyframes enter {
@@ -30,22 +30,23 @@
     }
 
     .transition-enter {
-      animation: enter 0.3s ease-out forwards;
+      animation: enter 0.3s ease-out;
     }
 
     .transition-out {
-      animation: out 0.3s ease-in forwards;
+      animation: out 0.3s ease-in;
     }
   </style>
   <body>
-    <div d-if="this.show" @click.away="this.show = false" d-transition="transition">
-      Modal Content...
+    <div id="if" d-if="show" d-transition="transition">Modal Content... (by d-if)</div>
+    <div id="show" style="display: flex" d-show="show" d-transition="transition">
+      Modal Content... (by d-show)
     </div>
-    <button @click="this.show = true">Show modal</button>
+    <button @click="show = !show">Show modal</button>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         show: false
       }
     });

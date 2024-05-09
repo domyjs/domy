@@ -4,19 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>binding</title>
-    <script src="/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
+    <style>
+      .red {
+        color: red;
+      }
+
+      .bg-blue {
+        background-color: blue;
+      }
+    </style>
   </head>
   <body>
-    <h1 :style="this.style" :id="this.id">Id: {{ this.id }}</h1>
-    <button @click="this.update()">Update id and color</button>
+    <h1 :style="style" :id="id">Id: {{ id }}</h1>
+    <button id="simple" @click="update()">Update id and color</button>
+
+    <p id="class" class="red" :class="classTest">Class test</p>
+    <p id="class2" class="red" :class="classTest2">Class test2</p>
+    <p id="style" style="color: red" d-bind:style="styleTest">Style test</p>
+
+    <button id="class-btn" @click="classTest.shift()">Remove class test bg blue</button>
+    <button id="class2-btn" @click="classTest2['bg-blue'] = false">
+      Remove class test2 bg blue
+    </button>
+    <button id="style-btn" @click="styleTest = {}">Remove style test bg blue</button>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         id: 0,
-        style: { backgroundColor: 'red' }
+        style: { backgroundColor: 'red' },
+
+        classTest: ['bg-blue'],
+        classTest2: { 'bg-blue': true },
+        styleTest: { backgroundColor: 'blue' }
       },
-      $fn: {
+      methods: {
         update() {
           this.id++;
           this.style.backgroundColor = 'green';

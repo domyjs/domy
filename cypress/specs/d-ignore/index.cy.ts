@@ -6,8 +6,7 @@ beforeEach(() => {
 
 describe('Attribute d-ignore test', () => {
   it('Check the element is not rendered by domy', async () => {
-    cy.get('div').should('have.attr', 'd-ignore');
     cy.get('div').should('have.attr', 'd-if');
-    cy.get('p').should('have.text', '{{ this.msg }}');
+    cy.get('p').should('have.text', '{{ msg }}');
   });
 });

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$nextTick</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <button
+      @click="async () => {
+        const p = $el.querySelector('p');
+        msg = 'Hello World!';
+        console.log(p.textContent);
+        await $nextTick();
+        console.log(p.textContent)
+    }"
+    >
+      <p>{{ msg }}</p>
+    </button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        msg: 'Say hi'
+      }
+    });
+  </script>
+</html>

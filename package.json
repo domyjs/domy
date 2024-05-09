@@ -1,9 +1,8 @@
 {
-  "name": "domy",
-  "version": "1.0.0",
-  "description": "A lightweight and minimal javascript framework for your frontend",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "private": true,
+  "workspaces": [
+    "./packages/*"
+  ],
   "scripts": {
     "test": "cypress run --quiet",
     "cypress": "cypress open",
@@ -12,28 +11,8 @@
     "lint": "eslint . --ext .ts",
     "prettier": "prettier --write ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yoannchb-pro/domy.git"
-  },
-  "keywords": [
-    "framework",
-    "javascript",
-    "typescript",
-    "html",
-    "template",
-    "state",
-    "store"
-  ],
-  "author": "yoannchb",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/yoannchb-pro/domy/issues"
-  },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme",
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
-    "@types/chrome": "^0.0.263",
     "@types/cypress": "^1.1.3",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
@@ -43,6 +22,7 @@
     "prettier": "^3.2.5",
     "rollup": "^4.13.0",
     "rollup-plugin-ts": "^3.4.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
   }
 }

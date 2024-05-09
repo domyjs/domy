@@ -4,16 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>d-ignore</title>
-    <script src="/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
     <div d-ignore d-if="count > 0">
-      <p>{{ this.msg }}</p>
+      <p>{{ msg }}</p>
     </div>
   </body>
   <script>
     DOMY.createApp({
-      $state: {
+      data: {
         count: 0,
         msg: 'Hello World!'
       }

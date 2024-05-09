@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$fn</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ count }}</h1>
+    <button id="inc" @click="increment">+</button>
+    <button id="dec" d-on:click="decrement()">-</button>
+    <button id="sinc" @click="superIncrement">+10</button>
+    <button id="sdec" d-on:click="superDecrement()">-10</button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        count: 0
+      },
+      methods: {
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        },
+        superIncrement() {
+          for (let i = 0; i < 10; ++i) {
+            this.increment();
+          }
+        },
+        superDecrement() {
+          for (let i = 0; i < 10; ++i) {
+            this.decrement();
+          }
+        }
+      }
+    });
+  </script>
+</html>

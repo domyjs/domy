@@ -34,7 +34,7 @@ describe('Attribute d-for test', () => {
   });
 
   it('Check the d-ignore is working into d-for', () => {
-    cy.get('span').should('have.text', '{{ this.index }}');
+    cy.get('span').should('have.text', '{{ index }}');
   });
 
   it('Check the other d-for have the good index, is rendered and can trigger event on his self', () => {

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'nonce-a23gbfz9e'"
+    />
+    <title>CSP</title>
+    <script nonce="a23gbfz9e" src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ greeting.msg[0] }}</h1>
+
+    <p id="count">Count: {{ count }}</p>
+    <p id="odd">Is odd: {{ isOdd() }}</p>
+
+    <button id="inc" @click="increment">+</button>
+    <button id="dec" @click="decrement">-</button>
+
+    <p id="search">Search: {{ search }}</p>
+    <input type="text" d-model="search" placeholder="Search something..." />
+  </body>
+  <script nonce="a23gbfz9e">
+    DOMY.configure({
+      CSP: true
+    });
+
+    DOMY.createApp({
+      watch: {
+        count(prevValue, newValue) {
+          if (newValue < 0) this.count = prevValue;
+        }
+      },
+      data: {
+        greeting: {
+          msg: ['Hello World!']
+        },
+        count: 0,
+        search: ''
+      },
+      methods: {
+        isOdd() {
+          return this.count % 2 === 1;
+        },
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        }
+      }
+    });
+  </script>
+</html>

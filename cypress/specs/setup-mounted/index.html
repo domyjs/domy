@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>binding</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>Rendering took: {{ typeof perf === "number" ? Math.round(perf) : perf }}ms</h1>
+  </body>
+  <script>
+    DOMY.createApp({
+      async setup() {
+        this.perf = performance.now();
+      },
+      async mounted() {
+        this.perf = performance.now() - this.perf;
+      },
+      data: {
+        perf: null
+      }
+    });
+  </script>
+</html>

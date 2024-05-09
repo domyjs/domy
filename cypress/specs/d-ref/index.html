@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>d-ref</title>
-    <script src="/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
     <input type="text" d-ref="text" value="Hello World!" />
-    <p>{{ this.$refs.text.value }}</p>
+    <p>{{ $refs.text.value }}</p>
   </body>
   <script>
     DOMY.createApp({});

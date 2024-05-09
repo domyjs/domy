@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Computed</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>Count: {{ count }}</h1>
+    <p>Is odd: {{ isCountOdd() }}</p>
+
+    <button id="inc" @click="count++">+</button>
+    <button id="dec" @click="count--">-</button>
+  </body>
+  <script>
+    DOMY.createApp({
+      watch: {
+        count(prevValue, newValue) {
+          if (newValue < 0) this.count = prevValue;
+        }
+      },
+      data: {
+        count: 0
+      },
+      methods: {
+        isCountOdd() {
+          return this.count % 2 === 1;
+        }
+      }
+    });
+  </script>
+</html>

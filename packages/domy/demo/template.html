@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>template</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <ul>
+      <template d-for="color of colors">
+        <li :key="color">{{ color }}</li>
+      </template>
+    </ul>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        colors: ['red', 'blue', 'green']
+      }
+    });
+  </script>
+</html>
