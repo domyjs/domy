@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <p>Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
+    <p>Count: {{ count }}</p>
+    <button @click="increment()">+</button>
+    <button @click="decrement()">-</button>
+  </body>
+  <script>
+    window.DOMY.createApp({
+      setup() {
+        this.perf = performance.now();
+      },
+      mounted() {
+        this.perf = performance.now() - this.perf;
+      },
+      watch: {
+        count(prevValue, newValue) {
+          if (newValue < 0) this.count = prevValue;
+        }
+      },
+      data: {
+        perf: null,
+        count: 0
+      },
+      methods: {
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        }
+      }
+    });
+  </script>
+</html>

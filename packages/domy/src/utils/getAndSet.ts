@@ -11,7 +11,7 @@ function splitPath(path: string): string[] {
  *
  * @author yoannchb-pro
  */
-export function get<T, R>(object: T, path: string, defaultValue?: R): R | undefined {
+export function get<T, R = any>(object: T, path: string, defaultValue?: R): R | undefined {
   const keys = splitPath(path);
   let result: any = object;
   for (const key of keys) {

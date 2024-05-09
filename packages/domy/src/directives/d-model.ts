@@ -70,7 +70,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
       }
     }
 
-    const isCsp = configuration.getConfig().csp;
+    const isCsp = configuration.getConfig().CSP;
 
     if (isCsp) {
       const objPath = domy.attr.value;
