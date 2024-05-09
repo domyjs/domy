@@ -21,6 +21,18 @@ type Props = {
 };
 
 /**
+ * Remove the domy "d-" prefix of a string
+ * Otherwise it retun an empty string
+ * @param attrName
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+function removeDPrefix(str: string) {
+  return str.startsWith('d-') ? str.slice(2) : '';
+}
+
+/**
  * Deep render an element (with the childs and textContent)
  * @param props
  *
@@ -66,19 +78,29 @@ export function deepRender(props: Props) {
     // Rendering attributes if it's an element
     let skipChildRendering = false;
     for (const attr of attributes) {
-      domyHelper = new DomyHelper(deepRender, element, props.state, [...domyHelper.scopedNodeData]);
-
       const shouldByPassAttribute =
         toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
 
       if (!shouldByPassAttribute && !isNormalAttr(attr.name)) {
-        const [attrName, ...modifiers] = attr.name.split('.');
+        domyHelper = new DomyHelper(deepRender, element, props.state, [
+          ...domyHelper.scopedNodeData
+        ]);
 
-        domyHelper.directive = attrName.slice(2); // We remove the prefix "d-"
-        domyHelper.attrName = attrName;
+        const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
+
+        let prefix = '';
+        let attrName = attrNameWithPrefix;
+        if (attrName.includes(':')) {
+          [prefix, attrName] = attrName.split(':');
+        }
+
+        domyHelper.prefix = removeDPrefix(prefix);
+        domyHelper.directive = removeDPrefix(attrName);
+        domyHelper.modifiers = modifiers;
+
+        domyHelper.attrName = attrName; // The attribute name without the modifiers and prefix (examples: d-for, style ...)
         domyHelper.attr.name = attr.name;
         domyHelper.attr.value = attr.value;
-        domyHelper.modifiers = modifiers;
 
         const options: DomyDirectiveReturn = renderAttribute(
           domyHelper.getPluginHelper(props.renderWithoutListeningToChange)

@@ -24,6 +24,8 @@ export function isEventAttr(attr: string) {
 
 /**
  * Check if the current attribute is a domy attribute
+ * It could be a prefix like d-on:click
+ * Or it could be a simple attribute like d-for
  * @param attr
  * @returns
  *
@@ -34,10 +36,10 @@ export function isDomyAttr(attr: string) {
 
   if (!attrName.startsWith('d-')) return false;
 
-  const currentDirective = attrName.slice(2);
-  for (const directive of Object.keys(PLUGINS.directives)) {
-    if (directive === currentDirective) return true;
-  }
+  const attrNameWithoutDPrefix = attrName.slice(2);
+
+  if (attrNameWithoutDPrefix in PLUGINS.directives || attrNameWithoutDPrefix in PLUGINS.prefixes)
+    return true;
 
   return false;
 }

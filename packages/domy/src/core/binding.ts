@@ -58,10 +58,7 @@ function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass
  * @author yoannchb-pro
  */
 export function binding(domy: DomyDirectiveHelper) {
-  const orignalAttrName = domy.attrName;
-  const attrName = orignalAttrName.startsWith(':')
-    ? orignalAttrName.slice(1)
-    : orignalAttrName.slice('d-bind:'.length);
+  const attrName = domy.attrName;
 
   // We register the default style and default class
   // To handle :class with class as same time (same for style)

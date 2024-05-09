@@ -16,6 +16,15 @@ describe('Plugin helper test', () => {
   });
 });
 
+describe('Plugin prefix test', () => {
+  it('Check the prefix add a click listener', () => {
+    cy.get('#prefix').should('not.have.attr', 'd-click:class');
+    cy.get('#prefix').should('have.class', '');
+    cy.get('#prefix').click();
+    cy.get('#prefix').should('have.class', 'red');
+  });
+});
+
 describe('Plugin prioritise test', () => {
   it('Check d-before is executed before d-after', () => {
     cy.get('#prioritise').should('have.text', 'Hello World!');

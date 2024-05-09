@@ -12,10 +12,7 @@ import on from '../utils/on';
  */
 export function events(domy: DomyDirectiveHelper) {
   const domyAttrName = domy.attrName;
-
-  const eventName = domyAttrName.startsWith('@')
-    ? domyAttrName.slice(1)
-    : domyAttrName.slice('d-on:'.length);
+  const eventName = domyAttrName.startsWith('@') ? domyAttrName.slice(1) : domyAttrName;
 
   if (!domy.state.events[eventName]) domy.state.events[eventName] = [];
   domy.state.events[eventName].push(domy.el);

@@ -17,8 +17,9 @@ export class DomyHelper {
   private cleanupFn: (() => Promise<void> | void) | null = null;
   private effectFn: (() => Promise<void> | void) | null = null;
 
+  public prefix: string = '';
   public directive: string = '';
-  public attrName: string = ''; // The attribute name without the modifiers
+  public attrName: string = ''; // The attribute name without the modifiers and prefix
   public attr: { name: string; value: string } = { name: '', value: '' };
   public modifiers: string[] = [];
 
@@ -40,10 +41,14 @@ export class DomyHelper {
       el: this.el,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
+
+      prefix: this.prefix,
       directive: this.directive,
-      attrName: this.attrName,
       modifiers: this.modifiers,
+
+      attrName: this.attrName,
       attr: this.attr,
+
       queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),

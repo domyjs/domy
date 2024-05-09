@@ -21,7 +21,7 @@
 
     <p id="class" class="red" :class="classTest">Class test</p>
     <p id="class2" class="red" :class="classTest2">Class test2</p>
-    <p id="style" style="color: red" :style="styleTest">Style test</p>
+    <p id="style" style="color: red" d-bind:style="styleTest">Style test</p>
 
     <button id="class-btn" @click="classTest.shift()">Remove class test bg blue</button>
     <button id="class2-btn" @click="classTest2['bg-blue'] = false">

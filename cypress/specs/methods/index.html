@@ -9,9 +9,9 @@
   <body>
     <h1>{{ count }}</h1>
     <button id="inc" @click="increment">+</button>
-    <button id="dec" @click="decrement()">-</button>
+    <button id="dec" d-on:click="decrement()">-</button>
     <button id="sinc" @click="superIncrement">+10</button>
-    <button id="sdec" @click="superDecrement()">-10</button>
+    <button id="sdec" d-on:click="superDecrement()">-10</button>
   </body>
   <script>
     DOMY.createApp({

@@ -18,15 +18,22 @@ import { $root } from '../helpers/$root';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 import { error, warn } from '../utils/logs';
 import { dElseImplementation } from '../directives/d-else';
+import { binding } from './binding';
+import { events } from './events';
 
 type Plugins = {
   sortedDirectives: string[];
+  prefixes: Record<string, DomyDirectiveFn>;
   directives: Record<string, DomyDirectiveFn>;
   helpers: Record<string, DomySpecialFn>;
 };
 
 export const PLUGINS: Plugins = {
   sortedDirectives: ['ignore', 'once', 'cloak', 'transition', 'ref', 'if', 'else-if', 'else'],
+  prefixes: {
+    bind: binding,
+    on: events
+  },
   directives: {
     if: dIfImplementation,
     'else-if': dElseIfImplementation,
@@ -52,6 +59,12 @@ export const PLUGINS: Plugins = {
 };
 
 const pluginDefinition: DomyPluginDefinition = {
+  prefix(name, fn) {
+    if (name in PLUGINS.prefixes) {
+      throw new Error(`A prefix with the name "${name}" already exist.`);
+    }
+    PLUGINS.prefixes[name] = fn;
+  },
   directive(name, fn) {
     if (name in PLUGINS.directives) {
       throw new Error(`A directive with the name "${name}" already exist.`);

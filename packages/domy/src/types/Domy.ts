@@ -4,6 +4,9 @@ import { reactive } from '../core/reactive';
 import { getContext } from '../utils/getContext';
 import { queueJob } from '../core/scheduler';
 
+export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
+export type DomySpecialFn = (domy: DomySpecialHelper) => any;
+
 export type DomyDirectiveReturn = {
   skipChildsRendering?: boolean;
   skipOtherAttributesRendering?: boolean;
@@ -19,9 +22,10 @@ export type DomyDirectiveHelper = {
   el: Element;
   state: State;
   scopedNodeData: Record<string, any>[];
+  prefix: string;
   directive: string;
-  attrName: string;
   modifiers: string[];
+  attrName: string; // The attribute name without the modifiers and prefix
   attr: { name: string; value: string };
   queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;
@@ -35,10 +39,8 @@ export type DomyDirectiveHelper = {
   getContext: typeof getContext;
 };
 
-export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
-export type DomySpecialFn = (domy: DomySpecialHelper) => any;
-
 export type DomyPluginDefinition = {
+  prefix(name: string, fn: DomyDirectiveFn): void;
   directive(name: string, fn: DomyDirectiveFn): void;
   helper(name: string, fn: DomySpecialFn): void;
   prioritise(directives: string[]): void;
