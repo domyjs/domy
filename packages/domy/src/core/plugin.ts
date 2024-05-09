@@ -80,7 +80,7 @@ const pluginDefinition: DomyPluginDefinition = {
   prioritise(directives) {
     for (const directive of directives) {
       if (PLUGINS.sortedDirectives.includes(directive)) {
-        warn(`The directive "${directive}" is already prioritise.`);
+        warn(`The directive "${directive}" is already prioritised.`);
         continue;
       }
       PLUGINS.sortedDirectives.push(directive);
