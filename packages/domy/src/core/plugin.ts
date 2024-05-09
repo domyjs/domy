@@ -79,10 +79,22 @@ const pluginDefinition: DomyPluginDefinition = {
   },
   prioritise(directives) {
     for (const directive of directives) {
+      // Check the directive exist
+      if (!(directive in PLUGINS.directives)) {
+        error(
+          new Error(
+            `The directive "${directive}" can't be prioritise because it doesn't exist. Ensure to register it with domy.directive() first.`
+          )
+        );
+        continue;
+      }
+
+      // Check the directive is not already prioritised
       if (PLUGINS.sortedDirectives.includes(directive)) {
         warn(`The directive "${directive}" is already prioritised.`);
         continue;
       }
+
       PLUGINS.sortedDirectives.push(directive);
     }
   }
