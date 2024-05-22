@@ -32,9 +32,7 @@ export function events(domy: DomyDirectiveHelper) {
 
     // ensure nextTick is called after changing variable state
     if (typeof executedValue === 'function') {
-      domy.queueJob(() =>
-        executedValue.call(domy.getContext(domy.el, domy.state, domy.scopedNodeData), event)
-      );
+      domy.queueJob(() => executedValue(event));
     }
 
     domy.removeScopeToNode($event);

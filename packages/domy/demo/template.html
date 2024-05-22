@@ -12,6 +12,9 @@
         <li :key="color">{{ color }}</li>
       </template>
     </ul>
+    <template>
+      <p>{{ colors.join(',') }}</p>
+    </template>
   </body>
   <script>
     DOMY.createApp({

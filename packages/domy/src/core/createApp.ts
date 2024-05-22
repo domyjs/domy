@@ -29,17 +29,10 @@ export async function createApp(app: App = {}, target?: Element) {
     transitions: new Map()
   };
 
-  // Functions
+  // Methods
   for (const key in app.methods) {
     const method = toRegularFn(app.methods[key]);
-    state.methods[key] = function (...args: any[]) {
-      try {
-        const res = method.call(getContext(undefined, state), ...args);
-        return res;
-      } catch (err: any) {
-        error(err);
-      }
-    };
+    state.methods[key] = method.bind(getContext(undefined, state));
   }
 
   // Watchers
