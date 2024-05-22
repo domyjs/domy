@@ -1,7 +1,7 @@
 {
-  "name": "@domyjs/anchor",
+  "name": "@domyjs/debounce",
   "version": "1.0.0",
-  "description": "Domyjs anchor plugin",
+  "description": "Domyjs debounce plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [

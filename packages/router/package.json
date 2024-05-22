@@ -1,9 +1,14 @@
 {
-  "name": "@domy/router",
+  "name": "@domyjs/router",
   "version": "1.0.0",
   "description": "Domyjs router plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "/dist",
+    "package.json",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yoannchb-pro/domy.git"

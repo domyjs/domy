@@ -1,9 +1,14 @@
 {
-  "name": "@domy/intersect",
+  "name": "@domyjs/intersect",
   "version": "1.0.0",
   "description": "Domyjs intersect plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "/dist",
+    "package.json",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yoannchb-pro/domy.git"
