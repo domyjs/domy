@@ -1,4 +1,5 @@
 import { App } from '../types/App';
+import { DomyEvents, DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
@@ -17,7 +18,10 @@ export async function createApp(app: App = {}, target?: Element) {
   const domTarget = target ?? document.body;
 
   document.dispatchEvent(
-    new CustomEvent('domy:ready', { bubbles: true, detail: { app, target: domTarget } })
+    new CustomEvent(DomyEvents.Ready, {
+      bubbles: true,
+      detail: { app, target: domTarget } as DomyReadyEventDetails
+    })
   );
 
   // State of the app
@@ -71,6 +75,7 @@ export async function createApp(app: App = {}, target?: Element) {
       await setupFn.call(getContext(undefined, state));
     } catch (err: any) {
       error(err);
+      return;
     }
   }
 
@@ -100,7 +105,10 @@ export async function createApp(app: App = {}, target?: Element) {
     }
 
     document.dispatchEvent(
-      new CustomEvent('domy:mounted', { bubbles: true, detail: { app, state, target: domTarget } })
+      new CustomEvent(DomyEvents.Mounted, {
+        bubbles: true,
+        detail: { app, state, target: domTarget } as DomyMountedEventDetails
+      })
     );
   }
 }
