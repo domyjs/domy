@@ -32,7 +32,9 @@ export async function createApp(app: App = {}, target?: Element) {
   // Methods
   for (const key in app.methods) {
     const method = toRegularFn(app.methods[key]);
-    state.methods[key] = method.bind(getContext(undefined, state));
+    state.methods[key] = function (...args: any[]) {
+      return method.call(getContext(undefined, state), ...args);
+    };
   }
 
   // Watchers
