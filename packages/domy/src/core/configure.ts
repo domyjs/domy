@@ -1,6 +1,7 @@
 import { configuration } from '../config';
 import { Config } from '../types/Config';
 import { get } from '../utils/getAndSet';
+import { error } from '../utils/logs';
 import { DomyHelper } from './DomyHelper';
 
 /**
@@ -30,9 +31,13 @@ function handleCSP() {
  * @author yoannchb-pro
  */
 export function configure(config: Config) {
-  if (config.CSP) {
-    handleCSP();
-  }
+  try {
+    configuration.setConfig(config);
 
-  configuration.setConfig(config);
+    if (config.CSP) {
+      handleCSP();
+    }
+  } catch (err: any) {
+    error(err);
+  }
 }
