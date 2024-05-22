@@ -25,7 +25,7 @@ export type DomyDirectiveHelper = {
   prefix: string;
   directive: string;
   modifiers: string[];
-  attrName: string; // The attribute name without the modifiers and prefix
+  attrName: string;
   attr: { name: string; value: string };
   queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;
