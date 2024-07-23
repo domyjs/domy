@@ -38,8 +38,9 @@ export function isDomyAttr(attr: string) {
 
   const attrNameWithoutDPrefix = attrName.slice(2);
 
-  if (attrNameWithoutDPrefix in PLUGINS.directives || attrNameWithoutDPrefix in PLUGINS.prefixes)
+  if (attrNameWithoutDPrefix in PLUGINS.directives || attrNameWithoutDPrefix in PLUGINS.prefixes) {
     return true;
+  }
 
   return false;
 }

@@ -1,5 +1,6 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandler';
+import { getPreviousConditionsElements } from '../utils/getPreviousConditionsElements';
 import { IsConnectedWatcher } from '../utils/IsConnectedWatcher';
 
 /**
@@ -12,29 +13,12 @@ import { IsConnectedWatcher } from '../utils/IsConnectedWatcher';
  * @author yoannchb-pro
  */
 export function dElseIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const previousConditionElement = domy.el.previousElementSibling;
+  const el = domy.el as HTMLElement;
 
-  if (
-    !previousConditionElement ||
-    (!previousConditionElement.getAttribute('d-if') &&
-      !previousConditionElement.getAttribute('d-else-if'))
-  ) {
+  const allPreviousConditions = getPreviousConditionsElements(el, ['d-if', 'd-else-if']);
+
+  if (allPreviousConditions.length === 0) {
     throw new Error(`"${domy.attrName}" should be preceded by "d-if" or "d-else-if" element.`);
-  }
-
-  // We get all the previous elements which are part of the full conditiion
-  const allPreviousConditions: Element[] = [previousConditionElement];
-  while (true) {
-    const currentPreviousSibling =
-      allPreviousConditions[allPreviousConditions.length - 1].previousElementSibling;
-    if (
-      !currentPreviousSibling ||
-      (!currentPreviousSibling.getAttribute('d-if') &&
-        !currentPreviousSibling.getAttribute('d-else-if'))
-    ) {
-      break;
-    }
-    allPreviousConditions.push(currentPreviousSibling as Element);
   }
 
   const visibilityHandler = getElementVisibilityHandler({

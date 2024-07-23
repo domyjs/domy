@@ -1,4 +1,5 @@
 import { PLUGINS } from '../core/plugin';
+import { DomySpecialHelper } from '../types/Domy';
 import { State } from '../types/State';
 
 /**
@@ -66,10 +67,10 @@ export function getContext(
 
   // We create fake key with a null value because otherwise we have a reference error in the with(){ }
   const fakeDatas = createFakeData(stateDatas);
-  const fakeInjectableDatas = scopedNodeData.reduce((a, b) => ({ ...a, ...createFakeData(b) }), {});
+  const fakeScopedDatas = scopedNodeData.reduce((a, b) => ({ ...a, ...createFakeData(b) }), {});
 
   // we init the helpers
-  const helpers: any = {};
+  const helpers: Record<string, (domy: DomySpecialHelper) => any> = {};
   for (const [name, fn] of Object.entries(PLUGINS.helpers)) {
     helpers['$' + name] = fn({
       el,
@@ -81,7 +82,7 @@ export function getContext(
   const context = new Proxy(
     {
       ...fakeDatas,
-      ...fakeInjectableDatas,
+      ...fakeScopedDatas,
 
       ...state.methods,
 

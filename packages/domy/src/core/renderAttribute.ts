@@ -12,7 +12,7 @@ import { PLUGINS } from './plugin';
  * @author yoannchb-pro
  */
 export function renderAttribute(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  // Handle prefix attribute like d-on:click
+  // Handle prefix attribute (example: d-on:click)
   if (domy.prefix.length > 0) {
     for (const [prefix, implementation] of Object.entries(PLUGINS.prefixes)) {
       if (domy.prefix === prefix) return implementation(domy);

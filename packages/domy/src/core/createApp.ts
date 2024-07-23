@@ -25,7 +25,7 @@ const DOMY_EVENTS = {
 export async function createApp(app: App = {}) {
   const domTarget = app.target ?? document.body;
 
-  // Ready event
+  // Initialisation event dispatch
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Initialisation, {
       bubbles: true,
@@ -88,7 +88,7 @@ export async function createApp(app: App = {}) {
     }
   }
 
-  // Setuped event
+  // Setuped event dispatch
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Setuped, {
       bubbles: true,
@@ -121,7 +121,7 @@ export async function createApp(app: App = {}) {
       }
     }
 
-    // Mounted event
+    // Mounted event dispatch
     document.dispatchEvent(
       new CustomEvent(DOMY_EVENTS.App.Mounted, {
         bubbles: true,

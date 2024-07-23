@@ -91,7 +91,9 @@ const pluginDefinition: DomyPluginDefinition = {
 
       // Check the directive is not already prioritised
       if (PLUGINS.sortedDirectives.includes(directive)) {
-        warn(`The directive "${directive}" is already prioritised.`);
+        warn(
+          `The directive "${directive}" is already prioritised. The prioritisation has been skipped.`
+        );
         continue;
       }
 

@@ -23,19 +23,20 @@ export function events(domy: DomyDirectiveHelper) {
       return;
     }
 
-    const $event = {
+    const scope = {
       $event: event
     };
-    domy.addScopeToNode($event);
+
+    domy.addScopeToNode(scope);
 
     const executedValue = domy.evaluateWithoutListening(domy.attr.value);
 
-    // ensure nextTick is called after changing variable state
+    // Ensure nextTick is called after changing variable state
     if (typeof executedValue === 'function') {
       domy.queueJob(() => executedValue(event));
     }
 
-    domy.removeScopeToNode($event);
+    domy.removeScopeToNode(scope);
   };
 
   on({

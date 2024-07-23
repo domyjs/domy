@@ -29,7 +29,7 @@ export class DomyHelper {
   private static evaluator = evaluate;
 
   constructor(
-    private deepRenderFn: typeof deepRender, // It allow us to avoir circular dependencie (deepRender -> DomyHelper -> deepRender)
+    private deepRenderFn: typeof deepRender, // It allow us to avoid circular dependencie (deepRender -> DomyHelper -> deepRender)
     public el: Element,
     public state: State,
     public scopedNodeData: Record<string, any>[] = []

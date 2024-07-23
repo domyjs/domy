@@ -2,6 +2,98 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { warn } from '../utils/logs';
 import { moveElement } from '../utils/moveElement';
 
+type RendererProps = {
+  value: any;
+  valueIndex: number;
+  initialChilds: Element[];
+  domy: DomyDirectiveHelper;
+  forPattern: RegExpExecArray;
+};
+
+/**
+ * Render the childs in d-for element for a specific value and index
+ * @param props
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+function renderer(props: RendererProps) {
+  const domy = props.domy;
+  const el = domy.el;
+  const currentChildrens = Array.from(el.children);
+  const renderedChildrens: (Element | ChildNode | Node)[] = [];
+
+  // Add the current value to the scope
+  let scope = {
+    [props.forPattern!.groups!.dest]: props.value
+  };
+  // Add the current value index to the scope if needed
+  if (props.forPattern!.groups?.index) {
+    scope = {
+      ...scope,
+      [props.forPattern!.groups.index]: props.valueIndex
+    };
+  }
+  domy.addScopeToNode(scope);
+
+  for (let childIndex = 0; childIndex < props.initialChilds.length; ++childIndex) {
+    const initialChild = props.initialChilds[childIndex] as Element;
+    const currentIndex = props.valueIndex * props.initialChilds.length + childIndex;
+
+    const keyAttr = initialChild.getAttribute(':key');
+    if (keyAttr) {
+      // Check if the key already exist so we can skip render
+      const keyValue = domy.evaluateWithoutListening(keyAttr);
+      const elementWithKeyIndex = currentChildrens.findIndex(
+        el => el.getAttribute('key') === keyValue.toString()
+      );
+
+      if (elementWithKeyIndex !== -1) {
+        const elementWithKey = currentChildrens[elementWithKeyIndex];
+        if (elementWithKeyIndex !== currentIndex) {
+          // If the index of the element changed we move it to the new position
+          moveElement(el, elementWithKey, currentIndex);
+        }
+
+        renderedChildrens.push(elementWithKey);
+        continue;
+      }
+    }
+
+    // Create and render the new element
+    const newChild = initialChild.cloneNode(true);
+    domy.deepRender({
+      element: newChild as Element,
+      state: domy.state,
+      scopedNodeData: domy.scopedNodeData
+    });
+
+    const oldRender: ChildNode | undefined = el.childNodes[currentIndex];
+
+    // If an element doesn't exist at this index it mean we append a new child
+    if (!oldRender) {
+      el.appendChild(newChild);
+      renderedChildrens.push(newChild);
+      continue;
+    }
+
+    // If an element exist at this index we compare them
+    // If there are different we append the new child just before the old one
+    // Otherwise we don't do anything
+    const isEqual = oldRender.isEqualNode(newChild);
+    if (!isEqual) {
+      el.insertBefore(newChild, oldRender);
+      renderedChildrens.push(newChild);
+    } else {
+      renderedChildrens.push(oldRender);
+    }
+  }
+
+  domy.removeScopeToNode(scope);
+
+  return renderedChildrens;
+}
+
 /**
  * d-for implementation
  * Allow to render a list of element
@@ -26,101 +118,39 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   el.innerHTML = '';
 
   domy.effect(() => {
-    const currentChildrens = Array.from(el.children);
-
     const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)/gi;
-    const res = forRegex.exec(domy.attr.value);
+    const forPattern = forRegex.exec(domy.attr.value);
 
-    if (!res)
+    if (!forPattern)
       throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
 
-    const isForIn = res.groups!.type === 'in';
-    const executedValue = domy.evaluate(res.groups!.org);
+    const isForIn = forPattern.groups!.type === 'in';
+    const executedValue = domy.evaluate(forPattern.groups!.org);
 
     const renderedChildrens: (Element | ChildNode | Node)[] = [];
 
-    function renderer(value: any, valueIndex: number) {
-      for (let childIndex = 0; childIndex < initialChilds.length; ++childIndex) {
-        const initialChild = initialChilds[childIndex] as Element;
-        const currentIndex = valueIndex * initialChilds.length + childIndex;
-
-        // Inject the new datas like index
-        const scopes: Record<string, any>[] = [
-          {
-            [res!.groups!.dest]: value
-          }
-        ];
-
-        if (res!.groups?.index) {
-          scopes.push({
-            [res!.groups.index]: valueIndex
-          });
-        }
-
-        for (const scope of scopes) {
-          domy.addScopeToNode(scope);
-        }
-
-        const keyAttr = initialChild.getAttribute(':key');
-        if (keyAttr) {
-          // Check if the key already exist so we can skip render
-          const keyValue = domy.evaluateWithoutListening(keyAttr);
-          const elementWithKeyIndex = currentChildrens.findIndex(
-            el => el.getAttribute('key') === keyValue.toString()
-          );
-
-          if (elementWithKeyIndex !== -1) {
-            const elementWithKey = currentChildrens[elementWithKeyIndex];
-            if (elementWithKeyIndex !== currentIndex) {
-              // If the index of the element changed we move it to the new position
-              moveElement(el, elementWithKey, currentIndex);
-            }
-            renderedChildrens.push(elementWithKey);
-            continue;
-          }
-        }
-
-        // Create and render the new element
-        const newChild = initialChild.cloneNode(true);
-        domy.deepRender({
-          element: newChild as Element,
-          state: domy.state,
-          scopedNodeData: domy.scopedNodeData
-        });
-
-        for (const scope of scopes) {
-          domy.removeScopeToNode(scope);
-        }
-
-        const oldRender: ChildNode | undefined = el.childNodes[currentIndex];
-
-        // We compare if we need to replace the old rendering or not
-        if (!oldRender) {
-          el.appendChild(newChild);
-          renderedChildrens.push(newChild);
-          continue;
-        }
-
-        const isEqual = oldRender.isEqualNode(newChild);
-        if (!isEqual) {
-          el.insertBefore(newChild, oldRender);
-          renderedChildrens.push(newChild);
-        } else {
-          renderedChildrens.push(oldRender);
-        }
-      }
-    }
-
     let valueIndex = 0;
+    const renderChilds = (value: any) => {
+      const renderedChildForCurrentValue = renderer({
+        domy,
+        forPattern,
+        initialChilds,
+        value,
+        valueIndex
+      });
+      renderedChildrens.push(...renderedChildForCurrentValue);
+      ++valueIndex;
+    };
+
     if (isForIn) {
+      // Handle "for in"
       for (const value in executedValue) {
-        renderer(value, valueIndex);
-        ++valueIndex;
+        renderChilds(value);
       }
     } else {
+      // Handle "for of"
       for (const value of executedValue) {
-        renderer(value, valueIndex);
-        ++valueIndex;
+        renderChilds(value);
       }
     }
 

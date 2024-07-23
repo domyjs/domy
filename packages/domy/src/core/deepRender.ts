@@ -54,7 +54,7 @@ export function deepRender(props: Props) {
 
     let domyHelper = new DomyHelper(deepRender, element, props.state, toRender.scopedNodeData);
 
-    // Rendering text content
+    // Rendering textContent
     if (element.nodeType === Node.TEXT_NODE) {
       renderText(domyHelper.getPluginHelper());
       domyHelper.callEffect();
@@ -62,10 +62,10 @@ export function deepRender(props: Props) {
     }
 
     const attributes = Array.from(element.attributes ?? []);
-    // We ensure some attributes are rendered first like d-ingore, d-once, ...
+    // We ensure some attributes are rendered first like d-ignore, d-once, ...
     attributes.sort((a, b) => {
-      const iA = PLUGINS.sortedDirectives.indexOf(a.name.slice(2));
-      const iB = PLUGINS.sortedDirectives.indexOf(b.name.slice(2));
+      const iA = PLUGINS.sortedDirectives.indexOf(removeDPrefix(a.name));
+      const iB = PLUGINS.sortedDirectives.indexOf(removeDPrefix(b.name));
       if (iA === -1) {
         return 1;
       } else if (iB === -1) {
@@ -81,43 +81,45 @@ export function deepRender(props: Props) {
       const shouldByPassAttribute =
         toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
 
-      if (!shouldByPassAttribute && !isNormalAttr(attr.name)) {
-        domyHelper = new DomyHelper(deepRender, element, props.state, [
-          ...domyHelper.scopedNodeData
-        ]);
+      if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
 
-        const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
+      // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData
+      domyHelper = new DomyHelper(deepRender, element, props.state, [...domyHelper.scopedNodeData]);
 
-        let prefix = '';
-        let attrName = attrNameWithPrefix;
-        if (attrName.includes(':')) {
-          [prefix, attrName] = attrName.split(':');
-        }
+      // We get the prefix, modifiers and attribute name
+      const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
+      let prefix = '';
+      let attrName = attrNameWithPrefix;
+      if (attrName.includes(':')) {
+        [prefix, attrName] = attrName.split(':');
+      }
 
-        domyHelper.prefix = removeDPrefix(prefix);
-        domyHelper.directive = removeDPrefix(attrName);
-        domyHelper.modifiers = modifiers;
+      domyHelper.prefix = removeDPrefix(prefix);
+      domyHelper.directive = removeDPrefix(attrName);
+      domyHelper.modifiers = modifiers;
 
-        domyHelper.attrName = attrName; // The attribute name without the modifiers and prefix (examples: d-for, style ...)
-        domyHelper.attr.name = attr.name;
-        domyHelper.attr.value = attr.value;
+      domyHelper.attrName = attrName; // The attribute name without the modifiers and prefix (examples: d-for, style ...)
+      domyHelper.attr.name = attr.name;
+      domyHelper.attr.value = attr.value;
 
-        const options: DomyDirectiveReturn = renderAttribute(
-          domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
-        );
+      // We render the attribute
+      // It's the main logic of DOMY
+      const options: DomyDirectiveReturn = renderAttribute(
+        domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
+      );
 
-        domyHelper.callEffect();
+      domyHelper.callEffect();
 
-        element.removeAttribute(attr.name);
+      element.removeAttribute(attr.name);
 
-        // Handling options return by the attribute
-        if (options) {
-          if (options.skipChildsRendering) skipChildRendering = true;
-          if (options.skipOtherAttributesRendering) break;
-        }
+      // Handling options returned by the attribute
+      if (options) {
+        if (options.skipChildsRendering) skipChildRendering = true;
+        if (options.skipOtherAttributesRendering) break;
       }
     }
 
+    // We add the child of the element to the list to render them next
     // We reverse the child because in the case of d-if, d-else-if, d-else
     // the element need to know if is previousSibling is displayed or not and to access to the d-if or d-else-if content
     if (!skipChildRendering) {

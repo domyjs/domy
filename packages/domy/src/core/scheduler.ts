@@ -5,6 +5,11 @@ type QueueElement = () => void | Promise<void>;
 let queued = false;
 const queue: QueueElement[] = [];
 
+/**
+ * Flush the queue
+ *
+ * @author yoannchb-pro
+ */
 function flushJobs() {
   queued = true;
 
