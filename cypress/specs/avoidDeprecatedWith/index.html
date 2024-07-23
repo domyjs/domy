@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Avoid Deprecated With</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <p id="count">Count: {{ this.count }}</p>
+    <p id="odd">Is odd: {{ this.count % 2 === 1 }}</p>
+
+    <button id="inc" @click="this.increment">+</button>
+    <button id="dec" @click="this.decrement()">-</button>
+
+    <p id="search">Search: {{ this.search }}</p>
+    <input type="text" d-model="this.search" placeholder="Search something..." />
+  </body>
+  <script>
+    DOMY.configure({
+      avoidDeprecatedWith: true
+    });
+
+    DOMY.createApp({
+      watch: {
+        count(prevValue, newValue) {
+          if (newValue < 0) this.count = prevValue;
+        }
+      },
+      data: {
+        count: 0,
+        search: ''
+      },
+      methods: {
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        }
+      }
+    });
+  </script>
+</html>
