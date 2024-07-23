@@ -1,4 +1,3 @@
-import { configuration } from '../config';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { set } from '../utils/getAndSet';
 
@@ -70,7 +69,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
       }
     }
 
-    const config = configuration.getConfig();
+    const config = domy.getConfig();
     const isCsp = config.CSP;
     const avoidDeprecatedWith = config.avoidDeprecatedWith;
 

@@ -3,6 +3,7 @@ import { State } from './State';
 import { reactive } from '../core/reactive';
 import { getContext } from '../utils/getContext';
 import { queueJob } from '../core/scheduler';
+import { Config } from './Config';
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -20,6 +21,7 @@ export type DomySpecialHelper = {
 
 export type DomyDirectiveHelper = {
   el: Element;
+  getConfig: () => Config;
   state: State;
   scopedNodeData: Record<string, any>[];
   prefix: string;

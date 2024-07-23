@@ -50,6 +50,7 @@ export class DomyHelper {
       attrName: this.attrName,
       attr: this.attr,
 
+      getConfig: configuration.getConfig,
       queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
