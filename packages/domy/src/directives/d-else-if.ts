@@ -37,11 +37,17 @@ export function dElseIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     allPreviousConditions.push(currentPreviousSibling as Element);
   }
 
-  const visibilityHandler = getElementVisibilityHandler(() => {
-    const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(el => el.isConnected);
-    const shouldBeDisplay = allPreviousConditionsAreDisconnected && domy.evaluate(domy.attr.value);
-    return shouldBeDisplay;
-  }, domy);
+  const visibilityHandler = getElementVisibilityHandler({
+    shouldBeDisplay: () => {
+      const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(
+        el => el.isConnected
+      );
+      const shouldBeDisplay =
+        allPreviousConditionsAreDisconnected && domy.evaluate(domy.attr.value);
+      return shouldBeDisplay;
+    },
+    domy
+  });
 
   IsConnectedWatcher.getInstance().watch(allPreviousConditions, visibilityHandler);
 

@@ -37,11 +37,16 @@ export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     allPreviousConditions.push(currentPreviousSibling as Element);
   }
 
-  const visiblityHandler = getElementVisibilityHandler(() => {
-    const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(el => el.isConnected);
-    const shouldBeDisplay = allPreviousConditionsAreDisconnected;
-    return shouldBeDisplay;
-  }, domy);
+  const visiblityHandler = getElementVisibilityHandler({
+    shouldBeDisplay: () => {
+      const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(
+        el => el.isConnected
+      );
+      const shouldBeDisplay = allPreviousConditionsAreDisconnected;
+      return shouldBeDisplay;
+    },
+    domy
+  });
 
   IsConnectedWatcher.getInstance().watch(allPreviousConditions, visiblityHandler);
 

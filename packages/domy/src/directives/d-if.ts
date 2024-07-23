@@ -11,7 +11,10 @@ import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandle
  * @author yoannchb-pro
  */
 export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const visibilityHandler = getElementVisibilityHandler(() => domy.evaluate(domy.attr.value), domy);
+  const visibilityHandler = getElementVisibilityHandler({
+    shouldBeDisplay: () => domy.evaluate(domy.attr.value),
+    domy
+  });
 
   domy.effect(visibilityHandler);
 
