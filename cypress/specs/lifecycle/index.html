@@ -8,23 +8,35 @@
   </head>
   <body>
     <p id="res" d-text="'Hello World!'"></p>
-    <p id="ready"></p>
+
+    <p id="initialisation"></p>
+    <p id="setuped"></p>
     <p id="mounted"></p>
   </body>
   <script>
     const domyEl = document.querySelector('#res');
-    const readyEl = document.querySelector('#ready');
+    const initialisationEl = document.querySelector('#initialisation');
+    const setupedEl = document.querySelector('#setuped');
     const mountedEl = document.querySelector('#mounted');
 
-    document.addEventListener('domy:ready', function () {
-      console.log('ready', domyEl.getAttribute('d-text'));
-      readyEl.textContent = domyEl.getAttribute('d-text');
+    document.addEventListener('domy:app:initialisation', function () {
+      console.log('initialisation', domyEl.getAttribute('d-text'));
+      initialisationEl.textContent = domyEl.getAttribute('d-text');
     });
 
-    document.addEventListener('domy:mounted', function () {
+    document.addEventListener('domy:app:setuped', function () {
+      console.log('setuped', domyEl.getAttribute('d-text'));
+      setupedEl.textContent = domyEl.getAttribute('d-text');
+    });
+
+    document.addEventListener('domy:app:mounted', function () {
       mountedEl.textContent = domyEl.getAttribute('d-text') ?? '';
     });
 
-    DOMY.createApp();
+    DOMY.createApp({
+      setup() {
+        res.setAttribute('d-text', "'Bye World!'");
+      }
+    });
   </script>
 </html>

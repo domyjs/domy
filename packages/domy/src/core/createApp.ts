@@ -1,11 +1,19 @@
 import { App } from '../types/App';
-import { DomyEvents, DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
+import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { deepRender } from './deepRender';
 import { reactive } from './reactive';
+
+const DOMY_EVENTS = {
+  App: {
+    Initialisation: 'domy:app:initialisation',
+    Setuped: 'domy:app:setuped',
+    Mounted: 'domy:app:mounted'
+  }
+};
 
 /**
  * Initialise domy state on a target (by default the body)
@@ -17,8 +25,9 @@ import { reactive } from './reactive';
 export async function createApp(app: App = {}, target?: Element) {
   const domTarget = target ?? document.body;
 
+  // Ready event
   document.dispatchEvent(
-    new CustomEvent(DomyEvents.Ready, {
+    new CustomEvent(DOMY_EVENTS.App.Initialisation, {
       bubbles: true,
       detail: { app, target: domTarget } as DomyReadyEventDetails
     })
@@ -79,6 +88,14 @@ export async function createApp(app: App = {}, target?: Element) {
     }
   }
 
+  // Setuped event
+  document.dispatchEvent(
+    new CustomEvent(DOMY_EVENTS.App.Setuped, {
+      bubbles: true,
+      detail: { app, target: domTarget } as DomyReadyEventDetails
+    })
+  );
+
   // Init domy
   if (document.readyState === 'complete') {
     await mountApp();
@@ -104,8 +121,9 @@ export async function createApp(app: App = {}, target?: Element) {
       }
     }
 
+    // Mounted event
     document.dispatchEvent(
-      new CustomEvent(DomyEvents.Mounted, {
+      new CustomEvent(DOMY_EVENTS.App.Mounted, {
         bubbles: true,
         detail: { app, state, target: domTarget } as DomyMountedEventDetails
       })
