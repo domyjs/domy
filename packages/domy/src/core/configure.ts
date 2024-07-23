@@ -12,8 +12,8 @@ import { DomyHelper } from './DomyHelper';
 function handleCSP() {
   DomyHelper.setEvaluator(evaluatorConf => {
     const pathFn = evaluatorConf.contextAsGlobal
-      ? evaluatorConf.code.replace(/^this\./g, '')
-      : evaluatorConf.code;
+      ? evaluatorConf.code
+      : evaluatorConf.code.replace(/^this\./g, '');
     const isFn = pathFn.endsWith('()');
     const path = pathFn.replace(/\(\)$/g, '');
 

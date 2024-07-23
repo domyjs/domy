@@ -70,10 +70,14 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
       }
     }
 
-    const isCsp = configuration.getConfig().CSP;
+    const config = configuration.getConfig();
+    const isCsp = config.CSP;
+    const avoidDeprecatedWith = config.avoidDeprecatedWith;
 
     if (isCsp) {
-      const objPath = domy.attr.value;
+      const objPath = avoidDeprecatedWith
+        ? domy.attr.value.replace(/^this\./g, '')
+        : domy.attr.value;
       set(domy.state.data.reactiveObj, objPath, value);
     } else {
       const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);

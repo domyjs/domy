@@ -1,3 +1,4 @@
+import { configuration } from '../config';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { State } from '../types/State';
 import { evaluate } from '../utils/evaluate';
@@ -88,6 +89,16 @@ export class DomyHelper {
     this.cleanupFn = cb;
   }
 
+  eval(code: string) {
+    const executedValued = DomyHelper.evaluator({
+      code: code,
+      contextAsGlobal: !configuration.getConfig().avoidDeprecatedWith,
+      context: getContext(this.el, this.state, this.scopedNodeData),
+      returnResult: true
+    });
+    return executedValued;
+  }
+
   evaluate(code: string) {
     this.paths = new Set<string>();
 
@@ -101,12 +112,7 @@ export class DomyHelper {
 
     this.state.data.attachListener(listener);
 
-    const executedValued = DomyHelper.evaluator({
-      code: code,
-      contextAsGlobal: true,
-      context: getContext(this.el, this.state, this.scopedNodeData),
-      returnResult: true
-    });
+    const executedValued = this.eval(code);
 
     this.state.data.removeListener(listener);
 
@@ -114,13 +120,7 @@ export class DomyHelper {
   }
 
   evaluateWithoutListening(code: string) {
-    const executedValued = DomyHelper.evaluator({
-      code: code,
-      contextAsGlobal: true,
-      context: getContext(this.el, this.state, this.scopedNodeData),
-      returnResult: true
-    });
-    return executedValued;
+    return this.eval(code);
   }
 
   static setEvaluator(evaluator: typeof DomyHelper.evaluator) {
