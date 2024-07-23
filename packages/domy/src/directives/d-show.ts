@@ -35,7 +35,6 @@ export function dShowImplementation(domy: DomyDirectiveHelper) {
         el.classList.remove(`${transition}-enter`);
         el.classList.add(`${transition}-out`);
         cleanupTransition = executeActionAfterAnimation(el, () => {
-          console.log('removed');
           el.style.display = 'none';
         });
       } else {
