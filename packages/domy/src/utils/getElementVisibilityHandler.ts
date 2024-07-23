@@ -2,20 +2,35 @@ import { DomyDirectiveHelper } from '../types/Domy';
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
 import { restoreElement } from './restoreElement';
 
-type GetShouldBeDisplay = () => boolean;
+type Props = {
+  shouldBeDisplay: () => boolean;
+  domy: DomyDirectiveHelper;
+};
 
 /**
- * Logic for d-if, d-else-if and d-else
- * @param shouldBeDisplayCallback
- * @param domy
+ * Find where to insert the element
+ * @returns
+ */
+function findElementIndex(parentChilds: ChildNode[], el: Element): number {
+  let index = 0;
+  for (const child of parentChilds) {
+    if (child === el) break;
+    if (child.isConnected) ++index;
+  }
+  return index;
+}
+
+/**
+ * LHandle the visibility of an element with the transition
+ * removeAction: By default it will remove the element
+ * displayAction: By default it will append the element to his last position into the dom
+ * @param props
  * @returns
  *
  * @author yoannchb-pro
  */
-export function getElementVisibilityHandler(
-  shouldBeDisplayCallback: GetShouldBeDisplay,
-  domy: DomyDirectiveHelper
-) {
+export function getElementVisibilityHandler(props: Props) {
+  const domy = props.domy;
   const el = domy.el;
   const parent = domy.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
@@ -26,19 +41,6 @@ export function getElementVisibilityHandler(
   let cleanupTransition: null | (() => void) = null;
 
   /**
-   * Find where to insert the element
-   * @returns
-   */
-  function findElementIndex(): number {
-    let index = 0;
-    for (const child of parentChilds) {
-      if (child === el) break;
-      if (child.isConnected) ++index;
-    }
-    return index;
-  }
-
-  /**
    * Check if an element should be display
    * If the element should be display we render it, add it to the dom and add the corresponding transition
    * Otherwise we remove it from the dom and add the exit transition
@@ -47,21 +49,21 @@ export function getElementVisibilityHandler(
    */
   function handleVisibility() {
     const isConnected = el.isConnected;
-    const shouldBeDisplay = shouldBeDisplayCallback();
+    const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {
+      const removeAction = () => el.remove();
+
       // Handle out transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
         el.classList.remove(`${transition}-enter`);
         el.classList.add(`${transition}-out`);
-        cleanupTransition = executeActionAfterAnimation(el, () => el.remove());
+        cleanupTransition = executeActionAfterAnimation(el, removeAction);
       } else {
-        el.remove();
+        removeAction();
       }
     } else if (!isConnected && shouldBeDisplay) {
-      const indexToInsert = findElementIndex();
-
       // Handle enter transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
@@ -82,6 +84,7 @@ export function getElementVisibilityHandler(
         hasBeenRender = true;
       }
 
+      const indexToInsert = findElementIndex(parentChilds, el);
       restoreElement(parent, el, indexToInsert);
     }
 
