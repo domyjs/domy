@@ -1,4 +1,5 @@
 export type App = {
+  target?: HTMLElement;
   setup?: () => void | Promise<void>;
   mounted?: () => void | Promise<void>;
   watch?: {

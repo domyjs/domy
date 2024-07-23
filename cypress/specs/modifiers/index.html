@@ -23,38 +23,32 @@
     </div>
   </body>
   <script>
-    DOMY.createApp(
-      {
-        data: {
-          count: 0
-        }
-      },
-      document.querySelector('#once')
-    );
+    DOMY.createApp({
+      target: document.querySelector('#once'),
+      data: {
+        count: 0
+      }
+    });
 
-    DOMY.createApp(
-      {
-        data: {
-          name: '',
-          submitedName: ''
-        },
-        methods: {
-          submit() {
-            this.submitedName = this.name;
-            this.name = '';
-          }
-        }
+    DOMY.createApp({
+      target: document.querySelector('#enter'),
+      data: {
+        name: '',
+        submitedName: ''
       },
-      document.querySelector('#enter')
-    );
+      methods: {
+        submit() {
+          this.submitedName = this.name;
+          this.name = '';
+        }
+      }
+    });
 
-    DOMY.createApp(
-      {
-        data: {
-          show: false
-        }
-      },
-      document.querySelector('#away')
-    );
+    DOMY.createApp({
+      target: document.querySelector('#away'),
+      data: {
+        show: false
+      }
+    });
   </script>
 </html>

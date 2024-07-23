@@ -22,8 +22,8 @@ const DOMY_EVENTS = {
  *
  * @author yoannchb-pro
  */
-export async function createApp(app: App = {}, target?: Element) {
-  const domTarget = target ?? document.body;
+export async function createApp(app: App = {}) {
+  const domTarget = app.target ?? document.body;
 
   // Ready event
   document.dispatchEvent(
