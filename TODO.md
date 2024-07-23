@@ -2,6 +2,7 @@
 
 - Handle template
 
+- Refactor reactive to handle option API
 - Separate reactive, utils and types in other packages
 - script auto build, release ...
 
