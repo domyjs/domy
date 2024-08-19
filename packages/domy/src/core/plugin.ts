@@ -20,6 +20,7 @@ import { error, warn } from '../utils/logs';
 import { dElseImplementation } from '../directives/d-else';
 import { binding } from './binding';
 import { events } from './events';
+import { dDataImplementation } from '../directives/d-data';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -29,12 +30,24 @@ type Plugins = {
 };
 
 export const PLUGINS: Plugins = {
-  sortedDirectives: ['ignore', 'once', 'cloak', 'transition', 'ref', 'if', 'else-if', 'else'],
+  sortedDirectives: [
+    'ignore',
+    'once',
+    'cloak',
+    'transition',
+    'ref',
+
+    'data',
+    'if',
+    'else-if',
+    'else'
+  ],
   prefixes: {
     bind: binding,
     on: events
   },
   directives: {
+    data: dDataImplementation,
     if: dIfImplementation,
     'else-if': dElseIfImplementation,
     else: dElseImplementation,

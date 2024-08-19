@@ -63,7 +63,7 @@ export function getElementVisibilityHandler(props: Props) {
       } else {
         removeAction();
       }
-    } else if (!isConnected && shouldBeDisplay) {
+    } else if ((!isConnected && shouldBeDisplay) || (isConnected && !isInitialised)) {
       // Handle enter transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
@@ -79,6 +79,7 @@ export function getElementVisibilityHandler(props: Props) {
         domy.deepRender({
           element: el,
           state: domy.state,
+          scopedNodeData: domy.scopedNodeData,
           byPassAttributes: [domy.attr.name]
         });
         hasBeenRender = true;

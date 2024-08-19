@@ -10,7 +10,9 @@ import {
   matchPath,
   OnSetListener,
   reactive,
-  removeGlobalWatch
+  removeGlobalWatch,
+  unwatch,
+  watch
 } from './reactive';
 import { queueJob } from './scheduler';
 
@@ -57,11 +59,17 @@ export class DomyHelper {
       attrName: this.attrName,
       attr: this.attr,
 
+      reactive,
+      watch,
+      unwatch,
+      globalWatch,
+      removeGlobalWatch,
+      matchPath,
+
       getConfig: configuration.getConfig,
       queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
-      reactive,
       evaluate: renderWithoutListeningToChange
         ? evaluateWithoutListening
         : this.evaluate.bind(this),
@@ -122,11 +130,19 @@ export class DomyHelper {
 
     globalWatch(listener);
 
-    const executedValued = this.eval(code);
+    let executedValue;
+    let errorMsg;
+    try {
+      executedValue = this.eval(code);
+    } catch (err: any) {
+      errorMsg = err;
+    }
 
     removeGlobalWatch(listener);
 
-    return executedValued;
+    if (errorMsg) throw errorMsg; // We want to throw the error later to ensure we removed the global watcher
+
+    return executedValue;
   }
 
   evaluateWithoutListening(code: string) {

@@ -35,15 +35,12 @@ export function getContext(
       if (typeof property === 'symbol') return Reflect.get(target, property, receiver);
 
       // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
-      if (property in stateDatas) {
-        return stateDatas[property];
-      } else {
-        for (const injectableData of scopedNodeData) {
-          if (property in injectableData) {
-            return injectableData[property];
-          }
+      for (const scopedData of scopedNodeData) {
+        if (property in scopedData) {
+          return scopedData[property];
         }
       }
+      if (property in stateDatas) return stateDatas[property];
 
       return Reflect.get(target, property, receiver);
     },
@@ -51,15 +48,12 @@ export function getContext(
       if (typeof property === 'symbol') return Reflect.set(target, property, newValue, receiver);
 
       // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
-      if (property in stateDatas) {
-        return (stateDatas[property] = newValue);
-      } else {
-        for (const injectableData of scopedNodeData) {
-          if (property in injectableData) {
-            return (injectableData[property] = newValue);
-          }
+      for (const scopedData of scopedNodeData) {
+        if (property in scopedData) {
+          return (scopedData[property] = newValue);
         }
       }
+      if (property in stateDatas) return (stateDatas[property] = newValue);
 
       return Reflect.set(target, property, newValue, receiver);
     }

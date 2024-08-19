@@ -1,6 +1,13 @@
 import { deepRender } from '../core/deepRender';
 import { State } from './State';
-import { reactive } from '../core/reactive';
+import {
+  reactive,
+  watch,
+  unwatch,
+  globalWatch,
+  removeGlobalWatch,
+  matchPath
+} from '../core/reactive';
 import { getContext } from '../utils/getContext';
 import { queueJob } from '../core/scheduler';
 import { Config } from './Config';
@@ -29,10 +36,17 @@ export type DomyDirectiveHelper = {
   modifiers: string[];
   attrName: string;
   attr: { name: string; value: string };
+
+  reactive: typeof reactive;
+  watch: typeof watch;
+  unwatch: typeof unwatch;
+  globalWatch: typeof globalWatch;
+  removeGlobalWatch: typeof removeGlobalWatch;
+  matchPath: typeof matchPath;
+
   queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;
   cleanup: (cb: () => void | Promise<void>) => void;
-  reactive: typeof reactive;
   evaluate: (code: string) => any;
   evaluateWithoutListening: (code: string) => any;
   deepRender: typeof deepRender;

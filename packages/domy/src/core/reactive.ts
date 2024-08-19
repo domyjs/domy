@@ -229,6 +229,8 @@ class ReactiveVariable {
  * @author yoannchb-pro
  */
 export function reactive<T>(obj: T): T {
+  if (ReactiveVariable.isReactive(obj)) return obj;
+
   const reactiveVariable = new ReactiveVariable(obj);
   reactivesVariablesList.push(reactiveVariable);
 
