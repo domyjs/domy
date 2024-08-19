@@ -48,6 +48,8 @@ export type DomyDirectiveHelper = {
   effect: (cb: () => void | Promise<void>) => void;
   cleanup: (cb: () => void | Promise<void>) => void;
   evaluate: (code: string) => any;
+  startMultipleEvaluate: () => void;
+  stopMultipleEvaluate: () => void;
   evaluateWithoutListening: (code: string) => any;
   deepRender: typeof deepRender;
   addScopeToNode(obj: Record<string, any>): void;
