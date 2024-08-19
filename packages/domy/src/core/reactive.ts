@@ -302,7 +302,9 @@ export function removeGlobalWatch(listener: Listener) {
  * @author yoannchb-pro
  */
 export function watch(listener: Listener, objsToWatch: unknown[]) {
-  const variablesToWatch = reactivesVariablesList.filter(obj => objsToWatch.includes(obj));
+  const variablesToWatch = reactivesVariablesList.filter(reactiveVariable =>
+    objsToWatch.some(objToWatch => objToWatch === reactiveVariable.getProxy())
+  );
   for (const reactiveVariable of variablesToWatch) {
     reactiveVariable.attachListener(listener);
   }
@@ -316,8 +318,10 @@ export function watch(listener: Listener, objsToWatch: unknown[]) {
  * @author yoannchb-pro
  */
 export function unwatch(listener: Listener, objsToUnwatch: unknown[]) {
-  const variablesToWatch = reactivesVariablesList.filter(obj => objsToUnwatch.includes(obj));
-  for (const reactiveVariable of variablesToWatch) {
+  const variablesToUnwatch = reactivesVariablesList.filter(reactiveVariable =>
+    objsToUnwatch.some(objToUnwatch => objToUnwatch === reactiveVariable.getProxy())
+  );
+  for (const reactiveVariable of variablesToUnwatch) {
     reactiveVariable.removeListener(listener);
   }
 }

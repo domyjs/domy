@@ -2,7 +2,7 @@
 
 - Handle template
 
-- Refactor reactive to handle option API
+- Handle option api (watch, onMounted, reactive, ref ...)
 - Separate reactive, utils and types in other packages
 - script auto build, release ...
 
