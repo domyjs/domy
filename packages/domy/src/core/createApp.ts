@@ -1,11 +1,11 @@
-import { App } from '../types/App';
+import { App, WatcherFn } from '../types/App';
 import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { deepRender } from './deepRender';
-import { reactive } from './reactive';
+import { globalWatch, matchPath, reactive } from './reactive';
 
 const DOMY_EVENTS = {
   App: {
@@ -51,18 +51,26 @@ export async function createApp(app: App = {}) {
   }
 
   // Watchers
+  const watchers: Record<string, { locked: boolean; fn: WatcherFn }> = {};
+  // We convert all watcher function to regular function so we can change the context
   for (const watcherName in app.watch) {
-    let isWatcherLocked = false; // We ensure the watcher can't call it self (act like a lock)
-    const watcherfn = toRegularFn(app.watch[watcherName]);
+    watchers[watcherName] = { fn: toRegularFn(app.watch[watcherName]), locked: false };
+  }
+  // We attach a global watcher which will call the correct watcher
+  globalWatch({
+    type: 'onSet',
+    fn: async ({ path, prevValue, newValue }) => {
+      for (const watcherName in app.watch) {
+        const isWatcherLocked = watchers[watcherName].locked; // We ensure the watcher can't call it self (act like a lock)
 
-    state.data.attachListener({
-      type: 'onSet',
-      fn: async ({ path, prevValue, newValue }) => {
-        const match = state.data.matchPath(watcherName, path);
+        const match = matchPath(watcherName, path);
+
         if (match.isMatching) {
           if (!isWatcherLocked) {
-            isWatcherLocked = true;
+            watchers[watcherName].locked = true;
+
             try {
+              const watcherfn = watchers[watcherName].fn;
               await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
                 path,
                 params: match.params
@@ -71,11 +79,12 @@ export async function createApp(app: App = {}) {
               error(err);
             }
           }
-          isWatcherLocked = false;
+
+          watchers[watcherName].locked = false;
         }
       }
-    });
-  }
+    }
+  });
 
   // Setup
   if (app.setup) {

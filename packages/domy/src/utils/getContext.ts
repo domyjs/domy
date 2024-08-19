@@ -28,7 +28,7 @@ export function getContext(
   state: State,
   scopedNodeData: Record<string, any>[] = []
 ) {
-  const stateDatas = state.data.reactiveObj;
+  const stateDatas = state.data;
 
   const contextProxyHandler: ProxyHandler<any> = {
     get(target, property, receiver) {

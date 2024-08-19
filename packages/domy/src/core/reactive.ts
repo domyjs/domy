@@ -2,22 +2,23 @@
 
 type MatchingResult = { isMatching: boolean; params: Record<string, string> };
 
+type GetListenerByType<T> = T extends 'onGet' ? OnGetListener : OnSetListener;
+export type Listener = OnGetListener | OnSetListener;
 export type OnGetListener = { type: 'onGet'; fn: (props: { path: string }) => void };
-
 export type OnSetListener = {
   type: 'onSet';
-  fn: (props: { path: string; prevValue: any; newValue: any }) => void;
+  fn: (props: { path: string; prevValue: any; newValue: any }) => void | Promise<void>;
 };
 
-export type Listener = OnGetListener | OnSetListener;
-
 const isProxySymbol = Symbol('isProxy');
+const reactivesVariablesList: ReactiveVariable[] = [];
+const globalListenersList: Listener[] = [];
 
 /**
  * Allow to create a DeepProxy to listen to any change into an object
  * @author yoannchb-pro
  */
-class DeepProxy {
+class ReactiveVariable {
   private proxy: any = null;
 
   private onSetListeners: OnSetListener['fn'][] = [];
@@ -28,49 +29,6 @@ class DeepProxy {
   public getProxy() {
     if (!this.proxy) this.proxy = this.createProxy(this.target);
     return this.proxy;
-  }
-
-  /**
-   * Check if a path match a certain rule
-   * Example:
-   * path: todos.0.isComplete
-   * reg: todos.*.isComplete or todos, todos.* or todos.*.*
-   * Will give true
-   * reg: todos.1.isComplete, todos.*.name, todos.*.*.id
-   * Will give false
-   * @param reg
-   * @param path
-   * @returns
-   *
-   * @author yoannchb-pro
-   */
-  public static matchPath(reg: string, path: string): MatchingResult {
-    const defaultRes: MatchingResult = {
-      isMatching: false,
-      params: {}
-    };
-
-    const rules = reg.split('.');
-    const paths = path.split('.');
-
-    const params: Record<string, string> = {};
-
-    for (let i = 0; i < rules.length; ++i) {
-      if (!path[i]) return defaultRes;
-
-      const isParam = rules[i].match(/\{\w+\}/);
-      if (rules[i] === '*' || isParam) {
-        if (isParam) {
-          const paramName = isParam[0];
-          params[paramName.substring(1, paramName.length - 1)] = paths[i];
-        }
-        continue;
-      }
-
-      if (paths[i] !== rules[i]) return defaultRes;
-    }
-
-    return { isMatching: true, params };
   }
 
   /**
@@ -93,7 +51,7 @@ class DeepProxy {
     }
   }
 
-  public removeEventListener(l: Listener) {
+  public removeListener(l: Listener) {
     let listeners: Listener['fn'][] = [];
     switch (l.type) {
       case 'onGet':
@@ -171,7 +129,7 @@ class DeepProxy {
             // If the new value is not a proxy we declare a proxy for it
             const isNewObj = ['add', 'set'].includes(property as string);
             const obj = args[args.length - 1]; // In case of a set(key, obj) and add(obj)
-            if (isNewObj && !DeepProxy.isReactive(obj)) {
+            if (isNewObj && !ReactiveVariable.isReactive(obj)) {
               args[args.length - 1] = ctx.createProxy(obj, fullPath);
             }
 
@@ -213,7 +171,7 @@ class DeepProxy {
         const fullPath = [...path, p as string];
 
         // If the new value is not a proxy we declare a proxy for it
-        const isNewObj = !DeepProxy.isReactive(newValue);
+        const isNewObj = !ReactiveVariable.isReactive(newValue);
         if (isNewObj) {
           newValue = ctx.createProxy(newValue, fullPath);
         }
@@ -231,11 +189,11 @@ class DeepProxy {
   }
 
   private createProxy(target: any, path: string[] = []): any {
-    if (!this.canAttachProxy(target) || DeepProxy.isReactive(target)) return target;
+    if (!this.canAttachProxy(target) || ReactiveVariable.isReactive(target)) return target;
 
     try {
       for (const key in target) {
-        const isAlreadyProxy = DeepProxy.isReactive(target[key]);
+        const isAlreadyProxy = ReactiveVariable.isReactive(target[key]);
         if (!isAlreadyProxy) target[key] = this.createProxy(target[key], [...path, key]);
       }
       const isCollection = this.isCollection(target);
@@ -270,13 +228,137 @@ class DeepProxy {
  *
  * @author yoannchb-pro
  */
-export function reactive<T extends Record<string, any>>(obj: T) {
-  const deepProxy = new DeepProxy(obj);
-  return {
-    reactiveObj: deepProxy.getProxy() as T,
-    matchPath: DeepProxy.matchPath,
-    isReactive: DeepProxy.isReactive,
-    attachListener: deepProxy.attachListener.bind(deepProxy),
-    removeListener: deepProxy.removeEventListener.bind(deepProxy)
+export function reactive<T>(obj: T): T {
+  const reactiveVariable = new ReactiveVariable(obj);
+  reactivesVariablesList.push(reactiveVariable);
+
+  // We attach the global listener
+  function createGlobalListener<T extends Listener['type']>(type: T): GetListenerByType<T>['fn'] {
+    return (props: any) => {
+      const globalListenerByType = globalListenersList.filter(
+        curr => curr.type === type
+      ) as GetListenerByType<T>[];
+
+      for (const globalListener of globalListenerByType) {
+        try {
+          globalListener.fn(props);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+  }
+  reactiveVariable.attachListener({
+    type: 'onGet',
+    fn: createGlobalListener('onGet')
+  });
+  reactiveVariable.attachListener({
+    type: 'onSet',
+    fn: createGlobalListener('onSet')
+  });
+
+  return reactiveVariable.getProxy();
+}
+
+/**
+ * Transform a primitive into a reactive object to listen to any change
+ * @param obj
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function ref<T>(obj: T): { value: T } {
+  return reactive({ value: obj });
+}
+
+/**
+ * Attach a listener to all reactive variables
+ * @param listener
+ *
+ * @author yoannchb-pro
+ */
+export function globalWatch(listener: Listener) {
+  globalListenersList.push(listener);
+}
+
+/**
+ * Remove a global listener
+ * @param listener
+ *
+ * @author yoannchb-pro
+ */
+export function removeGlobalWatch(listener: Listener) {
+  const index = globalListenersList.findIndex(l => l === listener);
+  globalListenersList.splice(index, 1);
+}
+
+/**
+ * Attach a listener to some reactives variables
+ * @param fn
+ * @param objsToWatch
+ *
+ * @author yoannchb-pro
+ */
+export function watch(listener: Listener, objsToWatch: unknown[]) {
+  const variablesToWatch = reactivesVariablesList.filter(obj => objsToWatch.includes(obj));
+  for (const reactiveVariable of variablesToWatch) {
+    reactiveVariable.attachListener(listener);
+  }
+}
+
+/**
+ * Remove a listener from some reactives variables
+ * @param fn
+ * @param objsToWatch
+ *
+ * @author yoannchb-pro
+ */
+export function unwatch(listener: Listener, objsToUnwatch: unknown[]) {
+  const variablesToWatch = reactivesVariablesList.filter(obj => objsToUnwatch.includes(obj));
+  for (const reactiveVariable of variablesToWatch) {
+    reactiveVariable.removeListener(listener);
+  }
+}
+
+/**
+ * Check if a path match a certain rule
+ * Example:
+ * path: todos.0.isComplete
+ * reg: todos.*.isComplete or todos, todos.* or todos.*.*
+ * Will give true
+ * reg: todos.1.isComplete, todos.*.name, todos.*.*.id
+ * Will give false
+ * @param reg
+ * @param path
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function matchPath(reg: string, path: string): MatchingResult {
+  const defaultRes: MatchingResult = {
+    isMatching: false,
+    params: {}
   };
+
+  const rules = reg.split('.');
+  const paths = path.split('.');
+
+  const params: Record<string, string> = {};
+
+  for (let i = 0; i < rules.length; ++i) {
+    if (!path[i]) return defaultRes;
+
+    const isParam = rules[i].match(/\{\w+\}/);
+    if (rules[i] === '*' || isParam) {
+      if (isParam) {
+        const paramName = isParam[0];
+        params[paramName.substring(1, paramName.length - 1)] = paths[i];
+      }
+      continue;
+    }
+
+    if (paths[i] !== rules[i]) return defaultRes;
+  }
+
+  return { isMatching: true, params };
 }

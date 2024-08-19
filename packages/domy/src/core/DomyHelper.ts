@@ -4,7 +4,14 @@ import { State } from '../types/State';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import { deepRender } from './deepRender';
-import { Listener, OnSetListener, reactive } from './reactive';
+import {
+  globalWatch,
+  Listener,
+  matchPath,
+  OnSetListener,
+  reactive,
+  removeGlobalWatch
+} from './reactive';
 import { queueJob } from './scheduler';
 
 /**
@@ -68,18 +75,20 @@ export class DomyHelper {
 
   attachOnSetListener() {
     if (this.onSetListener) return;
+
     this.onSetListener = {
       type: 'onSet',
       fn: ({ path }) => {
         for (const listenedPath of this.paths) {
-          if (this.state.data.matchPath(listenedPath, path).isMatching) {
+          if (matchPath(listenedPath, path).isMatching) {
             this.callCleanup();
             this.callEffect();
           }
         }
       }
     };
-    this.state.data.attachListener(this.onSetListener);
+
+    globalWatch(this.onSetListener);
   }
 
   effect(cb: () => void | Promise<void>) {
@@ -111,11 +120,11 @@ export class DomyHelper {
       }
     };
 
-    this.state.data.attachListener(listener);
+    globalWatch(listener);
 
     const executedValued = this.eval(code);
 
-    this.state.data.removeListener(listener);
+    removeGlobalWatch(listener);
 
     return executedValued;
   }

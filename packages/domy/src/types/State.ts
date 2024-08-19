@@ -1,7 +1,5 @@
-import { reactive } from '../core/reactive';
-
 export type State = {
-  data: ReturnType<typeof reactive>;
+  data: Record<string, unknown>;
   methods: { [fnName: string]: (...args: any[]) => any | Promise<any> };
   events: { [eventName: string]: Element[] };
   transitions: Map<Element, string>;
