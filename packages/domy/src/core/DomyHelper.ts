@@ -34,7 +34,6 @@ export class DomyHelper {
   public modifiers: string[] = [];
 
   private paths = new Set<string>();
-  private resetPaths = true;
 
   private static evaluator = evaluate;
 
@@ -74,8 +73,6 @@ export class DomyHelper {
       evaluate: renderWithoutListeningToChange
         ? evaluateWithoutListening
         : this.evaluate.bind(this),
-      startMultipleEvaluate: this.startMultipleEvaluate.bind(this),
-      stopMultipleEvaluate: this.stopMultipleEvalueate.bind(this),
       evaluateWithoutListening,
       deepRender: this.deepRenderFn,
       addScopeToNode: this.addScopeToNode.bind(this),
@@ -120,21 +117,7 @@ export class DomyHelper {
     return executedValued;
   }
 
-  /**
-   * If we need to do many evaluate we don't want to reset paths on every evaluate
-   * This is why startMultipleEvaluate and stopMultipleEvaluate exists
-   */
-  startMultipleEvaluate() {
-    this.resetPaths = false;
-  }
-
-  stopMultipleEvalueate() {
-    this.resetPaths = true;
-  }
-
   evaluate(code: string) {
-    if (this.resetPaths) this.paths = new Set<string>();
-
     const listener: Listener = {
       type: 'onGet',
       fn: ({ path }) => {
@@ -182,6 +165,8 @@ export class DomyHelper {
   }
 
   callEffect() {
+    // We remove every paths every times the effect is called because the dependencies to watch can be differents
+    this.paths = new Set();
     if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
   }
 }

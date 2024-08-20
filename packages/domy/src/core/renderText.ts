@@ -17,11 +17,9 @@ export function renderText(domy: DomyDirectiveHelper) {
 
   domy.effect(() => {
     if (reg.test(originalTextContent)) {
-      domy.startMultipleEvaluate();
       domy.el.textContent = originalTextContent.replace(reg, function (_, code) {
         return domy.evaluate(code);
       });
-      domy.stopMultipleEvaluate();
     }
   });
 }
