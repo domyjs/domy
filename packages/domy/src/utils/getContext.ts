@@ -1,4 +1,5 @@
 import { PLUGINS } from '../core/plugin';
+import { isRef } from '../core/reactive';
 import { DomySpecialHelper } from '../types/Domy';
 import { State } from '../types/State';
 
@@ -37,10 +38,14 @@ export function getContext(
       // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
       for (const scopedData of scopedNodeData) {
         if (property in scopedData) {
-          return scopedData[property];
+          const value = scopedData[property];
+          return isRef(value) ? value.value : value;
         }
       }
-      if (property in stateDatas) return stateDatas[property];
+      if (property in stateDatas) {
+        const value: any = stateDatas[property];
+        return isRef(value) ? value.value : value;
+      }
 
       return Reflect.get(target, property, receiver);
     },
@@ -50,10 +55,18 @@ export function getContext(
       // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
       for (const scopedData of scopedNodeData) {
         if (property in scopedData) {
+          if (isRef(scopedData[property])) {
+            return (scopedData[property].value = newValue);
+          }
           return (scopedData[property] = newValue);
         }
       }
-      if (property in stateDatas) return (stateDatas[property] = newValue);
+      if (property in stateDatas) {
+        if (isRef(stateDatas[property])) {
+          return ((stateDatas[property] as any).value = newValue);
+        }
+        return (stateDatas[property] = newValue);
+      }
 
       return Reflect.set(target, property, newValue, receiver);
     }

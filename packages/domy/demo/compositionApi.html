@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <p>Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
+    <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
+    <button @click="increment()">+</button>
+    <button d-on:click="decrement()">-</button>
+  </body>
+  <script>
+    const { ref, reactive, watch } = DOMY;
+
+    function useCount() {
+      const count = ref(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
+        },
+        [count]
+      );
+
+      const increment = () => {
+        count.value++;
+      };
+
+      const decrement = () => {
+        count.value--;
+      };
+
+      return { count, increment, decrement };
+    }
+
+    DOMY.createApp(({ onMounted }) => {
+      const perf = ref(performance.now());
+      const { count, increment, decrement } = useCount();
+
+      onMounted(() => {
+        perf.value = performance.now() - perf.value;
+      });
+
+      return {
+        perf,
+        count,
+        increment,
+        decrement
+      };
+    });
+  </script>
+</html>

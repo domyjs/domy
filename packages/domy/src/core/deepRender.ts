@@ -125,6 +125,8 @@ export function deepRender(props: Props) {
     if (!skipChildRendering) {
       const reversedChild = Array.from(element.childNodes).reverse();
       for (const child of reversedChild) {
+        if ((child as HTMLElement).tagName === 'SCRIPT') continue;
+
         toRenderList.push({
           element: child as Element,
           scopedNodeData: domyHelper.scopedNodeData

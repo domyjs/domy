@@ -16,6 +16,7 @@ export function renderText(domy: DomyDirectiveHelper) {
   const originalTextContent = domy.el.textContent ?? '';
 
   domy.effect(() => {
+    console.log(domy.el.textContent);
     if (reg.test(originalTextContent)) {
       domy.el.textContent = originalTextContent.replace(reg, function (_, code) {
         return domy.evaluate(code);

@@ -11,6 +11,7 @@ export type OnSetListener = {
 };
 
 const isProxySymbol = Symbol('isProxy');
+const isRefSymbol = Symbol('isRef');
 const reactivesVariablesList: ReactiveVariable[] = [];
 const globalListenersList: Listener[] = [];
 
@@ -270,7 +271,7 @@ export function reactive<T>(obj: T): T {
  * @author yoannchb-pro
  */
 export function ref<T>(obj: T): { value: T } {
-  return reactive({ value: obj });
+  return reactive({ value: obj, [isRefSymbol]: true });
 }
 
 /**
@@ -367,4 +368,26 @@ export function matchPath(reg: string, path: string): MatchingResult {
   }
 
   return { isMatching: true, params };
+}
+
+/**
+ * Will return true if a obj is a ref/reactive
+ * @param obj
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function isReactive(obj: any) {
+  return ReactiveVariable.isReactive(obj);
+}
+
+/**
+ * Will return true if the obj is a ref
+ * @param obj
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function isRef(obj: any) {
+  return !!obj?.[isRefSymbol];
 }
