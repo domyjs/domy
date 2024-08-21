@@ -33,6 +33,14 @@ export class DomyHelper {
   public attr: { name: string; value: string } = { name: '', value: '' };
   public modifiers: string[] = [];
 
+  // We need to know the objectId because in compositionMode we don't know the variable name
+  // And even if we can know it with registerName it don't make it unique because we can declare the same variable name for an other DOMY instance
+  // Or if the hook is called more than one time
+  private objectsIdToListen = new Set<number>();
+  // Allow us to only update if a the correct property have been update
+  // Let's imagine a deep property has been updated data.todoList.0
+  // We wan't to update only if this property has been update and not when an other property has been modified (example: data.todoList.1)
+  // It happend because the id only identifie the first level (so data and data.todoList have the same id)
   private paths = new Set<string>();
 
   private static evaluator = evaluate;
@@ -86,7 +94,9 @@ export class DomyHelper {
 
     this.onSetListener = {
       type: 'onSet',
-      fn: ({ path }) => {
+      fn: ({ path, objectId }) => {
+        if (!this.objectsIdToListen.has(objectId)) return;
+
         for (const listenedPath of this.paths) {
           if (matchPath(listenedPath, path).isMatching) {
             this.callCleanup();
@@ -120,8 +130,9 @@ export class DomyHelper {
   evaluate(code: string) {
     const listener: Listener = {
       type: 'onGet',
-      fn: ({ path }) => {
+      fn: ({ path, objectId }) => {
         this.attachOnSetListener();
+        this.objectsIdToListen.add(objectId);
         this.paths.add(path);
       }
     };
@@ -165,8 +176,9 @@ export class DomyHelper {
   }
 
   callEffect() {
-    // We remove every paths every times the effect is called because the dependencies to watch can be differents
+    // We remove every paths/objectsIdToListen every times the effect is called because the dependencies to watch can be differents
     this.paths = new Set();
+    this.objectsIdToListen = new Set();
     if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
   }
 }

@@ -7,7 +7,10 @@ import { deepRender } from './deepRender';
 import { isReactive, registerName } from './reactive';
 
 type PromisedOrNot<T> = Promise<T> | T;
-type CompositionAPIParams = { onMounted: (callback: () => PromisedOrNot<void>) => void };
+type CompositionAPIParams = {
+  onMounted: (callback: () => PromisedOrNot<void>) => void;
+  helpers: Record<`$${string}`, any>;
+};
 export type CompositionAPIFn = (
   params: CompositionAPIParams
 ) => PromisedOrNot<void | Record<string, any>>;
@@ -39,7 +42,8 @@ export async function compositionAPI(fn: CompositionAPIFn) {
   const data = await fn({
     onMounted: callback => {
       app.mounted = callback;
-    }
+    },
+    helpers: {} // TODO
   });
 
   // We set the data and methods of the app
@@ -48,7 +52,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
       const value = data[key];
       if (typeof value === 'function') app.methods![key] = value;
       else {
-        if (isReactive(value)) registerName(key, value);
+        if (isReactive(value)) registerName(key, value); // To make the path as correct otherwise we will get "value" instead of "count.value"
         app.data![key] = value;
       }
     }

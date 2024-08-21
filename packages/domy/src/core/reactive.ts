@@ -4,12 +4,21 @@ type MatchingResult = { isMatching: boolean; params: Record<string, string> };
 
 type GetListenerByType<T> = T extends 'onGet' ? OnGetListener : OnSetListener;
 export type Listener = OnGetListener | OnSetListener;
-export type OnGetListener = { type: 'onGet'; fn: (props: { path: string }) => void };
+export type OnGetListener = {
+  type: 'onGet';
+  fn: (props: { path: string; objectId: number }) => void;
+};
 export type OnSetListener = {
   type: 'onSet';
-  fn: (props: { path: string; prevValue: any; newValue: any }) => void | Promise<void>;
+  fn: (props: {
+    path: string;
+    prevValue: any;
+    newValue: any;
+    objectId: number;
+  }) => void | Promise<void>;
 };
 
+let objectId = 0;
 const isProxySymbol = Symbol('isProxy');
 const isRefSymbol = Symbol('isRef');
 const reactivesVariablesList: ReactiveVariable[] = [];
@@ -20,7 +29,8 @@ const globalListenersList: Listener[] = [];
  * @author yoannchb-pro
  */
 class ReactiveVariable {
-  public name: string = '';
+  public id = ++objectId;
+  public name = '';
   private proxy: any = null;
 
   private onSetListeners: OnSetListener['fn'][] = [];
@@ -212,13 +222,13 @@ class ReactiveVariable {
 
   private callOnGetListeners(path: string[]) {
     for (const listener of this.onGetListeners) {
-      listener({ path: this.name + path.join('.') });
+      listener({ path: this.name + path.join('.'), objectId: this.id });
     }
   }
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
     for (const listener of this.onSetListeners) {
-      listener({ path: this.name + path.join('.'), prevValue, newValue });
+      listener({ path: this.name + path.join('.'), prevValue, newValue, objectId: this.id });
     }
   }
 }
@@ -395,8 +405,14 @@ export function isRef(obj: any) {
 
 /**
  * Register a name for a reactive variable
- * It allow us to have an unique path like count.value, i18n.value
- * And not value, value ...
+ * It allow us to have a correct path name
+ * Example of use case:
+ * cont count = ref(0);
+ * watch(({ path }) => console.log(path), [count]);
+ * count.value += 1;
+ *
+ * The path is going to be "value" instead of "count.value" because we don't know the variable name
+ * So to fixe that we just need to put registerName("count", count) after the variable declaration
  * @param name
  * @param obj
  * @returns
