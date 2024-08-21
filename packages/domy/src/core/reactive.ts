@@ -20,6 +20,7 @@ const globalListenersList: Listener[] = [];
  * @author yoannchb-pro
  */
 class ReactiveVariable {
+  public name: string = '';
   private proxy: any = null;
 
   private onSetListeners: OnSetListener['fn'][] = [];
@@ -211,13 +212,13 @@ class ReactiveVariable {
 
   private callOnGetListeners(path: string[]) {
     for (const listener of this.onGetListeners) {
-      listener({ path: path.join('.') });
+      listener({ path: this.name + path.join('.') });
     }
   }
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
     for (const listener of this.onSetListeners) {
-      listener({ path: path.join('.'), prevValue, newValue });
+      listener({ path: this.name + path.join('.'), prevValue, newValue });
     }
   }
 }
@@ -390,4 +391,23 @@ export function isReactive(obj: any) {
  */
 export function isRef(obj: any) {
   return !!obj?.[isRefSymbol];
+}
+
+/**
+ * Register a name for a reactive variable
+ * It allow us to have an unique path like count.value, i18n.value
+ * And not value, value ...
+ * @param name
+ * @param obj
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function registerName(name: string, obj: any) {
+  for (const reactiveVariable of reactivesVariablesList) {
+    if (reactiveVariable.getProxy() === obj) {
+      reactiveVariable.name = name + '.';
+      return;
+    }
+  }
 }

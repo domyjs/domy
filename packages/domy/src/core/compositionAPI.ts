@@ -4,6 +4,7 @@ import { State } from '../types/State';
 import { error } from '../utils/logs';
 import { DOMY_EVENTS } from './DomyEvents';
 import { deepRender } from './deepRender';
+import { isReactive, registerName } from './reactive';
 
 type PromisedOrNot<T> = Promise<T> | T;
 type CompositionAPIParams = { onMounted: (callback: () => PromisedOrNot<void>) => void };
@@ -44,8 +45,12 @@ export async function compositionAPI(fn: CompositionAPIFn) {
   // We set the data and methods of the app
   if (data) {
     for (const key in data) {
-      if (typeof data[key] === 'function') app.methods![key] = data[key];
-      else app.data![key] = data[key];
+      const value = data[key];
+      if (typeof value === 'function') app.methods![key] = value;
+      else {
+        if (isReactive(value)) registerName(key, value);
+        app.data![key] = value;
+      }
     }
   }
 
