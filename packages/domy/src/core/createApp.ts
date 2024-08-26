@@ -1,22 +1,22 @@
-import { OptionApiApp } from '../types/App';
+import { StructuredAPIApp } from '../types/App';
 import { Config } from '../types/Config';
-import { compositionAPI, CompositionAPIFn } from './compositionAPI';
-import { optionAPI } from './optionAPI';
+import { hookAPI, HookAPIFnDefinition } from './hookAPI';
+import { structuredAPI } from './structuredAPI';
 
 /**
  * Initialise domy on a target (by default the body)
- * @param app
+ * @param appDefinition
  * @param target
  *
  * @author yoannchb-pro
  */
-export function createApp(app: OptionApiApp | CompositionAPIFn) {
+export function createApp(appDefinition: StructuredAPIApp | HookAPIFnDefinition) {
   let config: Config = {};
 
   function mount(target?: HTMLElement) {
     const domTarget = target ?? document.body;
-    if (typeof app === 'function') return compositionAPI(app, domTarget, config);
-    return optionAPI(app, domTarget, config);
+    if (typeof appDefinition === 'function') return hookAPI(appDefinition, domTarget, config);
+    return structuredAPI(appDefinition, domTarget, config);
   }
 
   function configure(newConfig: Config) {

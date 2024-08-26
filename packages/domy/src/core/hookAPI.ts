@@ -1,4 +1,4 @@
-import { CompositionApiApp } from '../types/App';
+import { HookAPIApp } from '../types/App';
 import { Config } from '../types/Config';
 import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
 import { State } from '../types/State';
@@ -11,24 +11,25 @@ import { isReactive, registerName } from './reactive';
 
 type PromisedOrNot<T> = Promise<T> | T;
 type Helpers = Record<`$${string}`, any>;
-type CompositionAPIParams = {
+type HookAPIParams = {
   onMounted: (callback: (props: { helpers: Helpers }) => PromisedOrNot<void>) => void;
   helpers: Helpers;
 };
-export type CompositionAPIFn = (
-  params: CompositionAPIParams
+
+export type HookAPIFnDefinition = (
+  params: HookAPIParams
 ) => PromisedOrNot<void | Record<string, any>>;
 
 /**
- * Composition API
+ * Hook API
  * Create DOMY App with Hooks structure
  * @param fn
  * @returns
  *
  * @author yoannchb-pro
  */
-export async function compositionAPI(fn: CompositionAPIFn, target: HTMLElement, config: Config) {
-  const app: CompositionApiApp = {
+export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, config: Config) {
+  const app: HookAPIApp = {
     data: {},
     methods: {}
   };

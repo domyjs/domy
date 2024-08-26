@@ -26,9 +26,8 @@ export class DomyHelper {
   public attr: { name: string; value: string } = { name: '', value: '' };
   public modifiers: string[] = [];
 
-  // We need to know the objectId because in compositionMode we don't know the variable name
-  // And even if we can know it with registerName it don't make it unique because we can declare the same variable name for an other DOMY instance
-  // Or if the hook is called more than one time
+  // The name of a variable don't make it unique because we can declare the same variable name for an other DOMY instance
+  // It happend because domy have a globalWatcher when it evaluate a code to check dependencies
   private objectsIdToListen = new Set<number>();
   // Allow us to only update if a the correct property have been update
   // Let's imagine a deep property has been updated data.todoList.0

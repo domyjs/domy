@@ -1,5 +1,5 @@
 import { State } from '../types/State';
-import { OptionApiApp, WatcherFn } from '../types/App';
+import { StructuredAPIApp, WatcherFn } from '../types/App';
 import { DomyReadyEventDetails, DomyMountedEventDetails } from '../types/Events';
 import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
@@ -10,14 +10,18 @@ import { Config } from '../types/Config';
 import { createConfigurableDeepRender } from './deepRender';
 
 /**
- * Option API
+ * Structured API
  * Create a DOMY App with an object structure
  * @param app
  * @returns
  *
  * @author yoannchb-pro
  */
-export async function optionAPI(app: OptionApiApp = {}, target: HTMLElement, config: Config) {
+export async function structuredAPI(
+  app: StructuredAPIApp = {},
+  target: HTMLElement,
+  config: Config
+) {
   // Initialisation event dispatch
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Initialisation, {
