@@ -19,16 +19,19 @@ export function getContext(
   scopedNodeData: Record<string, any>[] = []
 ) {
   const helpers = getHelpers(el, state, scopedNodeData);
+
   const context = concatProxiesAndObjs(
+    // We put scoped datas at first place to ensure it override data
     [...scopedNodeData, state.data, state.methods, helpers],
     ({ type, obj, property, newValue }) => {
-      if (type === 'get') {
-        if (isRef(obj)) return obj[property].value;
-        return obj[property];
+      switch (type) {
+        case 'get':
+          if (isRef(obj[property])) return obj[property].value;
+          return obj[property];
+        case 'set':
+          if (isRef(obj[property])) return (obj[property].value = newValue);
+          return (obj[property] = newValue);
       }
-
-      if (isRef(obj)) return (obj[property].value = newValue);
-      return (obj[property] = newValue);
     }
   );
 
