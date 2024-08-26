@@ -1,3 +1,5 @@
+import { Helpers } from './Helpers';
+
 export type WatcherFn = (
   prevValue: any,
   newValue: any,
@@ -15,7 +17,7 @@ export type StructuredAPIApp = {
 };
 
 export type HookAPIApp = {
-  mounted?: (props: { helpers: Record<`${string}`, any> }) => void | Promise<void>;
+  mounted?: (props: { helpers: Helpers }) => void | Promise<void>;
   data?: { [depName: string]: any };
   methods?: { [fnName: string]: (...args: any[]) => any | Promise<any> };
 };

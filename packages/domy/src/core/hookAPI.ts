@@ -1,16 +1,15 @@
 import { HookAPIApp } from '../types/App';
 import { Config } from '../types/Config';
 import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
+import { Helpers } from '../types/Helpers';
 import { State } from '../types/State';
 import { getHelpers } from '../utils/getHelpers';
 import { error } from '../utils/logs';
 import { createConfigurableDeepRender } from './deepRender';
 import { DOMY_EVENTS } from './DomyEvents';
-
 import { isReactive, registerName } from './reactive';
 
 type PromisedOrNot<T> = Promise<T> | T;
-type Helpers = Record<`$${string}`, any>;
 type HookAPIParams = {
   onMounted: (callback: (props: { helpers: Helpers }) => PromisedOrNot<void>) => void;
   helpers: Helpers;
