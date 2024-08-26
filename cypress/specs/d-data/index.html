@@ -14,9 +14,16 @@
     </main>
     <p id="err">{{ showModal }}</p>
     <p id="initialMsg">{{ msg }}</p>
+
+    <p id="watcherCalled" d-ref="watcherCalled">false</p>
   </body>
   <script>
     DOMY.createApp({
+      watch: {
+        showModal() {
+          this.$refs.watcherCalled.textContent = 'true';
+        }
+      },
       data: {
         msg: 'Hello World!'
       }
