@@ -24,14 +24,12 @@
   </body>
   <script>
     DOMY.createApp({
-      target: document.querySelector('#once'),
       data: {
         count: 0
       }
-    });
+    }).mount(document.querySelector('#once'));
 
     DOMY.createApp({
-      target: document.querySelector('#enter'),
       data: {
         name: '',
         submitedName: ''
@@ -42,13 +40,12 @@
           this.name = '';
         }
       }
-    });
+    }).mount(document.querySelector('#enter'));
 
     DOMY.createApp({
-      target: document.querySelector('#away'),
       data: {
         show: false
       }
-    });
+    }).mount(document.querySelector('#away'));
   </script>
 </html>

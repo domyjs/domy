@@ -16,14 +16,12 @@ import { matchPath, reactive, watch } from './reactive';
  *
  * @author yoannchb-pro
  */
-export async function optionAPI(app: OptionApiApp = {}) {
-  const domTarget = app.target ?? document.body;
-
+export async function optionAPI(app: OptionApiApp = {}, target: HTMLElement) {
   // Initialisation event dispatch
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Initialisation, {
       bubbles: true,
-      detail: { app, target: domTarget } as DomyReadyEventDetails
+      detail: { app, target } as DomyReadyEventDetails
     })
   );
 
@@ -98,7 +96,7 @@ export async function optionAPI(app: OptionApiApp = {}) {
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Setuped, {
       bubbles: true,
-      detail: { app, target: domTarget } as DomyReadyEventDetails
+      detail: { app, target } as DomyReadyEventDetails
     })
   );
 
@@ -110,7 +108,7 @@ export async function optionAPI(app: OptionApiApp = {}) {
   async function mountApp() {
     try {
       deepRender({
-        element: domTarget,
+        element: target,
         state
       });
     } catch (err: any) {
@@ -131,7 +129,7 @@ export async function optionAPI(app: OptionApiApp = {}) {
     document.dispatchEvent(
       new CustomEvent(DOMY_EVENTS.App.Mounted, {
         bubbles: true,
-        detail: { app, state, target: domTarget } as DomyMountedEventDetails
+        detail: { app, state, target } as DomyMountedEventDetails
       })
     );
   }

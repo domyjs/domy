@@ -5,7 +5,6 @@ export type WatcherFn = (
 ) => void | Promise<void>;
 
 export type OptionApiApp = {
-  target?: HTMLElement;
   setup?: () => void | Promise<void>;
   mounted?: () => void | Promise<void>;
   watch?: {

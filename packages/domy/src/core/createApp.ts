@@ -10,6 +10,18 @@ import { optionAPI } from './optionAPI';
  * @author yoannchb-pro
  */
 export function createApp(app: OptionApiApp | CompositionAPIFn) {
-  if (typeof app === 'function') return compositionAPI(app);
-  return optionAPI(app);
+  function mount(target?: HTMLElement) {
+    const domTarget = target ?? document.body;
+    if (typeof app === 'function') return compositionAPI(app, domTarget);
+    return optionAPI(app, domTarget);
+  }
+
+  function config() {
+    return { mount };
+  }
+
+  return {
+    mount,
+    config
+  };
 }

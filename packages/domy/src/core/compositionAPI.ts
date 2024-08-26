@@ -25,9 +25,7 @@ export type CompositionAPIFn = (
  *
  * @author yoannchb-pro
  */
-export async function compositionAPI(fn: CompositionAPIFn) {
-  const domTarget = document.body; // TODO
-
+export async function compositionAPI(fn: CompositionAPIFn, target: HTMLElement) {
   const app: CompositionApiApp = {
     data: {},
     methods: {}
@@ -46,7 +44,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Initialisation, {
       bubbles: true,
-      detail: { app, target: domTarget } as DomyReadyEventDetails
+      detail: { app, target } as DomyReadyEventDetails
     })
   );
 
@@ -75,7 +73,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Setuped, {
       bubbles: true,
-      detail: { app, target: domTarget } as DomyReadyEventDetails
+      detail: { app, target } as DomyReadyEventDetails
     })
   );
 
@@ -87,7 +85,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
   async function mountApp() {
     try {
       deepRender({
-        element: domTarget,
+        element: target,
         state
       });
     } catch (err: any) {
@@ -107,7 +105,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
     document.dispatchEvent(
       new CustomEvent(DOMY_EVENTS.App.Mounted, {
         bubbles: true,
-        detail: { app, state, target: domTarget } as DomyMountedEventDetails
+        detail: { app, state, target } as DomyMountedEventDetails
       })
     );
   }
