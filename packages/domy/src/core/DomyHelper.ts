@@ -1,9 +1,11 @@
-import { configuration } from '../config';
+import { Config } from '../types/Config';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { State } from '../types/State';
+import { cspEvaluate } from '../utils/cspEvaluate';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
-import { deepRender } from './deepRender';
+import { createConfigurableDeepRender } from './deepRender';
+
 import * as ReactiveUtils from './reactive';
 import { queueJob } from './scheduler';
 
@@ -34,13 +36,12 @@ export class DomyHelper {
   // It happend because the id only identifie the first level (so data and data.todoList have the same id)
   private paths = new Set<string>();
 
-  private static evaluator = evaluate;
-
   constructor(
-    private deepRenderFn: typeof deepRender, // It allow us to avoid circular dependencie (deepRender -> DomyHelper -> deepRender)
+    private deepRenderFn: ReturnType<typeof createConfigurableDeepRender>,
     public el: Element,
     public state: State,
-    public scopedNodeData: Record<string, any>[] = []
+    public scopedNodeData: Record<string, any>[] = [],
+    public config: Config
   ) {}
 
   getPluginHelper(renderWithoutListeningToChange = false): DomyDirectiveHelper {
@@ -50,6 +51,7 @@ export class DomyHelper {
       el: this.el,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
+      config: this.config,
 
       prefix: this.prefix,
       directive: this.directive,
@@ -60,7 +62,6 @@ export class DomyHelper {
 
       ...ReactiveUtils,
 
-      getConfig: configuration.getConfig,
       queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
@@ -104,9 +105,10 @@ export class DomyHelper {
   }
 
   eval(code: string) {
-    const executedValued = DomyHelper.evaluator({
+    const evaluator = this.config.CSP ? cspEvaluate : evaluate;
+    const executedValued = evaluator({
       code: code,
-      contextAsGlobal: !configuration.getConfig().avoidDeprecatedWith,
+      contextAsGlobal: !this.config.avoidDeprecatedWith,
       context: getContext(this.el, this.state, this.scopedNodeData),
       returnResult: true
     });
@@ -142,10 +144,6 @@ export class DomyHelper {
 
   evaluateWithoutListening(code: string) {
     return this.eval(code);
-  }
-
-  static setEvaluator(evaluator: typeof DomyHelper.evaluator) {
-    DomyHelper.evaluator = evaluator;
   }
 
   addScopeToNode(obj: Record<string, any>) {

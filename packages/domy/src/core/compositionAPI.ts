@@ -1,10 +1,12 @@
 import { CompositionApiApp } from '../types/App';
+import { Config } from '../types/Config';
 import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
 import { State } from '../types/State';
 import { getHelpers } from '../utils/getHelpers';
 import { error } from '../utils/logs';
+import { createConfigurableDeepRender } from './deepRender';
 import { DOMY_EVENTS } from './DomyEvents';
-import { deepRender } from './deepRender';
+
 import { isReactive, registerName } from './reactive';
 
 type PromisedOrNot<T> = Promise<T> | T;
@@ -25,7 +27,7 @@ export type CompositionAPIFn = (
  *
  * @author yoannchb-pro
  */
-export async function compositionAPI(fn: CompositionAPIFn, target: HTMLElement) {
+export async function compositionAPI(fn: CompositionAPIFn, target: HTMLElement, config: Config) {
   const app: CompositionApiApp = {
     data: {},
     methods: {}
@@ -84,6 +86,7 @@ export async function compositionAPI(fn: CompositionAPIFn, target: HTMLElement) 
 
   async function mountApp() {
     try {
+      const deepRender = createConfigurableDeepRender(config);
       deepRender({
         element: target,
         state

@@ -5,8 +5,9 @@ import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { DOMY_EVENTS } from './DomyEvents';
-import { deepRender } from './deepRender';
 import { matchPath, reactive, watch } from './reactive';
+import { Config } from '../types/Config';
+import { createConfigurableDeepRender } from './deepRender';
 
 /**
  * Option API
@@ -16,7 +17,7 @@ import { matchPath, reactive, watch } from './reactive';
  *
  * @author yoannchb-pro
  */
-export async function optionAPI(app: OptionApiApp = {}, target: HTMLElement) {
+export async function optionAPI(app: OptionApiApp = {}, target: HTMLElement, config: Config) {
   // Initialisation event dispatch
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Initialisation, {
@@ -107,6 +108,7 @@ export async function optionAPI(app: OptionApiApp = {}, target: HTMLElement) {
 
   async function mountApp() {
     try {
+      const deepRender = createConfigurableDeepRender(config);
       deepRender({
         element: target,
         state

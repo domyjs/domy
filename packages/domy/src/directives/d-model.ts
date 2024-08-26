@@ -55,7 +55,7 @@ function changeValue(domy: DomyDirectiveHelper) {
     }
   }
 
-  const config = domy.getConfig();
+  const config = domy.config;
   const isCsp = config.CSP;
   const avoidDeprecatedWith = config.avoidDeprecatedWith;
 

@@ -20,11 +20,6 @@
     <input type="text" d-model="this.search" placeholder="Search something..." />
   </body>
   <script nonce="a23gbfz9e">
-    DOMY.configure({
-      avoidDeprecatedWith: true,
-      CSP: true
-    });
-
     DOMY.createApp({
       watch: {
         count(prevValue, newValue) {
@@ -43,6 +38,11 @@
           this.count--;
         }
       }
-    }).mount();
+    })
+      .configure({
+        avoidDeprecatedWith: true,
+        CSP: true
+      })
+      .mount();
   </script>
 </html>

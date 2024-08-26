@@ -23,10 +23,6 @@
     <input type="text" d-model="search" placeholder="Search something..." />
   </body>
   <script nonce="a23gbfz9e">
-    DOMY.configure({
-      CSP: true
-    });
-
     DOMY.createApp({
       watch: {
         count(prevValue, newValue) {
@@ -51,6 +47,10 @@
           this.count--;
         }
       }
-    }).mount();
+    })
+      .configure({
+        CSP: true
+      })
+      .mount();
   </script>
 </html>
