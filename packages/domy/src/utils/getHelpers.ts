@@ -1,13 +1,5 @@
 import { PLUGINS } from '../core/plugin';
-import {
-  reactive,
-  ref,
-  globalWatch,
-  matchPath,
-  removeGlobalWatch,
-  unwatch,
-  watch
-} from '../core/reactive';
+import * as ReactiveUtils from '../core/reactive';
 import { DomySpecialHelper } from '../types/Domy';
 import { State } from '../types/State';
 
@@ -17,6 +9,8 @@ import { State } from '../types/State';
  * @param state
  * @param scopedNodeData
  * @returns
+ *
+ * @author yoannchb-pro
  */
 export function getHelpers(
   el: Element | Text | undefined,
@@ -29,13 +23,7 @@ export function getHelpers(
       el,
       state,
       scopedNodeData,
-      reactive,
-      ref,
-      globalWatch,
-      matchPath,
-      removeGlobalWatch,
-      unwatch,
-      watch
+      ...ReactiveUtils
     });
   }
   return helpers;

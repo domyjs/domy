@@ -18,6 +18,8 @@ const defaultTransformer: Transformer = ({ type, obj, property, newValue }) => {
  * @param objs
  * @param transformer Apply an action when set or get is called
  * @returns
+ *
+ * @author yoannchb-pro
  */
 export function concatProxiesAndObjs(
   objs: Record<string, any>[],

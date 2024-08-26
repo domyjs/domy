@@ -4,17 +4,7 @@ import { State } from '../types/State';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import { deepRender } from './deepRender';
-import {
-  globalWatch,
-  Listener,
-  matchPath,
-  OnSetListener,
-  reactive,
-  ref,
-  removeGlobalWatch,
-  unwatch,
-  watch
-} from './reactive';
+import * as ReactiveUtils from './reactive';
 import { queueJob } from './scheduler';
 
 /**
@@ -23,7 +13,7 @@ import { queueJob } from './scheduler';
  * @author yoannchb-pro
  */
 export class DomyHelper {
-  private onSetListener: OnSetListener | null = null;
+  private onSetListener: ReactiveUtils.OnSetListener | null = null;
 
   private cleanupFn: (() => Promise<void> | void) | null = null;
   private effectFn: (() => Promise<void> | void) | null = null;
@@ -68,13 +58,7 @@ export class DomyHelper {
       attrName: this.attrName,
       attr: this.attr,
 
-      ref,
-      reactive,
-      watch,
-      unwatch,
-      globalWatch,
-      removeGlobalWatch,
-      matchPath,
+      ...ReactiveUtils,
 
       getConfig: configuration.getConfig,
       queueJob,
@@ -100,7 +84,7 @@ export class DomyHelper {
         if (!this.objectsIdToListen.has(objectId)) return;
 
         for (const listenedPath of this.paths) {
-          if (matchPath(listenedPath, path).isMatching) {
+          if (ReactiveUtils.matchPath(listenedPath, path).isMatching) {
             this.callCleanup();
             this.callEffect();
           }
@@ -108,7 +92,7 @@ export class DomyHelper {
       }
     };
 
-    globalWatch(this.onSetListener);
+    ReactiveUtils.globalWatch(this.onSetListener);
   }
 
   effect(cb: () => void | Promise<void>) {
@@ -130,7 +114,7 @@ export class DomyHelper {
   }
 
   evaluate(code: string) {
-    const listener: Listener = {
+    const listener: ReactiveUtils.Listener = {
       type: 'onGet',
       fn: ({ path, objectId }) => {
         this.attachOnSetListener();
@@ -139,7 +123,7 @@ export class DomyHelper {
       }
     };
 
-    globalWatch(listener);
+    ReactiveUtils.globalWatch(listener);
 
     let executedValue;
     let errorMsg;
@@ -149,7 +133,7 @@ export class DomyHelper {
       errorMsg = err;
     }
 
-    removeGlobalWatch(listener);
+    ReactiveUtils.removeGlobalWatch(listener);
 
     if (errorMsg) throw errorMsg; // We want to throw the error later to ensure we removed the global watcher
 

@@ -1,27 +1,9 @@
 import { deepRender } from '../core/deepRender';
 import { State } from './State';
-import {
-  reactive,
-  watch,
-  unwatch,
-  globalWatch,
-  removeGlobalWatch,
-  matchPath,
-  ref
-} from '../core/reactive';
+import * as ReactiveUtils from '../core/reactive';
 import { getContext } from '../utils/getContext';
 import { queueJob } from '../core/scheduler';
 import { Config } from './Config';
-
-type WatchingUtils = {
-  ref: typeof ref;
-  reactive: typeof reactive;
-  watch: typeof watch;
-  unwatch: typeof unwatch;
-  globalWatch: typeof globalWatch;
-  removeGlobalWatch: typeof removeGlobalWatch;
-  matchPath: typeof matchPath;
-};
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -35,7 +17,7 @@ export type DomySpecialHelper = {
   el: Element | Text | undefined;
   state: State;
   scopedNodeData: Record<string, any>[];
-} & WatchingUtils;
+} & typeof ReactiveUtils;
 
 export type DomyDirectiveHelper = {
   el: Element;
@@ -57,7 +39,7 @@ export type DomyDirectiveHelper = {
   addScopeToNode(obj: Record<string, any>): void;
   removeScopeToNode(obj: Record<string, any>): void;
   getContext: typeof getContext;
-} & WatchingUtils;
+} & typeof ReactiveUtils;
 
 export type DomyPluginDefinition = {
   prefix(name: string, fn: DomyDirectiveFn): void;
