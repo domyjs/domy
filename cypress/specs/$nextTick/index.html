@@ -8,6 +8,7 @@
   </head>
   <body>
     <button
+      id="updateMessage"
       @click="async () => {
         const p = $el.querySelector('p');
         msg = 'Hello World!';
@@ -16,7 +17,7 @@
         console.log(p.textContent)
     }"
     >
-      <p>{{ msg }}</p>
+      <p id="messageText">{{ msg }}</p>
     </button>
   </body>
   <script>

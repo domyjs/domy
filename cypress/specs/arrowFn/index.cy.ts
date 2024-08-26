@@ -5,15 +5,17 @@ beforeEach(() => {
 });
 
 describe('arrowFn', () => {
-  it('Check the app is working', async () => {
-    await new Promise(r => setTimeout(r, 1000));
+  it('Check the app is working', () => {
+    cy.wait(1000);
 
     cy.get('h1').should('have.text', 'Count: 2');
 
     cy.get('#dec').click();
     cy.get('h1').should('have.text', 'Count: 1');
+
     cy.get('#dec').click();
     cy.get('h1').should('have.text', 'Count: 0');
+
     cy.get('#dec').click();
     cy.get('h1').should('have.text', 'Count: 0');
 
