@@ -6,7 +6,7 @@ import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { DOMY_EVENTS } from './DomyEvents';
 import { deepRender } from './deepRender';
-import { globalWatch, matchPath, reactive } from './reactive';
+import { matchPath, reactive, watch } from './reactive';
 
 /**
  * Option API
@@ -50,35 +50,38 @@ export async function optionAPI(app: OptionApiApp = {}) {
   for (const watcherName in app.watch) {
     watchers[watcherName] = { fn: toRegularFn(app.watch[watcherName]), locked: false };
   }
-  // We attach a global watcher which will call the correct watcher
-  globalWatch({
-    type: 'onSet',
-    fn: async ({ path, prevValue, newValue }) => {
-      for (const watcherName in app.watch) {
-        const isWatcherLocked = watchers[watcherName].locked; // We ensure the watcher can't call it self (act like a lock)
+  // We attach a watcher to data (so a global watcher) to call the correct watcher based on the path
+  watch(
+    {
+      type: 'onSet',
+      fn: async ({ path, prevValue, newValue }) => {
+        for (const watcherName in app.watch) {
+          const isWatcherLocked = watchers[watcherName].locked; // We ensure the watcher can't call it self (act like a lock)
 
-        const match = matchPath(watcherName, path);
+          const match = matchPath(watcherName, path);
 
-        if (match.isMatching) {
-          if (!isWatcherLocked) {
-            watchers[watcherName].locked = true;
+          if (match.isMatching) {
+            if (!isWatcherLocked) {
+              watchers[watcherName].locked = true;
 
-            try {
-              const watcherfn = watchers[watcherName].fn;
-              await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
-                path,
-                params: match.params
-              });
-            } catch (err: any) {
-              error(err);
+              try {
+                const watcherfn = watchers[watcherName].fn;
+                await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
+                  path,
+                  params: match.params
+                });
+              } catch (err: any) {
+                error(err);
+              }
             }
-          }
 
-          watchers[watcherName].locked = false;
+            watchers[watcherName].locked = false;
+          }
         }
       }
-    }
-  });
+    },
+    [state.data]
+  );
 
   // Setup
   if (app.setup) {

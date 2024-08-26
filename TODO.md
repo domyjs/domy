@@ -2,13 +2,10 @@
 
 - Handle template
 
-- Voir comment gerer les helpers car $emit devient un hook (dans vue par exemple)
-
-- Fixer le fait que on peut peut etre passer de globalWatch a watch comme on connait les objets et aussi le fait que un watcher d'une autre instance de domy peut etre appeller
-- registerName in DomyHelper
-- Give access to helpers in compositionAPI
-- Access to reactive in DomySpecialHelper (or maybe not because we can make it globally accessible and not adding it to DomyHelper as well)
+- registerName in DomyHelper (trouver une facons de donnée access a reactive api avec toute les methode sans devoir les mettre a chaque fois quand je creer une nouvelle methode)
 - Make test for composition API and handle target for composition api (setTarget or .config().mount())
+- Fixer le fait que une data de d-data peut appeller watch (fait mais a chekc avec des tests)
+
 - Separate reactive, utils and types in other packages
 - script auto build, release ...
 

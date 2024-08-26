@@ -1,4 +1,13 @@
 import { PLUGINS } from '../core/plugin';
+import {
+  reactive,
+  ref,
+  globalWatch,
+  matchPath,
+  removeGlobalWatch,
+  unwatch,
+  watch
+} from '../core/reactive';
 import { DomySpecialHelper } from '../types/Domy';
 import { State } from '../types/State';
 
@@ -19,7 +28,14 @@ export function getHelpers(
     helpers['$' + name] = fn({
       el,
       state,
-      scopedNodeData
+      scopedNodeData,
+      reactive,
+      ref,
+      globalWatch,
+      matchPath,
+      removeGlobalWatch,
+      unwatch,
+      watch
     });
   }
   return helpers;

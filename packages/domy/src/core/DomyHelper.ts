@@ -10,6 +10,7 @@ import {
   matchPath,
   OnSetListener,
   reactive,
+  ref,
   removeGlobalWatch,
   unwatch,
   watch
@@ -67,6 +68,7 @@ export class DomyHelper {
       attrName: this.attrName,
       attr: this.attr,
 
+      ref,
       reactive,
       watch,
       unwatch,
