@@ -1,4 +1,4 @@
-import { isRef } from '../core/reactive';
+import { isSignal } from '../core/reactive';
 import { State } from '../types/State';
 import { concatProxiesAndObjs } from './concatProxiesAndObjs';
 import { getHelpers } from './getHelpers';
@@ -24,12 +24,13 @@ export function getContext(
     // We put scoped datas at first place to ensure it override data
     [...scopedNodeData, state.data, state.methods, helpers],
     ({ type, obj, property, newValue }) => {
+      const isObjSignal = isSignal(obj[property]);
       switch (type) {
         case 'get':
-          if (isRef(obj[property])) return obj[property].value;
+          if (isObjSignal) return obj[property].value;
           return obj[property];
         case 'set':
-          if (isRef(obj[property])) return (obj[property].value = newValue);
+          if (isObjSignal) return (obj[property].value = newValue);
           return (obj[property] = newValue);
       }
     }

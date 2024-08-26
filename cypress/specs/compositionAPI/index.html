@@ -19,10 +19,10 @@
     </div>
   </body>
   <script>
-    const { ref, reactive, watch } = DOMY;
+    const { signal, reactive, watch } = DOMY;
 
     function useCount() {
-      const count = ref(0);
+      const count = signal(0);
 
       watch(
         ({ prevValue, newValue }) => {

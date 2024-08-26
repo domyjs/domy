@@ -20,7 +20,7 @@ export type OnSetListener = {
 
 let objectId = 0;
 const isProxySymbol = Symbol('isProxy');
-const isRefSymbol = Symbol('isRef');
+const isSignalSymbol = Symbol('isSignal');
 const reactivesVariablesList: ReactiveVariable[] = [];
 const globalListenersList: Listener[] = [];
 
@@ -281,8 +281,8 @@ export function reactive<T>(obj: T): T {
  *
  * @author yoannchb-pro
  */
-export function ref<T>(obj: T): { value: T } {
-  return reactive({ value: obj, [isRefSymbol]: true });
+export function signal<T>(obj: T): { value: T } {
+  return reactive({ value: obj, [isSignalSymbol]: true });
 }
 
 /**
@@ -382,7 +382,7 @@ export function matchPath(reg: string, path: string): MatchingResult {
 }
 
 /**
- * Will return true if a obj is a ref/reactive
+ * Will return true if a obj is a signal/reactive
  * @param obj
  * @returns
  *
@@ -393,21 +393,21 @@ export function isReactive(obj: any) {
 }
 
 /**
- * Will return true if the obj is a ref
+ * Will return true if the obj is a signal
  * @param obj
  * @returns
  *
  * @author yoannchb-pro
  */
-export function isRef(obj: any) {
-  return !!obj?.[isRefSymbol];
+export function isSignal(obj: any) {
+  return !!obj?.[isSignalSymbol];
 }
 
 /**
  * Register a name for a reactive variable
  * It allow us to have a correct path name
  * Example of use case:
- * cont count = ref(0);
+ * cont count = signal(0);
  * watch(({ path }) => console.log(path), [count]);
  * count.value += 1;
  *
