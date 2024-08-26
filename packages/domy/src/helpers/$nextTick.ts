@@ -6,7 +6,8 @@ import { queueJob } from '../core/scheduler';
  * With msg: ""
  * <p @click="() => {
  *   msg = 'Hello World!';
- *   $nextTick(() => console.log($el.textContent)); // Hello World!
+ *   console.log($el.textContent); // ""
+ *   $nextTick(() => console.log($el.textContent)); // "Hello World!"
  * }">{{ msg }}</p>
  * @returns
  *

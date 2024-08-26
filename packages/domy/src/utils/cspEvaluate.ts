@@ -1,6 +1,13 @@
 import { EvaluateProps } from './evaluate';
 import { get } from './getAndSet';
 
+/**
+ * An evalutor function like evaluate but which support CSP
+ * @param evaluatorConf
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
 export function cspEvaluate(evaluatorConf: EvaluateProps) {
   const pathFn = evaluatorConf.contextAsGlobal
     ? evaluatorConf.code

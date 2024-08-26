@@ -36,7 +36,7 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
   // State of the app
   const state: State = {
     data: {},
-    methods: app.methods!,
+    methods: {},
     events: {},
     refs: {},
     transitions: new Map()
@@ -50,6 +50,7 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
     })
   );
 
+  // We call the setup
   const data = await fn({
     onMounted: callback => {
       app.mounted = callback;
@@ -63,13 +64,15 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
       const value = data[key];
       if (typeof value === 'function') app.methods![key] = value;
       else {
-        if (isReactive(value)) registerName(key, value); // To make the path as correct otherwise we will get "value" instead of "count.value"
+        if (isReactive(value)) registerName(key, value); // To make the path as correct otherwise we will get "value" instead of "count.value" for example
         app.data![key] = value;
       }
     }
   }
 
+  // We update the state now we have the methods and data
   state.data = app.data!;
+  state.methods = app.methods!;
 
   // Setuped event dispatch
   document.dispatchEvent(
@@ -79,37 +82,31 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
     })
   );
 
-  // Init domy
-  if (document.readyState === 'complete') {
-    await mountApp();
-  } else document.addEventListener('DOMContentLoaded', mountApp);
+  try {
+    // Render the dom with DOMY
+    const deepRender = createConfigurableDeepRender(config);
+    deepRender({
+      element: target,
+      state
+    });
+  } catch (err: any) {
+    error(err);
+  }
 
-  async function mountApp() {
+  // Mounted
+  if (app.mounted) {
     try {
-      const deepRender = createConfigurableDeepRender(config);
-      deepRender({
-        element: target,
-        state
-      });
+      await app.mounted({ helpers: getHelpers(undefined, state) });
     } catch (err: any) {
       error(err);
     }
-
-    // Mounted
-    if (app.mounted) {
-      try {
-        await app.mounted({ helpers: getHelpers(undefined, state) });
-      } catch (err: any) {
-        error(err);
-      }
-    }
-
-    // Mounted event dispatch
-    document.dispatchEvent(
-      new CustomEvent(DOMY_EVENTS.App.Mounted, {
-        bubbles: true,
-        detail: { app, state, target } as DomyMountedEventDetails
-      })
-    );
   }
+
+  // Mounted event dispatch
+  document.dispatchEvent(
+    new CustomEvent(DOMY_EVENTS.App.Mounted, {
+      bubbles: true,
+      detail: { app, state, target } as DomyMountedEventDetails
+    })
+  );
 }

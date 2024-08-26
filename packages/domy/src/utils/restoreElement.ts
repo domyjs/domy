@@ -8,6 +8,7 @@
  */
 export function restoreElement(parent: Element, element: Element, index: number) {
   const referenceElement = parent.childNodes[index];
+
   if (referenceElement) {
     parent.insertBefore(element, referenceElement);
   } else {

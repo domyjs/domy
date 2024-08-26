@@ -4,6 +4,7 @@ const AsyncFunction = async function () {}.constructor;
 
 /**
  * Transform an arrow function to a regular function to bind the context
+ * By doing this we loose global variables
  * @param arrowFn
  * @returns
  *

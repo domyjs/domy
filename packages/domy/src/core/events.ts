@@ -14,10 +14,11 @@ export function events(domy: DomyDirectiveHelper) {
   const domyAttrName = domy.attrName;
   const eventName = domyAttrName.startsWith('@') ? domyAttrName.slice(1) : domyAttrName;
 
+  // We register the event into the state
   if (!domy.state.events[eventName]) domy.state.events[eventName] = [];
   domy.state.events[eventName].push(domy.el);
 
-  const eventListener: EventListenerOrEventListenerObject = event => {
+  const eventListener: EventListenerOrEventListenerObject = async event => {
     // If the element is not present in the dom we don't execute the event
     if (!domy.el.isConnected) {
       return;
@@ -29,9 +30,9 @@ export function events(domy: DomyDirectiveHelper) {
 
     domy.addScopeToNode(scope);
 
-    const executedValue = domy.evaluateWithoutListening(domy.attr.value);
+    const executedValue = await domy.evaluateWithoutListening(domy.attr.value);
 
-    // Ensure nextTick is called after changing variable state
+    // Ensure $nextTick is called after changing variable state
     if (typeof executedValue === 'function') {
       domy.queueJob(() => executedValue(event));
     }
@@ -39,6 +40,7 @@ export function events(domy: DomyDirectiveHelper) {
     domy.removeScopeToNode(scope);
   };
 
+  // We add wrappers to the listener to ensure we can add modifiers
   on({
     el: domy.el,
     eventName,

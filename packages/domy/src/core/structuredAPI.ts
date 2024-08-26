@@ -105,38 +105,32 @@ export async function structuredAPI(
     })
   );
 
-  // Init domy
-  if (document.readyState === 'complete') {
-    await mountApp();
-  } else document.addEventListener('DOMContentLoaded', mountApp);
+  try {
+    // Render the dom with DOMY
+    const deepRender = createConfigurableDeepRender(config);
+    deepRender({
+      element: target,
+      state
+    });
+  } catch (err: any) {
+    error(err);
+  }
 
-  async function mountApp() {
+  // Mounted
+  if (app.mounted) {
     try {
-      const deepRender = createConfigurableDeepRender(config);
-      deepRender({
-        element: target,
-        state
-      });
+      const mountedFn = toRegularFn(app.mounted);
+      await mountedFn.call(getContext(undefined, state));
     } catch (err: any) {
       error(err);
     }
-
-    // Mounted
-    if (app.mounted) {
-      try {
-        const mountedFn = toRegularFn(app.mounted);
-        await mountedFn.call(getContext(undefined, state));
-      } catch (err: any) {
-        error(err);
-      }
-    }
-
-    // Mounted event dispatch
-    document.dispatchEvent(
-      new CustomEvent(DOMY_EVENTS.App.Mounted, {
-        bubbles: true,
-        detail: { app, state, target } as DomyMountedEventDetails
-      })
-    );
   }
+
+  // Mounted event dispatch
+  document.dispatchEvent(
+    new CustomEvent(DOMY_EVENTS.App.Mounted, {
+      bubbles: true,
+      detail: { app, state, target } as DomyMountedEventDetails
+    })
+  );
 }

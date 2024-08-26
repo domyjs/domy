@@ -5,7 +5,7 @@ import { Helpers } from '../types/Helpers';
 import { State } from '../types/State';
 
 /**
- * Return the initialised helpers
+ * Return the initialised helpers with everything it need
  * @param el
  * @param state
  * @param scopedNodeData

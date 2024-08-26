@@ -1,6 +1,5 @@
 # TODO
 
-- Big refactor (code + test)
 - Handle template (use `__proto__` to assign content ??)
 
 - Separate reactive, utils and types in other packages

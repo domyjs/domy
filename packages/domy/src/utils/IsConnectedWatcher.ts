@@ -4,7 +4,7 @@ type Callback = () => void;
 
 /**
  * Utility class that create just one mutation oberserver
- * To notify a callback when the visibility of a watched element change
+ * It will notify a callback when the visibility of a watched element change
  *
  * @author yoannchb-pro
  */

@@ -2,7 +2,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
  * d-cloak implementation
- * This attriute allow the user to know when the full content of an element is rendered
+ * This attribute allow the user to know when the full content of an element is rendered
  * @param domy
  *
  * @author yoannchb-pro

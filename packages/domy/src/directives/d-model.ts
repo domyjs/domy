@@ -4,7 +4,7 @@ import { set } from '../utils/getAndSet';
 type Value = string | number | boolean | string[] | undefined;
 
 /**
- * Trigger a change to the data when the value on input change
+ * Trigger a change to the data when the value of an input change
  *
  * @author yoannchb-pro
  */

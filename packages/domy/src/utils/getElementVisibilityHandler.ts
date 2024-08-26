@@ -21,9 +21,7 @@ function findElementIndex(parentChilds: ChildNode[], el: Element): number {
 }
 
 /**
- * LHandle the visibility of an element with the transition
- * removeAction: By default it will remove the element
- * displayAction: By default it will append the element to his last position into the dom
+ * Handle the visibility of an element with the transition
  * @param props
  * @returns
  *

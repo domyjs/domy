@@ -62,8 +62,8 @@ export function binding(domy: DomyDirectiveHelper) {
 
   // We register the default style and default class
   // To handle :class with class as same time (same for style)
-  const defaultStyle = domy.el.getAttribute('style') ?? '';
-  const defaultClass = domy.el.getAttribute('class') ?? '';
+  const defaultStyle = attrName === 'style' && domy.el.getAttribute('style');
+  const defaultClass = attrName === 'class' && domy.el.getAttribute('class');
 
   // We check the attribute is not already present (only class and style can already be there)
   if (attrName !== 'class' && attrName !== 'style' && domy.el.getAttribute(attrName))
@@ -74,9 +74,9 @@ export function binding(domy: DomyDirectiveHelper) {
     const isExecutedValueObject = typeof executedValue === 'object' && executedValue !== null;
 
     if (isExecutedValueObject && attrName === 'style') {
-      handleStyle(domy, executedValue, defaultStyle);
+      handleStyle(domy, executedValue, defaultStyle as string);
     } else if (isExecutedValueObject && attrName === 'class') {
-      handleClass(domy, executedValue, defaultClass);
+      handleClass(domy, executedValue, defaultClass as string);
     } else {
       domy.el.setAttribute(attrName, executedValue);
     }

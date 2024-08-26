@@ -1,5 +1,6 @@
 /**
  * Wrap a function
+ * It allow us to apply many effects to a listener
  * @param listener
  * @param wrapper
  * @returns
@@ -52,6 +53,8 @@ export default function on(props: {
   if (modifiers.includes('capture')) options.capture = true;
   if (modifiers.includes('once')) options.once = true;
 
+  // We handle keys
+  // Example: keydown.{enter}
   const keyReg = /^\{(?<keys>.+?)\}$/gi;
   const keyModifier = modifiers.find(modifier => !!modifier.match(keyReg));
   if (keyModifier) {

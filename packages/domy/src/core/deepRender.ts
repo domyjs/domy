@@ -70,6 +70,7 @@ export function createConfigurableDeepRender(config: Config) {
       }
 
       const attributes = Array.from(element.attributes ?? []);
+
       // We ensure some attributes are rendered first like d-ignore, d-once, ...
       attributes.sort((a, b) => {
         const iA = PLUGINS.sortedDirectives.indexOf(removeDPrefix(a.name));
@@ -112,8 +113,8 @@ export function createConfigurableDeepRender(config: Config) {
         domyHelper.directive = removeDPrefix(attrName);
         domyHelper.modifiers = modifiers;
 
-        domyHelper.attrName = attrName; // The attribute name without the modifiers and prefix (examples: d-for, style ...)
-        domyHelper.attr.name = attr.name;
+        domyHelper.attrName = attrName; // The attribute name without the modifiers and prefix (examples: d-on:click.{enter} -> click)
+        domyHelper.attr.name = attr.name; // the full attribute name
         domyHelper.attr.value = attr.value;
 
         // We render the attribute
@@ -139,7 +140,7 @@ export function createConfigurableDeepRender(config: Config) {
       if (!skipChildRendering) {
         const reversedChild = Array.from(element.childNodes).reverse();
         for (const child of reversedChild) {
-          if ((child as HTMLElement).tagName === 'SCRIPT') continue;
+          if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We never render script
 
           toRenderList.push({
             element: child as Element,

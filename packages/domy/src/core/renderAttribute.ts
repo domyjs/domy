@@ -6,7 +6,7 @@ import { PLUGINS } from './plugin';
 
 /**
  * Render a special attribute
- * It can be an event, a binding or a domy attribute
+ * It can be an event, a binding, a domy attribute or a domy prefix
  * @param domy
  *
  * @author yoannchb-pro
@@ -14,22 +14,24 @@ import { PLUGINS } from './plugin';
 export function renderAttribute(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // Handle prefix attribute (example: d-on:click)
   if (domy.prefix.length > 0) {
-    for (const [prefix, implementation] of Object.entries(PLUGINS.prefixes)) {
-      if (domy.prefix === prefix) return implementation(domy);
-    }
-    return;
+    const prefixImplementation = PLUGINS.prefixes[domy.prefix];
+    return prefixImplementation?.(domy);
   }
 
+  // Handle binding attribute like :style
   if (isBindAttr(domy.attr.name)) {
-    // Handle binding attribute like :style
     return binding(domy);
-  } else if (isEventAttr(domy.attr.name)) {
-    // Handle event attribute like @click
+  }
+
+  // Handle event attribute like @click
+  if (isEventAttr(domy.attr.name)) {
     return events(domy);
-  } else if (isDomyAttr(domy.attr.name)) {
-    // Handle domy attribute like d-for
-    for (const [directive, implementation] of Object.entries(PLUGINS.directives)) {
-      if (domy.directive === directive) return implementation(domy);
-    }
+  }
+
+  // Handle domy attribute like d-for, d-if, ...
+  // Every attributes starting by "d-"
+  if (isDomyAttr(domy.attr.name)) {
+    const directiveImplementation = PLUGINS.directives[domy.directive];
+    return directiveImplementation?.(domy);
   }
 }

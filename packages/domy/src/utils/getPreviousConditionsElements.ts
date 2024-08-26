@@ -1,6 +1,6 @@
 /**
  * Return the list of previous conditions elements before an element
- * USeful for d-else and d-else-if directives
+ * Useful for d-else and d-else-if directives
  * @param element
  * @param previousAuthorizedAttrs
  * @returns

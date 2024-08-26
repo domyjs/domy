@@ -78,6 +78,7 @@ export class DomyHelper {
   attachOnSetListener() {
     if (this.onSetListener) return;
 
+    // Allow us to call the cleanup and effect when a dependencie value change
     this.onSetListener = {
       type: 'onSet',
       fn: ({ path, objectId }) => {
@@ -118,7 +119,7 @@ export class DomyHelper {
     const listener: ReactiveUtils.Listener = {
       type: 'onGet',
       fn: ({ path, objectId }) => {
-        this.attachOnSetListener();
+        this.attachOnSetListener(); // Only attach a onSet listener if we have a dependencie
         this.objectsIdToListen.add(objectId);
         this.paths.add(path);
       }

@@ -2,7 +2,9 @@ import { DomySpecialHelper } from '../types/Domy';
 
 /**
  * Allow to dispatch a registered event
- * Example: $dispatch("notify")
+ * Example:
+ * <button @click="doSomething">Click me!</button>
+ * $dispatch("click")
  * @param domy
  * @returns
  *
