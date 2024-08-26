@@ -33,13 +33,14 @@ function removeDPrefix(str: string) {
   return str.startsWith('d-') ? str.slice(2) : '';
 }
 
+/**
+ * Deep render an element (with the childs and textContent)
+ * It will keep the config for all the specified target only
+ * @param config
+ *
+ * @author yoannchb-pro
+ */
 export function createConfigurableDeepRender(config: Config) {
-  /**
-   * Deep render an element (with the childs and textContent)
-   * @param props
-   *
-   * @author yoannchb-pro
-   */
   return function deepRender(props: Props) {
     const toRenderList: Elem[] = [
       {
