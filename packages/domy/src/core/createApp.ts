@@ -1,4 +1,4 @@
-import { App } from '../types/App';
+import { OptionApiApp } from '../types/App';
 import { compositionAPI, CompositionAPIFn } from './compositionAPI';
 import { optionAPI } from './optionAPI';
 
@@ -9,7 +9,7 @@ import { optionAPI } from './optionAPI';
  *
  * @author yoannchb-pro
  */
-export function createApp(app: App | CompositionAPIFn) {
+export function createApp(app: OptionApiApp | CompositionAPIFn) {
   if (typeof app === 'function') return compositionAPI(app);
   return optionAPI(app);
 }

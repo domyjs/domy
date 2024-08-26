@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-text test', () => {
+describe('Attribute d-data test', () => {
   it('Check attribute is removed', () => {
     cy.get('main').should('not.have.attr', 'd-data');
   });

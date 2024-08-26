@@ -1,15 +1,17 @@
-import { App } from '../types/App';
+import { CompositionApiApp } from '../types/App';
 import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
 import { State } from '../types/State';
+import { getHelpers } from '../utils/getHelpers';
 import { error } from '../utils/logs';
 import { DOMY_EVENTS } from './DomyEvents';
 import { deepRender } from './deepRender';
 import { isReactive, registerName } from './reactive';
 
 type PromisedOrNot<T> = Promise<T> | T;
+type Helpers = Record<`$${string}`, any>;
 type CompositionAPIParams = {
-  onMounted: (callback: () => PromisedOrNot<void>) => void;
-  helpers: Record<`$${string}`, any>;
+  onMounted: (callback: (props: { helpers: Helpers }) => PromisedOrNot<void>) => void;
+  helpers: Helpers;
 };
 export type CompositionAPIFn = (
   params: CompositionAPIParams
@@ -26,9 +28,18 @@ export type CompositionAPIFn = (
 export async function compositionAPI(fn: CompositionAPIFn) {
   const domTarget = document.body; // TODO
 
-  const app: App = {
+  const app: CompositionApiApp = {
     data: {},
     methods: {}
+  };
+
+  // State of the app
+  const state: State = {
+    data: {},
+    methods: app.methods!,
+    events: {},
+    refs: {},
+    transitions: new Map()
   };
 
   // Initialisation event dispatch
@@ -43,7 +54,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
     onMounted: callback => {
       app.mounted = callback;
     },
-    helpers: {} // TODO
+    helpers: getHelpers(undefined, state)
   });
 
   // We set the data and methods of the app
@@ -58,14 +69,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
     }
   }
 
-  // State of the app
-  const state: State = {
-    data: app.data!,
-    methods: app.methods!,
-    events: {},
-    refs: {},
-    transitions: new Map()
-  };
+  state.data = app.data!;
 
   // Setuped event dispatch
   document.dispatchEvent(
@@ -93,7 +97,7 @@ export async function compositionAPI(fn: CompositionAPIFn) {
     // Mounted
     if (app.mounted) {
       try {
-        await app.mounted();
+        await app.mounted({ helpers: getHelpers(undefined, state) });
       } catch (err: any) {
         error(err);
       }

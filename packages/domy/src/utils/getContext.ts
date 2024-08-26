@@ -1,18 +1,7 @@
-import { PLUGINS } from '../core/plugin';
 import { isRef } from '../core/reactive';
-import { DomySpecialHelper } from '../types/Domy';
 import { State } from '../types/State';
-
-/**
- * Create fake data to provide an object with the same keys but a null value
- * @param obj
- * @returns
- *
- * @author yoannchb-pro
- */
-function createFakeData(obj: Record<string, any>) {
-  return Object.keys(obj).reduce((a, b) => ({ ...a, [b]: null }), {});
-}
+import { concatProxiesAndObjs } from './concatProxiesAndObjs';
+import { getHelpers } from './getHelpers';
 
 /**
  * Return a context with all what domy need to render
@@ -29,73 +18,18 @@ export function getContext(
   state: State,
   scopedNodeData: Record<string, any>[] = []
 ) {
-  const stateDatas = state.data;
-
-  const contextProxyHandler: ProxyHandler<any> = {
-    get(target, property, receiver) {
-      if (typeof property === 'symbol') return Reflect.get(target, property, receiver);
-
-      // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
-      for (const scopedData of scopedNodeData) {
-        if (property in scopedData) {
-          const value = scopedData[property];
-          return isRef(value) ? value.value : value;
-        }
-      }
-      if (property in stateDatas) {
-        const value: any = stateDatas[property];
-        return isRef(value) ? value.value : value;
+  const helpers = getHelpers(el, state, scopedNodeData);
+  const context = concatProxiesAndObjs(
+    [...scopedNodeData, state.data, state.methods, helpers],
+    ({ type, obj, property, newValue }) => {
+      if (type === 'get') {
+        if (isRef(obj)) return obj[property].value;
+        return obj[property];
       }
 
-      return Reflect.get(target, property, receiver);
-    },
-    set(target, property, newValue, receiver) {
-      if (typeof property === 'symbol') return Reflect.set(target, property, newValue, receiver);
-
-      // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
-      for (const scopedData of scopedNodeData) {
-        if (property in scopedData) {
-          if (isRef(scopedData[property])) {
-            return (scopedData[property].value = newValue);
-          }
-          return (scopedData[property] = newValue);
-        }
-      }
-      if (property in stateDatas) {
-        if (isRef(stateDatas[property])) {
-          return ((stateDatas[property] as any).value = newValue);
-        }
-        return (stateDatas[property] = newValue);
-      }
-
-      return Reflect.set(target, property, newValue, receiver);
+      if (isRef(obj)) return (obj[property].value = newValue);
+      return (obj[property] = newValue);
     }
-  };
-
-  // We create fake key with a null value because otherwise we have a reference error in the with(){ }
-  const fakeDatas = createFakeData(stateDatas);
-  const fakeScopedDatas = scopedNodeData.reduce((a, b) => ({ ...a, ...createFakeData(b) }), {});
-
-  // we init the helpers
-  const helpers: Record<string, (domy: DomySpecialHelper) => any> = {};
-  for (const [name, fn] of Object.entries(PLUGINS.helpers)) {
-    helpers['$' + name] = fn({
-      el,
-      state,
-      scopedNodeData
-    });
-  }
-
-  const context = new Proxy(
-    {
-      ...fakeDatas,
-      ...fakeScopedDatas,
-
-      ...state.methods,
-
-      ...helpers
-    },
-    contextProxyHandler
   );
 
   return context;

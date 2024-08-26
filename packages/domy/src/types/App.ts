@@ -4,7 +4,7 @@ export type WatcherFn = (
   utils: { path: string; params: Record<string, string> }
 ) => void | Promise<void>;
 
-export type App = {
+export type OptionApiApp = {
   target?: HTMLElement;
   setup?: () => void | Promise<void>;
   mounted?: () => void | Promise<void>;
@@ -14,3 +14,11 @@ export type App = {
   data?: { [depName: string]: any };
   methods?: { [fnName: string]: (...args: any[]) => any | Promise<any> };
 };
+
+export type CompositionApiApp = {
+  mounted?: (props: { helpers: Record<`${string}`, any> }) => void | Promise<void>;
+  data?: { [depName: string]: any };
+  methods?: { [fnName: string]: (...args: any[]) => any | Promise<any> };
+};
+
+export type App = OptionApiApp | CompositionApiApp;

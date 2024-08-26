@@ -1,6 +1,5 @@
-import { App } from '../types/App';
 import { State } from '../types/State';
-import { WatcherFn } from '../types/App';
+import { OptionApiApp, WatcherFn } from '../types/App';
 import { DomyReadyEventDetails, DomyMountedEventDetails } from '../types/Events';
 import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
@@ -17,7 +16,7 @@ import { globalWatch, matchPath, reactive } from './reactive';
  *
  * @author yoannchb-pro
  */
-export async function optionAPI(app: App = {}) {
+export async function optionAPI(app: OptionApiApp = {}) {
   const domTarget = app.target ?? document.body;
 
   // Initialisation event dispatch
