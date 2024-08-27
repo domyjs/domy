@@ -14,9 +14,16 @@ export function createApp(appDefinition: StructuredAPIApp | HookAPIFnDefinition)
   let config: Config = {};
 
   function mount(target?: HTMLElement) {
-    const domTarget = target ?? document.body;
-    if (typeof appDefinition === 'function') return hookAPI(appDefinition, domTarget, config);
-    return structuredAPI(appDefinition, domTarget, config);
+    const build = () => {
+      const domTarget = target ?? document.body;
+      if (typeof appDefinition === 'function') return hookAPI(appDefinition, domTarget, config);
+      return structuredAPI(appDefinition, domTarget, config);
+    };
+
+    // We ensure the DOM is accessible before mounting the app
+    if (document.readyState === 'complete') {
+      build();
+    } else document.addEventListener('DOMContentLoaded', build);
   }
 
   function configure(newConfig: Config) {
