@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- Inclure Alpine.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  </head>
+  <body>
+    <div x-data="appData" x-init="init()">
+      <p>Rendering took: <span x-text="Math.round(perf * 100) / 100"></span>ms</p>
+      <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">
+        Count: <span x-text="count"></span>
+      </p>
+      <button @click="increment()">+</button>
+      <button @click="decrement()">-</button>
+      <button @click="supert()">--</button>
+    </div>
+
+    <script>
+      function appData() {
+        return {
+          perf: null,
+          count: 0,
+          init() {
+            this.perf = performance.now();
+            this.$nextTick(() => {
+              this.perf = performance.now() - this.perf;
+            });
+          },
+          increment() {
+            this.count++;
+          },
+          decrement() {
+            this.count--;
+            if (this.count < 0) {
+              this.count = 0; // Reset to 0 if count goes below 0
+            }
+          },
+          supert() {
+            this.increment();
+            console.log('ok');
+          }
+        };
+      }
+    </script>
+  </body>
+</html>

@@ -9,9 +9,9 @@
   <body>
     <p>Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
     <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
-    <button @click="increment()">+</button>
-    <button d-on:click="decrement()">-</button>
-    <button d-on:click="supert">--</button>
+    <button @click="increment">+</button>
+    <button @click="decrement">-</button>
+    <button @click="supert">++</button>
   </body>
   <script>
     window.DOMY.createApp({
@@ -33,7 +33,6 @@
       methods: {
         supert() {
           this.increment();
-          console.log('ok');
         },
         increment() {
           this.count++;
@@ -42,6 +41,6 @@
           this.count--;
         }
       }
-    });
+    }).mount();
   </script>
 </html>

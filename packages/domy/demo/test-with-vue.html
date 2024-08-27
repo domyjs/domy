@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <p>Vue Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
+      <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
+      <button @click="increment">+</button>
+      <button @click="decrement">-</button>
+      <button @click="supert">++</button>
+    </div>
+  </body>
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          perf: null,
+          count: 0
+        };
+      },
+      methods: {
+        supert() {
+          this.increment();
+        },
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        }
+      },
+      watch: {
+        count(newValue, oldValue) {
+          if (newValue < 0) {
+            this.count = oldValue;
+          }
+        }
+      },
+      mounted() {
+        this.perf = performance.now() - this.perf;
+      },
+      created() {
+        this.perf = performance.now();
+      }
+    });
+
+    app.mount('#app');
+  </script>
+</html>
