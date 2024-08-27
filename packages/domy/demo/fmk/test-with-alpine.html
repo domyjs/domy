@@ -3,13 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <!-- Inclure Alpine.js via CDN -->
+    <title>Alpine</title>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   </head>
   <body>
     <div x-data="appData" x-init="init()">
-      <p>Rendering took: <span x-text="Math.round(perf * 100) / 100"></span>ms</p>
+      <p>Alpine Rendering took: <span x-text="Math.round(perf * 100) / 100"></span>ms</p>
       <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">
         Count: <span x-text="count"></span>
       </p>
