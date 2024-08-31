@@ -1,7 +1,7 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandler';
 import { getPreviousConditionsElements } from '../utils/getPreviousConditionsElements';
-import { IsConnectedWatcher } from '../utils/IsConnectedWatcher';
+import { GlobalMutationObserver } from '../utils/GlobalMutationObserver';
 
 /**
  * d-else-if implementation
@@ -33,7 +33,13 @@ export function dElseIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     domy
   });
 
-  IsConnectedWatcher.getInstance().watch(allPreviousConditions, visibilityHandler);
+  GlobalMutationObserver.getInstance().watch(
+    allPreviousConditions,
+    (element, mutation) =>
+      mutation.type === 'childList' && // Ensure the mutation is an added or removed node
+      allPreviousConditions.includes(element as Element) && // Ensure the added or removed node is not a deep children but one of the conditions
+      visibilityHandler()
+  );
 
   domy.effect(visibilityHandler);
 

@@ -1,7 +1,7 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandler';
 import { getPreviousConditionsElements } from '../utils/getPreviousConditionsElements';
-import { IsConnectedWatcher } from '../utils/IsConnectedWatcher';
+import { GlobalMutationObserver } from '../utils/GlobalMutationObserver';
 
 /**
  * d-else implementation
@@ -21,7 +21,7 @@ export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     throw new Error(`"${domy.attrName}" should be preceded by "d-if" or "d-else-if" element.`);
   }
 
-  const visiblityHandler = getElementVisibilityHandler({
+  const visibilityHandler = getElementVisibilityHandler({
     shouldBeDisplay: () => {
       const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(
         el => el.isConnected
@@ -31,9 +31,15 @@ export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     domy
   });
 
-  IsConnectedWatcher.getInstance().watch(allPreviousConditions, visiblityHandler);
+  GlobalMutationObserver.getInstance().watch(
+    allPreviousConditions,
+    (element, mutation) =>
+      mutation.type === 'childList' && // Ensure the mutation is an added or removed node
+      allPreviousConditions.includes(element as Element) && // Ensure the added or removed node is not a deep children but one of the conditions
+      visibilityHandler()
+  );
 
-  visiblityHandler();
+  visibilityHandler();
 
   return { skipChildsRendering: true, skipOtherAttributesRendering: true };
 }
