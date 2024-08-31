@@ -24,7 +24,7 @@ export class DomyHelper {
   public directive: string = '';
   public attrName: string = ''; // The attribute name without the modifiers and prefix
   public attr: { name: string; value: string } = { name: '', value: '' };
-  public modifiers: string[] = [];
+  public modifiers = new Set<string>();
 
   // The name of a variable don't make it unique because we can declare the same variable name for an other DOMY instance
   // It happend because domy have a globalWatcher when it evaluate a code to check dependencies

@@ -12,7 +12,7 @@ export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
   domy.deepRender({
     element: domy.el,
     state: domy.state,
-    byPassAttributes: ['d-once'],
+    byPassAttributes: [domy.attr.name],
     renderWithoutListeningToChange: true
   });
 

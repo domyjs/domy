@@ -29,7 +29,7 @@ function changeValue(domy: DomyDirectiveHelper) {
     } else {
       value = selectedOptions[0]?.value ?? '';
     }
-  } else if ((el.type === 'number' || domy.modifiers.includes('number')) && value) {
+  } else if ((el.type === 'number' || domy.modifiers.has('number')) && value) {
     // Number handling
     value = Number(value);
     value = isNaN(value) ? 0 : value;
@@ -88,9 +88,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   });
 
   // We look at change made by the user
-  el.addEventListener(domy.modifiers.includes('lazy') ? 'change' : 'input', () =>
-    changeValue(domy)
-  );
+  el.addEventListener(domy.modifiers.has('lazy') ? 'change' : 'input', () => changeValue(domy));
 
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);

@@ -42,13 +42,6 @@ function getDomyName(str: string) {
  * @author yoannchb-pro
  */
 function getDomyAttributeInformations(attr: Attr) {
-  const infos = {
-    prefix: '',
-    directive: '',
-    modifiers: [] as string[],
-    attrName: ''
-  };
-
   // Allow us to separate the prefix, the domy attribute name and the modifiers
   const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
   let prefix = '';
@@ -57,12 +50,12 @@ function getDomyAttributeInformations(attr: Attr) {
     [prefix, attrName] = attrName.split(':');
   }
 
-  infos.prefix = getDomyName(prefix);
-  infos.directive = getDomyName(attrName);
-  infos.modifiers = modifiers;
-  infos.attrName = attrName;
-
-  return infos;
+  return {
+    prefix: getDomyName(prefix),
+    directive: getDomyName(attrName),
+    modifiers: new Set(modifiers),
+    attrName: attrName
+  };
 }
 
 /**
@@ -173,8 +166,9 @@ export function createConfigurableDeepRender(config: Config) {
       // We add the child of the element to the list to render them next
       // We reverse the child because in the case of d-if, d-else-if, d-else
       // the element need to know if is previousSibling is displayed or not and to access to the d-if or d-else-if content
-      const reversedChild = Array.from(element.childNodes).reverse();
-      for (const child of reversedChild) {
+      for (let i = element.childNodes.length - 1; i >= 0; --i) {
+        const child = element.childNodes[i];
+
         if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We ensure we never render script
 
         toRenderList.push({

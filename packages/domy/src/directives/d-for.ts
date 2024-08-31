@@ -21,13 +21,13 @@ function renderer(props: RendererProps) {
   const domy = props.domy;
   const el = domy.el;
   const currentChildrens = Array.from(el.children);
-  const renderedChildrens: (Element | ChildNode | Node)[] = [];
+  const renderedChildrens = new Set<Element | ChildNode | Node>();
 
-  // Add the current value to the scope
+  // Add the value to the scope
   let scope = {
     [props.forPattern!.groups!.dest]: props.value
   };
-  // Add the current value index to the scope if needed
+  // Add the index to the scope if needed
   if (props.forPattern!.groups?.index) {
     scope = {
       ...scope,
@@ -55,7 +55,7 @@ function renderer(props: RendererProps) {
           moveElement(el, elementWithKey, currentIndex);
         }
 
-        renderedChildrens.push(elementWithKey);
+        renderedChildrens.add(elementWithKey);
         continue;
       }
     }
@@ -73,7 +73,7 @@ function renderer(props: RendererProps) {
     // If an element doesn't exist at this index it mean we append a new child
     if (!oldRender) {
       el.appendChild(newChild);
-      renderedChildrens.push(newChild);
+      renderedChildrens.add(newChild);
       continue;
     }
 
@@ -83,9 +83,9 @@ function renderer(props: RendererProps) {
     const isEqual = oldRender.isEqualNode(newChild);
     if (!isEqual) {
       el.insertBefore(newChild, oldRender);
-      renderedChildrens.push(newChild);
+      renderedChildrens.add(newChild);
     } else {
-      renderedChildrens.push(oldRender);
+      renderedChildrens.add(oldRender);
     }
   }
 
@@ -127,7 +127,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     const isForIn = forPattern.groups!.type === 'in';
     const executedValue = domy.evaluate(forPattern.groups!.org);
 
-    const renderedChildrens: (Element | ChildNode | Node)[] = [];
+    let renderedChildrens = new Set<Element | ChildNode | Node>();
 
     let valueIndex = 0;
     const renderChilds = (value: any) => {
@@ -138,28 +138,23 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         value,
         valueIndex
       });
-      renderedChildrens.push(...renderedChildForCurrentValue);
+
+      renderedChildrens = new Set([...renderedChildrens, ...renderedChildForCurrentValue]);
+
       ++valueIndex;
     };
 
     if (isForIn) {
       // Handle "for in"
-      for (const value in executedValue) {
-        renderChilds(value);
-      }
+      for (const value in executedValue) renderChilds(value);
     } else {
       // Handle "for of"
-      for (const value of executedValue) {
-        renderChilds(value);
-      }
+      for (const value of executedValue) renderChilds(value);
     }
 
     // Remove remaining childs that shouldn't be there
-    const childrendsToRemove = Array.from(el.childNodes ?? []).filter(
-      child => !renderedChildrens.includes(child)
-    );
-    for (const child of childrendsToRemove) {
-      child.remove();
+    for (const child of el.childNodes) {
+      if (!renderedChildrens.has(child)) child.remove();
     }
   });
 
