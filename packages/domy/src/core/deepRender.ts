@@ -22,15 +22,71 @@ type Props = {
 };
 
 /**
- * Remove the domy "d-" prefix of a string
+ * Get the name of a domy attribute/prefix
+ * It will remove the domy "d-" prefix of a string
  * Otherwise it retun an empty string
  * @param attrName
  * @returns
  *
  * @author yoannchb-pro
  */
-function removeDPrefix(str: string) {
+function getDomyName(str: string) {
   return str.startsWith('d-') ? str.slice(2) : '';
+}
+
+/**
+ * Retrieve some utils informations from a domy attribute
+ * @param attr
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+function getDomyAttributeInformations(attr: Attr) {
+  const infos = {
+    prefix: '',
+    directive: '',
+    modifiers: [] as string[],
+    attrName: ''
+  };
+
+  // Allow us to separate the prefix, the domy attribute name and the modifiers
+  const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
+  let prefix = '';
+  let attrName = attrNameWithPrefix;
+  if (attrName.includes(':')) {
+    [prefix, attrName] = attrName.split(':');
+  }
+
+  infos.prefix = getDomyName(prefix);
+  infos.directive = getDomyName(attrName);
+  infos.modifiers = modifiers;
+  infos.attrName = attrName;
+
+  return infos;
+}
+
+/**
+ * Sort a list of attributes based on the sorted directives order in plugin
+ * It ensure some attributes are rendered first like d-ignore, d-once, ...
+ * @param attrs
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+function sortAttributesBasedOnSortedDirectives(attrs: NamedNodeMap) {
+  const copy = Array.from(attrs ?? []);
+  copy.sort((a, b) => {
+    const iA = PLUGINS.sortedDirectives.indexOf(getDomyName(a.name));
+    const iB = PLUGINS.sortedDirectives.indexOf(getDomyName(b.name));
+    if (iA === -1) {
+      return 1;
+    } else if (iB === -1) {
+      return -1;
+    } else {
+      return iA - iB;
+    }
+  });
+  return copy;
 }
 
 /**
@@ -70,24 +126,11 @@ export function createConfigurableDeepRender(config: Config) {
         continue;
       }
 
-      const attributes = Array.from(element.attributes ?? []);
-
-      // We ensure some attributes are rendered first like d-ignore, d-once, ...
-      attributes.sort((a, b) => {
-        const iA = PLUGINS.sortedDirectives.indexOf(removeDPrefix(a.name));
-        const iB = PLUGINS.sortedDirectives.indexOf(removeDPrefix(b.name));
-        if (iA === -1) {
-          return 1;
-        } else if (iB === -1) {
-          return -1;
-        } else {
-          return iA - iB;
-        }
-      });
-
       // Rendering attributes if it's an element
+      const sortedAttributes = sortAttributesBasedOnSortedDirectives(element.attributes);
+
       let skipChildRendering = false;
-      for (const attr of attributes) {
+      for (const attr of sortedAttributes) {
         const shouldByPassAttribute =
           toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
 
@@ -102,19 +145,11 @@ export function createConfigurableDeepRender(config: Config) {
           config
         );
 
-        // We get the prefix, modifiers and attribute name
-        const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
-        let prefix = '';
-        let attrName = attrNameWithPrefix;
-        if (attrName.includes(':')) {
-          [prefix, attrName] = attrName.split(':');
-        }
-
-        domyHelper.prefix = removeDPrefix(prefix);
-        domyHelper.directive = removeDPrefix(attrName);
-        domyHelper.modifiers = modifiers;
-
-        domyHelper.attrName = attrName; // The attribute name without the modifiers and prefix (examples: d-on:click.{enter} -> click)
+        const attrInfos = getDomyAttributeInformations(attr);
+        domyHelper.prefix = attrInfos.prefix;
+        domyHelper.directive = attrInfos.directive;
+        domyHelper.modifiers = attrInfos.modifiers;
+        domyHelper.attrName = attrInfos.attrName; // The attribute name without the modifiers and prefix (examples: d-on:click.{enter} -> click)
         domyHelper.attr.name = attr.name; // the full attribute name
         domyHelper.attr.value = attr.value;
 
@@ -123,9 +158,7 @@ export function createConfigurableDeepRender(config: Config) {
         const options: DomyDirectiveReturn = renderAttribute(
           domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
         );
-
         domyHelper.callEffect();
-
         element.removeAttribute(attr.name);
 
         // Handling options returned by the attribute
@@ -135,19 +168,19 @@ export function createConfigurableDeepRender(config: Config) {
         }
       }
 
+      if (skipChildRendering) continue;
+
       // We add the child of the element to the list to render them next
       // We reverse the child because in the case of d-if, d-else-if, d-else
       // the element need to know if is previousSibling is displayed or not and to access to the d-if or d-else-if content
-      if (!skipChildRendering) {
-        const reversedChild = Array.from(element.childNodes).reverse();
-        for (const child of reversedChild) {
-          if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We never render script
+      const reversedChild = Array.from(element.childNodes).reverse();
+      for (const child of reversedChild) {
+        if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We ensure we never render script
 
-          toRenderList.push({
-            element: child as Element,
-            scopedNodeData: domyHelper.scopedNodeData
-          });
-        }
+        toRenderList.push({
+          element: child as Element,
+          scopedNodeData: domyHelper.scopedNodeData
+        });
       }
     }
   };
