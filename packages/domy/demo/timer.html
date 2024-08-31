@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ name }}: {{ time.toFixed(2) }}s</h1>
+    <button @click="start">Start</button>
+    <button @click="stop">Stop</button>
+    <button @click="reset">Reset</button>
+  </body>
+  <script>
+    const { signal, reactive, watch } = DOMY;
+
+    function useTimer() {
+      let interval;
+      const time = signal(0);
+
+      const start = () => {
+        if (!interval) interval = setInterval(() => (time.value += 0.01), 10);
+      };
+      const stop = () => {
+        clearInterval(interval);
+        interval = null;
+      };
+      const reset = () => {
+        stop();
+        time.value = 0;
+      };
+
+      return {
+        name: 'Timer',
+        time,
+        start,
+        stop,
+        reset
+      };
+    }
+
+    DOMY.createApp(() => useTimer()).mount();
+  </script>
+</html>
