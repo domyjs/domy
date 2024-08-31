@@ -101,7 +101,6 @@ export function createConfigurableDeepRender(config: Config) {
 
     while (toRenderList.length > 0) {
       const toRender = toRenderList.shift() as Elem;
-      // const isTemplate = toRender.element instanceof HTMLTemplateElement;
       const element = toRender.element;
 
       let domyHelper = new DomyHelper(
