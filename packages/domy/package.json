@@ -31,8 +31,5 @@
   "homepage": "https://github.com/yoannchb-pro/domy#readme",
   "dependencies": {
     "@domyjs/reactive": "file:../reactive"
-  },
-  "devDependencies": {
-    "@domyjs/types": "file:../types"
   }
 }

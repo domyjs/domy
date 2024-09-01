@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper, DomyDirectiveReturn } from '@domyjs/types/src/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { isBindAttr, isDomyAttr, isEventAttr } from '../utils/isSpecialAttribute';
 import { binding } from './binding';
 import { events } from './events';

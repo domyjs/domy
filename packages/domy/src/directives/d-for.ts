@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper, DomyDirectiveReturn } from '@domyjs/types/src/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { warn } from '../utils/logs';
 import { moveElement } from '../utils/moveElement';
 

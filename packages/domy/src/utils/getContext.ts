@@ -1,4 +1,4 @@
-import { State } from '@domyjs/types/src/State';
+import { State } from '../types/State';
 import { concatProxiesAndObjs } from './concatProxiesAndObjs';
 import { getHelpers } from './getHelpers';
 import { isSignal } from '@domyjs/reactive';

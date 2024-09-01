@@ -1,4 +1,4 @@
-import { DomyDirectiveReturn } from '@domyjs/types/src/Domy';
+import { DomyDirectiveReturn } from '../types/Domy';
 
 /**
  * d-ignore implementation

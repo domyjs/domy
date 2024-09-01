@@ -1,4 +1,4 @@
-import { DomySpecialHelper } from '@domyjs/types/src/Domy';
+import { DomySpecialHelper } from '../types/Domy';
 
 /**
  * Get a registered ref element

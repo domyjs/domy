@@ -1,8 +1,8 @@
 import { PLUGINS } from '../core/plugin';
 import * as ReactiveUtils from '@domyjs/reactive';
-import { DomySpecialHelper } from '@domyjs/types/src/Domy';
-import { Helpers } from '@domyjs/types/src/Helpers';
-import { State } from '@domyjs/types/src/State';
+import { DomySpecialHelper } from '../types/Domy';
+import { Helpers } from '../types/Helpers';
+import { State } from '../types/State';
 
 /**
  * Return the initialised helpers with everything it need

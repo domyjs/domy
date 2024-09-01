@@ -9,7 +9,7 @@ import config from '../tsconfig.json';
 const filters = ['docs'];
 
 // Argument to target a specific package to build
-const toBuild = process.argv[3];
+const toBuild = process.argv[2];
 
 (async () => {
   // Read directories within the packages folder
@@ -18,12 +18,9 @@ const toBuild = process.argv[3];
     return fs.statSync(path.join('./packages', dir)).isDirectory();
   });
 
-  // Compile the "types" package first because other packages depend on it
-  const sortedPackages = ['types', ...packages.filter(pkg => pkg !== 'types')];
+  console.log('Building packages: ', packages.join(','));
 
-  console.log('Building packages: ', sortedPackages.join(','));
-
-  for (const packageName of sortedPackages) {
+  for (const packageName of packages) {
     try {
       // Read and parse the package.json file
       const packageJsonPath = `./packages/${packageName}/package.json`;

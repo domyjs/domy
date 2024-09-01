@@ -1,5 +1,5 @@
-import { StructuredAPIApp } from '@domyjs/types/src/App';
-import { Config } from '@domyjs/types/src/Config';
+import { StructuredAPIApp } from '../types/App';
+import { Config } from '../types/Config';
 import { hookAPI, HookAPIFnDefinition } from './hookAPI';
 import { structuredAPI } from './structuredAPI';
 

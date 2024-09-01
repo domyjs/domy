@@ -1,6 +1,3 @@
-import { Config } from '@domyjs/types/src/Config';
-import { DomyDirectiveHelper } from '@domyjs/types/src/Domy';
-import { State } from '@domyjs/types/src/State';
 import { cspEvaluate } from '../utils/cspEvaluate';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
@@ -8,6 +5,9 @@ import { createConfigurableDeepRender } from './deepRender';
 import * as ReactiveUtils from '@domyjs/reactive';
 import { queueJob } from './scheduler';
 import { Listener, OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
+import { State } from '../types/State';
+import { Config } from '../types/Config';
+import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * Domy helper class that handle dependencie change and give everything we need

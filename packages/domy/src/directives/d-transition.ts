@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '@domyjs/types/src/Domy';
+import { DomyDirectiveHelper } from '../types/Domy';
 
 /**
  * d-transition implementation

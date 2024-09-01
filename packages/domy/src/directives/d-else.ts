@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper, DomyDirectiveReturn } from '@domyjs/types/src/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandler';
 import { getPreviousConditionsElements } from '../utils/getPreviousConditionsElements';
 import { GlobalMutationObserver } from '../utils/GlobalMutationObserver';

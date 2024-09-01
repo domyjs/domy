@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper, DomyDirectiveReturn } from '@domyjs/types/src/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { set } from '../utils/getAndSet';
 
 type Value = string | number | boolean | string[] | undefined;

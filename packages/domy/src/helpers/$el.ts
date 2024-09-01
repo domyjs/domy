@@ -1,4 +1,4 @@
-import { DomySpecialHelper } from '@domyjs/types/src/Domy';
+import { DomySpecialHelper } from '../types/Domy';
 
 /**
  * Give the current element
