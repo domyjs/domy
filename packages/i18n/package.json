@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/yoannchb-pro/domy/issues"
   },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme"
+  "homepage": "https://github.com/yoannchb-pro/domy#readme",
+  "devDependencies": {
+    "@domyjs/core": "file:../domy"
+  }
 }
