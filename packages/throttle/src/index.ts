@@ -10,7 +10,7 @@ declare const DOMY: DOMY;
  * @author yoannchb-pro
  */
 export function throttlePlugin() {
-  return function (fn: Function, limit: number) {
+  return function (fn: (...args: any[]) => void, limit: number) {
     let inThrottle = false;
     return function (this: any, ...args: any[]) {
       if (!inThrottle) {

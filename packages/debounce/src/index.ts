@@ -10,7 +10,7 @@ declare const DOMY: DOMY;
  * @author yoannchb-pro
  */
 export function debouncePlugin() {
-  return function (fn: Function, delay: number) {
+  return function (fn: (...args: any[]) => void, delay: number) {
     let timeoutId: NodeJS.Timeout;
     return function (this: any, ...args: any[]) {
       clearTimeout(timeoutId);
