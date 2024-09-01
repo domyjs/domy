@@ -21,7 +21,7 @@ export function createApp(appDefinition: StructuredAPIApp | HookAPIFnDefinition)
     };
 
     // We ensure the DOM is accessible before mounting the app
-    if (document.readyState === 'complete') {
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
       build();
     } else document.addEventListener('DOMContentLoaded', build);
   }
