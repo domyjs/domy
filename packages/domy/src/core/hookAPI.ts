@@ -55,7 +55,10 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
     onMounted: callback => {
       app.mounted = callback;
     },
-    helpers: getHelpers(undefined, state)
+    helpers: getHelpers({
+      state,
+      scopedNodeData: []
+    })
   });
 
   // We set the data and methods of the app
@@ -96,7 +99,7 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
   // Mounted
   if (app.mounted) {
     try {
-      await app.mounted({ helpers: getHelpers(undefined, state) });
+      await app.mounted({ helpers: getHelpers({ state, scopedNodeData: [] }) });
     } catch (err: any) {
       error(err);
     }
