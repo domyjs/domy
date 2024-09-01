@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$throttle</title>
+    <script src="/packages/debounce/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ count }}</h1>
+    <button id="inc" @click="$debounce(() => ++count, 500)">+</button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        count: 0
+      }
+    }).mount();
+  </script>
+</html>

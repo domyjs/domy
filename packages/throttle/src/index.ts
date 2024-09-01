@@ -1,7 +1,7 @@
 import type DOMY from '@domyjs/core';
 import type { DomySpecialHelper } from '@domyjs/core/src/types/Domy';
 
-const temp = new Map<number, (...args: any[]) => void>();
+const throttleCache = new Map<number, (...args: any[]) => void>();
 
 /**
  * Throttle utility implementation
@@ -13,12 +13,12 @@ const temp = new Map<number, (...args: any[]) => void>();
 export function throttlePlugin(domy: DomySpecialHelper) {
   const hasId = typeof domy.domyHelperId === 'number';
 
-  if (hasId) {
-    const tempFn = temp.get(domy.domyHelperId as number);
-    if (tempFn) return () => tempFn;
-  }
-
   return function <T extends (...args: any[]) => void>(fn: T, limit: number) {
+    if (hasId) {
+      const cachedThrottleFn = throttleCache.get(domy.domyHelperId as number);
+      if (cachedThrottleFn) return cachedThrottleFn;
+    }
+
     let inThrottle = false;
 
     const throttleFn = function (this: any, ...args: any[]) {
@@ -29,7 +29,7 @@ export function throttlePlugin(domy: DomySpecialHelper) {
       }
     };
 
-    if (hasId) temp.set(domy.domyHelperId as number, throttleFn);
+    if (hasId) throttleCache.set(domy.domyHelperId as number, throttleFn);
 
     return throttleFn;
   };
