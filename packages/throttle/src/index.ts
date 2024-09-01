@@ -1,6 +1,4 @@
-import { DOMY } from '@domyjs/types';
-
-declare const DOMY: DOMY;
+import type DOMY from '@domyjs/core';
 
 /**
  * Throttle utility implementation
@@ -10,7 +8,7 @@ declare const DOMY: DOMY;
  * @author yoannchb-pro
  */
 export function throttlePlugin() {
-  return function (fn: (...args: any[]) => void, limit: number) {
+  return function <T extends (...args: any[]) => void>(fn: T, limit: number) {
     let inThrottle = false;
     return function (this: any, ...args: any[]) {
       if (!inThrottle) {
@@ -22,6 +20,9 @@ export function throttlePlugin() {
   };
 }
 
-DOMY.plugin(domyPluginSetter => {
-  domyPluginSetter.helper('throttle', throttlePlugin);
+document.addEventListener('domy:ready', event => {
+  const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
+  DOMYOBJ.plugin(domyPluginSetter => {
+    domyPluginSetter.helper('throttle', throttlePlugin);
+  });
 });
