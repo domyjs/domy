@@ -1,6 +1,5 @@
 import type { State } from './State';
 import type * as ReactiveUtils from '@domyjs/reactive';
-import type { DomyHelper } from '../core/DomyHelper';
 import { Config } from './Config';
 import { createConfigurableDeepRender } from '../core/deepRender';
 import { getContext } from '../utils/getContext';
