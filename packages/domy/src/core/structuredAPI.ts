@@ -43,7 +43,7 @@ export async function structuredAPI(
   for (const key in app.methods) {
     const method = toRegularFn(app.methods[key]);
     state.methods[key] = function (...args: any[]) {
-      return method.call(getContext(undefined, state), ...args);
+      return method.call(getContext({ state, scopedNodeData: [] }), ...args);
     };
   }
 
@@ -69,10 +69,15 @@ export async function structuredAPI(
 
               try {
                 const watcherfn = watchers[watcherName].fn;
-                await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
-                  path,
-                  params: match.params
-                });
+                await watcherfn.call(
+                  getContext({ state, scopedNodeData: [] }),
+                  prevValue,
+                  newValue,
+                  {
+                    path,
+                    params: match.params
+                  }
+                );
               } catch (err: any) {
                 error(err);
               }
@@ -90,7 +95,7 @@ export async function structuredAPI(
   if (app.setup) {
     try {
       const setupFn = toRegularFn(app.setup);
-      await setupFn.call(getContext(undefined, state));
+      await setupFn.call(getContext({ state, scopedNodeData: [] }));
     } catch (err: any) {
       error(err);
       return;
@@ -120,7 +125,7 @@ export async function structuredAPI(
   if (app.mounted) {
     try {
       const mountedFn = toRegularFn(app.mounted);
-      await mountedFn.call(getContext(undefined, state));
+      await mountedFn.call(getContext({ state, scopedNodeData: [] }));
     } catch (err: any) {
       error(err);
     }
