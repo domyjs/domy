@@ -8,9 +8,16 @@
   </head>
   <body>
     <input type="text" d-ref="text" value="Hello World!" />
-    <p>{{ $refs.text.value }}</p>
+    <p>{{ content }}</p>
   </body>
   <script>
-    DOMY.createApp().mount();
+    DOMY.createApp({
+      data: {
+        content: ''
+      },
+      mounted() {
+        this.content = this.$refs.text.value;
+      }
+    }).mount();
   </script>
 </html>
