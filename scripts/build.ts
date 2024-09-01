@@ -19,7 +19,8 @@ const toBuild = process.argv[2];
   });
 
   // Ensure domy is build first because plugin depends of it
-  const sortedPackages = ['domy', ...packages.filter(name => name !== 'domy')];
+  const sorted = ['reactive', 'domy'];
+  const sortedPackages = [...sorted, ...packages.filter(name => !sorted.includes(name))];
 
   console.log('Building packages: ', sortedPackages.join(','));
 
