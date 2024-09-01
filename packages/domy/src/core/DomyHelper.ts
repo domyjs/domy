@@ -7,7 +7,10 @@ import { queueJob } from './scheduler';
 import { Listener, OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { State } from '../types/State';
 import { Config } from '../types/Config';
+import { accessibleUtils } from '../utils/accessibleUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
+
+let domyHelperId = 0;
 
 /**
  * Domy helper class that handle dependencie change and give everything we need
@@ -15,6 +18,8 @@ import { DomyDirectiveHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export class DomyHelper {
+  private domyHelperId = ++domyHelperId;
+
   private onSetListener: OnSetListener | null = null;
 
   private cleanupFn: (() => Promise<void> | void) | null = null;
@@ -47,6 +52,7 @@ export class DomyHelper {
     const evaluateWithoutListening = this.evaluateWithoutListening.bind(this);
 
     return {
+      domyHelperId: this.domyHelperId,
       el: this.el,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
@@ -60,6 +66,7 @@ export class DomyHelper {
       attr: this.attr,
 
       ...ReactiveUtils,
+      utils: accessibleUtils,
 
       queueJob,
       effect: this.effect.bind(this),
@@ -109,7 +116,12 @@ export class DomyHelper {
     const executedValued = evaluator({
       code: code,
       contextAsGlobal: !this.config.avoidDeprecatedWith,
-      context: getContext(this.el, this.state, this.scopedNodeData),
+      context: getContext({
+        domyHelperId: this.domyHelperId,
+        el: this.el,
+        state: this.state,
+        scopedNodeData: this.scopedNodeData
+      }),
       returnResult: true
     });
     return executedValued;

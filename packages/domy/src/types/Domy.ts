@@ -1,9 +1,11 @@
-import { State } from './State';
-import * as ReactiveUtils from '@domyjs/reactive';
+import type { State } from './State';
+import type * as ReactiveUtils from '@domyjs/reactive';
+import type { DomyHelper } from '../core/DomyHelper';
 import { Config } from './Config';
 import { createConfigurableDeepRender } from '../core/deepRender';
 import { getContext } from '../utils/getContext';
 import { queueJob } from '../core/scheduler';
+import { accessibleUtils } from '../utils/accessibleUtils';
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -14,12 +16,14 @@ export type DomyDirectiveReturn = {
 } | void;
 
 export type DomySpecialHelper = {
-  el: Element | Text | undefined;
+  domyHelperId?: number;
+  el?: Element | Text;
   state: State;
   scopedNodeData: Record<string, any>[];
 } & typeof ReactiveUtils;
 
 export type DomyDirectiveHelper = {
+  domyHelperId: number;
   el: Element;
   config: Config;
   state: State;
@@ -29,6 +33,8 @@ export type DomyDirectiveHelper = {
   modifiers: Set<string>;
   attrName: string;
   attr: { name: string; value: string };
+
+  utils: typeof accessibleUtils;
 
   queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;
