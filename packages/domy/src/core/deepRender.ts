@@ -100,7 +100,9 @@ export function createConfigurableDeepRender(config: Config) {
     ];
 
     while (toRenderList.length > 0) {
-      const toRender = toRenderList.shift() as Elem;
+      // We use pop for performance issue and because we render the tree from the bottom to top
+      // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
+      const toRender = toRenderList.pop() as Elem;
       const element = toRender.element;
 
       let domyHelper = new DomyHelper(
@@ -162,12 +164,7 @@ export function createConfigurableDeepRender(config: Config) {
 
       if (skipChildRendering) continue;
 
-      // We add the child of the element to the list to render them next
-      // We reverse the child because in the case of d-if, d-else-if, d-else
-      // the element need to know if is previousSibling is displayed or not and to access to the d-if or d-else-if content
-      for (let i = element.childNodes.length - 1; i >= 0; --i) {
-        const child = element.childNodes[i];
-
+      for (const child of element.childNodes) {
         if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We ensure we never render script
 
         toRenderList.push({
