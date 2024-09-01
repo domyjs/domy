@@ -1,4 +1,5 @@
-import { watch as initialWatch, OnSetListener } from '../core/reactive';
+import { watch as initialWatch } from '@domyjs/reactive';
+import { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
 /**
  * Add a watcher to some reactives variables

@@ -1,13 +1,13 @@
-import { HookAPIApp } from '../types/App';
-import { Config } from '../types/Config';
-import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
-import { Helpers } from '../types/Helpers';
-import { State } from '../types/State';
+import { HookAPIApp } from '@domyjs/types/src/App';
+import { Config } from '@domyjs/types/src/Config';
+import { DomyMountedEventDetails, DomyReadyEventDetails } from '@domyjs/types/src/Events';
+import { Helpers } from '@domyjs/types/src/Helpers';
+import { State } from '@domyjs/types/src/State';
 import { getHelpers } from '../utils/getHelpers';
 import { error } from '../utils/logs';
 import { createConfigurableDeepRender } from './deepRender';
 import { DOMY_EVENTS } from './DomyEvents';
-import { isReactive, registerName } from './reactive';
+import { isReactive, registerName } from '@domyjs/reactive';
 
 type PromisedOrNot<T> = Promise<T> | T;
 type HookAPIParams = {

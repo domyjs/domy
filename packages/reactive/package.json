@@ -1,7 +1,7 @@
 {
-  "name": "@domyjs/types",
+  "name": "@domyjs/reactive",
   "version": "1.0.0",
-  "description": "Domyjs types declaration",
+  "description": "Domyjs reactive variable",
   "types": "./dist/index.d.ts",
   "files": [
     "/dist",
@@ -17,15 +17,13 @@
     "domyjs",
     "framework",
     "typescript",
-    "javascript"
+    "javascript",
+    "reactive"
   ],
   "author": "yoannchb",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/yoannchb-pro/domy/issues"
   },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme",
-  "devDependencies": {
-    "@domyjs/reactive": "file:../reactive"
-  }
+  "homepage": "https://github.com/yoannchb-pro/domy#readme"
 }

@@ -1,8 +1,5 @@
 /* eslint @typescript-eslint/no-this-alias: "off" */
 
-type MatchingResult = { isMatching: boolean; params: Record<string, string> };
-
-type GetListenerByType<T> = T extends 'onGet' ? OnGetListener : OnSetListener;
 export type Listener = OnGetListener | OnSetListener;
 export type OnGetListener = {
   type: 'onGet';
@@ -19,16 +16,14 @@ export type OnSetListener = {
 };
 
 let objectId = 0;
-const isProxySymbol = Symbol('isProxy');
-const isSignalSymbol = Symbol('isSignal');
-const reactivesVariablesList: ReactiveVariable[] = [];
-const globalListenersList: Listener[] = [];
+export const isProxySymbol = Symbol();
+export const isSignalSymbol = Symbol();
 
 /**
  * Allow to create a DeepProxy to listen to any change into an object
  * @author yoannchb-pro
  */
-class ReactiveVariable {
+export class ReactiveVariable {
   public id = ++objectId;
   public name = '';
   private proxy: any = null;
@@ -229,201 +224,6 @@ class ReactiveVariable {
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
     for (const listener of this.onSetListeners) {
       listener({ path: this.name + path.join('.'), prevValue, newValue, objectId: this.id });
-    }
-  }
-}
-
-/**
- * Transform an object into a reactive object to listen to any change
- * @param obj
- * @returns
- *
- * @author yoannchb-pro
- */
-export function reactive<T>(obj: T): T {
-  if (ReactiveVariable.isReactive(obj)) return obj;
-
-  const reactiveVariable = new ReactiveVariable(obj);
-  reactivesVariablesList.push(reactiveVariable);
-
-  // We attach the global listener
-  function createGlobalListener<T extends Listener['type']>(type: T): GetListenerByType<T>['fn'] {
-    return (props: any) => {
-      const globalListenerByType = globalListenersList.filter(
-        curr => curr.type === type
-      ) as GetListenerByType<T>[];
-
-      for (const globalListener of globalListenerByType) {
-        try {
-          globalListener.fn(props);
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
-  }
-  reactiveVariable.attachListener({
-    type: 'onGet',
-    fn: createGlobalListener('onGet')
-  });
-  reactiveVariable.attachListener({
-    type: 'onSet',
-    fn: createGlobalListener('onSet')
-  });
-
-  return reactiveVariable.getProxy();
-}
-
-/**
- * Transform a primitive into a reactive object to listen to any change
- * @param obj
- * @returns
- *
- * @author yoannchb-pro
- */
-export function signal<T>(obj: T): { value: T } {
-  return reactive({ value: obj, [isSignalSymbol]: true });
-}
-
-/**
- * Attach a listener to all reactive variables
- * @param listener
- *
- * @author yoannchb-pro
- */
-export function globalWatch(listener: Listener) {
-  globalListenersList.push(listener);
-}
-
-/**
- * Remove a global listener
- * @param listener
- *
- * @author yoannchb-pro
- */
-export function removeGlobalWatch(listener: Listener) {
-  const index = globalListenersList.findIndex(l => l === listener);
-  globalListenersList.splice(index, 1);
-}
-
-/**
- * Attach a listener to some reactives variables
- * @param fn
- * @param objsToWatch
- *
- * @author yoannchb-pro
- */
-export function watch(listener: Listener, objsToWatch: unknown[]) {
-  const variablesToWatch = reactivesVariablesList.filter(reactiveVariable =>
-    objsToWatch.some(objToWatch => objToWatch === reactiveVariable.getProxy())
-  );
-  for (const reactiveVariable of variablesToWatch) {
-    reactiveVariable.attachListener(listener);
-  }
-}
-
-/**
- * Remove a listener from some reactives variables
- * @param fn
- * @param objsToWatch
- *
- * @author yoannchb-pro
- */
-export function unwatch(listener: Listener, objsToUnwatch: unknown[]) {
-  const variablesToUnwatch = reactivesVariablesList.filter(reactiveVariable =>
-    objsToUnwatch.some(objToUnwatch => objToUnwatch === reactiveVariable.getProxy())
-  );
-  for (const reactiveVariable of variablesToUnwatch) {
-    reactiveVariable.removeListener(listener);
-  }
-}
-
-/**
- * Check if a path match a certain rule
- * Example:
- * path: todos.0.isComplete
- * reg: todos.*.isComplete or todos, todos.* or todos.*.*
- * Will give true
- * reg: todos.1.isComplete, todos.*.name, todos.*.*.id
- * Will give false
- * @param reg
- * @param path
- * @returns
- *
- * @author yoannchb-pro
- */
-export function matchPath(reg: string, path: string): MatchingResult {
-  const defaultRes: MatchingResult = {
-    isMatching: false,
-    params: {}
-  };
-
-  const rules = reg.split('.');
-  const paths = path.split('.');
-
-  const params: Record<string, string> = {};
-
-  for (let i = 0; i < rules.length; ++i) {
-    if (!path[i]) return defaultRes;
-
-    const isParam = rules[i].match(/\{\w+\}/);
-    if (rules[i] === '*' || isParam) {
-      if (isParam) {
-        const paramName = isParam[0];
-        params[paramName.substring(1, paramName.length - 1)] = paths[i];
-      }
-      continue;
-    }
-
-    if (paths[i] !== rules[i]) return defaultRes;
-  }
-
-  return { isMatching: true, params };
-}
-
-/**
- * Will return true if a obj is a signal/reactive
- * @param obj
- * @returns
- *
- * @author yoannchb-pro
- */
-export function isReactive(obj: any) {
-  return ReactiveVariable.isReactive(obj);
-}
-
-/**
- * Will return true if the obj is a signal
- * @param obj
- * @returns
- *
- * @author yoannchb-pro
- */
-export function isSignal(obj: any) {
-  return !!obj?.[isSignalSymbol];
-}
-
-/**
- * Register a name for a reactive variable
- * It allow us to have a correct path name
- * Example of use case:
- * cont count = signal(0);
- * watch(({ path }) => console.log(path), [count]);
- * count.value += 1;
- *
- * The path is going to be "value" instead of "count.value" because we don't know the variable name
- * So to fixe that we just need to put registerName("count", count) after the variable declaration
- * @param name
- * @param obj
- * @returns
- *
- * @author yoannchb-pro
- */
-export function registerName(name: string, obj: any) {
-  for (const reactiveVariable of reactivesVariablesList) {
-    if (reactiveVariable.getProxy() === obj) {
-      reactiveVariable.name = name + '.';
-      return;
     }
   }
 }

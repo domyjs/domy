@@ -1,13 +1,13 @@
-import { State } from '../types/State';
-import { StructuredAPIApp, WatcherFn } from '../types/App';
-import { DomyReadyEventDetails, DomyMountedEventDetails } from '../types/Events';
+import { State } from '@domyjs/types/src/State';
+import { StructuredAPIApp, WatcherFn } from '@domyjs/types/src/App';
+import { DomyReadyEventDetails, DomyMountedEventDetails } from '@domyjs/types/src/Events';
 import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { DOMY_EVENTS } from './DomyEvents';
-import { matchPath, reactive, watch } from './reactive';
-import { Config } from '../types/Config';
+import { Config } from '@domyjs/types/src/Config';
 import { createConfigurableDeepRender } from './deepRender';
+import { reactive, watch, matchPath } from '@domyjs/reactive';
 
 /**
  * Structured API

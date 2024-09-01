@@ -1,9 +1,7 @@
 import { State } from './State';
-import * as ReactiveUtils from '../core/reactive';
-import { getContext } from '../utils/getContext';
-import { queueJob } from '../core/scheduler';
+import * as ReactiveUtils from '@domyjs/reactive';
 import { Config } from './Config';
-import { createConfigurableDeepRender } from '../core/deepRender';
+import { DeepRenderFn } from './DeepRenderFn';
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -30,15 +28,19 @@ export type DomyDirectiveHelper = {
   attrName: string;
   attr: { name: string; value: string };
 
-  queueJob: typeof queueJob;
+  queueJob: (fn: () => void | Promise<void>) => void;
   effect: (cb: () => void | Promise<void>) => void;
   cleanup: (cb: () => void | Promise<void>) => void;
   evaluate: (code: string) => any;
   evaluateWithoutListening: (code: string) => any;
-  deepRender: ReturnType<typeof createConfigurableDeepRender>;
+  deepRender: DeepRenderFn;
   addScopeToNode(obj: Record<string, any>): void;
   removeScopeToNode(obj: Record<string, any>): void;
-  getContext: typeof getContext;
+  getContext: (
+    el: Element | Text | undefined,
+    state: State,
+    scopedNodeData: Record<string, any>[]
+  ) => any;
 } & typeof ReactiveUtils;
 
 export type DomyPluginDefinition = {

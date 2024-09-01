@@ -15,7 +15,12 @@ import { $el } from '../helpers/$el';
 import { $nextTick } from '../helpers/$nextTick';
 import { $refs } from '../helpers/$refs';
 import { $root } from '../helpers/$root';
-import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
+import {
+  DomyDirectiveFn,
+  DomyPlugin,
+  DomyPluginDefinition,
+  DomySpecialFn
+} from '@domyjs/types/src/Domy';
 import { error, warn } from '../utils/logs';
 import { dElseImplementation } from '../directives/d-else';
 import { binding } from './binding';

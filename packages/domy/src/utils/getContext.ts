@@ -1,7 +1,7 @@
-import { isSignal } from '../core/reactive';
-import { State } from '../types/State';
+import { State } from '@domyjs/types/src/State';
 import { concatProxiesAndObjs } from './concatProxiesAndObjs';
 import { getHelpers } from './getHelpers';
+import { isSignal } from '@domyjs/reactive';
 
 /**
  * Return a context with all what domy need to render

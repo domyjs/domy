@@ -1,6 +1,6 @@
-import { Config } from '../types/Config';
-import { DomyDirectiveReturn } from '../types/Domy';
-import { State } from '../types/State';
+import { Config } from '@domyjs/types/src/Config';
+import { DomyDirectiveReturn } from '@domyjs/types/src/Domy';
+import { State } from '@domyjs/types/src/State';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { DomyHelper } from './DomyHelper';
 import { PLUGINS } from './plugin';

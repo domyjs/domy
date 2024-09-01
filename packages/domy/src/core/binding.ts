@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '@domyjs/types/src/Domy';
 
 /**
  * Handle style attribute if it's an object

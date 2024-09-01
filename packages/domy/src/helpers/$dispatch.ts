@@ -1,4 +1,4 @@
-import { DomySpecialHelper } from '../types/Domy';
+import { DomySpecialHelper } from '@domyjs/types/src/Domy';
 
 /**
  * Allow to dispatch a registered event

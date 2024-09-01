@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '@domyjs/types/src/Domy';
 
 /**
  * d-once implementation

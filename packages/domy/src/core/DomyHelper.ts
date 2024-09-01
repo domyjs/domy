@@ -1,13 +1,13 @@
-import { Config } from '../types/Config';
-import { DomyDirectiveHelper } from '../types/Domy';
-import { State } from '../types/State';
+import { Config } from '@domyjs/types/src/Config';
+import { DomyDirectiveHelper } from '@domyjs/types/src/Domy';
+import { State } from '@domyjs/types/src/State';
 import { cspEvaluate } from '../utils/cspEvaluate';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import { createConfigurableDeepRender } from './deepRender';
-
-import * as ReactiveUtils from './reactive';
+import * as ReactiveUtils from '@domyjs/reactive';
 import { queueJob } from './scheduler';
+import { Listener, OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
 /**
  * Domy helper class that handle dependencie change and give everything we need
@@ -15,7 +15,7 @@ import { queueJob } from './scheduler';
  * @author yoannchb-pro
  */
 export class DomyHelper {
-  private onSetListener: ReactiveUtils.OnSetListener | null = null;
+  private onSetListener: OnSetListener | null = null;
 
   private cleanupFn: (() => Promise<void> | void) | null = null;
   private effectFn: (() => Promise<void> | void) | null = null;
@@ -116,7 +116,7 @@ export class DomyHelper {
   }
 
   evaluate(code: string) {
-    const listener: ReactiveUtils.Listener = {
+    const listener: Listener = {
       type: 'onGet',
       fn: ({ path, objectId }) => {
         this.attachOnSetListener(); // Only attach a onSet listener if we have a dependencie

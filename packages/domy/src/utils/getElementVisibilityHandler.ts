@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper } from '@domyjs/types/src/Domy';
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
 import { restoreElement } from './restoreElement';
 

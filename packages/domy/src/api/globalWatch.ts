@@ -1,4 +1,5 @@
-import { globalWatch as initialGlobalWatch, OnSetListener } from '../core/reactive';
+import { globalWatch as initialGlobalWatch } from '@domyjs/reactive';
+import { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
 /**
  * Add a watcher to every reactive variables (even the one from d-data)
