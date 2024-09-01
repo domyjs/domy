@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import ts from '@rollup/plugin-typescript';
+import ts from 'rollup-plugin-ts';
 import terser from '@rollup/plugin-terser';
 import { OutputOptions, rollup, RollupOptions } from 'rollup';
 import config from '../tsconfig.json';
