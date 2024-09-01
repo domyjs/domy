@@ -3,7 +3,7 @@ import { error } from '../utils/logs';
 type QueueElement = () => void | Promise<void>;
 
 let queued = false;
-const queue = new Set<QueueElement>();
+const queue: QueueElement[] = [];
 
 /**
  * Flush the queue
@@ -21,7 +21,7 @@ function flushJobs() {
     }
   }
 
-  queue.clear();
+  queue.length = 0;
 
   queued = false;
 }
@@ -33,7 +33,7 @@ function flushJobs() {
  * @author yoannchb-pro
  */
 export function queueJob(job: QueueElement) {
-  queue.add(job);
+  queue.push(job);
 
   if (!queued) {
     flushJobs();
