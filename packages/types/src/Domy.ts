@@ -51,3 +51,7 @@ export type DomyPluginDefinition = {
 };
 
 export type DomyPlugin = (domy: DomyPluginDefinition) => void;
+
+export type DOMY = {
+  plugin: (domyPluginDefinition: DomyPlugin) => void;
+};

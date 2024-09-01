@@ -4,6 +4,7 @@ import { DeepRenderFn } from './DeepRenderFn';
 import { DomyReadyEventDetails, DomyMountedEventDetails } from './Events';
 import { Helpers } from './Helpers';
 import { State } from './State';
+import { DOMY } from './Domy';
 import {
   DomyDirectiveFn,
   DomySpecialHelper,
@@ -21,6 +22,7 @@ export {
   WatcherFn,
   Config,
   State,
+  DOMY,
   DeepRenderFn,
   DomyDirectiveFn,
   DomySpecialHelper,

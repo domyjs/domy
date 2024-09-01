@@ -1,3 +1,7 @@
+import { DOMY } from '@domyjs/types';
+
+declare const DOMY: DOMY;
+
 /**
  * Throttle utility implementation
  * @param domy
@@ -5,7 +9,7 @@
  *
  * @author yoannchb-pro
  */
-export function $throttle() {
+export function throttlePlugin() {
   return function (fn: Function, limit: number) {
     let inThrottle = false;
     return function (this: any, ...args: any[]) {
@@ -17,3 +21,7 @@ export function $throttle() {
     };
   };
 }
+
+DOMY.plugin(domyPluginSetter => {
+  domyPluginSetter.helper('throttle', throttlePlugin);
+});
