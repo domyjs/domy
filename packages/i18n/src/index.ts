@@ -26,6 +26,9 @@ function getI18nHelper(domy: DomySpecialHelper) {
   if (!langage) langage = domy.reactive({ lang: settings.currentLangage });
 
   return {
+    getSupportedLangages() {
+      return Object.keys(settings.messages);
+    },
     getLangage() {
       return langage.lang;
     },

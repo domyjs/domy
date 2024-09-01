@@ -51,4 +51,12 @@ describe('i18n Functionality Test', () => {
     // Check the title in French
     cy.get('h1').should('have.text', 'Bonjour le monde!');
   });
+
+  it('Check we return the key if the message doesnt exist', () => {
+    cy.get('#invalideKey').should('have.text', 'Message: key.who.doesnt.exist');
+  });
+
+  it('Check we can get all suported langages', () => {
+    cy.get('#supportedLangages').should('have.text', 'en,fr');
+  });
 });

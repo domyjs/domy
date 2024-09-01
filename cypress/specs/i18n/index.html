@@ -11,6 +11,8 @@
     <h1>{{ $t('title') }}</h1>
     <p id="validName">Message: {{ $t('greeting.hello', { name }) }}</p>
     <p id="invalideName">Message: {{ $t('greeting.bye') }}</p>
+    <p id="invalideKey">Message: {{ $t('key.who.doesnt.exist') }}</p>
+    <p id="supportedLangages">{{ $i18n.getSupportedLangages().join(',') }}</p>
     <button id="name" @click="name = 'Pierre'">Change name to pierre</button>
     <button id="fr" @click="$i18n.setLangage('fr')">Change to FR</button>
     <button id="uk" @click="$i18n.setLangage('uk')">Change to UK</button>
