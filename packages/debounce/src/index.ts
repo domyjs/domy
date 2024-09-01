@@ -1,6 +1,4 @@
-import { DOMY } from '@domyjs/types';
-
-declare const DOMY: DOMY;
+import type DOMY from '@domyjs/core';
 
 /**
  * Debounce utility implementation
@@ -10,7 +8,7 @@ declare const DOMY: DOMY;
  * @author yoannchb-pro
  */
 export function debouncePlugin() {
-  return function (fn: (...args: any[]) => void, delay: number) {
+  return function <T extends (...args: any[]) => void>(fn: T, delay: number) {
     let timeoutId: NodeJS.Timeout;
     return function (this: any, ...args: any[]) {
       clearTimeout(timeoutId);
@@ -21,6 +19,9 @@ export function debouncePlugin() {
   };
 }
 
-DOMY.plugin(domyPluginSetter => {
-  domyPluginSetter.helper('debouncePlugin', debouncePlugin);
+document.addEventListener('domy:ready', event => {
+  const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
+  DOMYOBJ.plugin(domyPluginSetter => {
+    domyPluginSetter.helper('debouncePlugin', debouncePlugin);
+  });
 });
