@@ -31,6 +31,9 @@ export class ReactiveVariable {
   private onSetListeners: OnSetListener['fn'][] = [];
   private onGetListeners: OnGetListener['fn'][] = [];
 
+  private proxyQueue: (() => void)[] = [];
+  private queued = false;
+
   constructor(private target: any) {}
 
   public getProxy() {
@@ -180,21 +183,38 @@ export class ReactiveVariable {
     return handler;
   }
 
+  private proxyQueueAction(action: () => void) {
+    this.proxyQueue.push(action);
+
+    if (!this.queued) {
+      this.queued = true;
+
+      for (const job of this.proxyQueue) {
+        job(); // Errors are already handled in createProxy method
+      }
+
+      this.proxyQueue.length = 0;
+      this.queued = false;
+    }
+  }
+
   private createProxy(target: any, path: string[] = []): any {
     if (!this.canAttachProxy(target)) return target;
 
     try {
       for (const key in target) {
         if (this.canAttachProxy(target[key]))
-          target[key] = this.createProxy(target[key], [...path, key]);
+          this.proxyQueueAction(
+            () => (target[key] = this.createProxy(target[key], [...path, key]))
+          );
       }
 
       const isCollection = this.isCollection(target);
+      target[isProxySymbol] = true;
       const prox = new Proxy(
         target,
         isCollection ? this.createCollectionHandler(path) : this.createHandler(path)
       );
-      prox[isProxySymbol] = true;
 
       return prox;
     } catch (err) {
