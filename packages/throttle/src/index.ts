@@ -6,7 +6,7 @@
  * @author yoannchb-pro
  */
 export function $throttle() {
-  return function throttle(fn: Function, limit: number) {
+  return function (fn: Function, limit: number) {
     let inThrottle = false;
     return function (this: any, ...args: any[]) {
       if (!inThrottle) {
