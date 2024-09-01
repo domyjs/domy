@@ -1,7 +1,5 @@
 // TODO
-import { Plugin } from '@domyjs/types';
-
-const collapsePlugin: Plugin = [
+const collapsePlugin = [
   {
     type: 'attribute',
     name: 'd-collapse',

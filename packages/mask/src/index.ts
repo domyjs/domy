@@ -1,7 +1,6 @@
 // TODO
-import { Plugin } from '@domyjs/types';
 
-const maskPlugin: Plugin = [
+const maskPlugin = [
   {
     type: 'attribute',
     name: 'd-mask',

@@ -1,7 +1,6 @@
 // TODO
-import { Plugin } from '@domyjs/types';
 
-const anchorPlugin: Plugin = [
+const anchorPlugin = [
   {
     type: 'attribute',
     name: 'd-anchor',

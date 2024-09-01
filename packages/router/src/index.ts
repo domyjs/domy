@@ -1,7 +1,6 @@
 // TODO
-import { Plugin } from '@domyjs/types';
 
-const routerPlugin: Plugin = [
+const routerPlugin = [
   {
     type: 'attribute',
     name: 'd-link',
