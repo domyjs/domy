@@ -1,7 +1,7 @@
 import type DOMY from '@domyjs/core';
 import type { DomySpecialHelper } from '@domyjs/core/src/types/Domy';
 
-const temp = new Map<Element, (...args: any[]) => void>();
+const temp = new Map<number, (...args: any[]) => void>();
 
 /**
  * Throttle utility implementation
@@ -11,25 +11,28 @@ const temp = new Map<Element, (...args: any[]) => void>();
  * @author yoannchb-pro
  */
 export function throttlePlugin(domy: DomySpecialHelper) {
-  if (domy.el) {
-    const tempFn = temp.get(domy.el as Element);
-    if (tempFn) return tempFn;
+  const hasId = typeof domy.domyHelperId === 'number';
+
+  if (hasId) {
+    const tempFn = temp.get(domy.domyHelperId as number);
+    if (tempFn) return () => tempFn;
   }
 
-  const fn = function <T extends (...args: any[]) => void>(fn: T, limit: number) {
+  return function <T extends (...args: any[]) => void>(fn: T, limit: number) {
     let inThrottle = false;
-    return function (this: any, ...args: any[]) {
+
+    const throttleFn = function (this: any, ...args: any[]) {
       if (!inThrottle) {
         fn.apply(this, args);
         inThrottle = true;
         setTimeout(() => (inThrottle = false), limit);
       }
     };
+
+    if (hasId) temp.set(domy.domyHelperId as number, throttleFn);
+
+    return throttleFn;
   };
-
-  if (domy.el) temp.set(domy.el as Element, fn);
-
-  return fn;
 }
 
 document.addEventListener('domy:ready', event => {
