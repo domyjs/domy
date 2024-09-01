@@ -4,6 +4,13 @@ import { DomySpecialHelper } from '../types/Domy';
 import { Helpers } from '../types/Helpers';
 import { State } from '../types/State';
 
+type Props = {
+  domyHelperId?: number;
+  el?: Element | Text;
+  state: State;
+  scopedNodeData: Record<string, any>[];
+};
+
 /**
  * Return the initialised helpers with everything it need
  * @param el
@@ -13,17 +20,11 @@ import { State } from '../types/State';
  *
  * @author yoannchb-pro
  */
-export function getHelpers(
-  el: Element | Text | undefined,
-  state: State,
-  scopedNodeData: Record<string, any>[] = []
-): Helpers {
+export function getHelpers(props: Props): Helpers {
   const helpers: Record<string, (domy: DomySpecialHelper) => any> = {};
   for (const [name, fn] of Object.entries(PLUGINS.helpers)) {
     helpers['$' + name] = fn({
-      el,
-      state,
-      scopedNodeData,
+      ...props,
       ...ReactiveUtils
     });
   }
