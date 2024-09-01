@@ -18,9 +18,12 @@ const toBuild = process.argv[2];
     return fs.statSync(path.join('./packages', dir)).isDirectory();
   });
 
-  console.log('Building packages: ', packages.join(','));
+  // Ensure domy is build first because plugin depends of it
+  const sortedPackages = ['domy', ...packages.filter(name => name !== 'domy')];
 
-  for (const packageName of packages) {
+  console.log('Building packages: ', sortedPackages.join(','));
+
+  for (const packageName of sortedPackages) {
     try {
       // Read and parse the package.json file
       const packageJsonPath = `./packages/${packageName}/package.json`;
