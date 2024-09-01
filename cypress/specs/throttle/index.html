@@ -9,7 +9,7 @@
   </head>
   <body>
     <h1>{{ count }}</h1>
-    <button id="inc" @click="$throttle(() => ++count, 2000)">+</button>
+    <button id="inc" @click="$throttle(() => ++count, 500)">+</button>
   </body>
   <script>
     DOMY.createApp({
