@@ -48,33 +48,18 @@ export class ReactiveVariable {
   }
 
   public attachListener(l: Listener) {
-    switch (l.type) {
-      case 'onGet':
-        this.onGetListeners.push(l.fn);
-        break;
-      case 'onSet':
-        this.onSetListeners.push(l.fn);
-        break;
-    }
+    const listeners = l.type === 'onGet' ? this.onGetListeners : this.onSetListeners;
+    listeners.push(l.fn);
   }
 
   public removeListener(l: Listener) {
-    let listeners: Listener['fn'][] = [];
-    switch (l.type) {
-      case 'onGet':
-        listeners = this.onGetListeners;
-        break;
-      case 'onSet':
-        listeners = this.onSetListeners;
-        break;
-    }
-
+    const listeners = l.type === 'onGet' ? this.onGetListeners : this.onSetListeners;
     const index = listeners.indexOf(l.fn);
     if (index !== -1) listeners.splice(index, 1);
   }
 
   private canAttachProxy(target: any) {
-    return target !== null && typeof target === 'object';
+    return target !== null && typeof target === 'object' && !ReactiveVariable.isReactive(target);
   }
 
   private isCollection(target: any) {
@@ -196,19 +181,21 @@ export class ReactiveVariable {
   }
 
   private createProxy(target: any, path: string[] = []): any {
-    if (!this.canAttachProxy(target) || ReactiveVariable.isReactive(target)) return target;
+    if (!this.canAttachProxy(target)) return target;
 
     try {
       for (const key in target) {
-        const isAlreadyProxy = ReactiveVariable.isReactive(target[key]);
-        if (!isAlreadyProxy) target[key] = this.createProxy(target[key], [...path, key]);
+        if (this.canAttachProxy(target[key]))
+          target[key] = this.createProxy(target[key], [...path, key]);
       }
+
       const isCollection = this.isCollection(target);
       const prox = new Proxy(
         target,
         isCollection ? this.createCollectionHandler(path) : this.createHandler(path)
       );
       prox[isProxySymbol] = true;
+
       return prox;
     } catch (err) {
       return target;
@@ -216,14 +203,16 @@ export class ReactiveVariable {
   }
 
   private callOnGetListeners(path: string[]) {
+    const params = { path: this.name + path.join('.'), objectId: this.id };
     for (const listener of this.onGetListeners) {
-      listener({ path: this.name + path.join('.'), objectId: this.id });
+      listener(params);
     }
   }
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
+    const params = { path: this.name + path.join('.'), prevValue, newValue, objectId: this.id };
     for (const listener of this.onSetListeners) {
-      listener({ path: this.name + path.join('.'), prevValue, newValue, objectId: this.id });
+      listener(params);
     }
   }
 }
