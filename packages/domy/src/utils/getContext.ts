@@ -3,6 +3,13 @@ import { concatProxiesAndObjs } from './concatProxiesAndObjs';
 import { getHelpers } from './getHelpers';
 import { isSignal } from '@domyjs/reactive';
 
+type Props = {
+  domyHelperId?: number;
+  el?: Element | Text;
+  state: State;
+  scopedNodeData: Record<string, any>[];
+};
+
 /**
  * Return a context with all what domy need to render
  * Like variables, methods, helpers ...
@@ -13,16 +20,12 @@ import { isSignal } from '@domyjs/reactive';
  *
  * @author yoannchb-pro
  */
-export function getContext(
-  el: Element | Text | undefined,
-  state: State,
-  scopedNodeData: Record<string, any>[] = []
-) {
-  const helpers = getHelpers(el, state, scopedNodeData);
+export function getContext(props: Props) {
+  const helpers = getHelpers(props);
 
   const context = concatProxiesAndObjs(
     // We put scoped datas at first place to ensure it override data
-    [...scopedNodeData, state.data, state.methods, helpers],
+    [...props.scopedNodeData, props.state.data, props.state.methods, helpers],
     ({ type, obj, property, newValue }) => {
       const isObjSignal = isSignal(obj[property]);
       switch (type) {
