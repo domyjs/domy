@@ -1,3 +1,7 @@
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void
+  ? I
+  : never;
+
 type Transformer = (props: {
   type: 'set' | 'get';
   obj: any;
@@ -21,10 +25,10 @@ const defaultTransformer: Transformer = ({ type, obj, property, newValue }) => {
  *
  * @author yoannchb-pro
  */
-export function concatProxiesAndObjs(
-  objs: Record<string, any>[],
+export function concatProxiesAndObjs<T extends Record<string, any>[]>(
+  objs: T,
   transformer: Transformer = defaultTransformer
-) {
+): UnionToIntersection<T[number]> {
   // We create a fake object with undefined values but all the keys
   // Because when we use a proxy in with() {} the key need to exist
   // Otherwise it will throw an error

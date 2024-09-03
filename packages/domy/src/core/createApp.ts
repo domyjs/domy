@@ -1,4 +1,4 @@
-import { StructuredAPIApp } from '../types/App';
+import { Data, StructuredAPIApp } from '../types/App';
 import { Config } from '../types/Config';
 import { hookAPI, HookAPIFnDefinition } from './hookAPI';
 import { structuredAPI } from './structuredAPI';
@@ -10,7 +10,9 @@ import { structuredAPI } from './structuredAPI';
  *
  * @author yoannchb-pro
  */
-export function createApp(appDefinition: StructuredAPIApp | HookAPIFnDefinition) {
+export function createApp<D extends Data, M extends string, A extends any[]>(
+  appDefinition: StructuredAPIApp<D, M, A> | HookAPIFnDefinition
+) {
   let config: Config = {};
 
   function mount(target?: HTMLElement) {
