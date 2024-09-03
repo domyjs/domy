@@ -13,6 +13,7 @@ export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     element: domy.el,
     state: domy.state,
     byPassAttributes: [domy.attr.name],
+    scopedNodeData: domy.scopedNodeData,
     renderWithoutListeningToChange: true
   });
 

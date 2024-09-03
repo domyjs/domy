@@ -83,7 +83,8 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   domy.deepRender({
     element: domy.el,
     state: domy.state,
-    byPassAttributes: [domy.attr.name]
+    byPassAttributes: [domy.attr.name],
+    scopedNodeData: domy.scopedNodeData
   });
 
   // We look at change made by the user
