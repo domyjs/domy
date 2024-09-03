@@ -11,7 +11,7 @@ function splitPath(path: string): string[] {
  *
  * @author yoannchb-pro
  */
-export function get<T extends Object>(object: T, path: string, defaultValue?: any) {
+export function get<T>(object: T, path: string, defaultValue?: any) {
   const keys = splitPath(path);
   let result: any = object;
   for (const key of keys) {
@@ -32,7 +32,7 @@ export function get<T extends Object>(object: T, path: string, defaultValue?: an
  *
  * @author yoannchb-pro
  */
-export function set<T extends Object>(object: T, path: string, value: any): T {
+export function set<T>(object: T, path: string, value: any): T {
   const keys = splitPath(path);
   let temp: any = object;
   for (let i = 0; i < keys.length - 1; i++) {

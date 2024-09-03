@@ -1,5 +1,4 @@
 import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/core/src/types/Domy';
-import { get } from './get';
 
 type Dict = {
   [key: string]: string | Dict;
@@ -59,7 +58,7 @@ function messageHandler(domy: DomySpecialHelper) {
   return (key: string, data: Record<string, string> = {}) => {
     const dataReg = /\{\{\s*(.+?)\s*\}\}/gi;
     const messages = settings.messages[langage.getLangage()];
-    let message = get(messages, key) as string | false;
+    let message = domy.utils.get(messages, key) as string | undefined;
 
     if (!message) {
       console.warn(`(I18N) Invalide key "${key}".`);

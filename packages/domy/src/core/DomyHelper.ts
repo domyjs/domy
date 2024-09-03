@@ -7,7 +7,7 @@ import { queueJob } from './scheduler';
 import { Listener, OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { State } from '../types/State';
 import { Config } from '../types/Config';
-import { accessibleUtils } from '../utils/accessibleUtils';
+import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
 
 let domyHelperId = 0;
@@ -66,7 +66,7 @@ export class DomyHelper {
       attr: this.attr,
 
       ...ReactiveUtils,
-      utils: accessibleUtils,
+      utils: directivesUtils,
 
       queueJob,
       effect: this.effect.bind(this),

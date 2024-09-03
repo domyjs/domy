@@ -4,7 +4,8 @@ import { Config } from './Config';
 import { createConfigurableDeepRender } from '../core/deepRender';
 import { getContext } from '../utils/getContext';
 import { queueJob } from '../core/scheduler';
-import { accessibleUtils } from '../utils/accessibleUtils';
+import { helpersUtils } from '../utils/helpersUtils';
+import { directivesUtils } from '../utils/directivesUtils';
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -19,6 +20,7 @@ export type DomySpecialHelper = {
   el?: Element | Text;
   state: State;
   scopedNodeData: Record<string, any>[];
+  utils: typeof helpersUtils;
 } & typeof ReactiveUtils;
 
 export type DomyDirectiveHelper = {
@@ -33,7 +35,7 @@ export type DomyDirectiveHelper = {
   attrName: string;
   attr: { name: string; value: string };
 
-  utils: typeof accessibleUtils;
+  utils: typeof directivesUtils;
 
   queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;

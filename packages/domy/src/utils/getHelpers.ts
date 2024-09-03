@@ -3,6 +3,7 @@ import * as ReactiveUtils from '@domyjs/reactive';
 import { DomySpecialHelper } from '../types/Domy';
 import { Helpers } from '../types/Helpers';
 import { State } from '../types/State';
+import { helpersUtils } from './helpersUtils';
 
 type Props = {
   domyHelperId?: number;
@@ -25,7 +26,8 @@ export function getHelpers(props: Props): Helpers {
   for (const [name, fn] of Object.entries(PLUGINS.helpers)) {
     helpers['$' + name] = fn({
       ...props,
-      ...ReactiveUtils
+      ...ReactiveUtils,
+      utils: helpersUtils
     });
   }
   return helpers;

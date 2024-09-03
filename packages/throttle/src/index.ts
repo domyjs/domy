@@ -1,4 +1,4 @@
-import type DOMY from '@domyjs/core';
+import type DOMY from '@domyjs/core/src';
 import type { DomySpecialHelper } from '@domyjs/core/src/types/Domy';
 
 const throttleCache = new Map<number, (...args: any[]) => void>();
