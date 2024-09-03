@@ -1,6 +1,5 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { warn } from '../utils/logs';
-import { moveElement } from '../utils/moveElement';
 
 type RendererProps = {
   value: any;
@@ -52,7 +51,7 @@ function renderer(props: RendererProps) {
         const elementWithKey = currentChildrens[elementWithKeyIndex];
         if (elementWithKeyIndex !== currentIndex) {
           // If the index of the element changed we move it to the new position
-          moveElement(el, elementWithKey, currentIndex);
+          domy.utils.moveElement(el, elementWithKey, currentIndex);
         }
 
         renderedChildrens.add(elementWithKey);

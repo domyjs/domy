@@ -1,5 +1,4 @@
 import { DomyDirectiveHelper } from '../types/Domy';
-import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimation';
 
 /**
  * d-show implementation
@@ -34,7 +33,7 @@ export function dShowImplementation(domy: DomyDirectiveHelper) {
       if (transition && isInitialised) {
         el.classList.remove(`${transition}-enter`);
         el.classList.add(`${transition}-out`);
-        cleanupTransition = executeActionAfterAnimation(el, () => {
+        cleanupTransition = domy.utils.executeActionAfterAnimation(el, () => {
           el.style.display = 'none';
         });
       } else {

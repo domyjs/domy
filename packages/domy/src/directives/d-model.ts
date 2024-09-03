@@ -1,5 +1,4 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
-import { set } from '../utils/getAndSet';
 
 type Value = string | number | boolean | string[] | undefined;
 
@@ -61,7 +60,7 @@ function changeValue(domy: DomyDirectiveHelper) {
 
   if (isCsp) {
     const objPath = avoidDeprecatedWith ? domy.attr.value.replace(/^this\./g, '') : domy.attr.value;
-    set(domy.state.data, objPath, value);
+    domy.utils.set(domy.state.data, objPath, value);
   } else {
     const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);
     setter(value);
