@@ -4,3 +4,4 @@
 - Jest tests for reactive
 - script auto build, release ...
 - Documentation
+- defineComponent (component lib ?)
