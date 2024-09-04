@@ -5,6 +5,12 @@ beforeEach(() => {
 });
 
 describe('Collapse directive', () => {
+  it('Check the setting attribute is removed', () => {
+    // Check settings attribute is removed
+    cy.get('#c2').should('not.have.attr', 'd-collapse-settings');
+    cy.get('#c3').should('not.have.attr', 'd-collapse-settings');
+  });
+
   it('should initially show all content', () => {
     // Assert that content is not collapsed initially
     cy.get('#c1').should('not.be.visible');
