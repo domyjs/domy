@@ -53,7 +53,7 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
             if (domy.matchPath(keyToWatch, props.path).isMatching) {
               const value = domy.evaluateWithoutListening(domy.attr.value);
               if (typeof value === 'function') domy.queueJob(() => value(props));
-              break; // Ensure we call the watcher only one time
+              break;
             }
           }
 
