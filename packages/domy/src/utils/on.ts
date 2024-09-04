@@ -23,7 +23,7 @@ function wrapListener(
 export default function on(props: {
   el: Element;
   eventName: string;
-  modifiers: Set<string>;
+  modifiers: string[];
   listener: EventListener;
   options?: AddEventListenerOptions;
 }) {
@@ -34,29 +34,29 @@ export default function on(props: {
 
   const { el, eventName, modifiers } = props;
 
-  if (modifiers.has('prevent'))
+  if (modifiers.includes('prevent'))
     listener = wrapListener(listener, (next, event) => {
       event.preventDefault();
       next(event);
     });
-  if (modifiers.has('stop'))
+  if (modifiers.includes('stop'))
     listener = wrapListener(listener, (next, event) => {
       event.stopPropagation();
       next(event);
     });
-  if (modifiers.has('self'))
+  if (modifiers.includes('self'))
     listener = wrapListener(listener, (next, event) => {
       event.target === listenerTarget && next(event);
     });
 
-  if (modifiers.has('passive')) options.passive = true;
-  if (modifiers.has('capture')) options.capture = true;
-  if (modifiers.has('once')) options.once = true;
+  if (modifiers.includes('passive')) options.passive = true;
+  if (modifiers.includes('capture')) options.capture = true;
+  if (modifiers.includes('once')) options.once = true;
 
   // We handle keys
   // Example: keydown.{enter}
   const keyReg = /^\{(?<keys>.+?)\}$/gi;
-  const keyModifier = Array.from(modifiers).find(modifier => !!modifier.match(keyReg));
+  const keyModifier = modifiers.find(modifier => !!modifier.match(keyReg));
   if (keyModifier) {
     const keys = keyReg
       .exec(keyModifier)!
@@ -70,7 +70,7 @@ export default function on(props: {
     });
   }
 
-  if (modifiers.has('away')) {
+  if (modifiers.includes('away')) {
     listenerTarget = document.body;
     listener = wrapListener(listener, (next, event) => {
       if (el.isConnected && event.target !== el && !el.contains(event.target as Node)) {

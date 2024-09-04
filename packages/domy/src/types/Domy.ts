@@ -31,7 +31,7 @@ export type DomyDirectiveHelper = {
   scopedNodeData: Record<string, any>[];
   prefix: string;
   directive: string;
-  modifiers: Set<string>;
+  modifiers: string[];
   attrName: string;
   attr: { name: string; value: string };
 

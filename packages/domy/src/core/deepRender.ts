@@ -53,7 +53,7 @@ function getDomyAttributeInformations(attr: Attr) {
   return {
     prefix: getDomyName(prefix),
     directive: getDomyName(attrName),
-    modifiers: new Set(modifiers),
+    modifiers,
     attrName: attrName
   };
 }
