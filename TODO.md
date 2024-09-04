@@ -3,5 +3,6 @@
 - Collapse, anchor, intersect, mutation, persist (localStorage), i18n, router plugins, (jsx)
 - Jest tests for reactive
 - script auto build, release ...
+- benchmark
 - Documentation
-- defineComponent (component lib ?)
+- defineComponent (component lib ? / store)
