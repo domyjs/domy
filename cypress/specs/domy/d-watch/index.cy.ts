@@ -28,7 +28,8 @@ describe('Attribute d-watch test', () => {
     cy.get('#count').should('contain', 'Count: 1');
 
     cy.get('#dec2').click();
-    cy.get('#somethingElse').click();
+    cy.get('#somethingElse').click(); // Ensure other scoped data don't call the watcher
+
     cy.get('#count2').should('contain', 'Count2: -1');
     cy.get('#count').should('contain', 'Count: 1');
   });
