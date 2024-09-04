@@ -11,9 +11,15 @@ import { error, warn } from '../utils/logs';
  * @author yoannchb-pro
  */
 export function dWatchImplementation(domy: DomyDirectiveHelper) {
+  if (domy.modifiers.length === 0)
+    throw new Error(
+      `At least one key has to be provided for the watch directive (example: d-watch.count="...").`
+    );
+
   const objsToWatch = new Set<any>();
   const keysToWatch = new Set<string>();
 
+  // We find the key to watch and the object to watch
   for (const keyToWatch of domy.modifiers) {
     if (keysToWatch.has(keyToWatch)) {
       warn(`Duplicate key to watch "${keyToWatch}".`);
@@ -31,6 +37,7 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
     keysToWatch.add(keyToWatch);
   }
 
+  // We add the watcher on the watched scoped data with a lock to avoid calling it self
   if (keysToWatch.size > 0 && objsToWatch.size > 0) {
     let isLock = false;
 
