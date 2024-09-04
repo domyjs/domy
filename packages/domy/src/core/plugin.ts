@@ -22,6 +22,7 @@ import { events } from './events';
 import { dScopeImplementation } from '../directives/d-scope';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 import { dInitImplementation } from '../directives/d-init';
+import { dWatchImplementation } from '../directives/d-watch';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -48,6 +49,7 @@ export const PLUGINS: Plugins = {
     on: events
   },
   directives: {
+    watch: dWatchImplementation,
     init: dInitImplementation,
     scope: dScopeImplementation,
     if: dIfImplementation,
