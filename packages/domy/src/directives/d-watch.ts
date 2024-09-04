@@ -1,5 +1,5 @@
 import { DomyDirectiveHelper } from '../types/Domy';
-import { error, warn } from '../utils/logs';
+import { warn } from '../utils/logs';
 
 /**
  * d-watch implementation
