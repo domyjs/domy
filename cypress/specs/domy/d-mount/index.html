@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-mount</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ text }}</h1>
+    <div d-mount="() => text = $refs.text.textContent">
+      <p d-ref="text">Hello World!</p>
+    </div>
+  </body>
+  <script>
+    DOMY.createApp({
+      data: {
+        text: ''
+      }
+    }).mount();
+  </script>
+</html>

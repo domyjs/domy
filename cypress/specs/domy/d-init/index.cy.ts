@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-scope test', () => {
+describe('Attribute d-init test', () => {
   it('Check attribute is removed', () => {
     cy.get('p').should('not.have.attr', 'd-init');
   });
