@@ -9,6 +9,6 @@ import { DomyDirectiveHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dInitImplementation(domy: DomyDirectiveHelper) {
-  const value = domy.evaluateWithoutListening(domy.attr.value);
-  if (typeof value === 'function') domy.queueJob(() => value());
+  const executedValue = domy.evaluateWithoutListening(domy.attr.value);
+  if (typeof executedValue === 'function') domy.queueJob(() => executedValue());
 }
