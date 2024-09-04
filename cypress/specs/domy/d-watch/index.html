@@ -7,7 +7,7 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <div d-scope="{ count: 0}">
+    <div d-scope="{ count: 0, somethingElse: 0 }">
       <p
         id="count"
         d-watch.count.count2="({ prevValue, newValue }) => { if(newValue < 0) count = prevValue; }"
@@ -19,6 +19,8 @@
       <button id="dec" @click="--count">Decrement</button>
       <button id="inc2" @click="++count2">Increment</button>
       <button id="dec2" @click="--count2">Decrement2</button>
+
+      <button id="somethingElse" @click="--somethingElse">Something else</button>
     </div>
   </body>
   <script>
