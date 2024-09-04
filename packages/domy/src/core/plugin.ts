@@ -21,6 +21,7 @@ import { binding } from './binding';
 import { events } from './events';
 import { dScopeImplementation } from '../directives/d-scope';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
+import { dInitImplementation } from '../directives/d-init';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -47,6 +48,7 @@ export const PLUGINS: Plugins = {
     on: events
   },
   directives: {
+    init: dInitImplementation,
     scope: dScopeImplementation,
     if: dIfImplementation,
     'else-if': dElseIfImplementation,
