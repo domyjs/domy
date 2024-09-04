@@ -7,7 +7,10 @@
     <script src="../dist/index.js"></script>
   </head>
   <body>
-    <main d-data=" { showModal: false, msg: 'An other message' }" d-if="msg === 'An other message'">
+    <main
+      d-scope=" { showModal: false, msg: 'An other message' }"
+      d-if="msg === 'An other message'"
+    >
       <p id="override">{{ msg }}</p>
       <div id="modal" d-if="showModal">Hello World</div>
       <button @click="showModal = !showModal">Show modal</button>

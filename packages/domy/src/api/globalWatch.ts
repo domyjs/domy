@@ -2,7 +2,7 @@ import { globalWatch as initialGlobalWatch } from '@domyjs/reactive';
 import { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
 /**
- * Add a watcher to every reactive variables (even the one from d-data)
+ * Add a watcher to every reactive variables (even the one from d-scope)
  * @param callback
  * @param objsToWatch
  * @returns

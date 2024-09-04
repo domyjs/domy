@@ -19,7 +19,7 @@ import { error, warn } from '../utils/logs';
 import { dElseImplementation } from '../directives/d-else';
 import { binding } from './binding';
 import { events } from './events';
-import { dDataImplementation } from '../directives/d-data';
+import { dScopeImplementation } from '../directives/d-scope';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 
 type Plugins = {
@@ -37,7 +37,7 @@ export const PLUGINS: Plugins = {
     'transition',
     'ref',
 
-    'data',
+    'scope',
     'if',
     'else-if',
     'else'
@@ -47,7 +47,7 @@ export const PLUGINS: Plugins = {
     on: events
   },
   directives: {
-    data: dDataImplementation,
+    scope: dScopeImplementation,
     if: dIfImplementation,
     'else-if': dElseIfImplementation,
     else: dElseImplementation,

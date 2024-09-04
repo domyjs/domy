@@ -4,9 +4,9 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-data test', () => {
+describe('Attribute d-scope test', () => {
   it('Check attribute is removed', () => {
-    cy.get('main').should('not.have.attr', 'd-data');
+    cy.get('main').should('not.have.attr', 'd-scope');
   });
 
   it('Check the modal show', () => {
