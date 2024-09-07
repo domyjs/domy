@@ -1,3 +1,4 @@
+import { Config } from '../types/Config';
 import { State } from '../types/State';
 import { concatProxiesAndObjs } from './concatProxiesAndObjs';
 import { getHelpers } from './getHelpers';
@@ -8,6 +9,7 @@ type Props = {
   el?: Element | Text;
   state: State;
   scopedNodeData: Record<string, any>[];
+  config: Config;
 };
 
 /**

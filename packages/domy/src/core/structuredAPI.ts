@@ -8,6 +8,7 @@ import { toRegularFn } from '../utils/toRegularFn';
 import { DOMY_EVENTS } from './DomyEvents';
 import { createConfigurableDeepRender } from './deepRender';
 import { reactive, watch, matchPath } from '@domyjs/reactive';
+import { getRender } from './getRender';
 
 /**
  * Structured API
@@ -30,6 +31,8 @@ export async function structuredAPI(
     })
   );
 
+  const deepRender = createConfigurableDeepRender(config);
+
   // State of the app
   const state: State = {
     data: reactive(app.data ?? {}),
@@ -43,7 +46,7 @@ export async function structuredAPI(
   for (const key in app.methods) {
     const method = toRegularFn(app.methods[key]);
     state.methods[key] = function (...args: any[]) {
-      return method.call(getContext({ state, scopedNodeData: [] }), ...args);
+      return method.call(getContext({ state, scopedNodeData: [], config }), ...args);
     };
   }
 
@@ -70,7 +73,7 @@ export async function structuredAPI(
               try {
                 const watcherfn = watchers[watcherName].fn;
                 await watcherfn.call(
-                  getContext({ state, scopedNodeData: [] }),
+                  getContext({ state, scopedNodeData: [], config }),
                   prevValue,
                   newValue,
                   {
@@ -95,7 +98,7 @@ export async function structuredAPI(
   if (app.setup) {
     try {
       const setupFn = toRegularFn(app.setup);
-      await setupFn.call(getContext({ state, scopedNodeData: [] }));
+      await setupFn.call(getContext({ state, scopedNodeData: [], config }));
     } catch (err: any) {
       error(err);
       return;
@@ -112,7 +115,6 @@ export async function structuredAPI(
 
   try {
     // Render the dom with DOMY
-    const deepRender = createConfigurableDeepRender(config);
     deepRender({
       element: target,
       state
@@ -125,7 +127,7 @@ export async function structuredAPI(
   if (app.mounted) {
     try {
       const mountedFn = toRegularFn(app.mounted);
-      await mountedFn.call(getContext({ state, scopedNodeData: [] }));
+      await mountedFn.call(getContext({ state, scopedNodeData: [], config }));
     } catch (err: any) {
       error(err);
     }
@@ -138,4 +140,6 @@ export async function structuredAPI(
       detail: { app, state, target } as DomyMountedEventDetails
     })
   );
+
+  return getRender(deepRender, state);
 }

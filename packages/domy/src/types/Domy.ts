@@ -20,6 +20,7 @@ export type DomySpecialHelper = {
   el?: Element | Text;
   state: State;
   scopedNodeData: Record<string, any>[];
+  config: Config;
   utils: typeof helpersUtils;
 } & typeof ReactiveUtils;
 

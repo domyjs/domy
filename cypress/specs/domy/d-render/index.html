@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-render</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <div
+      d-scope="{ count: 0, createP: () => {
+        const p = document.createElement('p');
+        p.textContent = 'Count: {{ count }}';
+        return p;
+      } }"
+    >
+      <template d-render="createP()"></template>
+      <button id="inc" @click="++count">+</button>
+      <button id="dec" @click="--count">-</button>
+    </div>
+  </body>
+  <script>
+    DOMY.createApp().mount();
+  </script>
+</html>

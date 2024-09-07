@@ -1,5 +1,6 @@
 import { Data, StructuredAPIApp } from '../types/App';
 import { Config } from '../types/Config';
+import { getRender } from './getRender';
 import { hookAPI, HookAPIFnDefinition } from './hookAPI';
 import { structuredAPI } from './structuredAPI';
 
@@ -15,17 +16,24 @@ export function createApp<D extends Data, M extends string, A extends any[]>(
 ) {
   let config: Config = {};
 
-  function mount(target?: HTMLElement) {
-    const build = () => {
-      const domTarget = target ?? document.body;
-      if (typeof appDefinition === 'function') return hookAPI(appDefinition, domTarget, config);
-      return structuredAPI(appDefinition, domTarget, config);
-    };
+  function mount(target?: HTMLElement): Promise<ReturnType<typeof getRender> | undefined> {
+    return new Promise(resolve => {
+      const build = async () => {
+        const domTarget = target ?? document.body;
 
-    // We ensure the DOM is accessible before mounting the app
-    if (document.readyState === 'interactive' || document.readyState === 'complete') {
-      build();
-    } else document.addEventListener('DOMContentLoaded', build);
+        let render;
+        if (typeof appDefinition === 'function')
+          render = await hookAPI(appDefinition, domTarget, config);
+        else render = await structuredAPI(appDefinition, domTarget, config);
+
+        resolve(render);
+      };
+
+      // We ensure the DOM is accessible before mounting the app
+      if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        build();
+      } else document.addEventListener('DOMContentLoaded', build);
+    });
   }
 
   function configure(newConfig: Config) {

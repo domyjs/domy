@@ -4,11 +4,13 @@ import { DomySpecialHelper } from '../types/Domy';
 import { Helpers } from '../types/Helpers';
 import { State } from '../types/State';
 import { helpersUtils } from './helpersUtils';
+import { Config } from '../types/Config';
 
 type Props = {
   domyHelperId?: number;
   el?: Element | Text;
   state: State;
+  config: Config;
   scopedNodeData: Record<string, any>[];
 };
 

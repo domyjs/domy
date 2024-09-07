@@ -8,6 +8,7 @@ import { error } from '../utils/logs';
 import { createConfigurableDeepRender } from './deepRender';
 import { DOMY_EVENTS } from './DomyEvents';
 import { isReactive, registerName } from '@domyjs/reactive';
+import { getRender } from './getRender';
 
 type PromisedOrNot<T> = Promise<T> | T;
 type HookAPIParams = {
@@ -28,6 +29,8 @@ export type HookAPIFnDefinition = (
  * @author yoannchb-pro
  */
 export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, config: Config) {
+  const deepRender = createConfigurableDeepRender(config);
+
   const app: HookAPIApp = {
     data: {},
     methods: {}
@@ -57,7 +60,8 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
     },
     helpers: getHelpers({
       state,
-      scopedNodeData: []
+      scopedNodeData: [],
+      config
     })
   });
 
@@ -87,7 +91,6 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
 
   try {
     // Render the dom with DOMY
-    const deepRender = createConfigurableDeepRender(config);
     deepRender({
       element: target,
       state
@@ -99,7 +102,7 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
   // Mounted
   if (app.mounted) {
     try {
-      await app.mounted({ helpers: getHelpers({ state, scopedNodeData: [] }) });
+      await app.mounted({ helpers: getHelpers({ state, scopedNodeData: [], config }) });
     } catch (err: any) {
       error(err);
     }
@@ -112,4 +115,6 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
       detail: { app, state, target } as DomyMountedEventDetails
     })
   );
+
+  return getRender(deepRender, state);
 }

@@ -120,7 +120,8 @@ export class DomyHelper {
         domyHelperId: this.domyHelperId,
         el: this.el,
         state: this.state,
-        scopedNodeData: this.scopedNodeData
+        scopedNodeData: this.scopedNodeData,
+        config: this.config
       }),
       returnResult: true
     });
