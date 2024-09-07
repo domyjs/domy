@@ -12,7 +12,7 @@ import { structuredAPI } from './structuredAPI';
  * @author yoannchb-pro
  */
 export function createApp<D extends Data, M extends string, A extends any[]>(
-  appDefinition: StructuredAPIApp<D, M, A> | HookAPIFnDefinition
+  appDefinition?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition
 ) {
   let config: Config = {};
 
