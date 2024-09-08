@@ -7,10 +7,12 @@ import { GlobalMutationObserver } from './GlobalMutationObserver';
 import { moveElement } from './moveElement';
 import { replaceElement } from './replaceElement';
 import { restoreElement } from './restoreElement';
+import { toKebabCase } from './toKebabCase';
 import { toRegularFn } from './toRegularFn';
 
 // A list of utils we can access in helpers
 export const helpersUtils = {
+  toKebabCase,
   getElementVisibilityHandler,
   get,
   set,

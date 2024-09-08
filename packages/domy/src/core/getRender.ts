@@ -1,5 +1,5 @@
 import type { State } from '../types/State';
-import type { createConfigurableDeepRender } from './deepRender';
+import type { createDeepRenderFn } from './deepRender';
 
 /**
  * Get the render function after mounting a DOMY app
@@ -15,10 +15,7 @@ import type { createConfigurableDeepRender } from './deepRender';
  *
  * @author yoannchb-pro
  */
-export function getRender(
-  deepRender: ReturnType<typeof createConfigurableDeepRender>,
-  state: State
-) {
+export function getRender(deepRender: ReturnType<typeof createDeepRenderFn>, state: State) {
   return {
     render: (element: Element) => {
       return deepRender({

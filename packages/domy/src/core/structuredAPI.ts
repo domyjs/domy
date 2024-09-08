@@ -6,9 +6,18 @@ import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { DOMY_EVENTS } from './DomyEvents';
-import { createConfigurableDeepRender } from './deepRender';
+import { createDeepRenderFn } from './deepRender';
 import { reactive, watch, matchPath } from '@domyjs/reactive';
 import { getRender } from './getRender';
+import { ComponentProps, Components } from '../types/Component';
+
+type Params = {
+  app?: StructuredAPIApp;
+  target: HTMLElement;
+  config: Config;
+  components: Components;
+  props?: ComponentProps;
+};
 
 /**
  * Structured API
@@ -18,11 +27,9 @@ import { getRender } from './getRender';
  *
  * @author yoannchb-pro
  */
-export async function structuredAPI(
-  app: StructuredAPIApp = {},
-  target: HTMLElement,
-  config: Config
-) {
+export async function structuredAPI(params: Params) {
+  const { components, config, target, app = {}, props } = params;
+
   // Initialisation event dispatch
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Initialisation, {
@@ -31,11 +38,12 @@ export async function structuredAPI(
     })
   );
 
-  const deepRender = createConfigurableDeepRender(config);
+  const deepRender = createDeepRenderFn(config, components);
 
   // State of the app
   const state: State = {
     data: reactive(app.data ?? {}),
+    props,
     methods: {},
     events: {},
     refs: {},

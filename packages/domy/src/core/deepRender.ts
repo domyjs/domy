@@ -1,3 +1,4 @@
+import { Components } from '../types/Component';
 import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
@@ -5,6 +6,7 @@ import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { DomyHelper } from './DomyHelper';
 import { PLUGINS } from './plugin';
 import { renderAttribute } from './renderAttribute';
+import { renderComponent } from './renderComponent';
 import { renderText } from './renderText';
 
 type Elem = {
@@ -89,7 +91,7 @@ function sortAttributesBasedOnSortedDirectives(attrs: NamedNodeMap) {
  *
  * @author yoannchb-pro
  */
-export function createConfigurableDeepRender(config: Config) {
+export function createDeepRenderFn(config: Config, components: Components) {
   return function deepRender(props: Props) {
     const toRenderList: Elem[] = [
       {
@@ -117,6 +119,16 @@ export function createConfigurableDeepRender(config: Config) {
       if (element.nodeType === Node.TEXT_NODE) {
         renderText(domyHelper.getPluginHelper());
         domyHelper.callEffect();
+        continue;
+      }
+
+      // Rendering components
+      if (element.localName in components) {
+        renderComponent(
+          domyHelper.getPluginHelper(),
+          element as HTMLElement,
+          components[element.localName]
+        );
         continue;
       }
 

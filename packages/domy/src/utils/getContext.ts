@@ -27,7 +27,13 @@ export function getContext(props: Props) {
 
   const context = concatProxiesAndObjs(
     // We put scoped datas at first place to ensure it override data
-    [...props.scopedNodeData, props.state.data, props.state.methods, helpers],
+    [
+      ...props.scopedNodeData,
+      props.state.data,
+      props.state.methods,
+      helpers,
+      { props: props.state.props }
+    ],
     ({ type, obj, property, newValue }) => {
       const isObjSignal = isSignal(obj[property]);
       switch (type) {

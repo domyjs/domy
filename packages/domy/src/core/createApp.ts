@@ -1,5 +1,7 @@
 import { Data, StructuredAPIApp } from '../types/App';
+import { Components, ComponentProps } from '../types/Component';
 import { Config } from '../types/Config';
+import { toKebabCase } from '../utils/toKebabCase';
 import { getRender } from './getRender';
 import { hookAPI, HookAPIFnDefinition } from './hookAPI';
 import { structuredAPI } from './structuredAPI';
@@ -11,10 +13,27 @@ import { structuredAPI } from './structuredAPI';
  *
  * @author yoannchb-pro
  */
-export function createApp<D extends Data, M extends string, A extends any[]>(
-  appDefinition?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition
+export function createAdvancedApp<D extends Data, M extends string, A extends any[]>(
+  appDefinition?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition,
+  props?: ComponentProps
 ) {
   let config: Config = {};
+  let componentsList: Components = {};
+
+  function components(c: Components) {
+    const kebabCaseComponents: Components = {};
+
+    for (const key in c) {
+      if (c.hasOwnProperty(key)) {
+        const kebabKey = toKebabCase(key);
+        kebabCaseComponents[kebabKey] = c[key];
+      }
+    }
+
+    componentsList = kebabCaseComponents;
+
+    return { configure, mount };
+  }
 
   function mount(target?: HTMLElement): Promise<ReturnType<typeof getRender> | undefined> {
     return new Promise(resolve => {
@@ -22,9 +41,24 @@ export function createApp<D extends Data, M extends string, A extends any[]>(
         const domTarget = target ?? document.body;
 
         let render;
-        if (typeof appDefinition === 'function')
-          render = await hookAPI(appDefinition, domTarget, config);
-        else render = await structuredAPI(appDefinition, domTarget, config);
+        const params = {
+          components: componentsList,
+          config,
+          target: domTarget,
+          props
+        };
+
+        if (typeof appDefinition === 'function') {
+          render = await hookAPI({
+            fn: appDefinition,
+            ...params
+          });
+        } else {
+          render = await structuredAPI({
+            app: appDefinition,
+            ...params
+          });
+        }
 
         resolve(render);
       };
@@ -36,13 +70,27 @@ export function createApp<D extends Data, M extends string, A extends any[]>(
     });
   }
 
-  function configure(newConfig: Config) {
-    config = newConfig;
-    return { mount };
+  function configure(c: Config) {
+    config = c;
+    return { mount, components };
   }
 
   return {
     mount,
-    configure
+    configure,
+    components
   };
+}
+
+/**
+ * Same as createAdvancedApp but the user can't inject data or methods
+ * @param appDefinition
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function createApp<D extends Data, M extends string, A extends any[]>(
+  appDefinition?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition
+) {
+  return createAdvancedApp<D, M, A>(appDefinition);
 }

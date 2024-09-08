@@ -1,11 +1,11 @@
 import type { State } from './State';
 import type * as ReactiveUtils from '@domyjs/reactive';
 import { Config } from './Config';
-import { createConfigurableDeepRender } from '../core/deepRender';
 import { getContext } from '../utils/getContext';
 import { queueJob } from '../core/scheduler';
 import { helpersUtils } from '../utils/helpersUtils';
 import { directivesUtils } from '../utils/directivesUtils';
+import { createDeepRenderFn } from '../core/deepRender';
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -43,7 +43,7 @@ export type DomyDirectiveHelper = {
   cleanup: (cb: () => void | Promise<void>) => void;
   evaluate: (code: string) => any;
   evaluateWithoutListening: (code: string) => any;
-  deepRender: ReturnType<typeof createConfigurableDeepRender>;
+  deepRender: ReturnType<typeof createDeepRenderFn>;
   addScopeToNode(obj: Record<string, any>): void;
   removeScopeToNode(obj: Record<string, any>): void;
   getContext: typeof getContext;

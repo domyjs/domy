@@ -5,10 +5,11 @@ import { Helpers } from '../types/Helpers';
 import { State } from '../types/State';
 import { getHelpers } from '../utils/getHelpers';
 import { error } from '../utils/logs';
-import { createConfigurableDeepRender } from './deepRender';
+import { createDeepRenderFn } from './deepRender';
 import { DOMY_EVENTS } from './DomyEvents';
 import { isReactive, registerName } from '@domyjs/reactive';
 import { getRender } from './getRender';
+import { ComponentProps, Components } from '../types/Component';
 
 type PromisedOrNot<T> = Promise<T> | T;
 type HookAPIParams = {
@@ -20,6 +21,14 @@ export type HookAPIFnDefinition = (
   params: HookAPIParams
 ) => PromisedOrNot<void | Record<string, any>>;
 
+type Params = {
+  fn: HookAPIFnDefinition;
+  target: HTMLElement;
+  config: Config;
+  components: Components;
+  props?: ComponentProps;
+};
+
 /**
  * Hook API
  * Create DOMY App with Hooks structure
@@ -28,8 +37,10 @@ export type HookAPIFnDefinition = (
  *
  * @author yoannchb-pro
  */
-export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, config: Config) {
-  const deepRender = createConfigurableDeepRender(config);
+export async function hookAPI(params: Params) {
+  const { props, components, config, fn, target } = params;
+
+  const deepRender = createDeepRenderFn(config, components);
 
   const app: HookAPIApp = {
     data: {},
@@ -39,6 +50,7 @@ export async function hookAPI(fn: HookAPIFnDefinition, target: HTMLElement, conf
   // State of the app
   const state: State = {
     data: {},
+    props,
     methods: {},
     events: {},
     refs: {},

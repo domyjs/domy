@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <error-message>
+      <p>An error occured</p>
+    </error-message>
+    <Count />
+  </body>
+  <script>
+    const ErrorMessage = DOMY.createComponent({
+      html: `
+            <p>Error Message:</p>
+            <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white' }">
+                <template d-render="props.childrens"></template>    
+            </div>
+            <p>contact admin for more infos</p>
+        `
+    });
+
+    const Count = DOMY.createComponent({
+      html: `
+            <p>Count: {{ count }}</p>
+            <button @click="increment">+</button>
+            <button @click="decrement">-</button>
+        `,
+      app: {
+        data: {
+          count: 0
+        },
+        methods: {
+          increment: () => ++this.count,
+          decrement: () => --this.count
+        }
+      }
+    });
+
+    DOMY.createApp()
+      .components({
+        ErrorMessage,
+        Count
+      })
+      .mount();
+  </script>
+</html>

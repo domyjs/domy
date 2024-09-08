@@ -1,7 +1,6 @@
 import { cspEvaluate } from '../utils/cspEvaluate';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
-import { createConfigurableDeepRender } from './deepRender';
 import * as ReactiveUtils from '@domyjs/reactive';
 import { queueJob } from './scheduler';
 import { Listener, OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
@@ -9,6 +8,7 @@ import { State } from '../types/State';
 import { Config } from '../types/Config';
 import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
+import { createDeepRenderFn } from './deepRender';
 
 let domyHelperId = 0;
 
@@ -41,7 +41,7 @@ export class DomyHelper {
   private paths = new Set<string>();
 
   constructor(
-    private deepRenderFn: ReturnType<typeof createConfigurableDeepRender>,
+    private deepRenderFn: ReturnType<typeof createDeepRenderFn>,
     public el: Element,
     public state: State,
     public scopedNodeData: Record<string, any>[] = [],
