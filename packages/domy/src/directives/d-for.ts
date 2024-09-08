@@ -63,7 +63,6 @@ function renderer(props: RendererProps) {
     const newChild = initialChild.cloneNode(true);
     domy.deepRender({
       element: newChild as Element,
-      state: domy.state,
       scopedNodeData: domy.scopedNodeData
     });
 

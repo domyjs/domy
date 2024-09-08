@@ -11,9 +11,8 @@ export function dCloakImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // We render the element and child first so we know the d-cloak attribute will be remove after child rendered
   domy.deepRender({
     element: domy.el,
-    state: domy.state,
-    byPassAttributes: [domy.attr.name],
-    scopedNodeData: domy.scopedNodeData
+    scopedNodeData: domy.scopedNodeData,
+    byPassAttributes: [domy.attr.name]
   });
 
   return {

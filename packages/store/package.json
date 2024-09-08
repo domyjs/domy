@@ -1,7 +1,7 @@
 {
-  "name": "@domyjs/store",
+  "name": "@domyjs/router",
   "version": "1.0.0",
-  "description": "Domyjs store plugin",
+  "description": "Domyjs router plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [

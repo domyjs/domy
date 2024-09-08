@@ -1,3 +1,4 @@
+import { Data } from '../types/App';
 import { Component, ComponentDefinition, ComponentProps } from '../types/Component';
 import { error } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
@@ -40,17 +41,20 @@ function parseHTMl(html: string): DocumentFragment {
  *
  * @author yoannchb-pro
  */
-export function createComponent<T extends ComponentProps>(
-  componentDefinition: ComponentDefinition<T, any, any, any>
-): Component<T> {
-  return (props: T) => {
+export function createComponent<
+  P extends ComponentProps['props'],
+  D extends Data,
+  M extends string,
+  A extends any[]
+>(componentDefinition: ComponentDefinition<D, M, A, P>): Component<P> {
+  return (data: { props: P }, childrens: Element[]) => {
     try {
       const fragment = parseHTMl(componentDefinition.html);
 
       const temp = document.createElement('div');
       temp.appendChild(fragment);
 
-      createAdvancedApp(componentDefinition.app, props)
+      createAdvancedApp(componentDefinition.app, { props: data.props, childrens })
         .components(componentDefinition.components ?? {})
         .mount(temp);
 
@@ -61,3 +65,18 @@ export function createComponent<T extends ComponentProps>(
     }
   };
 }
+
+// createComponent({
+//   html: '',
+//   app: {
+//     data: {
+//       g: 4
+//     },
+//     methods: {
+//       gg() {
+//         this.r(5);
+//       },
+//       r(t: string) {}
+//     }
+//   }
+// });

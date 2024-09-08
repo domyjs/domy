@@ -2,9 +2,12 @@ import { Components } from '../types/Component';
 import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
+import {
+  sortAttributesBasedOnSortedDirectives,
+  getDomyAttributeInformations
+} from '../utils/domyAttrUtils';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { DomyHelper } from './DomyHelper';
-import { PLUGINS } from './plugin';
 import { renderAttribute } from './renderAttribute';
 import { renderComponent } from './renderComponent';
 import { renderText } from './renderText';
@@ -16,73 +19,11 @@ type Elem = {
 };
 
 type Props = {
-  state: State;
   element: Element;
+  scopedNodeData: Record<string, any>[];
   byPassAttributes?: string[];
-  scopedNodeData?: Record<string, any>[];
   renderWithoutListeningToChange?: boolean;
 };
-
-/**
- * Get the name of a domy attribute/prefix
- * It will remove the domy "d-" prefix of a string
- * Otherwise it retun an empty string
- * @param attrName
- * @returns
- *
- * @author yoannchb-pro
- */
-function getDomyName(str: string) {
-  return str.startsWith('d-') ? str.slice(2) : '';
-}
-
-/**
- * Retrieve some utils informations from a domy attribute
- * @param attr
- * @returns
- *
- * @author yoannchb-pro
- */
-function getDomyAttributeInformations(attr: Attr) {
-  // Allow us to separate the prefix, the domy attribute name and the modifiers
-  const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
-  let prefix = '';
-  let attrName = attrNameWithPrefix;
-  if (attrName.includes(':')) {
-    [prefix, attrName] = attrName.split(':');
-  }
-
-  return {
-    prefix: getDomyName(prefix),
-    directive: getDomyName(attrName),
-    modifiers,
-    attrName: attrName
-  };
-}
-
-/**
- * Sort a list of attributes based on the sorted directives order in plugin
- * It ensure some attributes are rendered first like d-ignore, d-once, ...
- * @param attrs
- * @returns
- *
- * @author yoannchb-pro
- */
-function sortAttributesBasedOnSortedDirectives(attrs: NamedNodeMap) {
-  const copy = Array.from(attrs ?? []);
-  copy.sort((a, b) => {
-    const iA = PLUGINS.sortedDirectives.indexOf(getDomyName(a.name));
-    const iB = PLUGINS.sortedDirectives.indexOf(getDomyName(b.name));
-    if (iA === -1) {
-      return 1;
-    } else if (iB === -1) {
-      return -1;
-    } else {
-      return iA - iB;
-    }
-  });
-  return copy;
-}
 
 /**
  * Deep render an element (with the childs and textContent)
@@ -91,7 +32,7 @@ function sortAttributesBasedOnSortedDirectives(attrs: NamedNodeMap) {
  *
  * @author yoannchb-pro
  */
-export function createDeepRenderFn(config: Config, components: Components) {
+export function createDeepRenderFn(state: State, config: Config, components: Components) {
   return function deepRender(props: Props) {
     const toRenderList: Elem[] = [
       {
@@ -102,15 +43,27 @@ export function createDeepRenderFn(config: Config, components: Components) {
     ];
 
     while (toRenderList.length > 0) {
+      let skipChildRendering = false;
+
       // We use pop for performance issue and because we render the tree from the bottom to top
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
       const toRender = toRenderList.pop() as Elem;
       const element = toRender.element;
 
+      // To avoid infinite loop
+      // Example: <div d-once d-cloak></div> will create a bug without this safe function
+      // Because each directive call deeprender with byPassAttributes
+      const safeDeepRender = (args: Props) => {
+        deepRender({
+          ...args,
+          byPassAttributes: [...(toRender.byPassAttributes ?? []), ...(args.byPassAttributes ?? [])]
+        });
+      };
+
       let domyHelper = new DomyHelper(
-        deepRender,
+        safeDeepRender,
         element,
-        props.state,
+        state,
         toRender.scopedNodeData,
         config
       );
@@ -129,13 +82,14 @@ export function createDeepRenderFn(config: Config, components: Components) {
           element as HTMLElement,
           components[element.localName]
         );
-        continue;
+        domyHelper.callEffect();
+        skipChildRendering = true;
+        // We don't "continue" to ensure the events will be attach to the components
       }
 
       // Rendering attributes if it's an element
       const sortedAttributes = sortAttributesBasedOnSortedDirectives(element.attributes);
 
-      let skipChildRendering = false;
       for (const attr of sortedAttributes) {
         const shouldByPassAttribute =
           toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
@@ -144,9 +98,9 @@ export function createDeepRenderFn(config: Config, components: Components) {
 
         // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData
         domyHelper = new DomyHelper(
-          deepRender,
+          safeDeepRender,
           element,
-          props.state,
+          state,
           [...domyHelper.scopedNodeData],
           config
         );

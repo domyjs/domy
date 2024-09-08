@@ -6,18 +6,21 @@
     <title>Document</title>
     <script src="../dist/index.js"></script>
   </head>
-  <body>
+  <body d-scope="{ title: 'Test' }">
+    <p>{{ test.g }}</p>
     <error-message>
-      <p>An error occured</p>
+      <p>{{ message }}</p>
     </error-message>
-    <Count />
+    <Count d-if="5 === 6" :title="title"></Count>
+    <button @click="message = 'Nop'">Change error message</button>
+    <button @click="title = 'Test2'">changeTitle</button>
   </body>
   <script>
     const ErrorMessage = DOMY.createComponent({
       html: `
             <p>Error Message:</p>
             <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white' }">
-                <template d-render="props.childrens"></template>    
+                <template d-render="$childrens"></template>    
             </div>
             <p>contact admin for more infos</p>
         `
@@ -25,6 +28,7 @@
 
     const Count = DOMY.createComponent({
       html: `
+            <h1>{{ $props.title ?? "Counter default title" }}</h1>
             <p>Count: {{ count }}</p>
             <button @click="increment">+</button>
             <button @click="decrement">-</button>
@@ -40,7 +44,15 @@
       }
     });
 
-    DOMY.createApp()
+    DOMY.createApp({
+      data: {
+        message: 'An error occured',
+        test: {}
+      },
+      mounted() {
+        setTimeout(() => (this.test.g = 'hello'), 2000);
+      }
+    })
       .components({
         ErrorMessage,
         Count

@@ -38,8 +38,6 @@ export async function structuredAPI(params: Params) {
     })
   );
 
-  const deepRender = createDeepRenderFn(config, components);
-
   // State of the app
   const state: State = {
     data: reactive(app.data ?? {}),
@@ -121,11 +119,12 @@ export async function structuredAPI(params: Params) {
     })
   );
 
+  const deepRender = createDeepRenderFn(state, config, components);
   try {
     // Render the dom with DOMY
     deepRender({
       element: target,
-      state
+      scopedNodeData: []
     });
   } catch (err: any) {
     error(err);
@@ -149,5 +148,5 @@ export async function structuredAPI(params: Params) {
     })
   );
 
-  return getRender(deepRender, state);
+  return getRender(deepRender);
 }

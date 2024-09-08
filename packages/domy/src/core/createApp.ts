@@ -13,10 +13,12 @@ import { structuredAPI } from './structuredAPI';
  *
  * @author yoannchb-pro
  */
-export function createAdvancedApp<D extends Data, M extends string, A extends any[]>(
-  appDefinition?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition,
-  props?: ComponentProps
-) {
+export function createAdvancedApp<
+  D extends Data,
+  M extends string,
+  A extends any[],
+  P extends ComponentProps['props']
+>(appDefinition?: StructuredAPIApp<D, M, A, P> | HookAPIFnDefinition, props?: ComponentProps) {
   let config: Config = {};
   let componentsList: Components = {};
 
@@ -24,10 +26,8 @@ export function createAdvancedApp<D extends Data, M extends string, A extends an
     const kebabCaseComponents: Components = {};
 
     for (const key in c) {
-      if (c.hasOwnProperty(key)) {
-        const kebabKey = toKebabCase(key);
-        kebabCaseComponents[kebabKey] = c[key];
-      }
+      const kebabKey = toKebabCase(key);
+      kebabCaseComponents[kebabKey] = c[key];
     }
 
     componentsList = kebabCaseComponents;
@@ -92,5 +92,20 @@ export function createAdvancedApp<D extends Data, M extends string, A extends an
 export function createApp<D extends Data, M extends string, A extends any[]>(
   appDefinition?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition
 ) {
-  return createAdvancedApp<D, M, A>(appDefinition);
+  return createAdvancedApp<D, M, A, Record<string, never>>(appDefinition);
 }
+
+// createApp({
+//   data: {
+//     f: 5
+//   },
+//   methods: {
+//     r(t: string) {
+//       this.r;
+//     },
+//     g() {
+//       this.r();
+//       this.r(5);
+//     }
+//   }
+// });

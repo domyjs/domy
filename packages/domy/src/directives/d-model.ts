@@ -82,7 +82,6 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // So in case the value is a binding we need to ensure domy rendered the childs before handling d-model
   domy.deepRender({
     element: domy.el,
-    state: domy.state,
     byPassAttributes: [domy.attr.name],
     scopedNodeData: domy.scopedNodeData
   });

@@ -2,12 +2,13 @@ import { HookAPIFnDefinition } from '../core/hookAPI';
 import { Data, StructuredAPIApp } from './App';
 
 export type ComponentProps = {
-  [key: string]: any;
+  props: { [key: string]: any };
   childrens: Element[];
 };
 
-export type Component<T extends ComponentProps> = (
-  props: T
+export type Component<T extends ComponentProps['props']> = (
+  data: { props: T },
+  childrens: Element[]
 ) => (componentElement: HTMLElement) => void;
 
 export type Components = {
@@ -15,12 +16,12 @@ export type Components = {
 };
 
 export type ComponentDefinition<
-  T extends Record<string, any>,
   D extends Data,
   M extends string,
-  A extends any[]
+  A extends any[],
+  P extends ComponentProps['props']
 > = {
   html: string;
-  app?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition;
+  app?: StructuredAPIApp<D, M, A, P> | HookAPIFnDefinition;
   components?: Components;
 };

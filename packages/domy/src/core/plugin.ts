@@ -25,6 +25,8 @@ import { dInitImplementation } from '../directives/d-init';
 import { dWatchImplementation } from '../directives/d-watch';
 import { dMountImplementation } from '../directives/d-mount';
 import { dRenderImplementation } from '../directives/d-render';
+import { $childrens } from '../helpers/$childrens';
+import { $props } from '../helpers/$props';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -75,7 +77,9 @@ export const PLUGINS: Plugins = {
     refs: $refs,
     root: $root,
     dispatch: $dispatch,
-    nextTick: $nextTick
+    nextTick: $nextTick,
+    childrens: $childrens,
+    props: $props
   }
 };
 

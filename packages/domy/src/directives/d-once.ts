@@ -11,9 +11,8 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   domy.deepRender({
     element: domy.el,
-    state: domy.state,
-    byPassAttributes: [domy.attr.name],
     scopedNodeData: domy.scopedNodeData,
+    byPassAttributes: [domy.attr.name],
     renderWithoutListeningToChange: true
   });
 

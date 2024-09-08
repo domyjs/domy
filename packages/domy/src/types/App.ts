@@ -1,14 +1,25 @@
+import { ComponentProps } from './Component';
 import { Helpers } from './Helpers';
 
 export type Data = { [depName: string]: any };
 
-type MethodFn<D extends Data, M extends Methods<any, D, A>, A extends any[]> = (
-  this: D & M & Helpers,
+type MethodFn<
+  D extends Data,
+  M extends Methods<D, string, A, P>,
+  A extends any[],
+  P extends ComponentProps['props']
+> = (
+  this: D & M & { $props: P } & { $childrens: Element[] } & Helpers,
   ...args: A
 ) => any | Promise<any>;
 
-type Methods<M extends string, D extends Data, A extends any[]> = {
-  [fnName in M]: MethodFn<D, Methods<M, D, A>, A>;
+type Methods<
+  D extends Data,
+  M extends string,
+  A extends any[],
+  P extends ComponentProps['props']
+> = {
+  [fnName in M]: MethodFn<D, Methods<D, M, A, P>, A, P>;
 };
 
 export type WatcherFn = (
@@ -21,7 +32,8 @@ export type WatcherFn = (
 export type StructuredAPIApp<
   D extends Data = any,
   M extends string = any,
-  A extends any[] = any[]
+  A extends any[] = any[],
+  P extends ComponentProps['props'] = Record<string, never>
 > = {
   setup?: () => void | Promise<void>;
   mounted?: () => void | Promise<void>;
@@ -29,7 +41,7 @@ export type StructuredAPIApp<
     [depName: string]: WatcherFn;
   };
   data?: D;
-  methods?: Methods<M, D, A>;
+  methods?: Methods<D, M, A, P>;
 };
 
 export type HookAPIApp = {

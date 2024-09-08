@@ -76,9 +76,8 @@ export function getElementVisibilityHandler(props: Props) {
         // If it's the first time we display the element then we have to render it
         domy.deepRender({
           element: el,
-          state: domy.state,
-          scopedNodeData: domy.scopedNodeData,
-          byPassAttributes: [domy.attr.name]
+          byPassAttributes: [domy.attr.name],
+          scopedNodeData: domy.scopedNodeData
         });
         hasBeenRender = true;
       }

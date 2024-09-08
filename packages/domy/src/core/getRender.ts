@@ -1,4 +1,3 @@
-import type { State } from '../types/State';
 import type { createDeepRenderFn } from './deepRender';
 
 /**
@@ -15,12 +14,12 @@ import type { createDeepRenderFn } from './deepRender';
  *
  * @author yoannchb-pro
  */
-export function getRender(deepRender: ReturnType<typeof createDeepRenderFn>, state: State) {
+export function getRender(deepRender: ReturnType<typeof createDeepRenderFn>) {
   return {
     render: (element: Element) => {
       return deepRender({
         element,
-        state
+        scopedNodeData: []
       });
     }
   };

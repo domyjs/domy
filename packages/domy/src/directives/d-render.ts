@@ -32,7 +32,6 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     for (const child of fragment.childNodes) {
       domy.deepRender({
         element: child as Element,
-        state: domy.state,
         scopedNodeData: domy.scopedNodeData
       });
     }

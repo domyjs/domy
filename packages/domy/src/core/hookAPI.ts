@@ -40,8 +40,6 @@ type Params = {
 export async function hookAPI(params: Params) {
   const { props, components, config, fn, target } = params;
 
-  const deepRender = createDeepRenderFn(config, components);
-
   const app: HookAPIApp = {
     data: {},
     methods: {}
@@ -101,11 +99,12 @@ export async function hookAPI(params: Params) {
     })
   );
 
+  const deepRender = createDeepRenderFn(state, config, components);
   try {
     // Render the dom with DOMY
     deepRender({
       element: target,
-      state
+      scopedNodeData: []
     });
   } catch (err: any) {
     error(err);
@@ -128,5 +127,5 @@ export async function hookAPI(params: Params) {
     })
   );
 
-  return getRender(deepRender, state);
+  return getRender(deepRender);
 }
