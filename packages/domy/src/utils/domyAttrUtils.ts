@@ -33,7 +33,7 @@ export function getDomyAttributeInformations(attr: Attr) {
     prefix: getDomyName(prefix),
     directive: getDomyName(attrName),
     modifiers,
-    attrName: attrName
+    attrName: attrName.replace(/^@/, '')
   };
 }
 

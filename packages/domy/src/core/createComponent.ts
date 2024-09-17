@@ -10,14 +10,10 @@ import { createAdvancedApp } from './createApp';
  *
  * @author yoannchb-pro
  */
-function parseHTMl(html: string): DocumentFragment {
-  const fragment = new DocumentFragment();
+function parseHTMl(html: string): HTMLElement {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  for (const child of doc.body.childNodes) {
-    fragment.appendChild(child);
-  }
-  return fragment;
+  return doc.body.childNodes[0] as HTMLElement;
 }
 
 /**
@@ -47,21 +43,17 @@ export function createComponent<
   M extends string,
   A extends any[]
 >(componentDefinition: ComponentDefinition<D, M, A, P>): Component<P> {
-  return async (data: { props: P }, childrens: Element[]) => {
+  return async (componentElement: HTMLElement, data: { props: P }, childrens: Element[]) => {
     try {
-      const fragment = parseHTMl(componentDefinition.html);
+      const render = parseHTMl(componentDefinition.html);
 
-      const temp = document.createElement('div');
-      temp.appendChild(fragment);
+      componentElement.replaceWith(render);
 
       await createAdvancedApp(componentDefinition.app, { props: data.props, childrens })
         .components(componentDefinition.components ?? {})
-        .mount(temp);
-
-      return (componentElement: HTMLElement) => componentElement.replaceWith(...temp.childNodes);
+        .mount(render);
     } catch (err: any) {
       error(err);
-      return (componentElement: HTMLElement) => componentElement.remove();
     }
   };
 }

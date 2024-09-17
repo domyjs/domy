@@ -2,6 +2,7 @@ import { Component, ComponentProps } from '../types/Component';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 import { isBindAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { kebabToCamelCase } from '../utils/kebabToCamelCase';
 
 /**
  * Allow to render a component defined with createComponent
@@ -34,7 +35,8 @@ export async function renderComponent(
   domy.effect(() => {
     for (const attr of attributes) {
       if (isBindAttr(attr.name) || isEventAttr(attr.name)) {
-        const propName = getDomyAttributeInformations(attr).attrName.replace(/^@/, '');
+        const attrInfos = getDomyAttributeInformations(attr);
+        const propName = kebabToCamelCase(attrInfos.attrName);
         // When the attribute is empty we considere it as a true value
         // Example: <div isShow></div>
         data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
@@ -46,6 +48,5 @@ export async function renderComponent(
     }
   });
 
-  const renderComponent = await component(data, Array.from(element.childNodes) as Element[]);
-  renderComponent(element); // Replace the component with the render
+  await component(element, data, Array.from(element.childNodes) as Element[]);
 }

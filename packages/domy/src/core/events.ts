@@ -11,8 +11,7 @@ import on from '../utils/on';
  * @author yoannchb-pro
  */
 export function events(domy: DomyDirectiveHelper) {
-  const domyAttrName = domy.attrName;
-  const eventName = domyAttrName.startsWith('@') ? domyAttrName.slice(1) : domyAttrName;
+  const eventName = domy.attrName;
 
   // We register the event into the state
   if (!domy.state.events[eventName]) domy.state.events[eventName] = [];

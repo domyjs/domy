@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>components</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <Count :show-error="showError" @close="close" @open="open"></Count>
+  </body>
+  <script>
+    const ErrorMessage = DOMY.createComponent({
+      html: `
+            <div d-if="$props.showError" :style="{ padding: '1rem', backgroundColor: 'red', color: 'white', position: 'relative' }">
+              <p>Error Message:</p>
+              <template d-render="$childrens"></template>
+
+              <button @click="$props.close()" :style="{ position: 'absolute', right: '0.5rem', top: '0.5rem' }">X</button>
+            </div>
+        `
+    });
+
+    const Count = DOMY.createComponent({
+      html: `
+            <div>
+              <p>Count: {{ count }}</p>
+              <button @click="increment">+</button>
+              <button @click="decrement">-</button>
+              <error-message :show-error="$props.showError" @close="$props.close">
+                <p :style="{ fontWeight: 'bold' }">{{ message }}</p>
+              </error-message>
+            </div>
+        `,
+      components: {
+        ErrorMessage
+      },
+      app: {
+        setup() {},
+        mounted() {},
+        watch: {
+          count(prevValue, newValue) {
+            if (newValue < 0) {
+              this.$props.open();
+            } else {
+              this.$props.close();
+            }
+          }
+        },
+        data: {
+          message: 'The count as to be greater than 0!',
+          count: 0
+        },
+        methods: {
+          increment: () => ++this.count,
+          decrement: () => --this.count
+        }
+      }
+    });
+
+    DOMY.createApp({
+      data: {
+        showError: false
+      },
+      methods: {
+        close() {
+          this.showError = false;
+        },
+        open() {
+          this.showError = true;
+        }
+      }
+    })
+      .components({
+        Count
+      })
+      .mount();
+  </script>
+</html>
