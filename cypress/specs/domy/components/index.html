@@ -7,12 +7,15 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <Count :show-error="showError" @close="close" @open="open"></Count>
+    <div d-for="i of [1]">
+      <Count d-if="5 === 5" :key="i" :show-error="showError" :close="close" :open="open"></Count>
+    </div>
   </body>
   <script>
     const ErrorMessage = DOMY.createComponent({
+      propsName: ['close'],
       html: `
-            <div d-if="$props.showError" :style="{ padding: '1rem', backgroundColor: 'red', color: 'white', position: 'relative' }">
+            <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white', position: 'relative' }">
               <p>Error Message:</p>
               <template d-render="$childrens"></template>
 
@@ -22,12 +25,14 @@
     });
 
     const Count = DOMY.createComponent({
+      propsName: ['showError', 'open', 'close'],
       html: `
             <div>
+              <h1>Props: {{ Object.keys(this.$props).join(',') }}</h1>
               <p>Count: {{ count }}</p>
               <button @click="increment">+</button>
               <button @click="decrement">-</button>
-              <error-message :show-error="$props.showError" @close="$props.close">
+              <error-message d-if="$props.showError" :close="$props.close">
                 <p :style="{ fontWeight: 'bold' }">{{ message }}</p>
               </error-message>
             </div>

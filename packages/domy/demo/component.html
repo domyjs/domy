@@ -12,7 +12,7 @@
       <error-message>
         <p>{{ message }}</p>
       </error-message>
-      <Count d-if="5 === 6" :title="title" @sayHello="sayHello"></Count>
+      <Count :title="title" @sayHello="sayHello"></Count>
       <button @click="message = 'Nop'">Change error message</button>
       <button @click="title = 'Test2'">changeTitle</button>
     </div>

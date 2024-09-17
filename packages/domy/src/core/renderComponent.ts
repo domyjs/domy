@@ -1,7 +1,7 @@
-import { Component, ComponentProps } from '../types/Component';
+import { ComponentProps, Components } from '../types/Component';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
-import { isBindAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { isBindAttr } from '../utils/isSpecialAttribute';
 import { kebabToCamelCase } from '../utils/kebabToCamelCase';
 
 /**
@@ -14,10 +14,10 @@ import { kebabToCamelCase } from '../utils/kebabToCamelCase';
  *
  * @author yoannchb-pro
  */
-export async function renderComponent(
+export function renderComponent(
   domy: DomyDirectiveHelper,
   element: HTMLElement,
-  component: Component
+  component: Components[keyof Components]
 ) {
   // We render the childs first to ensure they keep the current state and not the component state
   for (const child of element.childNodes) {
@@ -29,24 +29,33 @@ export async function renderComponent(
 
   const data = domy.reactive({ props: {} as ComponentProps['props'] });
 
+  const attributes = Array.from(element.attributes).filter(attr => {
+    const attrName = kebabToCamelCase(attr.name.replace(/^:/, ''));
+    return component.propsName.has(attrName);
+  });
+
   // We ensure the props are reactive
   // In particular in that kind of case: <Component :prop="var ? data1 : data2" />
-  const attributes = Array.from(element.attributes);
   domy.effect(() => {
     for (const attr of attributes) {
-      if (isBindAttr(attr.name) || isEventAttr(attr.name)) {
+      if (isBindAttr(attr.name)) {
         const attrInfos = getDomyAttributeInformations(attr);
         const propName = kebabToCamelCase(attrInfos.attrName);
+        data.props[propName] = domy.evaluate(attr.value);
+      } else {
         // When the attribute is empty we considere it as a true value
         // Example: <div isShow></div>
-        data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
-      } else if (isNormalAttr(attr.name)) {
-        data.props[attr.name] = attr.value;
+        data.props[attr.name] = attr.value === '' ? true : attr.value;
       }
 
       element.removeAttribute(attr.name);
     }
   });
 
-  await component(element, data, Array.from(element.childNodes) as Element[]);
+  component.componentSetup({
+    componentElement: element,
+    data,
+    childrens: Array.from(element.childNodes) as Element[],
+    domy
+  });
 }

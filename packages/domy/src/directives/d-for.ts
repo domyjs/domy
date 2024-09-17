@@ -60,31 +60,14 @@ function renderer(props: RendererProps) {
     }
 
     // Create and render the new element
-    const newChild = initialChild.cloneNode(true);
+    let newChild = initialChild.cloneNode(true);
+    el.appendChild(newChild);
     domy.deepRender({
       element: newChild as Element,
       scopedNodeData: domy.scopedNodeData
     });
-
-    const oldRender: ChildNode | undefined = el.childNodes[currentIndex];
-
-    // If an element doesn't exist at this index it mean we append a new child
-    if (!oldRender) {
-      el.appendChild(newChild);
-      renderedChildrens.add(newChild);
-      continue;
-    }
-
-    // If an element exist at this index we compare them
-    // If there are different we append the new child just before the old one
-    // Otherwise we don't do anything
-    const isEqual = oldRender.isEqualNode(newChild);
-    if (!isEqual) {
-      el.insertBefore(newChild, oldRender);
-      renderedChildrens.add(newChild);
-    } else {
-      renderedChildrens.add(oldRender);
-    }
+    newChild = el.lastElementChild!; // Ensure we get the rendered component and not the component it self
+    renderedChildrens.add(newChild);
   }
 
   domy.removeScopeToNode(scope);

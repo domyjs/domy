@@ -1,6 +1,7 @@
 import { Data } from '../types/App';
-import { Component, ComponentDefinition, ComponentProps } from '../types/Component';
-import { error } from '../utils/logs';
+import { ComponentDefinition, ComponentProps, Components } from '../types/Component';
+import { kebabToCamelCase } from '../utils/kebabToCamelCase';
+import { error, warn } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
 
 /**
@@ -42,18 +43,53 @@ export function createComponent<
   D extends Data,
   M extends string,
   A extends any[]
->(componentDefinition: ComponentDefinition<D, M, A, P>): Component<P> {
-  return async (componentElement: HTMLElement, data: { props: P }, childrens: Element[]) => {
-    try {
-      const render = parseHTMl(componentDefinition.html);
+>(componentDefinition: ComponentDefinition<D, M, A, P>): Components[keyof Components] {
+  const propsName = new Set(componentDefinition.propsName);
 
-      componentElement.replaceWith(render);
+  return {
+    propsName,
+    componentSetup: ({ componentElement, data, childrens, domy }) => {
+      try {
+        const attributesToSkip: string[] = [];
+        const render = parseHTMl(componentDefinition.html);
 
-      await createAdvancedApp(componentDefinition.app, { props: data.props, childrens })
-        .components(componentDefinition.components ?? {})
-        .mount(render);
-    } catch (err: any) {
-      error(err);
+        for (const attr of componentElement.attributes) {
+          const attrName = kebabToCamelCase(attr.name.replace(/^:/, ''));
+
+          if (propsName.has(attrName)) {
+            attributesToSkip.push(attr.name);
+            continue;
+          }
+
+          if (render.getAttribute(attr.name)) {
+            warn(
+              `The domy attribute "${attr.name}" has been skipped because it's already present in the component root.`
+            );
+            attributesToSkip.push(attr.name);
+            continue;
+          }
+
+          render.setAttribute(attr.name.replace(/^@/, 'd-on:'), attr.value);
+        }
+
+        componentElement.replaceWith(render);
+
+        // Ensure we can add some domy attribute to the component and render them on the component root
+        // Example: <Count d-if="showCount"></Count>
+        domy.deepRender({
+          element: render,
+          scopedNodeData: domy.scopedNodeData,
+          byPassAttributes: attributesToSkip,
+          skipChildRendering: true,
+          isComponentRendering: true
+        });
+
+        createAdvancedApp(componentDefinition.app, { props: data.props, childrens })
+          .components(componentDefinition.components ?? {})
+          .mount(render);
+      } catch (err: any) {
+        error(err);
+      }
     }
   };
 }

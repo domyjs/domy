@@ -22,7 +22,9 @@ type Props = {
   element: Element;
   scopedNodeData: Record<string, any>[];
   byPassAttributes?: string[];
+  skipChildRendering?: boolean;
   renderWithoutListeningToChange?: boolean;
+  isComponentRendering?: boolean;
 };
 
 /**
@@ -43,20 +45,28 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     ];
 
     while (toRenderList.length > 0) {
-      let skipChildRendering = false;
+      let skipChildRendering = props.skipChildRendering ?? false;
 
       // We use pop for performance issue and because we render the tree from the bottom to top
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
       const toRender = toRenderList.pop() as Elem;
       const element = toRender.element;
 
-      // To avoid infinite loop
-      // Example: <div d-once d-cloak></div> will create a bug without this safe function
-      // Because each directive call deeprender with byPassAttributes
       const safeDeepRender = (args: Props) => {
+        // If it's the same element we are currently deepRendering we keep the byPassAtributes to avoid infinite loop
+        // Example: <div d-once d-cloak></div> each directives call deepRender with byPassAttributes so we need to keep trace of treated attributes
+        const byPassAttributes =
+          args.element === element
+            ? [...(toRender.byPassAttributes ?? []), ...(args.byPassAttributes ?? [])]
+            : args.byPassAttributes;
+        // It ensure some attributes doesnt render the child of the component
+        // Example: <Count d-if="showCount" :count="count"></Count> we doesnt want d-if to deep render component with the data of the app instead of the component
+        const skipChildRendering = props.isComponentRendering || args.skipChildRendering;
+
         deepRender({
           ...args,
-          byPassAttributes: [...(toRender.byPassAttributes ?? []), ...(args.byPassAttributes ?? [])]
+          byPassAttributes,
+          skipChildRendering
         });
       };
 
