@@ -1,8 +1,7 @@
 import { Component, ComponentProps } from '../types/Component';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
-import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
-import { warn } from '../utils/logs';
+import { isBindAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 
 /**
  * Allow to render a component defined with createComponent
