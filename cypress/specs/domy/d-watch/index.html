@@ -10,7 +10,7 @@
     <div d-scope="{ count: 0, somethingElse: 0 }">
       <p
         id="count"
-        d-watch.count.count2="({ prevValue, newValue }) => { if(newValue < 0) count = prevValue; }"
+        d-watch.count.count2="(prevValue, newValue) => { if(newValue < 0) count = prevValue; }"
       >
         Count: {{ count }}
       </p>

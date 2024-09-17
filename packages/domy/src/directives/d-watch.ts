@@ -1,3 +1,4 @@
+import { WatcherFn } from '../types/App';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { warn } from '../utils/logs';
 
@@ -50,9 +51,16 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
           isLock = true;
 
           for (const keyToWatch of keysToWatch) {
-            if (domy.matchPath(keyToWatch, props.path).isMatching) {
+            const matcher = domy.matchPath(keyToWatch, props.path);
+            if (matcher.isMatching) {
               const executedValue = domy.evaluateWithoutListening(domy.attr.value);
-              if (typeof executedValue === 'function') domy.queueJob(() => executedValue(props));
+              if (typeof executedValue === 'function')
+                domy.queueJob(() => {
+                  executedValue(props.prevValue, props.newValue, {
+                    path: props.path,
+                    params: matcher.params
+                  }) as WatcherFn;
+                });
               break;
             }
           }
