@@ -83,8 +83,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           components[element.localName]
         );
         domyHelper.callEffect();
-        skipChildRendering = true;
-        // We don't "continue" to ensure the events will be attach to the components
+        continue;
       }
 
       // Rendering attributes if it's an element

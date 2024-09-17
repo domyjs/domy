@@ -6,14 +6,16 @@
     <title>Document</title>
     <script src="../dist/index.js"></script>
   </head>
-  <body d-scope="{ title: 'Test' }">
-    <p>{{ test.g }}</p>
-    <error-message>
-      <p>{{ message }}</p>
-    </error-message>
-    <Count d-if="5 === 6" :title="title"></Count>
-    <button @click="message = 'Nop'">Change error message</button>
-    <button @click="title = 'Test2'">changeTitle</button>
+  <body>
+    <div id="app" d-scope="{ title: 'Test' }">
+      <p>{{ test.g }}</p>
+      <error-message>
+        <p>{{ message }}</p>
+      </error-message>
+      <Count d-if="5 === 6" :title="title" @sayHello="sayHello"></Count>
+      <button @click="message = 'Nop'">Change error message</button>
+      <button @click="title = 'Test2'">changeTitle</button>
+    </div>
   </body>
   <script>
     const ErrorMessage = DOMY.createComponent({
@@ -32,8 +34,13 @@
             <p>Count: {{ count }}</p>
             <button @click="increment">+</button>
             <button @click="decrement">-</button>
+            <button @click="$props.sayhello()">say hello</button>
         `,
       app: {
+        setup() {
+          console.log(this.$props, this.$childrens);
+        },
+        mounted() {},
         data: {
           count: 0
         },
@@ -47,7 +54,13 @@
     DOMY.createApp({
       data: {
         message: 'An error occured',
+        name: 'yoann',
         test: {}
+      },
+      methods: {
+        sayHello() {
+          console.log('hello', this.name);
+        }
       },
       mounted() {
         setTimeout(() => (this.test.g = 'hello'), 2000);
@@ -57,6 +70,6 @@
         ErrorMessage,
         Count
       })
-      .mount();
+      .mount(document.querySelector('#app'));
   </script>
 </html>

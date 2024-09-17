@@ -13,7 +13,8 @@ import { ComponentProps, Components } from '../types/Component';
 
 type PromisedOrNot<T> = Promise<T> | T;
 type HookAPIParams = {
-  onMounted: (callback: (props: { helpers: Helpers }) => PromisedOrNot<void>) => void;
+  props?: ComponentProps['props'];
+  onMounted: (callback: (params: { helpers: Helpers }) => PromisedOrNot<void>) => void;
   helpers: Helpers;
 };
 
@@ -65,6 +66,7 @@ export async function hookAPI(params: Params) {
 
   // We call the setup
   const data = await fn({
+    props,
     onMounted: callback => {
       app.mounted = callback;
     },

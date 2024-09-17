@@ -6,10 +6,10 @@ export type ComponentProps = {
   childrens: Element[];
 };
 
-export type Component<T extends ComponentProps['props']> = (
+export type Component<T extends ComponentProps['props'] = ComponentProps['props']> = (
   data: { props: T },
   childrens: Element[]
-) => (componentElement: HTMLElement) => void;
+) => Promise<(componentElement: HTMLElement) => void>;
 
 export type Components = {
   [name: string]: Component<any>;

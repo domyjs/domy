@@ -47,14 +47,14 @@ export function createComponent<
   M extends string,
   A extends any[]
 >(componentDefinition: ComponentDefinition<D, M, A, P>): Component<P> {
-  return (data: { props: P }, childrens: Element[]) => {
+  return async (data: { props: P }, childrens: Element[]) => {
     try {
       const fragment = parseHTMl(componentDefinition.html);
 
       const temp = document.createElement('div');
       temp.appendChild(fragment);
 
-      createAdvancedApp(componentDefinition.app, { props: data.props, childrens })
+      await createAdvancedApp(componentDefinition.app, { props: data.props, childrens })
         .components(componentDefinition.components ?? {})
         .mount(temp);
 

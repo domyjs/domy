@@ -1,7 +1,8 @@
-import { Component } from '../types/Component';
+import { Component, ComponentProps } from '../types/Component';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
-import { isBindAttr, isDomyAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { warn } from '../utils/logs';
 
 /**
  * Allow to render a component defined with createComponent
@@ -13,10 +14,10 @@ import { isBindAttr, isDomyAttr, isNormalAttr } from '../utils/isSpecialAttribut
  *
  * @author yoannchb-pro
  */
-export function renderComponent(
+export async function renderComponent(
   domy: DomyDirectiveHelper,
   element: HTMLElement,
-  component: Component<any>
+  component: Component
 ) {
   // We render the childs first to ensure they keep the current state and not the component state
   for (const child of element.childNodes) {
@@ -26,27 +27,26 @@ export function renderComponent(
     });
   }
 
-  const data = domy.reactive({ props: {} as any });
+  const data = domy.reactive({ props: {} as ComponentProps['props'] });
 
   // We ensure the props are reactive
   // In particular in that kind of case: <Component :prop="var ? data1 : data2" />
   const attributes = Array.from(element.attributes);
   domy.effect(() => {
     for (const attr of attributes) {
-      if (isBindAttr(attr.name)) {
-        const propName = getDomyAttributeInformations(attr).attrName;
-        data.props[propName] = domy.evaluate(attr.value);
-        element.removeAttribute(attr.name);
+      if (isBindAttr(attr.name) || isEventAttr(attr.name)) {
+        const propName = getDomyAttributeInformations(attr).attrName.replace(/^@/, '');
+        // When the attribute is empty we considere it as a true value
+        // Example: <div isShow></div>
+        data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
       } else if (isNormalAttr(attr.name)) {
         data.props[attr.name] = attr.value;
-        element.removeAttribute(attr.name);
-      } else if (isDomyAttr(attr.name)) {
-        // We remove the domy directive/prefix because we don't handle it for now
-        element.removeAttribute(attr.name);
       }
+
+      element.removeAttribute(attr.name);
     }
   });
 
-  const renderComponent = component(data, Array.from(element.childNodes) as Element[]);
+  const renderComponent = await component(data, Array.from(element.childNodes) as Element[]);
   renderComponent(element); // Replace the component with the render
 }
