@@ -13,7 +13,7 @@
   </body>
   <script>
     const ErrorMessage = DOMY.createComponent({
-      propsName: ['close'],
+      props: ['close'],
       html: `
             <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white', position: 'relative' }">
               <p>Error Message:</p>
@@ -25,7 +25,7 @@
     });
 
     const Count = DOMY.createComponent({
-      propsName: ['showError', 'open', 'close'],
+      props: ['showError', 'open', 'close'],
       html: `
             <div>
               <h1>Props: {{ Object.keys(this.$props).join(',') }}</h1>

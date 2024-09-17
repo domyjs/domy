@@ -7,15 +7,13 @@ export type ComponentProps = {
   childrens: Element[];
 };
 
-export type Component<T extends ComponentProps['props'] = ComponentProps['props']> = (props: {
+export type Component = (props: {
   componentElement: HTMLElement;
-  data: { props: T };
-  childrens: Element[];
   domy: DomyDirectiveHelper;
 }) => void;
 
 export type Components = {
-  [name: string]: { componentSetup: Component<any>; propsName: Set<string> };
+  [name: string]: Component;
 };
 
 export type ComponentDefinition<
@@ -24,8 +22,8 @@ export type ComponentDefinition<
   A extends any[],
   P extends ComponentProps['props']
 > = {
-  propsName: string[];
   html: string;
+  props?: string[];
   app?: StructuredAPIApp<D, M, A, P> | HookAPIFnDefinition;
   components?: Components;
 };

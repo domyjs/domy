@@ -9,7 +9,6 @@ import {
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
-import { renderComponent } from './renderComponent';
 import { renderText } from './renderText';
 
 type Elem = {
@@ -45,7 +44,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     ];
 
     while (toRenderList.length > 0) {
-      let skipChildRendering = props.skipChildRendering ?? false;
+      let skipChildRendering = props.isComponentRendering || props.skipChildRendering;
 
       // We use pop for performance issue and because we render the tree from the bottom to top
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
@@ -87,11 +86,11 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
       // Rendering components
       if (element.localName in components) {
-        renderComponent(
-          domyHelper.getPluginHelper(),
-          element as HTMLElement,
-          components[element.localName]
-        );
+        const componentSetup = components[element.localName];
+        componentSetup({
+          componentElement: element as HTMLElement,
+          domy: domyHelper.getPluginHelper()
+        });
         domyHelper.callEffect();
         continue;
       }
