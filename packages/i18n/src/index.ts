@@ -10,71 +10,74 @@ type Settings = {
   defaultCallbackLangage: string;
 };
 
-let langage: { lang: string };
-let settings: Settings;
+class I18N {
+  public langage: { lang: string } | undefined;
 
-/**
- * Give the i18n helper
- * It allow us to get/set the langage
- * @param domy
- * @returns
- *
- * @author yoannchb-pro
- */
-function getI18nHelper(domy: DomySpecialHelper) {
-  if (!langage) langage = domy.reactive({ lang: settings.currentLangage });
+  constructor(public settings: Settings) {}
 
-  return {
-    getSupportedLangages() {
-      return Object.keys(settings.messages);
-    },
-    getLangage() {
-      return langage.lang;
-    },
-    setLangage(newLangage: string) {
-      let destinationLangage = newLangage;
-      if (!(newLangage in settings.messages)) {
-        destinationLangage = settings.defaultCallbackLangage;
-        console.warn(
-          `(I18N) The langage "${newLangage}" doesn't exist. Switched to "${destinationLangage}".`
-        );
+  /**
+   * Give the i18n helper
+   * It allow us to get/set the langage
+   * @param domy
+   * @returns
+   *
+   * @author yoannchb-pro
+   */
+  getI18nHelper(domy: DomySpecialHelper) {
+    if (!this.langage) this.langage = domy.reactive({ lang: this.settings.currentLangage });
+
+    return {
+      getSupportedLangages: () => {
+        return Object.keys(this.settings.messages);
+      },
+      getLangage: () => {
+        return this.langage!.lang;
+      },
+      setLangage: (newLangage: string) => {
+        let destinationLangage = newLangage;
+        if (!(newLangage in this.settings.messages)) {
+          destinationLangage = this.settings.defaultCallbackLangage;
+          console.warn(
+            `(I18N) The langage "${newLangage}" doesn't exist. Switched to "${destinationLangage}".`
+          );
+        }
+        this.langage!.lang = destinationLangage;
       }
-      langage.lang = destinationLangage;
-    }
-  };
-}
+    };
+  }
 
-/**
- * Render a i18n message with the specified data
- * Example: $t('greeting.hello', { name: 'Yoann' })
- * @param domy
- * @returns
- *
- * @author yoannchb-pro
- */
-function messageHandler(domy: DomySpecialHelper) {
-  const langage = getI18nHelper(domy);
+  /**
+   * Render a i18n message with the specified data
+   * Example: $t('greeting.hello', { name: 'Yoann' })
+   * @param domy
+   * @returns
+   *
+   * @author yoannchb-pro
+   */
+  messageHandler(domy: DomySpecialHelper) {
+    const langage = this.getI18nHelper(domy);
 
-  return (key: string, data: Record<string, string> = {}) => {
-    const dataReg = /\{\{\s*(.+?)\s*\}\}/gi;
-    const messages = settings.messages[langage.getLangage()];
-    let message = domy.utils.get(messages, key) as string | undefined;
+    return (key: string, data: Record<string, string> = {}) => {
+      const dataReg = /\{\{\s*(.+?)\s*\}\}/gi;
+      const messages = this.settings.messages[langage.getLangage()];
+      let message = domy.utils.get(messages, key) as string | undefined;
 
-    if (!message) {
-      console.warn(`(I18N) Invalide key "${key}".`);
-      return key;
-    }
+      if (!message) {
+        console.warn(`(I18N) Invalide key "${key}".`);
+        return key;
+      }
 
-    if (dataReg.test(message)) {
-      message = message.replace(dataReg, function (match, key) {
-        const paramValue = data[key];
-        if (!paramValue) return match;
-        return paramValue;
-      });
-    }
+      if (dataReg.test(message)) {
+        message = message.replace(dataReg, function (match, key) {
+          const paramValue = data[key];
+          if (!paramValue) return match;
+          return paramValue;
+        });
+      }
 
-    return message;
-  };
+      return message;
+    };
+  }
 }
 
 /**
@@ -95,11 +98,11 @@ function i18n(options: Settings) {
     );
   }
 
-  settings = options;
+  const i18n = new I18N(options);
 
   return (domyPluginSetter: DomyPluginDefinition) => {
-    domyPluginSetter.helper('i18n', getI18nHelper);
-    domyPluginSetter.helper('t', messageHandler);
+    domyPluginSetter.helper('i18n', i18n.getI18nHelper.bind(i18n));
+    domyPluginSetter.helper('t', i18n.messageHandler.bind(i18n));
   };
 }
 
