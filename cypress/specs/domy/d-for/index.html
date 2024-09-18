@@ -35,9 +35,11 @@
       setup() {
         this.list.push(this.generateElement());
       },
-      data: {
-        id: 0,
-        list: []
+      data() {
+        return {
+          id: 0,
+          list: []
+        };
       },
       methods: {
         generateElement() {

@@ -7,9 +7,16 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <div d-for="i of [1]">
-      <Count d-if="5 === 5" :key="i" :show-error="showError" :close="close" :open="open"></Count>
-    </div>
+    <main d-for="i of [1, 2, 3]">
+      <Count
+        d-if="i % 2 === 1"
+        :key="i"
+        :id="'count-' + i"
+        :show-error="showError"
+        :close="close"
+        :open="open"
+      ></Count>
+    </main>
   </body>
   <script>
     const ErrorMessage = DOMY.createComponent({
@@ -52,9 +59,11 @@
             }
           }
         },
-        data: {
-          message: 'The count as to be greater than 0!',
-          count: 0
+        data() {
+          return {
+            message: 'The count as to be greater than 0!',
+            count: 0
+          };
         },
         methods: {
           increment: () => ++this.count,
@@ -64,8 +73,10 @@
     });
 
     DOMY.createApp({
-      data: {
-        showError: false
+      data() {
+        return {
+          showError: false
+        };
       },
       methods: {
         close() {

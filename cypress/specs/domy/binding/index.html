@@ -31,13 +31,15 @@
   </body>
   <script>
     DOMY.createApp({
-      data: {
-        id: 0,
-        style: { backgroundColor: 'red' },
+      data() {
+        return {
+          id: 0,
+          style: { backgroundColor: 'red' },
 
-        classTest: ['bg-blue'],
-        classTest2: { 'bg-blue': true },
-        styleTest: { backgroundColor: 'blue' }
+          classTest: ['bg-blue'],
+          classTest2: { 'bg-blue': true },
+          styleTest: { backgroundColor: 'blue' }
+        };
       },
       methods: {
         update() {

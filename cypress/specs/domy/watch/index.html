@@ -38,15 +38,17 @@
           this.index = params.index;
         }
       },
-      data: {
-        todos: [
-          { name: 'cleanning', isComplete: false },
-          { name: 'homework', isComplete: false }
-        ],
-        countby2: 0,
-        count: 0,
-        path: '',
-        index: ''
+      data() {
+        return {
+          todos: [
+            { name: 'cleanning', isComplete: false },
+            { name: 'homework', isComplete: false }
+          ],
+          countby2: 0,
+          count: 0,
+          path: '',
+          index: ''
+        };
       }
     }).mount();
   </script>

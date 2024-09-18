@@ -12,8 +12,10 @@
   </body>
   <script>
     DOMY.createApp({
-      data: {
-        content: ''
+      data() {
+        return {
+          content: ''
+        };
       },
       mounted() {
         this.content = this.$refs.text.value;

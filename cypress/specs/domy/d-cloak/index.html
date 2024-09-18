@@ -19,8 +19,10 @@
       async setup() {
         await new Promise(r => setTimeout(r, 1000));
       },
-      data: {
-        msg: 'Hello World!'
+      data() {
+        return {
+          msg: 'Hello World!'
+        };
       }
     }).mount();
   </script>

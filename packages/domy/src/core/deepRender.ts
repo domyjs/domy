@@ -104,7 +104,8 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
         if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
 
-        // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData
+        // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData (but we still need it for later)
+        // We also need a new domy helper because every attribute need his own call effect
         domyHelper = new DomyHelper(
           safeDeepRender,
           element,

@@ -17,8 +17,10 @@
       async mounted() {
         this.perf = performance.now() - this.perf;
       },
-      data: {
-        perf: null
+      data() {
+        return {
+          perf: null
+        };
       }
     }).mount();
   </script>

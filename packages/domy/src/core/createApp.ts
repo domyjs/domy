@@ -18,7 +18,11 @@ export function createAdvancedApp<
   M extends string,
   A extends any[],
   P extends ComponentProps['props']
->(appDefinition?: StructuredAPIApp<D, M, A, P> | HookAPIFnDefinition, props?: ComponentProps) {
+>(
+  appDefinition?: StructuredAPIApp<D, M, A, P> | HookAPIFnDefinition,
+  props?: ComponentProps,
+  byPassAttributes?: string[]
+) {
   let config: Config = {};
   let componentsList: Components = {};
 
@@ -45,7 +49,8 @@ export function createAdvancedApp<
           components: componentsList,
           config,
           target: domTarget,
-          props
+          props,
+          byPassAttributes
         };
 
         if (typeof appDefinition === 'function') {

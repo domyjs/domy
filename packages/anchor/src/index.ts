@@ -31,7 +31,7 @@ enum POSITION {
 export function anchorPlugin(domy: DomyDirectiveHelper) {
   const anchorEl = domy.evaluateWithoutListening(domy.attr.value);
 
-  console.log(POSITION);
+  console.warn(POSITION);
 
   if (!anchorEl) {
     throw new Error(

@@ -26,9 +26,11 @@
           if (newValue < 0) this.count = prevValue;
         }
       },
-      data: {
-        count: 0,
-        search: ''
+      data() {
+        return {
+          count: 0,
+          search: ''
+        };
       },
       methods: {
         increment() {

@@ -76,20 +76,22 @@
   </body>
   <script>
     DOMY.createApp({
-      data: {
-        search: 'Hello World!',
-        searchLazy: 'Hello World!',
-        search2: 'Hello World!',
+      data() {
+        return {
+          search: 'Hello World!',
+          searchLazy: 'Hello World!',
+          search2: 'Hello World!',
 
-        age: 0,
-        age2: 0,
+          age: 0,
+          age2: 0,
 
-        selectedColor: 'red',
-        selectedColor2: ['red', 'blue'],
-        selectedColor3: 'red',
+          selectedColor: 'red',
+          selectedColor2: ['red', 'blue'],
+          selectedColor3: 'red',
 
-        checked: true,
-        checkedColors: ['red']
+          checked: true,
+          checkedColors: ['red']
+        };
       }
     }).mount();
   </script>

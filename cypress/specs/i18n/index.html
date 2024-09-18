@@ -42,8 +42,10 @@
     );
 
     DOMY.createApp({
-      data: {
-        name: 'Yoann'
+      data() {
+        return {
+          name: 'Yoann'
+        };
       }
     }).mount();
   </script>

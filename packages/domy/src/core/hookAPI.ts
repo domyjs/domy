@@ -28,6 +28,7 @@ type Params = {
   config: Config;
   components: Components;
   props?: ComponentProps;
+  byPassAttributes?: string[]; // Some attribute have to be handled by an other DOMY instance in some components
 };
 
 /**
@@ -106,7 +107,8 @@ export async function hookAPI(params: Params) {
     // Render the dom with DOMY
     deepRender({
       element: target,
-      scopedNodeData: []
+      scopedNodeData: [],
+      byPassAttributes: params.byPassAttributes
     });
   } catch (err: any) {
     error(err);

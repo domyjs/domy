@@ -24,15 +24,19 @@
   </body>
   <script>
     DOMY.createApp({
-      data: {
-        count: 0
+      data() {
+        return {
+          count: 0
+        };
       }
     }).mount(document.querySelector('#once'));
 
     DOMY.createApp({
-      data: {
-        name: '',
-        submitedName: ''
+      data() {
+        return {
+          name: '',
+          submitedName: ''
+        };
       },
       methods: {
         submit() {
@@ -43,8 +47,10 @@
     }).mount(document.querySelector('#enter'));
 
     DOMY.createApp({
-      data: {
-        show: false
+      data() {
+        return {
+          show: false
+        };
       }
     }).mount(document.querySelector('#away'));
   </script>

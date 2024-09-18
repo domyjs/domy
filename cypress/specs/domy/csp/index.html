@@ -29,12 +29,14 @@
           if (newValue < 0) this.count = prevValue;
         }
       },
-      data: {
-        greeting: {
-          msg: ['Hello World!']
-        },
-        count: 0,
-        search: ''
+      data() {
+        return {
+          greeting: {
+            msg: ['Hello World!']
+          },
+          count: 0,
+          search: ''
+        };
       },
       methods: {
         isOdd() {

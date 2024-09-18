@@ -12,8 +12,10 @@
   </body>
   <script>
     DOMY.createApp({
-      data: {
-        html: '<p>Hello World!</p>'
+      data() {
+        return {
+          html: '<p>Hello World!</p>'
+        };
       }
     }).mount();
   </script>

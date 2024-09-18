@@ -60,6 +60,7 @@ export function createComponent<
     const data = domy.reactive({ props: {} as ComponentProps['props'] });
     const root = tree[0] as HTMLElement;
     const propsAttributes: Attr[] = [];
+    const componentAttributes: string[] = [];
 
     // We handle the attributes
     for (const attr of componentElement.attributes) {
@@ -81,7 +82,9 @@ export function createComponent<
       }
 
       // If it's not a prop we see the attribute on the root element
-      root.setAttribute(attr.name.replace(/^@/, 'd-on:'), attr.value);
+      const fixedName = attr.name.replace(/^@/, 'd-on:');
+      componentAttributes.push(fixedName);
+      root.setAttribute(fixedName, attr.value);
     }
 
     // Handle required props
@@ -123,10 +126,14 @@ export function createComponent<
     });
 
     // We mount the new app on the component
-    createAdvancedApp(componentDefinition.app, {
-      props: data.props,
-      childrens: Array.from(componentElement.childNodes) as Element[]
-    })
+    createAdvancedApp(
+      componentDefinition.app,
+      {
+        props: data.props,
+        childrens: Array.from(componentElement.childNodes) as Element[]
+      },
+      componentAttributes
+    )
       .components(componentDefinition.components ?? {})
       .mount(root);
   };

@@ -40,7 +40,7 @@ export type StructuredAPIApp<
   watch?: {
     [depName: string]: WatcherFn;
   };
-  data?: D;
+  data?: () => D;
   methods?: Methods<D, M, A, P>;
 };
 

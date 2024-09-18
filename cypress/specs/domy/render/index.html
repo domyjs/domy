@@ -14,8 +14,10 @@
   <script>
     (async () => {
       const app = await DOMY.createApp({
-        data: {
-          count: 0
+        data() {
+          return {
+            count: 0
+          };
         }
       }).mount();
 
