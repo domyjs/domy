@@ -7,7 +7,7 @@ import { warn } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
 
 /**
- * Parse an html string into a DocumentFragment
+ * Parse an html string
  * @param html
  * @returns
  *
@@ -32,8 +32,8 @@ function parseHTMl(html: string) {
  *  </div>
  * `,
  *  app: {
- *    data: {
- *      count: 0
+ *    data() {
+ *      return { count: 0 }
  *    }
  *  }
  * })

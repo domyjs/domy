@@ -5,7 +5,7 @@ const reg = /\{\{\s*(?<org>.+?)\s*\}\}/gi;
 /**
  * Render a textContent
  * Example with count = 5:
- * Count: {{ this.count.value }}
+ * Count: {{ count }}
  * Will give
  * Count: 5
  * @param domy

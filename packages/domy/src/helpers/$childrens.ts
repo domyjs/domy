@@ -4,10 +4,10 @@ import { DomySpecialHelper } from '../types/Domy';
  * Give the passed childrens for a component only
  * Example:
  * const ErrorMessage = DOMY.createComponent(...)
- * <ErrorMessage :count="5">
+ * <Error-Message :count="5">
  *  <p>Hello</p>
- * </ErrorMessage>
- * Inside ErrorMessage
+ * </Error-Message>
+ * Inside Error-Message
  * console.log($childrens) // [p]
  * @param domy
  * @returns

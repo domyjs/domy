@@ -6,7 +6,7 @@ import { warn } from '../utils/logs';
  * d-watch implementation
  * Allow to watch for a specific change into scoped data
  * Example:
- * <div d-scope="{ count: 0 }" d-watch.count="({ newValue, prevValue }) => { if(newValue < 0) count = prevValue }">...</div>
+ * <div d-scope="{ count: 0 }" d-watch.count="(prevValue, newValue) => { if(newValue < 0) count = prevValue }">...</div>
  * @param domy
  *
  * @author yoannchb-pro
