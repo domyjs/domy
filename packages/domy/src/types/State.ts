@@ -1,6 +1,7 @@
 import { ComponentProps } from './Component';
 
 export type State = {
+  target: HTMLElement;
   data: Record<string, unknown>;
   props?: ComponentProps;
   methods: { [fnName: string]: (...args: any[]) => any | Promise<any> };

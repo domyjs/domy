@@ -49,6 +49,7 @@ export async function hookAPI(params: Params) {
 
   // State of the app
   const state: State = {
+    target,
     data: {},
     props,
     methods: {},
