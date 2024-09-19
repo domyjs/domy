@@ -8,19 +8,6 @@ type Props = {
 };
 
 /**
- * Find where to insert the element
- * @returns
- */
-function findElementIndex(parentChilds: ChildNode[], el: Element): number {
-  let index = 0;
-  for (const child of parentChilds) {
-    if (child === el) break;
-    if (child.isConnected) ++index;
-  }
-  return index;
-}
-
-/**
  * Handle the visibility of an element with the transition
  * @param props
  * @returns
@@ -82,7 +69,7 @@ export function getElementVisibilityHandler(props: Props) {
         hasBeenRender = true;
       }
 
-      const indexToInsert = findElementIndex(parentChilds, el);
+      const indexToInsert = props.domy.utils.findElementIndex(parentChilds, el);
       restoreElement(parent, el, indexToInsert);
     }
 

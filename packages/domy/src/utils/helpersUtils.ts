@@ -1,5 +1,6 @@
 import { concatProxiesAndObjs } from './concatProxiesAndObjs';
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
+import { findElementIndex } from './findElementIndex';
 import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
@@ -13,6 +14,7 @@ import { toRegularFn } from './toRegularFn';
 
 // A list of utils we can access in helpers
 export const helpersUtils = {
+  findElementIndex,
   toKebabCase,
   kebabToCamelCase,
   getElementVisibilityHandler,

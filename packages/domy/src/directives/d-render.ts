@@ -19,25 +19,24 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const fragment = new DocumentFragment();
+  const elements = domy.evaluateWithoutListening(domy.attr.value);
 
-  domy.effect(() => {
-    const elements = domy.evaluate(domy.attr.value);
+  if (!elements) return;
 
-    if (Array.isArray(elements)) {
-      for (const element of elements) {
-        fragment.appendChild(element);
-      }
-    } else fragment.appendChild(elements);
-
-    for (const child of fragment.childNodes) {
-      domy.deepRender({
-        element: child as Element,
-        scopedNodeData: domy.scopedNodeData
-      });
+  if (Array.isArray(elements)) {
+    for (const element of elements) {
+      fragment.appendChild(element);
     }
+  } else fragment.appendChild(elements);
 
-    domy.utils.replaceElement(domy.el, fragment);
-  });
+  for (const child of fragment.childNodes) {
+    domy.deepRender({
+      element: child as Element,
+      scopedNodeData: domy.scopedNodeData
+    });
+  }
+
+  domy.utils.replaceElement(domy.el, fragment);
 
   return { skipChildsRendering: true };
 }
