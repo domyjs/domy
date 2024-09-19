@@ -11,7 +11,11 @@ function splitPath(path: string): string[] {
  *
  * @author yoannchb-pro
  */
-export function get<T>(object: T, path: string, defaultValue?: any) {
+export function get<T = any>(
+  object: Array<any> | Record<string, any>,
+  path: string,
+  defaultValue?: any
+): T | undefined {
   const keys = splitPath(path);
   let result: any = object;
   for (const key of keys) {
