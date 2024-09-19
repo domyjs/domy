@@ -17,7 +17,7 @@ import { reactivesVariablesList } from './data';
  * @author yoannchb-pro
  */
 export function registerName(name: string, obj: any) {
-  for (const reactiveVariable of reactivesVariablesList) {
+  for (const reactiveVariable of reactivesVariablesList.values()) {
     if (reactiveVariable.getProxy() === obj) {
       reactiveVariable.name = name + '.';
       return;

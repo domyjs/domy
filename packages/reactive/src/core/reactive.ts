@@ -14,7 +14,8 @@ export function reactive<T>(obj: T): T {
   if (ReactiveVariable.isReactive(obj)) return obj;
 
   const reactiveVariable = new ReactiveVariable(obj);
-  reactivesVariablesList.push(reactiveVariable);
+  const proxy = reactiveVariable.getProxy();
+  reactivesVariablesList.set(proxy, reactiveVariable);
 
   // We attach the global listener
   function createGlobalListener<T extends Listener['type']>(type: T): GetListenerByType<T>['fn'] {
@@ -32,6 +33,7 @@ export function reactive<T>(obj: T): T {
       }
     };
   }
+
   reactiveVariable.attachListener({
     type: 'onGet',
     fn: createGlobalListener('onGet')
@@ -41,5 +43,5 @@ export function reactive<T>(obj: T): T {
     fn: createGlobalListener('onSet')
   });
 
-  return reactiveVariable.getProxy();
+  return proxy;
 }

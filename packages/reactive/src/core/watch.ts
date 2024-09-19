@@ -9,9 +9,10 @@ import { Listener } from './ReactiveVariable';
  * @author yoannchb-pro
  */
 export function watch(listener: Listener, objsToWatch: unknown[]) {
-  const variablesToWatch = reactivesVariablesList.filter(reactiveVariable =>
-    objsToWatch.some(objToWatch => objToWatch === reactiveVariable.getProxy())
-  );
+  const variablesToWatch = objsToWatch
+    .map(obj => reactivesVariablesList.get(obj))
+    .filter(obj => !!obj);
+
   for (const reactiveVariable of variablesToWatch) {
     reactiveVariable.attachListener(listener);
   }

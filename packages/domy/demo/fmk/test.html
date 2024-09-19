@@ -26,9 +26,11 @@
           if (newValue < 0) this.count = prevValue;
         }
       },
-      data: {
-        perf: null,
-        count: 0
+      data() {
+        return {
+          perf: null,
+          count: 0
+        };
       },
       methods: {
         supert() {

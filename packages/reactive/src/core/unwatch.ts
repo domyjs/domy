@@ -9,9 +9,10 @@ import { Listener } from './ReactiveVariable';
  * @author yoannchb-pro
  */
 export function unwatch(listener: Listener, objsToUnwatch: unknown[]) {
-  const variablesToUnwatch = reactivesVariablesList.filter(reactiveVariable =>
-    objsToUnwatch.some(objToUnwatch => objToUnwatch === reactiveVariable.getProxy())
-  );
+  const variablesToUnwatch = objsToUnwatch
+    .map(obj => reactivesVariablesList.get(obj))
+    .filter(obj => !!obj);
+
   for (const reactiveVariable of variablesToUnwatch) {
     reactiveVariable.removeListener(listener);
   }
