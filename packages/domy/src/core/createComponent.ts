@@ -60,7 +60,9 @@ export function createComponent<
         throw new Error(`The component "${name}" need to have one element as root.`);
       }
 
-      const requiredProps = new Set(props.filter(e => e.startsWith('!')));
+      const requiredProps = new Set(
+        props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
+      );
       const data = domy.reactive({ props: {} as ComponentProps['props'] });
       const root = tree[0] as HTMLElement;
       const propsAttributes: Attr[] = [];
@@ -93,9 +95,7 @@ export function createComponent<
 
       // Handle required props
       for (const requiredProp of requiredProps) {
-        throw Error(
-          `The prop "${requiredProp.replace(/^!/, '')}" is required on the component "${name}".`
-        );
+        throw Error(`The prop "${requiredProp}" is required on the component "${name}".`);
       }
 
       // We ensure the props are reactive
