@@ -14,9 +14,9 @@ import { createAdvancedApp } from './createApp';
  * @author yoannchb-pro
  */
 function parseHTMl(html: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  return doc.body.childNodes;
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return temp.childNodes;
 }
 
 /**
