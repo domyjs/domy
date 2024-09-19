@@ -52,6 +52,10 @@ describe('i18n Functionality Test', () => {
     cy.get('h1').should('have.text', 'Bonjour le monde!');
   });
 
+  it('Check default message is working', () => {
+    cy.get('#defaultMessage').contains('Message: default message');
+  });
+
   it('Check we return the key if the message doesnt exist', () => {
     cy.get('#invalideKey').should('have.text', 'Message: key.who.doesnt.exist');
   });

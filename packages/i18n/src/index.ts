@@ -10,7 +10,7 @@ type Settings = {
   defaultCallbackLangage: string;
 };
 
-class I18N {
+class I18NHelper {
   public langage: { lang: string } | undefined;
 
   constructor(public settings: Settings) {}
@@ -57,14 +57,22 @@ class I18N {
   messageHandler(domy: DomySpecialHelper) {
     const langage = this.getI18nHelper(domy);
 
-    return (key: string, data: Record<string, string> = {}) => {
+    return (
+      obj: string | { key: string; defaultMessage: string },
+      data: Record<string, string> = {}
+    ) => {
+      const isObj = typeof obj === 'object';
+
+      const key = isObj ? obj.key : obj;
+      const defaultMessage = isObj ? obj.defaultMessage : obj;
+
       const dataReg = /\{\{\s*(.+?)\s*\}\}/gi;
       const messages = this.settings.messages[langage.getLangage()];
-      let message = domy.utils.get(messages, key) as string | undefined;
+      let message = domy.utils.get<string>(messages, key);
 
       if (!message) {
         console.warn(`(I18N) Invalide key "${key}".`);
-        return key;
+        return defaultMessage;
       }
 
       if (dataReg.test(message)) {
@@ -98,11 +106,11 @@ function i18n(options: Settings) {
     );
   }
 
-  const i18n = new I18N(options);
+  const i18nInstance = new I18NHelper(options);
 
   return (domyPluginSetter: DomyPluginDefinition) => {
-    domyPluginSetter.helper('i18n', i18n.getI18nHelper.bind(i18n));
-    domyPluginSetter.helper('t', i18n.messageHandler.bind(i18n));
+    domyPluginSetter.helper('i18n', i18nInstance.getI18nHelper.bind(i18nInstance));
+    domyPluginSetter.helper('t', i18nInstance.messageHandler.bind(i18nInstance));
   };
 }
 
