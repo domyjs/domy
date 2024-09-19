@@ -67,6 +67,7 @@ export function createComponent<
       const root = tree[0] as HTMLElement;
       const propsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
+      const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
 
       // We handle the attributes
       for (const attr of componentElement.attributes) {
@@ -127,7 +128,7 @@ export function createComponent<
       domy.deepRender({
         element: root,
         scopedNodeData: domy.scopedNodeData,
-        byPassAttributes: propsAttributes.map(attr => attr.name),
+        byPassAttributes: [...propsAttributes.map(attr => attr.name), ...rootAttributes],
         isComponentRendering: true
       });
 
