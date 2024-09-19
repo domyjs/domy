@@ -88,6 +88,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       if (element.localName in components) {
         const componentSetup = components[element.localName];
         componentSetup({
+          name: element.localName,
           componentElement: element as HTMLElement,
           domy: domyHelper.getPluginHelper()
         });

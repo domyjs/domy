@@ -3,7 +3,7 @@ import { ComponentDefinition, ComponentProps, Components } from '../types/Compon
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 import { isBindAttr } from '../utils/isSpecialAttribute';
 import { kebabToCamelCase } from '../utils/kebabToCamelCase';
-import { warn } from '../utils/logs';
+import { error, warn } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
 
 /**
@@ -52,91 +52,105 @@ export function createComponent<
   const props = componentDefinition.props ?? [];
   const propsName = new Set(props.map(prop => prop.replace(/^!/, '')));
 
-  return ({ componentElement, domy }) => {
-    const tree = parseHTMl(componentDefinition.html.trim());
+  return ({ name, componentElement, domy }) => {
+    try {
+      const tree = parseHTMl(componentDefinition.html.trim());
 
-    if (tree.length !== 1) throw new Error('A component need to have one element as root.');
-
-    const requiredProps = new Set(props.filter(e => e.startsWith('!')));
-    const data = domy.reactive({ props: {} as ComponentProps['props'] });
-    const root = tree[0] as HTMLElement;
-    const propsAttributes: Attr[] = [];
-    const componentAttributes: string[] = [];
-
-    // We handle the attributes
-    for (const attr of componentElement.attributes) {
-      const attrName = kebabToCamelCase(attr.name.replace(/^:/, ''));
-
-      // In case it's a prop
-      if (propsName.has(attrName)) {
-        requiredProps.delete(attrName);
-        propsAttributes.push(attr);
-        continue;
+      if (tree.length !== 1) {
+        throw new Error(`The component "${name}" need to have one element as root.`);
       }
 
-      // Handle the case the attribute already on the root
-      if (root.getAttribute(attr.name)) {
-        warn(
-          `The domy attribute "${attr.name}" has been skipped because it's already present in the component root.`
-        );
-        continue;
-      }
+      const requiredProps = new Set(props.filter(e => e.startsWith('!')));
+      const data = domy.reactive({ props: {} as ComponentProps['props'] });
+      const root = tree[0] as HTMLElement;
+      const propsAttributes: Attr[] = [];
+      const componentAttributes: string[] = [];
 
-      // If it's not a prop we see the attribute on the root element
-      const fixedName = attr.name.replace(/^@/, 'd-on:');
-      componentAttributes.push(fixedName);
-      root.setAttribute(fixedName, attr.value);
-    }
+      // We handle the attributes
+      for (const attr of componentElement.attributes) {
+        const attrName = kebabToCamelCase(attr.name.replace(/^:/, ''));
 
-    // Handle required props
-    for (const requiredProp of requiredProps) {
-      throw Error(`The prop "${requiredProp}" is required on the component.`);
-    }
-
-    // We ensure the props are reactive
-    domy.effect(() => {
-      for (const attr of propsAttributes) {
-        if (isBindAttr(attr.name)) {
-          const attrInfos = getDomyAttributeInformations(attr);
-          const propName = kebabToCamelCase(attrInfos.attrName);
-          data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
-        } else {
-          data.props[attr.name] = attr.value === '' ? true : attr.value;
+        // In case it's a prop
+        if (propsName.has(attrName)) {
+          requiredProps.delete(attrName);
+          propsAttributes.push(attr);
+          continue;
         }
+
+        // Handle the case the attribute already on the root
+        if (root.getAttribute(attr.name)) {
+          warn(
+            `The domy attribute "${attr.name}" has been skipped because it's already present in the component "${name}" root.`
+          );
+          continue;
+        }
+
+        // If it's not a prop we see the attribute on the root element
+        const fixedName = attr.name.replace(/^@/, 'd-on:');
+        componentAttributes.push(fixedName);
+        root.setAttribute(fixedName, attr.value);
       }
-    });
 
-    // Remplace the component
-    componentElement.replaceWith(root);
+      // Handle required props
+      for (const requiredProp of requiredProps) {
+        throw Error(
+          `The prop "${requiredProp.replace(/^!/, '')}" is required on the component "${name}".`
+        );
+      }
 
-    // We render the childs first to ensure they keep the current state and not the component state
-    for (const child of componentElement.childNodes) {
-      domy.deepRender({
-        element: child as Element,
-        scopedNodeData: domy.scopedNodeData
+      // We ensure the props are reactive
+      domy.effect(() => {
+        for (const attr of propsAttributes) {
+          if (isBindAttr(attr.name)) {
+            const attrInfos = getDomyAttributeInformations(attr);
+            const propName = kebabToCamelCase(attrInfos.attrName);
+            data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
+          } else {
+            data.props[attr.name] = attr.value === '' ? true : attr.value;
+          }
+        }
       });
+
+      // Remplace the component
+      componentElement.replaceWith(root);
+
+      // We render the childs first to ensure they keep the current state and not the component state
+      for (const child of componentElement.childNodes) {
+        domy.deepRender({
+          element: child as Element,
+          scopedNodeData: domy.scopedNodeData
+        });
+      }
+
+      // Ensure we can add some domy attribute to the component and render them on the component root
+      // Example: <Count d-if="showCount"></Count>
+      domy.deepRender({
+        element: root,
+        scopedNodeData: domy.scopedNodeData,
+        byPassAttributes: propsAttributes.map(attr => attr.name),
+        isComponentRendering: true
+      });
+
+      // We mount the new app on the component
+      createAdvancedApp(
+        componentDefinition.app,
+        {
+          props: data.props,
+          childrens: Array.from(componentElement.childNodes) as Element[]
+        },
+        componentAttributes
+      )
+        .components(componentDefinition.components ?? {})
+        .mount(root);
+    } catch (err: any) {
+      componentElement.remove();
+
+      if (!err?.message?.includes(name)) {
+        warn(`The following error happened on "${name}" component.`);
+      }
+
+      error(err);
     }
-
-    // Ensure we can add some domy attribute to the component and render them on the component root
-    // Example: <Count d-if="showCount"></Count>
-    domy.deepRender({
-      element: root,
-      scopedNodeData: domy.scopedNodeData,
-      byPassAttributes: propsAttributes.map(attr => attr.name),
-      isComponentRendering: true
-    });
-
-    // We mount the new app on the component
-    createAdvancedApp(
-      componentDefinition.app,
-      {
-        props: data.props,
-        childrens: Array.from(componentElement.childNodes) as Element[]
-      },
-      componentAttributes
-    )
-      .components(componentDefinition.components ?? {})
-      .mount(root);
   };
 }
 

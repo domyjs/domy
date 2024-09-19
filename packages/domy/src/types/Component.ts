@@ -8,6 +8,7 @@ export type ComponentProps = {
 };
 
 export type Component = (props: {
+  name: string;
   componentElement: HTMLElement;
   domy: DomyDirectiveHelper;
 }) => void;
