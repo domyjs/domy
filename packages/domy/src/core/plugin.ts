@@ -27,7 +27,6 @@ import { dMountImplementation } from '../directives/d-mount';
 import { dRenderImplementation } from '../directives/d-render';
 import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
-import { $target } from '../helpers/$target';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -80,8 +79,7 @@ export const PLUGINS: Plugins = {
     dispatch: $dispatch,
     nextTick: $nextTick,
     childrens: $childrens,
-    props: $props,
-    target: $target
+    props: $props
   }
 };
 

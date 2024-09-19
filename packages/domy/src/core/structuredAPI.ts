@@ -41,7 +41,6 @@ export async function structuredAPI(params: Params) {
 
   // State of the app
   const state: State = {
-    target,
     data: reactive(app.data?.() ?? {}),
     props,
     methods: {},
