@@ -7,7 +7,7 @@ import { warn } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
 
 /**
- * Parse an html string
+ * Parse a html string
  * @param html
  * @returns
  *
@@ -23,9 +23,10 @@ function parseHTMl(html: string) {
  * Allow the user to create component
  * Example:
  * createComponent({
+ *  props: ['title'],
  *  html: `
  *  <div>
- *    <h1>{{ this.props.title }}</h1>
+ *    <h1>{{ $props.title }}</h1>
  *    <p>Count: {{ count }}</p>
  *    <button @click="++count">+</button>
  *    <button @click="--count">-</button>
