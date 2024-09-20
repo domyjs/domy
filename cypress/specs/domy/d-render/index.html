@@ -14,12 +14,20 @@
         return p;
       } }"
     >
-      <template d-render="createP()"></template>
-      <button id="inc" @click="++count">+</button>
-      <button id="dec" @click="--count">-</button>
+      <template d-render="renderElement ? createP() : null"></template>
+      <button d-if="renderElement" id="inc" @click="++count">+</button>
+      <button d-if="renderElement" id="dec" @click="--count">-</button>
+
+      <button id="renderCount" @click="renderElement = !renderElement">Render element</button>
     </div>
   </body>
   <script>
-    DOMY.createApp().mount();
+    DOMY.createApp({
+      data() {
+        return {
+          renderElement: false
+        };
+      }
+    }).mount();
   </script>
 </html>
