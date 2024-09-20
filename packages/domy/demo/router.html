@@ -46,7 +46,7 @@
     DOMY.createApp({
       data() {
         return {
-          routes
+          routes: [...routes, r('/something-that-doesnt-exist-login', 'login')]
         };
       }
     })

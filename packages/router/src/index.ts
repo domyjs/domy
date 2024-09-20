@@ -221,7 +221,7 @@ class Router {
           },
           getRoute() {
             const x = this as any;
-            return (x.hashMode ? '#' : '') + ctx.getFullRoute(x.$props.path, x.$props.queryParams);
+            return (ctx.hashMode ? '#' : '') + ctx.getFullRoute(x.$props.to, x.$props.queryParams);
           }
         }
       } as any
