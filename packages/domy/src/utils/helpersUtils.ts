@@ -1,4 +1,3 @@
-import { concatProxiesAndObjs } from './concatProxiesAndObjs';
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
 import { findElementIndex } from './findElementIndex';
 import { get, set } from './getAndSet';
@@ -26,6 +25,5 @@ export const helpersUtils = {
   restoreElement,
   replaceElement,
   toRegularFn,
-  executeActionAfterAnimation,
-  concatProxiesAndObjs
+  executeActionAfterAnimation
 };

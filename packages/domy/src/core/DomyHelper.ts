@@ -78,6 +78,7 @@ export class DomyHelper {
       deepRender: this.deepRenderFn,
       addScopeToNode: this.addScopeToNode.bind(this),
       removeScopeToNode: this.removeScopeToNode.bind(this),
+      removeLastAddedScope: this.removeLastAddedScope.bind(this),
       getContext
     };
   }
@@ -160,12 +161,16 @@ export class DomyHelper {
   }
 
   addScopeToNode(obj: Record<string, any>) {
-    this.scopedNodeData.unshift(obj);
+    this.scopedNodeData.push(obj);
   }
 
   removeScopeToNode(obj: Record<string, any>) {
     const index = this.scopedNodeData.findIndex(o => o === obj);
     if (index !== -1) this.scopedNodeData.splice(index, 1);
+  }
+
+  removeLastAddedScope() {
+    this.scopedNodeData.pop();
   }
 
   callCleanup() {

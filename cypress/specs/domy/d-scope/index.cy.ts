@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-watch test', () => {
+describe('Attribute d-scope test', () => {
   it('Check the modal show', () => {
     cy.get('#modal').should('not.exist');
     cy.get('button').click();

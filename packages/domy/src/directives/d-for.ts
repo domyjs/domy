@@ -70,7 +70,7 @@ function renderer(props: RendererProps) {
     renderedChildrens.add(newChild);
   }
 
-  domy.removeScopeToNode(scope);
+  domy.removeLastAddedScope();
 
   return renderedChildrens;
 }

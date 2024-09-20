@@ -36,7 +36,7 @@ export function events(domy: DomyDirectiveHelper) {
       domy.queueJob(() => executedValue(event));
     }
 
-    domy.removeScopeToNode(scope);
+    domy.removeLastAddedScope();
   };
 
   // We add wrappers to the listener to ensure we can add modifiers
