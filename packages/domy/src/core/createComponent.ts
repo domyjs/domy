@@ -141,6 +141,7 @@ export function createComponent<
         },
         componentAttributes
       )
+        .configure(domy.config)
         .components(componentDefinition.components ?? {})
         .mount(root);
     } catch (err: any) {
