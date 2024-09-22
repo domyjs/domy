@@ -28,6 +28,7 @@ import { dRenderImplementation } from '../directives/d-render';
 import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
 import { dTeleportImplementation } from '../directives/d-teleport';
+import { $config } from '../helpers/$config';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -81,7 +82,8 @@ export const PLUGINS: Plugins = {
     dispatch: $dispatch,
     nextTick: $nextTick,
     childrens: $childrens,
-    props: $props
+    props: $props,
+    config: $config
   }
 };
 
