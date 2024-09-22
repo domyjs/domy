@@ -5,6 +5,6 @@ export type State = {
   props?: ComponentProps;
   methods: { [fnName: string]: (...args: any[]) => any | Promise<any> };
   events: { [eventName: string]: Element[] };
-  transitions: Map<Element, string>;
+  transitions: Map<Element, { enterTransition: string; outTransition: string }>;
   refs: Record<string, Element>;
 };

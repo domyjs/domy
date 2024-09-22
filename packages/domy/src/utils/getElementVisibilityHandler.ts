@@ -42,8 +42,8 @@ export function getElementVisibilityHandler(props: Props) {
       // Handle out transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
-        el.classList.remove(`${transition}-enter`);
-        el.classList.add(`${transition}-out`);
+        el.classList.remove(transition.enterTransition);
+        el.classList.add(transition.outTransition);
         cleanupTransition = executeActionAfterAnimation(el, removeAction);
       } else {
         removeAction();
@@ -52,10 +52,10 @@ export function getElementVisibilityHandler(props: Props) {
       // Handle enter transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
-        el.classList.remove(`${transition}-out`);
-        el.classList.add(`${transition}-enter`);
+        el.classList.remove(transition.outTransition);
+        el.classList.add(transition.enterTransition);
         cleanupTransition = executeActionAfterAnimation(el, () =>
-          el.classList.remove(`${transition}-enter`)
+          el.classList.remove(transition.enterTransition)
         );
       }
 

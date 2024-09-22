@@ -26,13 +26,13 @@ export function dShowImplementation(domy: DomyDirectiveHelper) {
       el.style.display = originalDisplay;
 
       if (transition && isInitialised) {
-        el.classList.remove(`${transition}-out`);
-        el.classList.add(`${transition}-enter`);
+        el.classList.remove(transition.outTransition);
+        el.classList.add(transition.enterTransition);
       }
     } else if (isAlreadyShow) {
       if (transition && isInitialised) {
-        el.classList.remove(`${transition}-enter`);
-        el.classList.add(`${transition}-out`);
+        el.classList.remove(transition.enterTransition);
+        el.classList.add(transition.outTransition);
         cleanupTransition = domy.utils.executeActionAfterAnimation(el, () => {
           el.style.display = 'none';
         });

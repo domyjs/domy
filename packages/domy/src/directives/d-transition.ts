@@ -9,5 +9,11 @@ import { DomyDirectiveHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dTransitionImplementation(domy: DomyDirectiveHelper) {
-  domy.state.transitions.set(domy.el, domy.attr.value);
+  const transitionName = domy.attr.value;
+  const enterTransition = `${transitionName}-enter`;
+  const outTransition = `${transitionName}-out`;
+  domy.state.transitions.set(domy.el, {
+    enterTransition,
+    outTransition
+  });
 }
