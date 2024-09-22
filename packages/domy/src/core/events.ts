@@ -13,9 +13,14 @@ import on from '../utils/on';
 export function events(domy: DomyDirectiveHelper) {
   const eventName = domy.attrName;
 
-  // We register the event into the state
-  if (!domy.state.events[eventName]) domy.state.events[eventName] = [];
-  domy.state.events[eventName].push(domy.el);
+  const originalFn = async (...args: any[]) => {
+    const executedValue = await domy.evaluateWithoutListening(domy.attr.value);
+
+    // Ensure $nextTick is called after changing variable state
+    if (typeof executedValue === 'function') {
+      domy.queueJob(() => executedValue(...args));
+    }
+  };
 
   const eventListener: EventListenerOrEventListenerObject = async event => {
     // If the element is not present in the dom we don't execute the event
@@ -29,15 +34,14 @@ export function events(domy: DomyDirectiveHelper) {
 
     domy.addScopeToNode(scope);
 
-    const executedValue = await domy.evaluateWithoutListening(domy.attr.value);
-
-    // Ensure $nextTick is called after changing variable state
-    if (typeof executedValue === 'function') {
-      domy.queueJob(() => executedValue(event));
-    }
+    originalFn(event);
 
     domy.removeLastAddedScope();
   };
+
+  // We register the event into the state
+  if (!domy.state.events[eventName]) domy.state.events[eventName] = [];
+  domy.state.events[eventName].push(originalFn);
 
   // We add wrappers to the listener to ensure we can add modifiers
   on({

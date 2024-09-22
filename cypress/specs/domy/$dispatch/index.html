@@ -7,8 +7,8 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <h1 id="message" @notify="msg = 'Hello World!'">{{ msg }}</h1>
-    <button id="notify-button" @click="$dispatch('notify')">Notify</button>
+    <h1 id="message" @notify="(text) => msg = text">{{ msg }}</h1>
+    <button id="notify-button" @click="$dispatch('notify', 'Hello World!')">Notify</button>
   </body>
   <script>
     DOMY.createApp({

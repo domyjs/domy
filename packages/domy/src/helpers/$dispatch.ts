@@ -11,10 +11,10 @@ import { DomySpecialHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function $dispatch(domy: DomySpecialHelper) {
-  return (eventName: string, data?: any) => {
-    const attachedElements = domy.state.events[eventName] ?? [];
-    for (const attachedElement of attachedElements) {
-      attachedElement.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+  return (eventName: string, ...args: any[]) => {
+    const attachedFns = domy.state.events[eventName] ?? [];
+    for (const attachedFn of attachedFns) {
+      attachedFn(...args);
     }
   };
 }
