@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$allData</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1 d-scope="{ hello: 'Hello' }">{{ $allData.hello }} {{ $allData.world }}</h1>
+  </body>
+  <script>
+    DOMY.createApp({
+      data() {
+        return {
+          world: 'World!'
+        };
+      }
+    }).mount();
+  </script>
+</html>

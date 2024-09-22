@@ -3,6 +3,7 @@ import { findElementIndex } from './findElementIndex';
 import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
+import { getReactiveHandler } from './getReactiveHandler';
 import { GlobalMutationObserver } from './GlobalMutationObserver';
 import { kebabToCamelCase } from './kebabToCamelCase';
 import { moveElement } from './moveElement';
@@ -25,5 +26,6 @@ export const helpersUtils = {
   restoreElement,
   replaceElement,
   toRegularFn,
-  executeActionAfterAnimation
+  executeActionAfterAnimation,
+  getReactiveHandler
 };

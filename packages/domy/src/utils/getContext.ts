@@ -1,7 +1,7 @@
 import { Config } from '../types/Config';
 import { State } from '../types/State';
 import { getHelpers } from './getHelpers';
-import { isSignal } from '@domyjs/reactive';
+import { getReactiveHandler } from './getReactiveHandler';
 
 type Props = {
   domyHelperId?: number;
@@ -10,30 +10,6 @@ type Props = {
   scopedNodeData: Record<string, any>[];
   config: Config;
 };
-
-/**
- * Return the get and set method for a reactive variable
- * It allow us to keep the proxy and to handle signals
- * @param obj
- * @param key
- * @returns
- *
- * @author yoannchb-pro
- */
-function getReactiveHandler(obj: Record<string, any>, key: string): PropertyDescriptor {
-  const isObjSignal = isSignal(obj[key]);
-  return {
-    enumerable: true,
-    configurable: true,
-    get() {
-      return isObjSignal ? obj[key].value : obj[key];
-    },
-    set(newValue: any) {
-      if (isObjSignal) return (obj[key].value = newValue);
-      return (obj[key] = newValue);
-    }
-  };
-}
 
 /**
  * Return a context with all what domy need to render

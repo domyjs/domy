@@ -29,6 +29,9 @@ import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
 import { dTeleportImplementation } from '../directives/d-teleport';
 import { $config } from '../helpers/$config';
+import { $data } from '../helpers/$data';
+import { $scopedData } from '../helpers/$scopedData';
+import { $allData } from '../helpers/$allData';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -83,7 +86,10 @@ export const PLUGINS: Plugins = {
     nextTick: $nextTick,
     childrens: $childrens,
     props: $props,
-    config: $config
+    config: $config,
+    data: $data,
+    scopedData: $scopedData,
+    allData: $allData
   }
 };
 
