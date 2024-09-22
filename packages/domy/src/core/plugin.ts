@@ -27,6 +27,7 @@ import { dMountImplementation } from '../directives/d-mount';
 import { dRenderImplementation } from '../directives/d-render';
 import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
+import { dTeleportImplementation } from '../directives/d-teleport';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -53,6 +54,7 @@ export const PLUGINS: Plugins = {
     on: events
   },
   directives: {
+    teleport: dTeleportImplementation,
     render: dRenderImplementation,
     mount: dMountImplementation,
     watch: dWatchImplementation,
