@@ -32,6 +32,7 @@ import { $config } from '../helpers/$config';
 import { $data } from '../helpers/$data';
 import { $scopedData } from '../helpers/$scopedData';
 import { $allData } from '../helpers/$allData';
+import { $methods } from '../helpers/$methods';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -89,7 +90,8 @@ export const PLUGINS: Plugins = {
     config: $config,
     data: $data,
     scopedData: $scopedData,
-    allData: $allData
+    allData: $allData,
+    methods: $methods
   }
 };
 
