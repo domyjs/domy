@@ -5,6 +5,17 @@ beforeEach(() => {
 });
 
 describe('methods test', () => {
+  it('Check the watcher return unwatch method', () => {
+    cy.get('#count1 h1').should('have.text', '1');
+    cy.get('#count1 #inc').click();
+    cy.get('#count1 h1').should('have.text', '2'); // We un watch when the count is 2
+
+    cy.get('#count1 #dec').click();
+    cy.get('#count1 #dec').click();
+    cy.get('#count1 #dec').click();
+    cy.get('#count1 h1').should('have.text', '-1');
+  });
+
   it('Check we can access helpers in mounted', () => {
     // Check the dispatch helper is called
     cy.get('#count1 h1').should('have.text', '1');

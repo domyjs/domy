@@ -1,5 +1,6 @@
 import { reactivesVariablesList } from './data';
 import { Listener } from './ReactiveVariable';
+import { unwatch } from './unwatch';
 
 /**
  * Attach a listener to some reactives variables
@@ -16,4 +17,6 @@ export function watch(listener: Listener, objsToWatch: unknown[]) {
   for (const reactiveVariable of variablesToWatch) {
     reactiveVariable.attachListener(listener);
   }
+
+  return () => unwatch(listener, objsToWatch);
 }

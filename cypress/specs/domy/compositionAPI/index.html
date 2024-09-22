@@ -24,9 +24,10 @@
     function useCount() {
       const count = signal(0);
 
-      watch(
+      const unwatch = watch(
         ({ prevValue, newValue }) => {
           if (newValue < 0) count.value = prevValue;
+          if (newValue === 2) unwatch();
         },
         [count]
       );
