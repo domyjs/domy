@@ -1,5 +1,6 @@
 # TODO
 
+- unmount() et DOMY_EVENTS unmount
 - Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests
 - Make dispatch work even for components to parent
 - Error boundary test with onError

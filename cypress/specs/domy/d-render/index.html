@@ -10,6 +10,7 @@
     <div
       d-scope="{ count: 0, createP: () => {
         const p = document.createElement('p');
+        p.setAttribute('d-if', '5 === 5');
         p.textContent = 'Count: {{ count }}';
         return p;
       } }"

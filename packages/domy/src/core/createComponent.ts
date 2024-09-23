@@ -5,6 +5,13 @@ import { isBindAttr } from '../utils/isSpecialAttribute';
 import { kebabToCamelCase } from '../utils/kebabToCamelCase';
 import { error, warn } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
+import { queueJob } from './scheduler';
+
+function cleanup(unmountFns: (() => void)[]) {
+  for (const unmountFn of unmountFns) {
+    unmountFn();
+  }
+}
 
 /**
  * Parse a html string
@@ -53,6 +60,8 @@ export function createComponent<
   const propsName = new Set(props.map(prop => prop.replace(/^!/, '')));
 
   return ({ name, componentElement, domy }) => {
+    const unmountFns: (() => void)[] = [];
+
     try {
       const tree = parseHTMl(componentDefinition.html.trim());
 
@@ -64,7 +73,7 @@ export function createComponent<
         props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
       );
       const data = domy.reactive({ props: {} as ComponentProps['props'] });
-      const root = tree[0] as HTMLElement;
+      let root = tree[0] as HTMLElement;
       const propsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
       const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
@@ -117,35 +126,47 @@ export function createComponent<
 
       // We render the childs first to ensure they keep the current state and not the component state
       for (const child of componentElement.childNodes) {
-        domy.deepRender({
+        const unmount = domy.deepRender({
           element: child as Element,
           scopedNodeData: domy.scopedNodeData
         });
+        unmountFns.push(unmount);
       }
+
+      domy.onClone(root, clone => {
+        root = clone as HTMLElement;
+      });
 
       // Ensure we can add some domy attribute to the component and render them on the component root
       // Example: <Count d-if="showCount"></Count>
-      domy.deepRender({
+      const unmount = domy.deepRender({
         element: root,
         scopedNodeData: domy.scopedNodeData,
         byPassAttributes: [...propsAttributes.map(attr => attr.name), ...rootAttributes],
         isComponentRendering: true
       });
+      unmountFns.push(unmount);
 
       // We mount the new app on the component
-      createAdvancedApp(
-        componentDefinition.app,
-        {
-          props: data.props,
-          childrens: Array.from(componentElement.childNodes) as Element[]
-        },
-        componentAttributes
-      )
-        .configure(domy.config)
-        .components(componentDefinition.components ?? {})
-        .mount(root);
+      // We queu it to ensure we waint for any clonage
+      queueJob(() => {
+        createAdvancedApp(
+          componentDefinition.app,
+          {
+            props: data.props,
+            childrens: Array.from(componentElement.childNodes) as Element[]
+          },
+          componentAttributes
+        )
+          .configure(domy.config)
+          .components(componentDefinition.components ?? {})
+          .mount(root);
+      });
+
+      domy.cleanup(() => cleanup(unmountFns));
     } catch (err: any) {
       componentElement.remove();
+      cleanup(unmountFns);
 
       if (!err?.message?.includes(name)) {
         warn(`The following error happened on "${name}" component.`);

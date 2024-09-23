@@ -16,4 +16,8 @@ export function dTransitionImplementation(domy: DomyDirectiveHelper) {
     enterTransition,
     outTransition
   });
+
+  domy.cleanup(() => {
+    domy.state.transitions.delete(domy.el);
+  });
 }

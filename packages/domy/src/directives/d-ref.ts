@@ -12,4 +12,8 @@ export function dRefImplementation(domy: DomyDirectiveHelper) {
     throw new Error(`A ref with the name "${domy.attr.value}" already exist.`);
 
   domy.state.refs[domy.attr.value] = domy.el;
+
+  domy.cleanup(() => {
+    delete domy.state.refs[domy.attr.value];
+  });
 }

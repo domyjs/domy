@@ -18,13 +18,22 @@ export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiv
 
   if (!target) throw Error(`Teleport canceled: can't find target "${domy.attr.value}".`);
 
+  const unmountFns: (() => void)[] = [];
+
   for (const child of childs) {
     target.appendChild(child);
-    domy.deepRender({
+    const unmout = domy.deepRender({
       element: child as Element,
       scopedNodeData: domy.scopedNodeData
     });
+    unmountFns.push(unmout);
   }
+
+  domy.cleanup(() => {
+    for (const unmountFn of unmountFns) {
+      unmountFn();
+    }
+  });
 
   domy.el.remove();
 }

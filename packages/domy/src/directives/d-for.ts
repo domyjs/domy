@@ -20,7 +20,7 @@ function renderer(props: RendererProps) {
   const domy = props.domy;
   const el = domy.el;
   const currentChildrens = Array.from(el.children);
-  const renderedChildrens = new Set<Element | ChildNode | Node>();
+  const elementsUnmount = new Map<Element | ChildNode | Node, (() => void) | null>();
 
   // Add the value to the scope
   let scope = {
@@ -54,7 +54,7 @@ function renderer(props: RendererProps) {
           domy.utils.moveElement(el, elementWithKey, currentIndex);
         }
 
-        renderedChildrens.add(elementWithKey);
+        elementsUnmount.set(elementWithKey, null);
         continue;
       }
     }
@@ -62,17 +62,17 @@ function renderer(props: RendererProps) {
     // Create and render the new element
     let newChild = initialChild.cloneNode(true);
     el.appendChild(newChild);
-    domy.deepRender({
+    const unmount = domy.deepRender({
       element: newChild as Element,
       scopedNodeData: domy.scopedNodeData
     });
     newChild = el.lastElementChild!; // Ensure we get the rendered component and not the component it self
-    renderedChildrens.add(newChild);
+    elementsUnmount.set(newChild, unmount);
   }
 
   domy.removeLastAddedScope();
 
-  return renderedChildrens;
+  return elementsUnmount;
 }
 
 /**
@@ -86,6 +86,7 @@ function renderer(props: RendererProps) {
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.el;
   const initialChilds = Array.from(el.children);
+  const elementsUnmount = new Map<Element, () => void>();
 
   // Display a warning message if the childrens don't have a :key attribute
   for (const child of initialChilds) {
@@ -112,7 +113,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
     let valueIndex = 0;
     const renderChilds = (value: any) => {
-      const renderedChildForCurrentValue = renderer({
+      const elementsUnmountForCurrentValue = renderer({
         domy,
         forPattern,
         initialChilds,
@@ -120,7 +121,13 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         valueIndex
       });
 
-      renderedChildrens = new Set([...renderedChildrens, ...renderedChildForCurrentValue]);
+      renderedChildrens = new Set([...renderedChildrens, ...elementsUnmountForCurrentValue.keys()]);
+
+      for (const [element, unmount] of elementsUnmountForCurrentValue.entries()) {
+        if (!elementsUnmount.has(element as Element) && unmount) {
+          elementsUnmount.set(element as Element, unmount);
+        }
+      }
 
       ++valueIndex;
     };
@@ -135,7 +142,21 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
     // Remove remaining childs that shouldn't be there
     for (const child of el.childNodes) {
-      if (!renderedChildrens.has(child)) child.remove();
+      if (!renderedChildrens.has(child)) {
+        const unmount = elementsUnmount.get(child as Element);
+        child.remove();
+
+        if (unmount) {
+          unmount();
+          elementsUnmount.delete(child as Element);
+        }
+      }
+    }
+  });
+
+  domy.cleanup(() => {
+    for (const unmount of elementsUnmount.values()) {
+      unmount();
     }
   });
 

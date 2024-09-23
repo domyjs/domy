@@ -69,6 +69,7 @@ export class DomyHelper {
       utils: directivesUtils,
 
       queueJob,
+      onClone: this.onClone.bind(this),
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
       evaluate: renderWithoutListeningToChange
@@ -94,7 +95,6 @@ export class DomyHelper {
 
         for (const listenedPath of this.paths) {
           if (ReactiveUtils.matchPath(listenedPath, path).isMatching) {
-            this.callCleanup();
             this.callEffect();
           }
         }
@@ -110,6 +110,15 @@ export class DomyHelper {
 
   cleanup(cb: () => void | Promise<void>) {
     this.cleanupFn = cb;
+  }
+
+  onClone(el: Element, cb: (clone: Element) => void | Promise<void>) {
+    const orignalCloneMethod = el.cloneNode.bind(el);
+    el.cloneNode = (deep?: boolean) => {
+      const clone = orignalCloneMethod(deep);
+      cb(clone as Element);
+      return clone;
+    };
   }
 
   eval(code: string) {
@@ -173,8 +182,15 @@ export class DomyHelper {
     this.scopedNodeData.pop();
   }
 
+  getUnmountFn() {
+    return this.callCleanup.bind(this);
+  }
+
   callCleanup() {
-    if (typeof this.cleanupFn === 'function') queueJob(this.cleanupFn.bind(this));
+    queueJob(() => {
+      this.effectFn = null; // Ensure we don't have effect on the element anymore
+      if (typeof this.cleanupFn === 'function') this.cleanupFn();
+    });
   }
 
   callEffect() {

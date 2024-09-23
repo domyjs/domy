@@ -84,17 +84,19 @@ export class GlobalMutationObserver {
     }
   }
 
-  public unwatch(element: Element, callback: Callback): void {
-    const callbacks = this.elements.get(element);
-    if (!callbacks) return;
+  public unwatch(elements: Element[], callback: Callback): void {
+    for (const element of elements) {
+      const callbacks = this.elements.get(element);
+      if (!callbacks) return;
 
-    const index = callbacks.indexOf(callback);
-    if (index !== -1) {
-      callbacks.splice(index, 1);
-    }
+      const index = callbacks.indexOf(callback);
+      if (index !== -1) {
+        callbacks.splice(index, 1);
+      }
 
-    if (callbacks.length === 0) {
-      this.elements.delete(element);
+      if (callbacks.length === 0) {
+        this.elements.delete(element);
+      }
     }
   }
 

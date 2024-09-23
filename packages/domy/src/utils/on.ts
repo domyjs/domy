@@ -79,5 +79,10 @@ export default function on(props: {
     });
   }
 
-  listenerTarget.addEventListener(eventName, listener, options);
+  return {
+    listenerTarget,
+    eventName,
+    listener,
+    options
+  };
 }

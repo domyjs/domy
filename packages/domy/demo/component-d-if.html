@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>components</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <main d-for="i of [1]">
+      <Count
+        d-if="i % 2 === 1"
+        :key="i"
+        :id="'count-' + i"
+        :show-error="showError"
+        :close="close"
+        :open="open"
+      ></Count>
+    </main>
+  </body>
+  <script>
+    const Count = DOMY.createComponent({
+      props: ['showError', 'open', 'close'],
+      html: `
+            <div>
+              <h1>Props: {{ Object.keys(this.$props).join(',') }}</h1>
+              <p>Count: {{ count }}</p>
+              <button @click="increment">+</button>
+              <button @click="decrement">-</button>
+            </div>
+        `,
+      app: {
+        setup() {},
+        mounted() {},
+        watch: {
+          count(prevValue, newValue) {
+            if (newValue < 0) {
+              this.$props.open();
+            } else {
+              this.$props.close();
+            }
+          }
+        },
+        data() {
+          return {
+            message: 'The count as to be greater than 0!',
+            count: 0
+          };
+        },
+        methods: {
+          increment: () => ++this.count,
+          decrement: () => --this.count
+        }
+      }
+    });
+
+    DOMY.createApp({
+      data() {
+        return {
+          showError: false
+        };
+      },
+      methods: {
+        close() {
+          this.showError = false;
+        },
+        open() {
+          this.showError = true;
+        }
+      }
+    })
+      .components({
+        Count
+      })
+      .mount();
+  </script>
+</html>

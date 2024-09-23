@@ -80,11 +80,13 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // We ensure to render the element/childs first so we can access to their value
   // For example select need to know the options value
   // So in case the value is a binding we need to ensure domy rendered the childs before handling d-model
-  domy.deepRender({
+  const unmout = domy.deepRender({
     element: domy.el,
     byPassAttributes: [domy.attr.name],
     scopedNodeData: domy.scopedNodeData
   });
+
+  domy.cleanup(unmout);
 
   // We look at change made by the user
   el.addEventListener(domy.modifiers.includes('lazy') ? 'change' : 'input', () =>

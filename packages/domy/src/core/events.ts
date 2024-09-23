@@ -44,10 +44,16 @@ export function events(domy: DomyDirectiveHelper) {
   domy.state.events[eventName].push(originalFn);
 
   // We add wrappers to the listener to ensure we can add modifiers
-  on({
+  const wrap = on({
     el: domy.el,
     eventName,
     listener: eventListener,
     modifiers: domy.modifiers
   });
+
+  wrap.listenerTarget.addEventListener(wrap.eventName, wrap.listener, wrap.options);
+
+  domy.cleanup(() =>
+    wrap.listenerTarget.removeEventListener(wrap.eventName, wrap.listener, wrap.options)
+  );
 }

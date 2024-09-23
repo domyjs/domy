@@ -7,6 +7,7 @@ import {
   getDomyAttributeInformations
 } from '../utils/domyAttrUtils';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
+import { error } from '../utils/logs';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
@@ -35,6 +36,8 @@ type Props = {
  */
 export function createDeepRenderFn(state: State, config: Config, components: Components) {
   return function deepRender(props: Props) {
+    const cleanupFnList: DomyHelper['callCleanup'][] = [];
+
     const toRenderList: Elem[] = [
       {
         element: props.element,
@@ -62,7 +65,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         // Example: <Count d-if="showCount" :count="count"></Count> we doesnt want d-if to deep render component with the data of the app instead of the component
         const skipChildRendering = props.isComponentRendering || args.skipChildRendering;
 
-        deepRender({
+        return deepRender({
           ...args,
           byPassAttributes,
           skipChildRendering
@@ -81,6 +84,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       if (element.nodeType === Node.TEXT_NODE) {
         renderText(domyHelper.getPluginHelper());
         domyHelper.callEffect();
+        cleanupFnList.push(domyHelper.getUnmountFn());
         continue;
       }
 
@@ -93,6 +97,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           domy: domyHelper.getPluginHelper()
         });
         domyHelper.callEffect();
+        cleanupFnList.push(domyHelper.getUnmountFn());
         continue;
       }
 
@@ -129,6 +134,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
         );
         domyHelper.callEffect();
+        cleanupFnList.push(domyHelper.getUnmountFn());
         element.removeAttribute(attr.name);
 
         // Handling options returned by the attribute
@@ -149,5 +155,16 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         });
       }
     }
+
+    // Unmount function
+    return () => {
+      for (const cleanupFn of cleanupFnList) {
+        try {
+          cleanupFn();
+        } catch (err: any) {
+          error(err);
+        }
+      }
+    };
   };
 }

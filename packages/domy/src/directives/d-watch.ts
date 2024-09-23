@@ -38,37 +38,38 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
     keysToWatch.add(keyToWatch);
   }
 
+  if (keysToWatch.size === 0 || objsToWatch.size === 0) return;
+
   // We add the watcher on the watched scoped data with a lock to avoid calling it self
-  if (keysToWatch.size > 0 && objsToWatch.size > 0) {
-    let isLock = false;
+  let isLock = false;
+  const unwatch = domy.watch(
+    {
+      type: 'onSet',
+      fn: props => {
+        if (isLock) return;
 
-    domy.watch(
-      {
-        type: 'onSet',
-        fn: props => {
-          if (isLock) return;
+        isLock = true;
 
-          isLock = true;
-
-          for (const keyToWatch of keysToWatch) {
-            const matcher = domy.matchPath(keyToWatch, props.path);
-            if (matcher.isMatching) {
-              const executedValue = domy.evaluateWithoutListening(domy.attr.value);
-              if (typeof executedValue === 'function')
-                domy.queueJob(() => {
-                  executedValue(props.prevValue, props.newValue, {
-                    path: props.path,
-                    params: matcher.params
-                  }) as WatcherFn;
-                });
-              break;
-            }
+        for (const keyToWatch of keysToWatch) {
+          const matcher = domy.matchPath(keyToWatch, props.path);
+          if (matcher.isMatching) {
+            const executedValue = domy.evaluateWithoutListening(domy.attr.value);
+            if (typeof executedValue === 'function')
+              domy.queueJob(() => {
+                executedValue(props.prevValue, props.newValue, {
+                  path: props.path,
+                  params: matcher.params
+                }) as WatcherFn;
+              });
+            break;
           }
-
-          isLock = false;
         }
-      },
-      Array.from(objsToWatch)
-    );
-  }
+
+        isLock = false;
+      }
+    },
+    Array.from(objsToWatch)
+  );
+
+  domy.cleanup(unwatch);
 }
