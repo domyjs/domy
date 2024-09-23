@@ -4,8 +4,8 @@ import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
 import { getReactiveHandler } from './getReactiveHandler';
-import { GlobalMutationObserver } from './GlobalMutationObserver';
 import { kebabToCamelCase } from './kebabToCamelCase';
+import { mergeToNegativeCondition } from './mergeToNegativeCondition';
 import { moveElement } from './moveElement';
 import { replaceElement } from './replaceElement';
 import { restoreElement } from './restoreElement';
@@ -21,11 +21,11 @@ export const helpersUtils = {
   get,
   set,
   getPreviousConditionsElements,
-  GlobalMutationObserver,
   moveElement,
   restoreElement,
   replaceElement,
   toRegularFn,
   executeActionAfterAnimation,
-  getReactiveHandler
+  getReactiveHandler,
+  mergeToNegativeCondition
 };

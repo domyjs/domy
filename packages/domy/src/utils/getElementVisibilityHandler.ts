@@ -5,7 +5,6 @@ import { restoreElement } from './restoreElement';
 type Props = {
   shouldBeDisplay: () => boolean;
   disconnectAction: (el: Element, unmount: (() => void) | null) => void;
-  connectAction?: (el: Element) => void;
   domy: DomyDirectiveHelper;
 };
 
@@ -66,9 +65,8 @@ export function getElementVisibilityHandler(props: Props) {
         );
       }
 
-      domy.onClone(el, clone => {
-        el = clone;
-      });
+      const indexToInsert = props.domy.utils.findElementIndex(parentChilds, originalEl);
+      restoreElement(parent, el, indexToInsert);
 
       const unmount = domy.deepRender({
         element: el,
@@ -76,14 +74,6 @@ export function getElementVisibilityHandler(props: Props) {
         scopedNodeData: domy.scopedNodeData
       });
       unmoutRender = unmount;
-
-      // Wait for clonage
-      domy.queueJob(() => {
-        const indexToInsert = props.domy.utils.findElementIndex(parentChilds, originalEl);
-        restoreElement(parent, el, indexToInsert);
-
-        props.connectAction?.(el);
-      });
     }
 
     isInitialised = true;

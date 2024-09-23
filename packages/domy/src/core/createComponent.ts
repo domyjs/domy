@@ -73,7 +73,7 @@ export function createComponent<
         props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
       );
       const data = domy.reactive({ props: {} as ComponentProps['props'] });
-      let root = tree[0] as HTMLElement;
+      const root = tree[0] as HTMLElement;
       const propsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
       const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
@@ -133,9 +133,19 @@ export function createComponent<
         unmountFns.push(unmount);
       }
 
-      domy.onClone(root, clone => {
-        root = clone as HTMLElement;
-      });
+      const mountComponent = (target: HTMLElement) => {
+        createAdvancedApp(
+          componentDefinition.app,
+          {
+            props: data.props,
+            childrens: Array.from(componentElement.childNodes) as Element[]
+          },
+          componentAttributes
+        )
+          .configure(domy.config)
+          .components(componentDefinition.components ?? {})
+          .mount(target);
+      };
 
       // Ensure we can add some domy attribute to the component and render them on the component root
       // Example: <Count d-if="showCount"></Count>
@@ -147,21 +157,10 @@ export function createComponent<
       });
       unmountFns.push(unmount);
 
+      domy.onClone(root, clone => mountComponent(clone as HTMLElement));
+
       // We mount the new app on the component
-      // We queu it to ensure we waint for any clonage
-      queueJob(() => {
-        createAdvancedApp(
-          componentDefinition.app,
-          {
-            props: data.props,
-            childrens: Array.from(componentElement.childNodes) as Element[]
-          },
-          componentAttributes
-        )
-          .configure(domy.config)
-          .components(componentDefinition.components ?? {})
-          .mount(root);
-      });
+      mountComponent(root);
 
       domy.cleanup(() => cleanup(unmountFns));
     } catch (err: any) {

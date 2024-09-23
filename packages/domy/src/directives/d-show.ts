@@ -29,7 +29,7 @@ export function dShowImplementation(domy: DomyDirectiveHelper) {
         el.classList.remove(transition.outTransition);
         el.classList.add(transition.enterTransition);
       }
-    } else if (isAlreadyShow) {
+    } else if (isAlreadyShow && !shouldBeDisplay) {
       if (transition && isInitialised) {
         el.classList.remove(transition.enterTransition);
         el.classList.add(transition.outTransition);
