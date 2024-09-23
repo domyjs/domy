@@ -9,6 +9,7 @@ import { Config } from '../types/Config';
 import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { createDeepRenderFn } from './deepRender';
+import { error } from '../utils/logs';
 
 let domyHelperId = 0;
 
@@ -96,7 +97,7 @@ export class DomyHelper {
 
         for (const listenedPath of this.paths) {
           if (ReactiveUtils.matchPath(listenedPath, path).isMatching) {
-            this.callEffect();
+            this.callEffect(true);
           }
         }
       }
@@ -202,10 +203,20 @@ export class DomyHelper {
     });
   }
 
-  callEffect() {
+  callEffect(queue?: boolean) {
     // We remove every paths/objectsIdToListen every times the effect is called because the dependencies to watch can be differents
     this.paths = new Set();
     this.objectsIdToListen = new Set();
-    if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
+    if (typeof this.effectFn === 'function') {
+      const eff = this.effectFn.bind(this);
+      if (queue) queueJob(eff);
+      else {
+        try {
+          eff();
+        } catch (err: any) {
+          error(err);
+        }
+      }
+    }
   }
 }

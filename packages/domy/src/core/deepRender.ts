@@ -36,6 +36,7 @@ type Props = {
  */
 export function createDeepRenderFn(state: State, config: Config, components: Components) {
   return function deepRender(props: Props) {
+    let renderedElement = props.element;
     const cleanupFnList: DomyHelper['callCleanup'][] = [];
 
     const toRenderList: Elem[] = [
@@ -80,6 +81,16 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         config
       );
 
+      // Ensure we get the rendered element
+      if (element === props.element) {
+        domyHelper.onClone(element, clone => {
+          renderedElement = clone;
+        });
+        domyHelper.onReplaceWith(element, node => {
+          renderedElement = node as Element;
+        });
+      }
+
       // Rendering textContent
       if (element.nodeType === Node.TEXT_NODE) {
         renderText(domyHelper.getPluginHelper());
@@ -91,12 +102,14 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       // Rendering components
       if (element.localName in components) {
         const componentSetup = components[element.localName];
-        componentSetup({
+        const newEl = componentSetup({
           name: element.localName,
           componentElement: element as HTMLElement,
           domy: domyHelper.getPluginHelper()
         });
+
         domyHelper.callEffect();
+        if (newEl) renderedElement = newEl;
         cleanupFnList.push(domyHelper.getUnmountFn());
         continue;
       }
@@ -119,6 +132,16 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           [...domyHelper.scopedNodeData],
           config
         );
+
+        // Ensure we get the rendered element
+        if (element === props.element) {
+          domyHelper.onClone(element, clone => {
+            renderedElement = clone;
+          });
+          domyHelper.onReplaceWith(element, node => {
+            renderedElement = node as Element;
+          });
+        }
 
         const attrInfos = getDomyAttributeInformations(attr);
         domyHelper.prefix = attrInfos.prefix;
@@ -156,13 +179,16 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       }
     }
 
-    // Unmount function
-    return () => {
-      for (const cleanupFn of cleanupFnList) {
-        try {
-          cleanupFn();
-        } catch (err: any) {
-          error(err);
+    // Deep render helpers
+    return {
+      renderedElement,
+      unmount: () => {
+        for (const cleanupFn of cleanupFnList) {
+          try {
+            cleanupFn();
+          } catch (err: any) {
+            error(err);
+          }
         }
       }
     };

@@ -22,11 +22,11 @@ export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiv
 
   for (const child of childs) {
     target.appendChild(child);
-    const unmout = domy.deepRender({
+    const { unmount } = domy.deepRender({
       element: child as Element,
       scopedNodeData: domy.scopedNodeData
     });
-    unmountFns.push(unmout);
+    unmountFns.push(unmount);
   }
 
   domy.cleanup(() => {

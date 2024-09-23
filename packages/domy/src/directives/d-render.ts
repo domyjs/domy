@@ -60,37 +60,32 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     // Render the childs
     for (let i = 0; i < fragment.childNodes.length; ++i) {
       const child = fragment.childNodes[i] as Element;
-      domy.onClone(child, clone => {
-        child.replaceWith(clone);
-      });
-      const unmount = domy.deepRender({
+      const { unmount, renderedElement } = domy.deepRender({
         element: child,
         scopedNodeData: domy.scopedNodeData
       });
       unmountFns.push(unmount);
+      child.replaceWith(renderedElement);
     }
 
-    // Wait for any clonage to end
-    domy.queueJob(() => {
-      // We restore the element if the childrens change and it have been remove
-      if (hasBeenRemove) {
-        const indexToInsert = domy.utils.findElementIndex(parentChilds, originalEl);
-        domy.utils.restoreElement(parent, el, indexToInsert);
-        hasBeenRemove = false;
-      }
+    // We restore the element if the childrens change and it have been remove
+    if (hasBeenRemove) {
+      const indexToInsert = domy.utils.findElementIndex(parentChilds, originalEl);
+      domy.utils.restoreElement(parent, el, indexToInsert);
+      hasBeenRemove = false;
+    }
 
-      // Copy the fragment child before adding them to the dom because the fragment don't keep them
-      const childsToRender = Array.from(fragment.childNodes) as Element[];
+    // Copy the fragment child before adding them to the dom because the fragment don't keep them
+    const childsToRender = Array.from(fragment.childNodes) as Element[];
 
-      el.replaceWith(fragment);
+    el.replaceWith(fragment);
 
-      // We remove the last rendered childs
-      for (const element of lastRenderedChilds) {
-        element.remove();
-      }
-      el = childsToRender[0]; // We will replace the first rendered children with the next render
-      lastRenderedChilds = childsToRender;
-    });
+    // We remove the last rendered childs
+    for (const element of lastRenderedChilds) {
+      element.remove();
+    }
+    el = childsToRender[0]; // We will replace the first rendered children with the next render
+    lastRenderedChilds = childsToRender;
   });
 
   domy.cleanup(() => cleanup(unmountFns));

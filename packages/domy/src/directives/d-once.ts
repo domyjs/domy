@@ -9,7 +9,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const unmount = domy.deepRender({
+  const { unmount } = domy.deepRender({
     element: domy.el,
     scopedNodeData: domy.scopedNodeData,
     byPassAttributes: [domy.attr.name],

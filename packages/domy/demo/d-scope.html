@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-scope</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <main
+      d-scope=" { showModal: false, msg: 'An other message' }"
+      d-if="msg === 'An other message'"
+    >
+      <p id="override">{{ msg }}</p>
+      <div id="modal" d-if="showModal">Hello World</div>
+      <button @click="showModal = !showModal">Show modal</button>
+    </main>
+  </body>
+  <script>
+    DOMY.createApp({
+      watch: {
+        showModal() {
+          this.$refs.watcherCalled.textContent = 'true';
+        }
+      },
+      data() {
+        return {
+          msg: 'Hello World!'
+        };
+      }
+    }).mount();
+  </script>
+</html>

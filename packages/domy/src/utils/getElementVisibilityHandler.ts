@@ -68,7 +68,7 @@ export function getElementVisibilityHandler(props: Props) {
       const indexToInsert = props.domy.utils.findElementIndex(parentChilds, originalEl);
       restoreElement(parent, el, indexToInsert);
 
-      const unmount = domy.deepRender({
+      const { unmount } = domy.deepRender({
         element: el,
         byPassAttributes: [domy.attr.name],
         scopedNodeData: domy.scopedNodeData

@@ -71,8 +71,7 @@ export function createComponent<
         props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
       );
       const data = domy.reactive({ props: {} as ComponentProps['props'] });
-      const originalRoot = tree[0] as HTMLElement;
-      let root = originalRoot.cloneNode(true) as HTMLElement;
+      const root = tree[0] as HTMLElement;
       const propsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
       const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
@@ -126,7 +125,7 @@ export function createComponent<
 
       // We render the childs first to ensure they keep the current state and not the component state
       for (const child of componentElement.childNodes) {
-        const unmount = domy.deepRender({
+        const { unmount } = domy.deepRender({
           element: child as Element,
           scopedNodeData: domy.scopedNodeData
         });
@@ -135,39 +134,36 @@ export function createComponent<
 
       let unmountComponent: (() => void) | undefined;
       const mountComponent = (target: HTMLElement) => {
-        if (unmountComponent) unmountComponent();
-        createAdvancedApp(
-          componentDefinition.app,
-          {
-            props: data.props,
-            childrens
-          },
-          componentAttributes
-        )
-          .configure(domy.config)
-          .components(componentDefinition.components ?? {})
-          .mount(target)
-          .then(render => {
-            unmountComponent = render?.unmount;
-          });
+        domy.queueJob(() => {
+          if (unmountComponent) unmountComponent();
+          createAdvancedApp(
+            componentDefinition.app,
+            {
+              props: data.props,
+              childrens
+            },
+            componentAttributes
+          )
+            .configure(domy.config)
+            .components(componentDefinition.components ?? {})
+            .mount(target)
+            .then(render => {
+              unmountComponent = render?.unmount;
+            });
+        });
       };
 
-      // When there is a clone of the component we render it again
+      // Ensure to mount the new element when the root is cloned or replaced
       domy.onClone(root, clone => {
-        root = clone as HTMLElement;
-        mountComponent(root);
+        mountComponent(clone as HTMLElement);
       });
-
-      // If the component render an toher component as root
-      domy.onReplaceWith(root, (...nodes) => {
-        for (const el of nodes) {
-          mountComponent(el as HTMLElement);
-        }
+      domy.onReplaceWith(root, node => {
+        mountComponent(node as HTMLElement);
       });
 
       // Ensure we can add some domy attribute to the component and render them on the component root
       // Example: <Count d-if="showCount"></Count>
-      const unmount = domy.deepRender({
+      const { unmount, renderedElement } = domy.deepRender({
         element: root,
         scopedNodeData: domy.scopedNodeData,
         byPassAttributes: [...propsAttributes.map(attr => attr.name), ...rootAttributes],
@@ -176,12 +172,14 @@ export function createComponent<
       unmountFns.push(unmount);
 
       // We mount the new app on the component
-      mountComponent(root);
+      mountComponent(renderedElement as HTMLElement);
 
       domy.cleanup(() => {
         if (unmountComponent) unmountComponent();
         cleanup(unmountFns);
       });
+
+      return renderedElement;
     } catch (err: any) {
       componentElement.remove();
       cleanup(unmountFns);

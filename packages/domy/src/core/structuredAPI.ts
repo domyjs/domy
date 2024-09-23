@@ -124,7 +124,7 @@ export async function structuredAPI(params: Params) {
   const deepRender = createDeepRenderFn(state, config, components);
   try {
     // Render the dom with DOMY
-    const unmount = deepRender({
+    const { unmount } = deepRender({
       element: target,
       scopedNodeData: [],
       byPassAttributes: params.byPassAttributes
