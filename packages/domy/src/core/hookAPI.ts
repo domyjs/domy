@@ -102,14 +102,16 @@ export async function hookAPI(params: Params) {
     })
   );
 
+  const unmountFns: (() => void)[] = [];
   const deepRender = createDeepRenderFn(state, config, components);
   try {
     // Render the dom with DOMY
-    deepRender({
+    const unmount = deepRender({
       element: target,
       scopedNodeData: [],
       byPassAttributes: params.byPassAttributes
     });
+    unmountFns.push(unmount);
   } catch (err: any) {
     error(err);
   }
@@ -131,5 +133,12 @@ export async function hookAPI(params: Params) {
     })
   );
 
-  return getRender(deepRender);
+  return {
+    render: getRender(deepRender),
+    unmount: () => {
+      for (const unmount of unmountFns) {
+        unmount();
+      }
+    }
+  };
 }

@@ -130,12 +130,12 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
         // We render the attribute
         // It's the main logic of DOMY
+        element.removeAttribute(attr.name);
         const options: DomyDirectiveReturn = renderAttribute(
           domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
         );
         domyHelper.callEffect();
         cleanupFnList.push(domyHelper.getUnmountFn());
-        element.removeAttribute(attr.name);
 
         // Handling options returned by the attribute
         if (options) {

@@ -69,6 +69,7 @@ export class DomyHelper {
       utils: directivesUtils,
 
       queueJob,
+      onReplaceWith: this.onReplaceWith.bind(this),
       onClone: this.onClone.bind(this),
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
@@ -112,12 +113,20 @@ export class DomyHelper {
     this.cleanupFn = cb;
   }
 
-  onClone(el: Element, cb: (clone: Element) => void | Promise<void>) {
+  onClone(el: Element, cb: (clone: Element) => void | Element) {
     const orignalCloneMethod = el.cloneNode.bind(el);
     el.cloneNode = (deep?: boolean) => {
       const clone = orignalCloneMethod(deep);
-      cb(clone as Element);
-      return clone;
+      const fixedClone = cb(clone as Element);
+      return fixedClone ?? clone;
+    };
+  }
+
+  onReplaceWith(el: Element, cb: (...nodes: (string | Node)[]) => void | Element) {
+    const orignalReplaceWithMethod = el.replaceWith.bind(el);
+    el.replaceWith = (...nodes: (string | Node)[]) => {
+      orignalReplaceWithMethod(...nodes);
+      cb(...nodes);
     };
   }
 

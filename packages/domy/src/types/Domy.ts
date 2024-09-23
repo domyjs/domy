@@ -38,7 +38,8 @@ export type DomyDirectiveHelper = {
 
   utils: typeof directivesUtils;
 
-  onClone: (element: Element, cb: (clone: Element) => void | Promise<void>) => void;
+  onClone: (element: Element, cb: (clone: Element) => void | Element) => void;
+  onReplaceWith: (element: Element, cb: (...nodes: (string | Node)[]) => void | Element) => void;
   queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;
   cleanup: (cb: () => void | Promise<void>) => void;

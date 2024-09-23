@@ -2,10 +2,8 @@ import { Data } from '../types/App';
 import { ComponentDefinition, ComponentProps, Components } from '../types/Component';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 import { isBindAttr } from '../utils/isSpecialAttribute';
-import { kebabToCamelCase } from '../utils/kebabToCamelCase';
 import { error, warn } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
-import { queueJob } from './scheduler';
 
 function cleanup(unmountFns: (() => void)[]) {
   for (const unmountFn of unmountFns) {
@@ -73,14 +71,16 @@ export function createComponent<
         props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
       );
       const data = domy.reactive({ props: {} as ComponentProps['props'] });
-      const root = tree[0] as HTMLElement;
+      const originalRoot = tree[0] as HTMLElement;
+      let root = originalRoot.cloneNode(true) as HTMLElement;
       const propsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
       const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
+      const childrens = Array.from(componentElement.childNodes) as Element[];
 
       // We handle the attributes
       for (const attr of componentElement.attributes) {
-        const attrName = kebabToCamelCase(attr.name.replace(/^:/, ''));
+        const attrName = domy.utils.kebabToCamelCase(attr.name.replace(/^:/, ''));
 
         // In case it's a prop
         if (propsName.has(attrName)) {
@@ -113,7 +113,7 @@ export function createComponent<
         for (const attr of propsAttributes) {
           if (isBindAttr(attr.name)) {
             const attrInfos = getDomyAttributeInformations(attr);
-            const propName = kebabToCamelCase(attrInfos.attrName);
+            const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
             data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
           } else {
             data.props[attr.name] = attr.value === '' ? true : attr.value;
@@ -133,19 +133,37 @@ export function createComponent<
         unmountFns.push(unmount);
       }
 
+      let unmountComponent: (() => void) | undefined;
       const mountComponent = (target: HTMLElement) => {
+        if (unmountComponent) unmountComponent();
         createAdvancedApp(
           componentDefinition.app,
           {
             props: data.props,
-            childrens: Array.from(componentElement.childNodes) as Element[]
+            childrens
           },
           componentAttributes
         )
           .configure(domy.config)
           .components(componentDefinition.components ?? {})
-          .mount(target);
+          .mount(target)
+          .then(render => {
+            unmountComponent = render?.unmount;
+          });
       };
+
+      // When there is a clone of the component we render it again
+      domy.onClone(root, clone => {
+        root = clone as HTMLElement;
+        mountComponent(root);
+      });
+
+      // If the component render an toher component as root
+      domy.onReplaceWith(root, (...nodes) => {
+        for (const el of nodes) {
+          mountComponent(el as HTMLElement);
+        }
+      });
 
       // Ensure we can add some domy attribute to the component and render them on the component root
       // Example: <Count d-if="showCount"></Count>
@@ -157,12 +175,13 @@ export function createComponent<
       });
       unmountFns.push(unmount);
 
-      domy.onClone(root, clone => mountComponent(clone as HTMLElement));
-
       // We mount the new app on the component
       mountComponent(root);
 
-      domy.cleanup(() => cleanup(unmountFns));
+      domy.cleanup(() => {
+        if (unmountComponent) unmountComponent();
+        cleanup(unmountFns);
+      });
     } catch (err: any) {
       componentElement.remove();
       cleanup(unmountFns);

@@ -27,7 +27,7 @@ export function getElementVisibilityHandler(props: Props) {
   let el = originalEl.cloneNode(true) as Element;
   let isInitialised = false;
   let cleanupTransition: null | (() => void) = null;
-  let unmoutRender: (() => void) | null = null;
+  let unmoutLastRender: (() => void) | null = null;
 
   /**
    * Check if an element should be display
@@ -41,7 +41,7 @@ export function getElementVisibilityHandler(props: Props) {
     const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {
-      const disconnectAction = () => props.disconnectAction(el, unmoutRender);
+      const disconnectAction = () => props.disconnectAction(el, unmoutLastRender);
 
       // Handle out transition
       if (transition && isInitialised) {
@@ -73,14 +73,14 @@ export function getElementVisibilityHandler(props: Props) {
         byPassAttributes: [domy.attr.name],
         scopedNodeData: domy.scopedNodeData
       });
-      unmoutRender = unmount;
+      unmoutLastRender = unmount;
     }
 
     isInitialised = true;
   }
 
   domy.cleanup(() => {
-    if (unmoutRender) unmoutRender();
+    if (unmoutLastRender) unmoutLastRender();
   });
 
   return handleVisibility;

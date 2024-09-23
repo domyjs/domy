@@ -39,7 +39,9 @@ export function createAdvancedApp<
     return { configure, mount };
   }
 
-  function mount(target?: HTMLElement): Promise<ReturnType<typeof getRender> | undefined> {
+  function mount(
+    target?: HTMLElement
+  ): Promise<{ render: ReturnType<typeof getRender>; unmount: () => void } | undefined> {
     return new Promise(resolve => {
       const build = async () => {
         const domTarget = target ?? document.body;

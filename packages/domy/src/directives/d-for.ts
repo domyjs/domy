@@ -20,7 +20,7 @@ function renderer(props: RendererProps) {
   const domy = props.domy;
   const el = domy.el;
   const currentChildrens = Array.from(el.children);
-  const elementsUnmount = new Map<Element | ChildNode | Node, (() => void) | null>();
+  const renderedChildrens = new Map<Element | ChildNode | Node, boolean>();
 
   // Add the value to the scope
   let scope = {
@@ -33,6 +33,7 @@ function renderer(props: RendererProps) {
       [props.forPattern!.groups.index]: props.valueIndex
     };
   }
+
   domy.addScopeToNode(scope);
 
   for (let childIndex = 0; childIndex < props.initialChilds.length; ++childIndex) {
@@ -54,25 +55,18 @@ function renderer(props: RendererProps) {
           domy.utils.moveElement(el, elementWithKey, currentIndex);
         }
 
-        elementsUnmount.set(elementWithKey, null);
+        renderedChildrens.set(elementWithKey, false);
         continue;
       }
     }
 
     // Create and render the new element
-    let newChild = initialChild.cloneNode(true);
+    const newChild = initialChild.cloneNode(true);
     el.appendChild(newChild);
-    const unmount = domy.deepRender({
-      element: newChild as Element,
-      scopedNodeData: domy.scopedNodeData
-    });
-    newChild = el.lastElementChild!; // Ensure we get the rendered component and not the component it self
-    elementsUnmount.set(newChild, unmount);
+    renderedChildrens.set(newChild, true);
   }
 
-  domy.removeLastAddedScope();
-
-  return elementsUnmount;
+  return renderedChildrens;
 }
 
 /**
@@ -86,7 +80,7 @@ function renderer(props: RendererProps) {
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.el;
   const initialChilds = Array.from(el.children);
-  const elementsUnmount = new Map<Element, () => void>();
+  const renderedChildrens = new Map<Element | ChildNode | Node, () => void>();
 
   // Display a warning message if the childrens don't have a :key attribute
   for (const child of initialChilds) {
@@ -109,11 +103,11 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     const isForIn = forPattern.groups!.type === 'in';
     const executedValue = domy.evaluate(forPattern.groups!.org);
 
-    let renderedChildrens = new Set<Element | ChildNode | Node>();
-
     let valueIndex = 0;
+    const renderedChildrensForCurrentRender = new Set<Element | ChildNode | Node>();
+
     const renderChilds = (value: any) => {
-      const elementsUnmountForCurrentValue = renderer({
+      const renderedChildForCurrentValue = renderer({
         domy,
         forPattern,
         initialChilds,
@@ -121,11 +115,32 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         valueIndex
       });
 
-      renderedChildrens = new Set([...renderedChildrens, ...elementsUnmountForCurrentValue.keys()]);
+      const renderedChildrens = new Map<Element | ChildNode | Node, () => void>();
+      for (const [element, needMount] of renderedChildForCurrentValue.entries()) {
+        if (needMount) {
+          let newElements = [element as Element];
 
-      for (const [element, unmount] of elementsUnmountForCurrentValue.entries()) {
-        if (!elementsUnmount.has(element as Element) && unmount) {
-          elementsUnmount.set(element as Element, unmount);
+          domy.onClone(newElements[0], clone => {
+            newElements[0] = clone;
+          });
+
+          domy.onReplaceWith(newElements[0], (...nodes) => {
+            newElements = nodes as Element[];
+          });
+
+          const unmount = domy.deepRender({
+            element: newElements[0],
+            scopedNodeData: domy.scopedNodeData
+          });
+
+          // Wait for clonage and component replacement
+
+          for (const element of newElements) {
+            renderedChildrensForCurrentRender.add(element);
+            renderedChildrens.set(element, unmount);
+          }
+        } else {
+          renderedChildrensForCurrentRender.add(element);
         }
       }
 
@@ -142,21 +157,22 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
     // Remove remaining childs that shouldn't be there
     for (const child of el.childNodes) {
-      if (!renderedChildrens.has(child)) {
-        const unmount = elementsUnmount.get(child as Element);
+      if (!renderedChildrensForCurrentRender.has(child)) {
         child.remove();
 
+        const unmount = renderedChildrens.get(child);
         if (unmount) {
           unmount();
-          elementsUnmount.delete(child as Element);
+          renderedChildrens.delete(child);
         }
       }
     }
   });
 
   domy.cleanup(() => {
-    for (const unmount of elementsUnmount.values()) {
+    for (const [element, unmount] of renderedChildrens.entries()) {
       unmount();
+      renderedChildrens.delete(element);
     }
   });
 

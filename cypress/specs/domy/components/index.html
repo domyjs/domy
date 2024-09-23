@@ -35,7 +35,7 @@
       props: ['showError', 'open', 'close'],
       html: `
             <div>
-              <h1>Props: {{ Object.keys(this.$props).join(',') }}</h1>
+              <h1>Props: {{ Object.keys($props).join(',') }}</h1>
               <p>Count: {{ count }}</p>
               <button @click="increment">+</button>
               <button @click="decrement">-</button>

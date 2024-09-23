@@ -15,12 +15,10 @@ import type { createDeepRenderFn } from './deepRender';
  * @author yoannchb-pro
  */
 export function getRender(deepRender: ReturnType<typeof createDeepRenderFn>) {
-  return {
-    render: (element: Element) => {
-      return deepRender({
-        element,
-        scopedNodeData: []
-      });
-    }
+  return (element: Element) => {
+    return deepRender({
+      element,
+      scopedNodeData: []
+    });
   };
 }
