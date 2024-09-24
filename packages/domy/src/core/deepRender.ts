@@ -25,6 +25,7 @@ type Props = {
   skipChildRendering?: boolean;
   renderWithoutListeningToChange?: boolean;
   isComponentRendering?: boolean;
+  onRenderedElementChange?: (renderedElement: Element) => void;
 };
 
 /**
@@ -36,7 +37,14 @@ type Props = {
  */
 export function createDeepRenderFn(state: State, config: Config, components: Components) {
   return function deepRender(props: Props) {
-    let renderedElement = props.element;
+    let renderedElement: Element | (() => Element) = props.element;
+
+    const setRenderedElement = (render: Element | (() => Element)) => {
+      renderedElement = render;
+      if (props.onRenderedElementChange)
+        props.onRenderedElementChange(typeof render === 'function' ? render() : render);
+    };
+
     const cleanupFnList: DomyHelper['callCleanup'][] = [];
 
     const toRenderList: Elem[] = [
@@ -84,10 +92,10 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       // Ensure we get the rendered element
       if (element === props.element) {
         domyHelper.onClone(element, clone => {
-          renderedElement = clone;
+          setRenderedElement(clone);
         });
         domyHelper.onReplaceWith(element, node => {
-          renderedElement = node as Element;
+          setRenderedElement(node as Element);
         });
       }
 
@@ -102,14 +110,14 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       // Rendering components
       if (element.localName in components) {
         const componentSetup = components[element.localName];
-        const newEl = componentSetup({
+        const getRenderElement = componentSetup({
           name: element.localName,
           componentElement: element as HTMLElement,
           domy: domyHelper.getPluginHelper()
         });
 
         domyHelper.callEffect();
-        if (newEl) renderedElement = newEl;
+        if (getRenderElement) setRenderedElement(getRenderElement);
         cleanupFnList.push(domyHelper.getUnmountFn());
         continue;
       }
@@ -132,16 +140,6 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           [...domyHelper.scopedNodeData],
           config
         );
-
-        // Ensure we get the rendered element
-        if (element === props.element) {
-          domyHelper.onClone(element, clone => {
-            renderedElement = clone;
-          });
-          domyHelper.onReplaceWith(element, node => {
-            renderedElement = node as Element;
-          });
-        }
 
         const attrInfos = getDomyAttributeInformations(attr);
         domyHelper.prefix = attrInfos.prefix;
@@ -181,8 +179,10 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
     // Deep render helpers
     return {
-      renderedElement,
-      unmount: () => {
+      getRenderedElement() {
+        return typeof renderedElement === 'function' ? renderedElement() : renderedElement;
+      },
+      unmount() {
         for (const cleanupFn of cleanupFnList) {
           try {
             cleanupFn();

@@ -86,12 +86,15 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     scopedNodeData: domy.scopedNodeData
   });
 
-  domy.cleanup(unmount);
-
   // We look at change made by the user
-  el.addEventListener(domy.modifiers.includes('lazy') ? 'change' : 'input', () =>
-    changeValue(domy)
-  );
+  const eventName = domy.modifiers.includes('lazy') ? 'change' : 'input';
+  const listenChangeCallback = () => changeValue(domy);
+  el.addEventListener(eventName, listenChangeCallback);
+
+  domy.cleanup(() => {
+    el.removeEventListener(eventName, listenChangeCallback);
+    unmount();
+  });
 
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);

@@ -11,7 +11,7 @@ export type Component = (props: {
   name: string;
   componentElement: HTMLElement;
   domy: DomyDirectiveHelper;
-}) => void | Element;
+}) => void | (() => Element);
 
 export type Components = {
   [name: string]: Component;

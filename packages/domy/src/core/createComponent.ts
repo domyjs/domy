@@ -163,7 +163,7 @@ export function createComponent<
 
       // Ensure we can add some domy attribute to the component and render them on the component root
       // Example: <Count d-if="showCount"></Count>
-      const { unmount, renderedElement } = domy.deepRender({
+      const { unmount, getRenderedElement } = domy.deepRender({
         element: root,
         scopedNodeData: domy.scopedNodeData,
         byPassAttributes: [...propsAttributes.map(attr => attr.name), ...rootAttributes],
@@ -172,14 +172,14 @@ export function createComponent<
       unmountFns.push(unmount);
 
       // We mount the new app on the component
-      mountComponent(renderedElement as HTMLElement);
+      mountComponent(getRenderedElement() as HTMLElement);
 
       domy.cleanup(() => {
         if (unmountComponent) unmountComponent();
         cleanup(unmountFns);
       });
 
-      return renderedElement;
+      return getRenderedElement;
     } catch (err: any) {
       componentElement.remove();
       cleanup(unmountFns);
