@@ -8,6 +8,8 @@ import {
 } from '../utils/domyAttrUtils';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { error } from '../utils/logs';
+import { onClone } from '../utils/onClone';
+import { onReplaceWith } from '../utils/onReplaceWith';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
@@ -37,14 +39,6 @@ type Props = {
  */
 export function createDeepRenderFn(state: State, config: Config, components: Components) {
   return function deepRender(props: Props) {
-    let renderedElement: Element | (() => Element) = props.element;
-
-    const setRenderedElement = (render: Element | (() => Element)) => {
-      renderedElement = render;
-      if (props.onRenderedElementChange)
-        props.onRenderedElementChange(typeof render === 'function' ? render() : render);
-    };
-
     const cleanupFnList: DomyHelper['callCleanup'][] = [];
 
     const toRenderList: Elem[] = [
@@ -54,6 +48,21 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         scopedNodeData: props.scopedNodeData ?? []
       }
     ];
+
+    // Ensure we get the rendered element even if it cloned or replaced
+    // Usefull for d-render or d-for which need to keep a trace of the element
+    let renderedElement: Element | (() => Element) = props.element;
+    const setRenderedElement = (render: Element | (() => Element)) => {
+      renderedElement = render;
+      if (props.onRenderedElementChange)
+        props.onRenderedElementChange(typeof render === 'function' ? render() : render);
+    };
+    onClone(props.element, clone => {
+      setRenderedElement(clone);
+    });
+    onReplaceWith(props.element, node => {
+      setRenderedElement(node as Element);
+    });
 
     while (toRenderList.length > 0) {
       let skipChildRendering = props.isComponentRendering || props.skipChildRendering;
@@ -88,16 +97,6 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         toRender.scopedNodeData,
         config
       );
-
-      // Ensure we get the rendered element
-      if (element === props.element) {
-        domyHelper.onClone(element, clone => {
-          setRenderedElement(clone);
-        });
-        domyHelper.onReplaceWith(element, node => {
-          setRenderedElement(node as Element);
-        });
-      }
 
       // Rendering textContent
       if (element.nodeType === Node.TEXT_NODE) {

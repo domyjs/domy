@@ -7,7 +7,8 @@ import { getReactiveHandler } from './getReactiveHandler';
 import { kebabToCamelCase } from './kebabToCamelCase';
 import { mergeToNegativeCondition } from './mergeToNegativeCondition';
 import { moveElement } from './moveElement';
-import { replaceElement } from './replaceElement';
+import { onClone } from './onClone';
+import { onReplaceWith } from './onReplaceWith';
 import { restoreElement } from './restoreElement';
 import { toKebabCase } from './toKebabCase';
 import { toRegularFn } from './toRegularFn';
@@ -23,9 +24,10 @@ export const helpersUtils = {
   getPreviousConditionsElements,
   moveElement,
   restoreElement,
-  replaceElement,
   toRegularFn,
   executeActionAfterAnimation,
   getReactiveHandler,
-  mergeToNegativeCondition
+  mergeToNegativeCondition,
+  onClone,
+  onReplaceWith
 };

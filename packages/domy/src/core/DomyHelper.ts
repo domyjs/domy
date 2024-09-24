@@ -9,7 +9,6 @@ import { Config } from '../types/Config';
 import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { createDeepRenderFn } from './deepRender';
-import { error } from '../utils/logs';
 
 let domyHelperId = 0;
 
@@ -70,8 +69,6 @@ export class DomyHelper {
       utils: directivesUtils,
 
       queueJob,
-      onReplaceWith: this.onReplaceWith.bind(this),
-      onClone: this.onClone.bind(this),
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
       evaluate: renderWithoutListeningToChange
@@ -97,7 +94,7 @@ export class DomyHelper {
 
         for (const listenedPath of this.paths) {
           if (ReactiveUtils.matchPath(listenedPath, path).isMatching) {
-            this.callEffect(true);
+            this.callEffect();
           }
         }
       }
@@ -112,23 +109,6 @@ export class DomyHelper {
 
   cleanup(cb: () => void | Promise<void>) {
     this.cleanupFn = cb;
-  }
-
-  onClone(el: Element, cb: (clone: Element) => void | Element) {
-    const orignalCloneMethod = el.cloneNode.bind(el);
-    el.cloneNode = (deep?: boolean) => {
-      const clone = orignalCloneMethod(deep);
-      const fixedClone = cb(clone as Element);
-      return fixedClone ?? clone;
-    };
-  }
-
-  onReplaceWith(el: Element, cb: (...nodes: (string | Node)[]) => void | Element) {
-    const orignalReplaceWithMethod = el.replaceWith.bind(el);
-    el.replaceWith = (...nodes: (string | Node)[]) => {
-      orignalReplaceWithMethod(...nodes);
-      cb(...nodes);
-    };
   }
 
   eval(code: string) {
@@ -203,20 +183,10 @@ export class DomyHelper {
     });
   }
 
-  callEffect(queue?: boolean) {
+  callEffect() {
     // We remove every paths/objectsIdToListen every times the effect is called because the dependencies to watch can be differents
     this.paths = new Set();
     this.objectsIdToListen = new Set();
-    if (typeof this.effectFn === 'function') {
-      const eff = this.effectFn.bind(this);
-      if (queue) queueJob(eff);
-      else {
-        try {
-          eff();
-        } catch (err: any) {
-          error(err);
-        }
-      }
-    }
+    if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
   }
 }

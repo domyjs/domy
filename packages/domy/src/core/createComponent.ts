@@ -154,10 +154,10 @@ export function createComponent<
       };
 
       // Ensure to mount the new element when the root is cloned or replaced
-      domy.onClone(root, clone => {
+      domy.utils.onClone(root, clone => {
         mountComponent(clone as HTMLElement);
       });
-      domy.onReplaceWith(root, node => {
+      domy.utils.onReplaceWith(root, node => {
         mountComponent(node as HTMLElement);
       });
 
@@ -184,11 +184,7 @@ export function createComponent<
       componentElement.remove();
       cleanup(unmountFns);
 
-      if (!err?.message?.includes(name)) {
-        warn(`The following error happened on "${name}" component.`);
-      }
-
-      error(err);
+      error(`Component "${name}":`, err);
     }
   };
 }
