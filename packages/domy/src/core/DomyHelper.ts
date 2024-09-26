@@ -113,7 +113,7 @@ export class DomyHelper {
     this.cleanupFn = cb;
   }
 
-  eval(code: string, onContextSet?: () => void) {
+  eval(code: string) {
     const evaluator = this.config.CSP ? cspEvaluate : evaluate;
     const context = getContext({
       domyHelperId: this.domyHelperId,
@@ -122,8 +122,6 @@ export class DomyHelper {
       scopedNodeData: this.scopedNodeData,
       config: this.config
     });
-
-    if (onContextSet) onContextSet(); // Ensure we don't listen to the 'get' watch when we set the context
 
     const executedValued = evaluator({
       code: code,
@@ -144,17 +142,17 @@ export class DomyHelper {
       }
     };
 
+    const unwatch = ReactiveUtils.globalWatch(listener);
+
     let executedValue;
     let errorMsg;
     try {
-      executedValue = this.eval(code, () => {
-        ReactiveUtils.globalWatch(listener);
-      });
+      executedValue = this.eval(code);
     } catch (err: any) {
       errorMsg = err;
     }
 
-    ReactiveUtils.removeGlobalWatch(listener);
+    unwatch();
 
     if (errorMsg) throw errorMsg; // We want to throw the error later to ensure we removed the global watcher
 

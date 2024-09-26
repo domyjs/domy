@@ -1,3 +1,4 @@
+import { lockWatchers, unlockWatchers } from '@domyjs/reactive';
 import { Config } from '../types/Config';
 import { State } from '../types/State';
 import { getHelpers } from './getHelpers';
@@ -22,6 +23,8 @@ type Props = {
  * @author yoannchb-pro
  */
 export function getContext(props: Props) {
+  lockWatchers();
+
   const helpers = getHelpers(props);
 
   const context = {
@@ -38,6 +41,8 @@ export function getContext(props: Props) {
       Object.defineProperty(context, key, getReactiveHandler(obj, key));
     }
   }
+
+  unlockWatchers();
 
   return context;
 }

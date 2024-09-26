@@ -6,6 +6,7 @@
 - Error boundary test with onError
 - Fixe typing (App, createApp, createComponent, params in watcher)
 - Refactoring
+
 - Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests
 
 - Toast plugin ?

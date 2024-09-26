@@ -38,14 +38,25 @@
     }
   </style>
   <body>
-    <div d-if="show" @click.away="show = false" d-transition="transition">Modal Content...</div>
-    <button @click="show = !show">Show/Hide modal</button>
+    <template d-transition="transition" d-render="createElement()"></template>
+
+    <button @click="show = !show">Show modal</button>
   </body>
   <script>
     DOMY.createApp({
-      data: {
-        show: false
+      data() {
+        return {
+          show: false
+        };
+      },
+      methods: {
+        createElement() {
+          const p = document.createElement('p');
+          p.textContent = 'd-render';
+          p.setAttribute('d-if', '5 === 5');
+          return p;
+        }
       }
-    });
+    }).mount();
   </script>
 </html>

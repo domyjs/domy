@@ -25,6 +25,7 @@ export const isSignalSymbol = Symbol();
  */
 export class ReactiveVariable {
   public id = ++objectId;
+  public isLock = false;
   public name = '';
   private proxy: any = null;
 
@@ -223,16 +224,20 @@ export class ReactiveVariable {
   }
 
   private callOnGetListeners(path: string[]) {
-    const params = { path: this.name + path.join('.'), objectId: this.id };
-    for (const listener of this.onGetListeners) {
-      listener(params);
+    if (!this.isLock) {
+      const params = { path: this.name + path.join('.'), objectId: this.id };
+      for (const listener of this.onGetListeners) {
+        listener(params);
+      }
     }
   }
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
-    const params = { path: this.name + path.join('.'), prevValue, newValue, objectId: this.id };
-    for (const listener of this.onSetListeners) {
-      listener(params);
+    if (!this.isLock) {
+      const params = { path: this.name + path.join('.'), prevValue, newValue, objectId: this.id };
+      for (const listener of this.onSetListeners) {
+        listener(params);
+      }
     }
   }
 }

@@ -8,8 +8,12 @@ import { removeGlobalWatch } from './core/removeGlobalWatch';
 import { signal } from './core/signal';
 import { unwatch } from './core/unwatch';
 import { watch } from './core/watch';
+import { lockWatchers } from './core/lockWatchers';
+import { unlockWatchers } from './core/unlockWatchers';
 
 export {
+  lockWatchers,
+  unlockWatchers,
   reactive,
   signal,
   globalWatch,
