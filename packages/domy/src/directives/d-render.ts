@@ -2,7 +2,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
  * d-render implementation
- * Allow to replace the current element by one or many elements
+ * Allow to replace the current element by an other element and to render it
  * Example:
  * <div
  *   d-scope="{ count: 0, createP: () => {
@@ -21,52 +21,47 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
   const parent = domy.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
-  const originalEl = domy.el;
+  const el = domy.el;
 
-  const lastRenders: ReturnType<DomyDirectiveHelper['deepRender']>[] = [];
+  let lastRender: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
 
   domy.effect(() => {
-    const elements: Element[] = [domy.evaluate(domy.attr.value)]
-      .flat()
-      .filter(element => !!element);
+    const elementToRender: Element | null | undefined = domy.evaluate(domy.attr.value.trim());
 
-    // We unmount the elements and we remove them
-    for (const { getRenderedElement, unmount } of lastRenders) {
-      unmount();
-      getRenderedElement().remove();
+    if (Array.isArray(elementToRender))
+      throw new Error(`The directive "d-render" only support one element as parameter.`);
+
+    // We unmount the  last render
+    if (lastRender) {
+      lastRender.getRenderedElement().remove();
+      lastRender.unmount();
     }
-    lastRenders.length = 0;
 
-    // Handle the case we don't have any element(s) to render
-    if (elements.length === 0) {
-      if (originalEl.isConnected) originalEl.remove();
+    // Handle the case we don't have any element to render
+    if (!elementToRender) {
+      if (el.isConnected) el.remove();
       return;
     }
 
     // We restore the element if the childrens change and it have been remove
-    if (!originalEl.isConnected) {
-      const indexToInsert = domy.utils.findElementIndex(parentChilds, originalEl);
-      domy.utils.restoreElement(parent, originalEl, indexToInsert);
+    if (!el.isConnected) {
+      const indexToInsert = domy.utils.findElementIndex(parentChilds, el);
+      domy.utils.restoreElement(parent, el, indexToInsert);
     }
 
     // We replace the element
-    originalEl.replaceWith(...elements);
+    el.replaceWith(elementToRender);
+    domy.setEl(elementToRender);
 
-    // Render the childs
-    for (let i = 0; i < elements.length; ++i) {
-      const element = elements[i];
-      const render = domy.deepRender({
-        element,
-        scopedNodeData: domy.scopedNodeData
-      });
-      lastRenders.push(render);
-    }
+    // Render the element
+    lastRender = domy.deepRender({
+      element: elementToRender,
+      scopedNodeData: domy.scopedNodeData
+    });
   });
 
   domy.cleanup(() => {
-    for (const { unmount } of lastRenders) {
-      unmount();
-    }
+    if (lastRender) lastRender.unmount();
   });
 
   return { skipChildsRendering: true };

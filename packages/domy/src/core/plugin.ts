@@ -33,6 +33,7 @@ import { $data } from '../helpers/$data';
 import { $scopedData } from '../helpers/$scopedData';
 import { $allData } from '../helpers/$allData';
 import { $methods } from '../helpers/$methods';
+import { dUnMountImplementation } from '../directives/d-unmount';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -62,6 +63,7 @@ export const PLUGINS: Plugins = {
     teleport: dTeleportImplementation,
     render: dRenderImplementation,
     mount: dMountImplementation,
+    unmount: dUnMountImplementation,
     watch: dWatchImplementation,
     init: dInitImplementation,
     scope: dScopeImplementation,

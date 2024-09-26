@@ -8,8 +8,6 @@ import {
 } from '../utils/domyAttrUtils';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { error } from '../utils/logs';
-import { onClone } from '../utils/onClone';
-import { onReplaceWith } from '../utils/onReplaceWith';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
@@ -57,12 +55,8 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       if (props.onRenderedElementChange)
         props.onRenderedElementChange(typeof render === 'function' ? render() : render);
     };
-    onClone(props.element, clone => {
-      setRenderedElement(clone);
-    });
-    onReplaceWith(props.element, node => {
-      setRenderedElement(node as Element);
-    });
+    const getSetEl = (currentEl: Element) =>
+      currentEl === props.element ? (element: Element) => setRenderedElement(element) : () => {};
 
     while (toRenderList.length > 0) {
       let skipChildRendering = props.isComponentRendering || props.skipChildRendering;
@@ -93,6 +87,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       let domyHelper = new DomyHelper(
         safeDeepRender,
         element,
+        getSetEl(element),
         state,
         toRender.scopedNodeData,
         config
@@ -135,6 +130,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         domyHelper = new DomyHelper(
           safeDeepRender,
           element,
+          getSetEl(element),
           state,
           [...domyHelper.scopedNodeData],
           config

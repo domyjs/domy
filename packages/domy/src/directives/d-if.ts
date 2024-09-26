@@ -12,10 +12,6 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const visibilityHandler = domy.utils.getElementVisibilityHandler({
     shouldBeDisplay: () => domy.evaluate(domy.attr.value),
-    disconnectAction: (element, unmount) => {
-      element.remove();
-      if (unmount) unmount();
-    },
     domy
   });
 

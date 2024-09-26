@@ -27,10 +27,6 @@ export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
 
   const visibilityHandler = domy.utils.getElementVisibilityHandler({
     shouldBeDisplay: () => domy.evaluate(mergedNegativeCondition),
-    disconnectAction: (element, unmount) => {
-      element.remove();
-      if (unmount) unmount();
-    },
     domy
   });
 

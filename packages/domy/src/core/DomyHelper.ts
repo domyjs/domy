@@ -43,6 +43,7 @@ export class DomyHelper {
   constructor(
     private deepRenderFn: ReturnType<typeof createDeepRenderFn>,
     public el: Element,
+    public setEl: (element: Element) => void,
     public state: State,
     public scopedNodeData: Record<string, any>[] = [],
     public config: Config
@@ -68,6 +69,7 @@ export class DomyHelper {
       ...ReactiveUtils,
       utils: directivesUtils,
 
+      setEl: this.setEl,
       queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
@@ -111,18 +113,22 @@ export class DomyHelper {
     this.cleanupFn = cb;
   }
 
-  eval(code: string) {
+  eval(code: string, onContextSet?: () => void) {
     const evaluator = this.config.CSP ? cspEvaluate : evaluate;
+    const context = getContext({
+      domyHelperId: this.domyHelperId,
+      el: this.el,
+      state: this.state,
+      scopedNodeData: this.scopedNodeData,
+      config: this.config
+    });
+
+    if (onContextSet) onContextSet(); // Ensure we don't listen to the 'get' watch when we set the context
+
     const executedValued = evaluator({
       code: code,
       contextAsGlobal: !this.config.avoidDeprecatedWith,
-      context: getContext({
-        domyHelperId: this.domyHelperId,
-        el: this.el,
-        state: this.state,
-        scopedNodeData: this.scopedNodeData,
-        config: this.config
-      }),
+      context,
       returnResult: true
     });
     return executedValued;
@@ -138,12 +144,12 @@ export class DomyHelper {
       }
     };
 
-    ReactiveUtils.globalWatch(listener);
-
     let executedValue;
     let errorMsg;
     try {
-      executedValue = this.eval(code);
+      executedValue = this.eval(code, () => {
+        ReactiveUtils.globalWatch(listener);
+      });
     } catch (err: any) {
       errorMsg = err;
     }
@@ -178,8 +184,10 @@ export class DomyHelper {
 
   callCleanup() {
     queueJob(() => {
+      if (this.onSetListener) ReactiveUtils.removeGlobalWatch(this.onSetListener);
       this.effectFn = null; // Ensure we don't have effect on the element anymore
       if (typeof this.cleanupFn === 'function') this.cleanupFn();
+      this.cleanupFn = null;
     });
   }
 

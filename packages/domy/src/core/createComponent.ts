@@ -75,7 +75,7 @@ export function createComponent<
       const propsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
       const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
-      const childrens = Array.from(componentElement.childNodes) as Element[];
+      const childrens = Array.from(componentElement.children) as Element[];
 
       // We handle the attributes
       for (const attr of componentElement.attributes) {
@@ -153,21 +153,14 @@ export function createComponent<
         });
       };
 
-      // Ensure to mount the new element when the root is cloned or replaced
-      domy.utils.onClone(root, clone => {
-        mountComponent(clone as HTMLElement);
-      });
-      domy.utils.onReplaceWith(root, node => {
-        mountComponent(node as HTMLElement);
-      });
-
       // Ensure we can add some domy attribute to the component and render them on the component root
       // Example: <Count d-if="showCount"></Count>
       const { unmount, getRenderedElement } = domy.deepRender({
         element: root,
         scopedNodeData: domy.scopedNodeData,
         byPassAttributes: [...propsAttributes.map(attr => attr.name), ...rootAttributes],
-        isComponentRendering: true
+        isComponentRendering: true,
+        onRenderedElementChange: newRoot => mountComponent(newRoot as HTMLElement)
       });
       unmountFns.push(unmount);
 

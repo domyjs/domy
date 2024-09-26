@@ -1,10 +1,7 @@
 import { DomyDirectiveHelper } from '../types/Domy';
-import { executeActionAfterAnimation } from './executeActionAfterAnimation';
-import { restoreElement } from './restoreElement';
 
 type Props = {
   shouldBeDisplay: () => boolean;
-  disconnectAction: (el: Element, unmount: (() => void) | null) => void;
   domy: DomyDirectiveHelper;
 };
 
@@ -20,14 +17,15 @@ export function getElementVisibilityHandler(props: Props) {
   const originalEl = domy.el;
   const parent = originalEl.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
-  const transition = domy.state.transitions.get(originalEl);
 
   originalEl.remove();
 
-  let el = originalEl.cloneNode(true) as Element;
+  let currentEl = originalEl.cloneNode(true) as Element;
+  domy.setEl(currentEl);
+
   let isInitialised = false;
   let cleanupTransition: null | (() => void) = null;
-  let unmoutLastRender: (() => void) | null = null;
+  let lastRender: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
 
   /**
    * Check if an element should be display
@@ -37,50 +35,57 @@ export function getElementVisibilityHandler(props: Props) {
    * @author yoannchb-pro
    */
   function handleVisibility() {
+    const transition = domy.state.transitions.get(originalEl);
+    const el = lastRender ? lastRender.getRenderedElement() : currentEl;
     const isConnected = el.isConnected;
     const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {
-      const disconnectAction = () => props.disconnectAction(el, unmoutLastRender);
+      const disconnectAction = () => {
+        el.remove();
+        if (lastRender) lastRender.unmount();
+      };
 
       // Handle out transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
         el.classList.remove(transition.enterTransition);
         el.classList.add(transition.outTransition);
-        cleanupTransition = executeActionAfterAnimation(el, disconnectAction);
+        cleanupTransition = domy.utils.executeActionAfterAnimation(el, disconnectAction);
       } else {
         disconnectAction();
       }
     } else if ((!isConnected && shouldBeDisplay) || (isConnected && !isInitialised)) {
-      if (!isConnected) el = originalEl.cloneNode(true) as Element;
+      if (!isConnected) {
+        currentEl = originalEl.cloneNode(true) as Element;
+        domy.setEl(currentEl);
+      }
 
       // Handle enter transition
       if (transition && isInitialised) {
         if (cleanupTransition) cleanupTransition();
-        el.classList.remove(transition.outTransition);
-        el.classList.add(transition.enterTransition);
-        cleanupTransition = executeActionAfterAnimation(el, () =>
-          el.classList.remove(transition.enterTransition)
+        currentEl.classList.remove(transition.outTransition);
+        currentEl.classList.add(transition.enterTransition);
+        cleanupTransition = domy.utils.executeActionAfterAnimation(currentEl, () =>
+          currentEl.classList.remove(transition.enterTransition)
         );
       }
 
       const indexToInsert = props.domy.utils.findElementIndex(parentChilds, originalEl);
-      restoreElement(parent, el, indexToInsert);
+      domy.utils.restoreElement(parent, currentEl, indexToInsert);
 
-      const { unmount } = domy.deepRender({
-        element: el,
+      lastRender = domy.deepRender({
+        element: currentEl,
         byPassAttributes: [domy.attr.name],
         scopedNodeData: domy.scopedNodeData
       });
-      unmoutLastRender = unmount;
     }
 
     isInitialised = true;
   }
 
   domy.cleanup(() => {
-    if (unmoutLastRender) unmoutLastRender();
+    if (lastRender) lastRender.unmount();
   });
 
   return handleVisibility;

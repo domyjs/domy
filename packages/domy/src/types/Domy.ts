@@ -38,6 +38,7 @@ export type DomyDirectiveHelper = {
 
   utils: typeof directivesUtils;
 
+  setEl: (element: Element) => void;
   queueJob: typeof queueJob;
   effect: (cb: () => void | Promise<void>) => void;
   cleanup: (cb: () => void | Promise<void>) => void;

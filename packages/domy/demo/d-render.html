@@ -4,20 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>d-render</title>
-    <script src="/packages/domy/dist/index.js"></script>
+    <script src="../dist/index.js"></script>
   </head>
   <body>
     <div
       d-scope="{ count: 0, createP: () => {
         const p = document.createElement('p');
-        p.setAttribute('d-if', 'count < 10');
         p.textContent = 'Count: {{ count }}';
         return p;
       } }"
     >
       <template d-if="5 === 5" d-render="renderElement ? createP() : null"></template>
-      <button d-if="renderElement" id="inc" @click="++count">+</button>
-      <button d-if="renderElement" id="dec" @click="--count">-</button>
+      <button id="inc" @click="++count">+</button>
+      <button id="dec" @click="--count">-</button>
 
       <button id="renderCount" @click="renderElement = !renderElement">Render element</button>
     </div>

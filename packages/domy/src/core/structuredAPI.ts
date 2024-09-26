@@ -29,6 +29,7 @@ type Params = {
  * @author yoannchb-pro
  */
 export async function structuredAPI(params: Params) {
+  const unmountFns: (() => void)[] = [];
   const { components, config, target, app = {}, props } = params;
 
   // Initialisation event dispatch
@@ -64,7 +65,7 @@ export async function structuredAPI(params: Params) {
     watchers[watcherName] = { fn: toRegularFn(app.watch[watcherName]), locked: false };
   }
   // We attach a watcher to data (so a global watcher) to call the correct watcher based on the path
-  watch(
+  const unwatch = watch(
     {
       type: 'onSet',
       fn: async ({ path, prevValue, newValue }) => {
@@ -100,6 +101,7 @@ export async function structuredAPI(params: Params) {
     },
     [state.data]
   );
+  unmountFns.push(unwatch);
 
   // Setup
   if (app.setup) {
@@ -120,7 +122,6 @@ export async function structuredAPI(params: Params) {
     })
   );
 
-  const unmountFns: (() => void)[] = [];
   const deepRender = createDeepRenderFn(state, config, components);
   try {
     // Render the dom with DOMY

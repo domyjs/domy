@@ -80,7 +80,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // We ensure to render the element/childs first so we can access to their value
   // For example select need to know the options value
   // So in case the value is a binding we need to ensure domy rendered the childs before handling d-model
-  const { unmount } = domy.deepRender({
+  const { unmount, getRenderedElement } = domy.deepRender({
     element: domy.el,
     byPassAttributes: [domy.attr.name],
     scopedNodeData: domy.scopedNodeData
@@ -102,7 +102,9 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
 
     if (isValueArray && el.tagName === 'SELECT' && (el as HTMLSelectElement).multiple) {
       // Handle multiple select
-      const options = el.querySelectorAll('option') as NodeListOf<HTMLOptionElement>;
+      const options = getRenderedElement().querySelectorAll(
+        'option'
+      ) as NodeListOf<HTMLOptionElement>;
 
       for (const option of options) {
         option.selected = executedValue.includes(option.value);

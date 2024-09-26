@@ -11,12 +11,13 @@ import { DomyDirectiveHelper } from '../types/Domy';
 export function dShowImplementation(domy: DomyDirectiveHelper) {
   const el = domy.el as HTMLElement;
   const originalDisplay = el.style.display ?? '';
-  const transition = domy.state.transitions.get(el);
 
   let isInitialised = false;
   let cleanupTransition: null | (() => void) = null;
 
   domy.effect(() => {
+    const transition = domy.state.transitions.get(el);
+
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
     const isAlreadyShow = el.style.display !== 'none';
 
