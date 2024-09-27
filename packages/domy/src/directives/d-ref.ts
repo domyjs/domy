@@ -29,7 +29,10 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
   setRef(render.getRenderedElement());
 
-  domy.cleanup(cleanRef);
+  domy.cleanup(() => {
+    cleanRef();
+    render.unmount();
+  });
 
   return { skipChildsRendering: true, skipOtherAttributesRendering: true };
 }

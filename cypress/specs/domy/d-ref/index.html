@@ -7,19 +7,22 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <input type="text" d-ref="text" value="Hello World!" />
-    <p>{{ content }}</p>
+    <Component d-ref="input"></Component>
+    <p d-ref="p"></p>
   </body>
   <script>
+    const Component = DOMY.createComponent({
+      html: `<input type="text" value="Hello World!" />`
+    });
+
     DOMY.createApp({
-      data() {
-        return {
-          content: ''
-        };
-      },
       mounted() {
-        this.content = this.$refs.text.value;
+        this.$refs.p.textContent = this.$refs.input.value;
       }
-    }).mount();
+    })
+      .components({
+        Component
+      })
+      .mount();
   </script>
 </html>
