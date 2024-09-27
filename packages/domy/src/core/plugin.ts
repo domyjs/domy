@@ -47,8 +47,8 @@ export const PLUGINS: Plugins = {
     'ignore',
     'once',
     'cloak',
-    'transition',
     'ref',
+    'transition',
 
     'scope',
     'if',

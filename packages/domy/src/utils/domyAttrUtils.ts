@@ -48,8 +48,8 @@ export function getDomyAttributeInformations(attr: Attr) {
 export function sortAttributesBasedOnSortedDirectives(attrs: NamedNodeMap) {
   const copy = Array.from(attrs ?? []);
   copy.sort((a, b) => {
-    const iA = PLUGINS.sortedDirectives.indexOf(getDomyName(a.name));
-    const iB = PLUGINS.sortedDirectives.indexOf(getDomyName(b.name));
+    const iA = PLUGINS.sortedDirectives.indexOf(getDomyAttributeInformations(a).directive);
+    const iB = PLUGINS.sortedDirectives.indexOf(getDomyAttributeInformations(b).directive);
     if (iA === -1) {
       return 1;
     } else if (iB === -1) {

@@ -39,15 +39,17 @@
     <button @click="show = !show">Show modal</button>
 
     <template
-      d-transition="transition"
+      d-transition.init="transition"
       d-render="show ? createElement('Hello World 1!') : createElement('Hello World 2!')"
     ></template>
+
+    <div d-transition.init="transition" d-if="show">d-if</div>
   </body>
   <script>
     DOMY.createApp({
       data() {
         return {
-          show: false
+          show: true
         };
       },
       methods: {
