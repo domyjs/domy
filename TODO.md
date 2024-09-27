@@ -1,6 +1,7 @@
 # TODO
 
-- unmount() et DOMY_EVENTS unmount and d-unmount (with tests)
+- Component make directives go first on the component, then render component, then $attrs with d-bind (test unmount test)
+- Test d-show and d-ref with component
 - Make dispatch work even for components to parent
 - Error boundary test with onError
 - Fixe typing (App, createApp, createComponent, params in watcher)

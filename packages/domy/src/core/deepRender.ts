@@ -11,7 +11,6 @@ import { renderText } from './renderText';
 
 type Elem = {
   element: Element;
-  byPassAttributes?: string[];
   scopedNodeData?: Record<string, any>[];
 };
 
@@ -39,7 +38,6 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     const toRenderList: Elem[] = [
       {
         element: props.element,
-        byPassAttributes: props.byPassAttributes,
         scopedNodeData: props.scopedNodeData ?? []
       }
     ];
@@ -57,7 +55,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     };
 
     while (toRenderList.length > 0) {
-      let skipChildRendering = props.isComponentRendering || props.skipChildRendering;
+      let skipChildRendering = (props.isComponentRendering || props.skipChildRendering) ?? false;
 
       // We use pop for performance issue and because we render the tree from the bottom to top
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
@@ -67,19 +65,17 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       const setEl = getSetEl(element);
 
       const safeDeepRender = (args: Props) => {
-        // If it's the same element we are currently deepRendering we keep the byPassAtributes to avoid infinite loop
-        // Example: <div d-once d-cloak></div> each directives call deepRender with byPassAttributes so we need to keep trace of treated attributes
-        const byPassAttributes =
-          args.element === element
-            ? [...(toRender.byPassAttributes ?? []), ...(args.byPassAttributes ?? [])]
-            : args.byPassAttributes;
+        // If it's the same element we are currently deepRendering we keep the byPassAtributes
+        // const byPassAttributes = [
+        //   ...(props.byPassAttributes ?? []),
+        //   ...(args.byPassAttributes ?? [])
+        // ];
         // It ensure some attributes doesnt render the child of the component
         // Example: <Count d-if="showCount" :count="count"></Count> we doesnt want d-if to deep render component with the data of the app instead of the component
         const skipChildRendering = props.isComponentRendering || args.skipChildRendering;
 
         return deepRender({
           ...args,
-          byPassAttributes,
           skipChildRendering
         });
       };
@@ -121,7 +117,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
       for (const attr of sortedAttributes) {
         const shouldByPassAttribute =
-          toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
+          props.byPassAttributes && props.byPassAttributes.includes(attr.name);
 
         if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
 

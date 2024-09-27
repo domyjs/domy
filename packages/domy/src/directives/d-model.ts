@@ -75,16 +75,15 @@ function changeValue(domy: DomyDirectiveHelper) {
  * @author yoannchb-pro
  */
 export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-
   // We ensure to render the element/childs first so we can access to their value
   // For example select need to know the options value
   // So in case the value is a binding we need to ensure domy rendered the childs before handling d-model
   const { unmount, getRenderedElement } = domy.deepRender({
     element: domy.el,
-    byPassAttributes: [domy.attr.name],
     scopedNodeData: domy.scopedNodeData
   });
+
+  const el = getRenderedElement() as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
   // We look at change made by the user
   const eventName = domy.modifiers.includes('lazy') ? 'change' : 'input';
@@ -102,9 +101,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
 
     if (isValueArray && el.tagName === 'SELECT' && (el as HTMLSelectElement).multiple) {
       // Handle multiple select
-      const options = getRenderedElement().querySelectorAll(
-        'option'
-      ) as NodeListOf<HTMLOptionElement>;
+      const options = el.querySelectorAll('option') as NodeListOf<HTMLOptionElement>;
 
       for (const option of options) {
         option.selected = executedValue.includes(option.value);

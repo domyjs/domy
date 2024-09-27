@@ -1,6 +1,10 @@
 import { StructuredAPIApp, WatcherFn } from '../types/App';
 import { Config } from '../types/Config';
-import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
+import {
+  DomyMountedEventDetails,
+  DomyReadyEventDetails,
+  DomyUnMountedEventDetails
+} from '../types/Events';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
@@ -155,10 +159,28 @@ export async function structuredAPI(params: Params) {
 
   return {
     render: getRender(deepRender),
-    unmount: () => {
+    async unmount() {
       for (const unmount of unmountFns) {
         unmount();
       }
+
+      // Unmount
+      if (app.unmount) {
+        try {
+          const unmountFn = toRegularFn(app.unmount);
+          await unmountFn.call(getContext({ state, scopedNodeData: [], config }));
+        } catch (err: any) {
+          error(err);
+        }
+      }
+
+      // Unmount event
+      document.dispatchEvent(
+        new CustomEvent(DOMY_EVENTS.App.UnMounted, {
+          bubbles: true,
+          detail: { app, state, target } as DomyUnMountedEventDetails
+        })
+      );
     }
   };
 }

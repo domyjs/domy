@@ -10,7 +10,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   if (domy.el.tagName !== 'TEMPLATE')
-    throw Error(`The directive "${domy.attr.name}" should only be use on template element.`);
+    throw Error(`The directive "${domy.directive}" should only be use on template element.`);
 
   const el = domy.el as HTMLTemplateElement;
   const childs = Array.from(el.content.childNodes);

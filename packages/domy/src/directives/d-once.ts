@@ -12,7 +12,6 @@ export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
   const { unmount } = domy.deepRender({
     element: domy.el,
     scopedNodeData: domy.scopedNodeData,
-    byPassAttributes: [domy.attr.name],
     renderWithoutListeningToChange: true
   });
 

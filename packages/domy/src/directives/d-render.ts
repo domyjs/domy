@@ -23,6 +23,9 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
   const el = domy.el;
 
+  if (el.tagName !== 'TEMPLATE')
+    throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
+
   let lastRender: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
   let isInitialised = false;
 
@@ -31,7 +34,7 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     const elementToRender: Element | null | undefined = domy.evaluate(domy.attr.value.trim());
 
     if (Array.isArray(elementToRender))
-      throw new Error(`The directive "d-render" only support one element as parameter.`);
+      throw new Error(`The directive "${domy.directive}" only support one element as parameter.`);
 
     // We unmount the  last render
     const disconnectAction = (currLastRender: typeof lastRender) => {

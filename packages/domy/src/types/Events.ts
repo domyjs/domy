@@ -11,3 +11,9 @@ export type DomyMountedEventDetails = {
   target: Element;
   state: State;
 };
+
+export type DomyUnMountedEventDetails = {
+  app: App;
+  target: Element;
+  state: State;
+};

@@ -91,7 +91,9 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   // Display a warning message if the childrens don't have a :key attribute
   for (const child of initialChilds) {
     if (!child.getAttribute(':key')) {
-      warn('Elements inside a d-for parent should be rendered with :key attribute.');
+      warn(
+        `Elements inside the "${domy.directive}" directive should be rendered with :key attribute.`
+      );
       break;
     }
   }

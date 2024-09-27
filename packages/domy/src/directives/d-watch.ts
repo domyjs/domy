@@ -14,7 +14,7 @@ import { warn } from '../utils/logs';
 export function dWatchImplementation(domy: DomyDirectiveHelper) {
   if (domy.modifiers.length === 0)
     throw new Error(
-      `At least one key has to be provided for the watch directive (example: d-watch.count="...").`
+      `At least one key has to be provided for the "${domy.directive}" directive (example: d-watch.count="...").`
     );
 
   const objsToWatch = new Set<any>();

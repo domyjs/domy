@@ -37,6 +37,7 @@ export type StructuredAPIApp<
 > = {
   setup?: () => void | Promise<void>;
   mounted?: () => void | Promise<void>;
+  unmount?: () => void | Promise<void>;
   watch?: {
     [depName: string]: WatcherFn;
   };
@@ -45,6 +46,7 @@ export type StructuredAPIApp<
 };
 
 export type HookAPIApp = {
+  unmount?: (props: { helpers: Helpers }) => void | Promise<void>;
   mounted?: (props: { helpers: Helpers }) => void | Promise<void>;
   data?: { [depName: string]: any };
   methods?: { [fnName: string]: (...args: any[]) => any | Promise<any> };

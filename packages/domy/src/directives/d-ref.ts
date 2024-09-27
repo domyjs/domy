@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
  * d-ref implementation
@@ -7,13 +7,29 @@ import { DomyDirectiveHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function dRefImplementation(domy: DomyDirectiveHelper) {
+export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  const refName = domy.attr.value;
+
   if (domy.state.refs[domy.attr.value])
-    throw new Error(`A ref with the name "${domy.attr.value}" already exist.`);
+    throw new Error(`A ref with the name "${refName}" already exist.`);
 
-  domy.state.refs[domy.attr.value] = domy.el;
+  const cleanRef = () => {
+    delete domy.state.refs[refName];
+  };
+  const setRef = (el: Element) => (domy.state.refs[refName] = el);
 
-  domy.cleanup(() => {
-    delete domy.state.refs[domy.attr.value];
+  // Ensure we update the ref when the element change
+  const render = domy.deepRender({
+    element: domy.el,
+    scopedNodeData: domy.scopedNodeData,
+    onRenderedElementChange(element) {
+      setRef(element);
+    }
   });
+
+  setRef(render.getRenderedElement());
+
+  domy.cleanup(cleanRef);
+
+  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
 }

@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
  * d-show implementation
@@ -8,8 +8,14 @@ import { DomyDirectiveHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function dShowImplementation(domy: DomyDirectiveHelper) {
-  const el = domy.el as HTMLElement;
+export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  // Ensure we deep render the element first for handling component/d-render for example
+  const render = domy.deepRender({
+    element: domy.el,
+    scopedNodeData: domy.scopedNodeData
+  });
+
+  const el = render.getRenderedElement() as HTMLElement;
   const originalDisplay = el.style.display ?? '';
 
   let isInitialised = false;
@@ -49,4 +55,9 @@ export function dShowImplementation(domy: DomyDirectiveHelper) {
 
     isInitialised = true;
   });
+
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true
+  };
 }

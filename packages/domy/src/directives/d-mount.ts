@@ -15,7 +15,6 @@ export function dMountImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // Ensure the element with the childrens are mounted first
   const { unmount } = domy.deepRender({
     element: domy.el,
-    byPassAttributes: [domy.attr.name],
     scopedNodeData: domy.scopedNodeData
   });
 

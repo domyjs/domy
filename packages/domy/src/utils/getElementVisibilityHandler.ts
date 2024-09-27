@@ -84,7 +84,6 @@ export function getElementVisibilityHandler(props: Props) {
 
       lastRender = domy.deepRender({
         element: currentEl,
-        byPassAttributes: [domy.attr.name],
         scopedNodeData: domy.scopedNodeData
       });
     }

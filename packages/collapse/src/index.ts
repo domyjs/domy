@@ -24,7 +24,6 @@ export function collapsePlugin(domy: DomyDirectiveHelper) {
   // We deep render the element first to get his initial height
   domy.deepRender({
     element: el,
-    byPassAttributes: [domy.attr.name],
     scopedNodeData: domy.scopedNodeData
   });
 

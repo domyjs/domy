@@ -1,6 +1,10 @@
 import { HookAPIApp } from '../types/App';
 import { Config } from '../types/Config';
-import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
+import {
+  DomyMountedEventDetails,
+  DomyReadyEventDetails,
+  DomyUnMountedEventDetails
+} from '../types/Events';
 import { Helpers } from '../types/Helpers';
 import { State } from '../types/State';
 import { getHelpers } from '../utils/getHelpers';
@@ -15,6 +19,7 @@ type PromisedOrNot<T> = Promise<T> | T;
 type HookAPIParams = {
   props?: ComponentProps['props'];
   onMounted: (callback: (params: { helpers: Helpers }) => PromisedOrNot<void>) => void;
+  onUnMount: (callback: (params: { helpers: Helpers }) => PromisedOrNot<void>) => void;
   helpers: Helpers;
 };
 
@@ -70,6 +75,9 @@ export async function hookAPI(params: Params) {
     props,
     onMounted: callback => {
       app.mounted = callback;
+    },
+    onUnMount: callback => {
+      app.unmount = callback;
     },
     helpers: getHelpers({
       state,
@@ -135,10 +143,27 @@ export async function hookAPI(params: Params) {
 
   return {
     render: getRender(deepRender),
-    unmount: () => {
+    async unmount() {
       for (const unmount of unmountFns) {
         unmount();
       }
+
+      // Unmount
+      if (app.unmount) {
+        try {
+          await app.unmount({ helpers: getHelpers({ state, scopedNodeData: [], config }) });
+        } catch (err: any) {
+          error(err);
+        }
+      }
+
+      // Unmount event
+      document.dispatchEvent(
+        new CustomEvent(DOMY_EVENTS.App.UnMounted, {
+          bubbles: true,
+          detail: { app, state, target } as DomyUnMountedEventDetails
+        })
+      );
     }
   };
 }
