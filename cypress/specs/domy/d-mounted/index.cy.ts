@@ -4,9 +4,9 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-mount test', () => {
+describe('Attribute d-mounted test', () => {
   it('Check attribute is removed', () => {
-    cy.get('div').should('not.have.attr', 'd-mount');
+    cy.get('div').should('not.have.attr', 'd-mounted');
   });
 
   it('Check mount function change the element content', () => {

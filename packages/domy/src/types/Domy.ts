@@ -13,6 +13,7 @@ export type DomySpecialFn = (domy: DomySpecialHelper) => any;
 export type DomyDirectiveReturn = {
   skipChildsRendering?: boolean;
   skipOtherAttributesRendering?: boolean;
+  skipComponentRendering?: boolean;
 } | void;
 
 export type DomySpecialHelper = {

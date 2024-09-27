@@ -81,4 +81,6 @@ export function binding(domy: DomyDirectiveHelper) {
       domy.el.setAttribute(attrName, executedValue);
     }
   });
+
+  domy.cleanup(() => domy.el.removeAttribute(attrName));
 }

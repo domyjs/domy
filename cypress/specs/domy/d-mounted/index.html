@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>d-mount</title>
+    <title>d-mounted</title>
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
     <h1>{{ text }}</h1>
-    <div d-mount="() => text = $refs.text.textContent">
+    <div d-mounted="() => text = $refs.text.textContent">
       <p d-ref="text">Hello World!</p>
     </div>
   </body>

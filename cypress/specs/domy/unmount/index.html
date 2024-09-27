@@ -7,6 +7,8 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
+    <p id="is-show">{{ show }}</p>
+
     <p id="unmount-events-count">0</p>
     <p id="unmount-count">{{ unmountCount }}</p>
 
@@ -16,12 +18,12 @@
 
     <hr />
 
-    <button id="show-hide" @click="show != show">Show/hide</button>
+    <button id="show-hide" @click="show = !show">Show/hide</button>
   </body>
   <script>
     const unMountEventsCount = document.querySelector('#unmount-events-count');
 
-    document.addEventListener('domy:app:unmount', () => {
+    document.addEventListener('domy:app:unmounted', () => {
       unMountEventsCount.textContent = Number(unMountEventsCount.textContent) + 1;
     });
 
@@ -32,10 +34,11 @@
               <p>Imbriqued Component</p>
             </div>
         `,
-      app: {
-        unmount() {
-          this.$props.unmountUpdate();
-        }
+      app: ({ onUnMounted }) => {
+        onUnMounted(({ helpers }) => {
+          console.log('Unmount imbriqued component');
+          helpers.$props.unmountUpdate();
+        });
       }
     });
 
@@ -59,7 +62,8 @@
             count: 0
           };
         },
-        unmount() {
+        unmounted() {
+          console.log('Unmount count');
           this.$props.unmountUpdate();
         },
         methods: {

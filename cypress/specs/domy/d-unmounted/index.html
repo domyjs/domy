@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>d-unmount</title>
+    <title>d-unmounted</title>
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
     <h1>{{ text }}</h1>
-    <div d-if="showModal" d-unmount="text += 'Hello '">
-      <div d-unmount="text += 'World!'">
+    <div d-if="showModal" d-unmounted="text += 'Hello '">
+      <div d-unmounted="text += 'World!'">
         <p>A random modal</p>
       </div>
     </div>

@@ -32,5 +32,9 @@ export function dElseIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
   domy.effect(visibilityHandler);
 
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

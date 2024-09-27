@@ -22,7 +22,7 @@
       html: `
             <p>Error Message:</p>
             <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white' }">
-                <template d-render="$childrens"></template>    
+                <template d-render="$childrens?.[0]"></template>    
             </div>
             <p>contact admin for more infos</p>
         `

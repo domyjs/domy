@@ -35,7 +35,7 @@
       html: `
             <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white', position: 'relative' }">
               <p>Error Message:</p>
-              <template d-render="$childrens"></template>
+              <template d-render="$childrens[0]"></template>
 
               <button @click="$props.close()" :style="{ position: 'absolute', right: '0.5rem', top: '0.5rem' }">X</button>
             </div>

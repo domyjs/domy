@@ -1,7 +1,7 @@
 import { Data } from '../types/App';
 import { ComponentDefinition, ComponentProps, Components } from '../types/Component';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
-import { isBindAttr } from '../utils/isSpecialAttribute';
+import { isBindAttr, isEventAttr } from '../utils/isSpecialAttribute';
 import { error, warn } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
 
@@ -70,8 +70,10 @@ export function createComponent<
       const requiredProps = new Set(
         props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
       );
+
       const data = domy.reactive({ props: {} as ComponentProps['props'] });
       const root = tree[0] as HTMLElement;
+
       const propsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
       const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
@@ -79,30 +81,36 @@ export function createComponent<
 
       // We handle the attributes
       for (const attr of componentElement.attributes) {
-        const attrName = domy.utils.kebabToCamelCase(attr.name.replace(/^:/, ''));
+        const attrNameWithoutBinding = attr.name.replace(/^:/, '');
+        const propName = domy.utils.kebabToCamelCase(attrNameWithoutBinding);
 
         // In case it's a prop
-        if (propsName.has(attrName)) {
-          requiredProps.delete(attrName);
+        if (propsName.has(propName)) {
+          requiredProps.delete(propName);
           propsAttributes.push(attr);
           continue;
         }
 
-        // Handle the case the attribute already on the root
-        if (root.getAttribute(attr.name)) {
+        // Attaching events
+        if (isEventAttr(attr.name)) {
+          const fixedName = attr.name.replace(/^@/, 'd-on:');
+          componentAttributes.push(fixedName);
+          root.setAttribute(fixedName, attr.value);
+          continue;
+        }
+
+        if (root.hasAttribute(attr.name)) {
           warn(
-            `The domy attribute "${attr.name}" has been skipped because it's already present in the component "${name}" root.`
+            `The attribute "${attr.name}" has been skiped because he is already present on the component "${name}"`
           );
           continue;
         }
 
-        // If it's not a prop we see the attribute on the root element
-        const fixedName = attr.name.replace(/^@/, 'd-on:');
-        componentAttributes.push(fixedName);
-        root.setAttribute(fixedName, attr.value);
+        componentAttributes.push(attr.name);
+        root.setAttribute(attr.name, attr.value);
       }
 
-      // Handle required props
+      // Error handling for required props
       for (const requiredProp of requiredProps) {
         throw Error(`The prop "${requiredProp}" is required on the component "${name}".`);
       }
@@ -110,12 +118,12 @@ export function createComponent<
       // We ensure the props are reactive
       domy.effect(() => {
         for (const attr of propsAttributes) {
+          const attrInfos = getDomyAttributeInformations(attr);
+          const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
           if (isBindAttr(attr.name)) {
-            const attrInfos = getDomyAttributeInformations(attr);
-            const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
             data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
           } else {
-            data.props[attr.name] = attr.value === '' ? true : attr.value;
+            data.props[propName] = attr.value === '' ? true : attr.value;
           }
         }
       });
@@ -123,7 +131,7 @@ export function createComponent<
       // Remplace the component
       componentElement.replaceWith(root);
 
-      // We render the childs first to ensure they keep the current state and not the component state
+      // // We render the childs first to ensure they keep the current state and not the component state
       for (const child of componentElement.childNodes) {
         const { unmount } = domy.deepRender({
           element: child as Element,
@@ -159,7 +167,7 @@ export function createComponent<
         element: root,
         scopedNodeData: domy.scopedNodeData,
         byPassAttributes: [...propsAttributes.map(attr => attr.name), ...rootAttributes],
-        isComponentRendering: true,
+        skipChildRendering: true,
         onRenderedElementChange: newRoot => mountComponent(newRoot as HTMLElement)
       });
       unmountFns.push(unmount);

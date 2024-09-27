@@ -3,7 +3,7 @@ import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
-import { isNormalAttr } from '../utils/isSpecialAttribute';
+import { isDomyAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 import { error } from '../utils/logs';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
@@ -20,7 +20,6 @@ type Props = {
   byPassAttributes?: string[];
   skipChildRendering?: boolean;
   renderWithoutListeningToChange?: boolean;
-  isComponentRendering?: boolean;
   onRenderedElementChange?: (renderedElement: Element) => void;
 };
 
@@ -55,7 +54,8 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     };
 
     while (toRenderList.length > 0) {
-      let skipChildRendering = (props.isComponentRendering || props.skipChildRendering) ?? false;
+      let skipChildRendering = props.skipChildRendering ?? false;
+      let skipComponentRendering = false;
 
       // We use pop for performance issue and because we render the tree from the bottom to top
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
@@ -64,24 +64,8 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
       const setEl = getSetEl(element);
 
-      const safeDeepRender = (args: Props) => {
-        // If it's the same element we are currently deepRendering we keep the byPassAtributes
-        // const byPassAttributes = [
-        //   ...(props.byPassAttributes ?? []),
-        //   ...(args.byPassAttributes ?? [])
-        // ];
-        // It ensure some attributes doesnt render the child of the component
-        // Example: <Count d-if="showCount" :count="count"></Count> we doesnt want d-if to deep render component with the data of the app instead of the component
-        const skipChildRendering = props.isComponentRendering || args.skipChildRendering;
-
-        return deepRender({
-          ...args,
-          skipChildRendering
-        });
-      };
-
       let domyHelper = new DomyHelper(
-        safeDeepRender,
+        deepRender,
         element,
         setEl,
         state,
@@ -97,29 +81,16 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         continue;
       }
 
-      // Rendering components
-      if (element.localName in components) {
-        const componentSetup = components[element.localName];
-        const getRenderElement = componentSetup({
-          name: element.localName,
-          componentElement: element as HTMLElement,
-          domy: domyHelper.getPluginHelper()
-        });
-
-        domyHelper.callEffect();
-        if (getRenderElement) setRenderedElement(getRenderElement);
-        cleanupFnList.push(domyHelper.getUnmountFn());
-        continue;
-      }
-
       // Rendering attributes if it's an element
       const sortedAttributes = sortAttributesBasedOnSortedDirectives(element.attributes);
+      const isComponent = element.localName in components;
 
       for (const attr of sortedAttributes) {
         const shouldByPassAttribute =
           props.byPassAttributes && props.byPassAttributes.includes(attr.name);
 
         if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
+        if (isComponent && !isDomyAttr(attr.name)) continue; //  We only render the directives for a component
 
         // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData (but we still need it for later)
         // We also need a new domy helper because every attribute need his own call effect
@@ -139,12 +110,29 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         // Handling options returned by the attribute
         if (options) {
           if (options.skipChildsRendering) skipChildRendering = true;
+          if (options.skipComponentRendering) skipComponentRendering = true;
           if (options.skipOtherAttributesRendering) break;
         }
       }
 
+      // Rendering component
+      if (isComponent && !skipComponentRendering) {
+        const componentSetup = components[element.localName];
+        const getRenderElement = componentSetup({
+          name: element.localName,
+          componentElement: element as HTMLElement,
+          domy: domyHelper.getPluginHelper()
+        });
+
+        domyHelper.callEffect();
+        if (getRenderElement) setRenderedElement(getRenderElement);
+        cleanupFnList.push(domyHelper.getUnmountFn());
+        continue;
+      }
+
       if (skipChildRendering) continue;
 
+      // Rendering childs
       for (const child of element.childNodes) {
         if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We ensure we never render script
 

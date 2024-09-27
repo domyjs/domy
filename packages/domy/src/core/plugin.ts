@@ -21,9 +21,8 @@ import { binding } from './binding';
 import { events } from './events';
 import { dScopeImplementation } from '../directives/d-scope';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
-import { dInitImplementation } from '../directives/d-init';
+import { dSetupImplementation } from '../directives/d-setup';
 import { dWatchImplementation } from '../directives/d-watch';
-import { dMountImplementation } from '../directives/d-mount';
 import { dRenderImplementation } from '../directives/d-render';
 import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
@@ -33,7 +32,9 @@ import { $data } from '../helpers/$data';
 import { $scopedData } from '../helpers/$scopedData';
 import { $allData } from '../helpers/$allData';
 import { $methods } from '../helpers/$methods';
-import { dUnMountImplementation } from '../directives/d-unmount';
+import { dMountedImplementation } from '../directives/d-mounted';
+import { dUnMountedImplementation } from '../directives/d-unmounted';
+import { dAttrsImplementation } from '../directives/d-attrs';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -60,12 +61,13 @@ export const PLUGINS: Plugins = {
     on: events
   },
   directives: {
+    attrs: dAttrsImplementation,
     teleport: dTeleportImplementation,
     render: dRenderImplementation,
-    mount: dMountImplementation,
-    unmount: dUnMountImplementation,
+    mounted: dMountedImplementation,
+    unmounted: dUnMountedImplementation,
     watch: dWatchImplementation,
-    init: dInitImplementation,
+    setup: dSetupImplementation,
     scope: dScopeImplementation,
     if: dIfImplementation,
     'else-if': dElseIfImplementation,

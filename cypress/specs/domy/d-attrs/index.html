@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-attrs</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <p id="attrs" name="test1" d-attrs="attrs">Attrs</p>
+    <p id="attrsRender" d-attrs.render="attrsRender">Render Attrs</p>
+
+    <button
+      id="attrsBtn"
+      @click="() => {
+      delete attrs.title;
+      attrs = { name: 'test2', onclick: null  }
+    }"
+    >
+      Change attrs
+    </button>
+    <button
+      id="attrsRenderBtn"
+      @click="() => {
+      delete attrsRender[':style'];
+      attrsRender = { 'd-show': '6 === 5', onclick: null, 'd-on:click': null }
+    }"
+    >
+      Change render attrs
+    </button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data() {
+        return {
+          style: { color: 'red' },
+          attrs: {
+            title: 'Hello'
+          },
+          attrsRender: {
+            ':style': 'style'
+          }
+        };
+      }
+    }).mount();
+  </script>
+</html>

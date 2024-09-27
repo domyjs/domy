@@ -17,5 +17,9 @@ export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetur
 
   domy.effect(visibilityHandler);
 
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

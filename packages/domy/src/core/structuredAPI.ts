@@ -165,10 +165,10 @@ export async function structuredAPI(params: Params) {
       }
 
       // Unmount
-      if (app.unmount) {
+      if (app.unmounted) {
         try {
-          const unmountFn = toRegularFn(app.unmount);
-          await unmountFn.call(getContext({ state, scopedNodeData: [], config }));
+          const unmountedFn = toRegularFn(app.unmounted);
+          await unmountedFn.call(getContext({ state, scopedNodeData: [], config }));
         } catch (err: any) {
           error(err);
         }

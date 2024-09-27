@@ -19,7 +19,7 @@ type PromisedOrNot<T> = Promise<T> | T;
 type HookAPIParams = {
   props?: ComponentProps['props'];
   onMounted: (callback: (params: { helpers: Helpers }) => PromisedOrNot<void>) => void;
-  onUnMount: (callback: (params: { helpers: Helpers }) => PromisedOrNot<void>) => void;
+  onUnMounted: (callback: (params: { helpers: Helpers }) => PromisedOrNot<void>) => void;
   helpers: Helpers;
 };
 
@@ -76,8 +76,8 @@ export async function hookAPI(params: Params) {
     onMounted: callback => {
       app.mounted = callback;
     },
-    onUnMount: callback => {
-      app.unmount = callback;
+    onUnMounted: callback => {
+      app.unmounted = callback;
     },
     helpers: getHelpers({
       state,
@@ -149,9 +149,9 @@ export async function hookAPI(params: Params) {
       }
 
       // Unmount
-      if (app.unmount) {
+      if (app.unmounted) {
         try {
-          await app.unmount({ helpers: getHelpers({ state, scopedNodeData: [], config }) });
+          await app.unmounted({ helpers: getHelpers({ state, scopedNodeData: [], config }) });
         } catch (err: any) {
           error(err);
         }

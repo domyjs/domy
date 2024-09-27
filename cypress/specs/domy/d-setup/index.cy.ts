@@ -4,9 +4,9 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-init test', () => {
+describe('Attribute d-setup test', () => {
   it('Check attribute is removed', () => {
-    cy.get('p').should('not.have.attr', 'd-init');
+    cy.get('p').should('not.have.attr', 'd-setup');
   });
 
   it('Check init function change the element content', () => {

@@ -1,6 +1,5 @@
 # TODO
 
-- Component make directives go first on the component, then render component, then $attrs with d-bind (test unmount test)
 - Test d-show and d-ref with component
 - Make dispatch work even for components to parent
 - Error boundary test with onError
