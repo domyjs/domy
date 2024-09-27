@@ -26,7 +26,7 @@ export function dTransitionImplementation(domy: DomyDirectiveHelper) {
     domy.state.transitions.set(domy.el, {
       enterTransition,
       outTransition,
-      onInit: domy.modifiers.includes('init')
+      init: domy.modifiers.includes('init')
     });
   };
 

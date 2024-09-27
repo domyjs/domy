@@ -9,38 +9,39 @@
   <style>
     @keyframes enter {
       0% {
-        opacity: 0;
-        transform: translateX(3rem);
+        transform: translateX(100%);
       }
       100% {
-        opacity: 1;
         transform: translateX(0rem);
       }
     }
 
     @keyframes out {
       0% {
-        opacity: 1;
         transform: translateX(0);
       }
       100% {
-        opacity: 0;
-        transform: translateX(-3rem);
+        transform: translateX(-100%);
       }
     }
 
     .transition-enter {
-      animation: enter 0.3s ease-out;
+      position: absolute;
+      animation: enter 0.6s ease;
     }
 
     .transition-out {
-      animation: out 0.3s ease-in;
+      position: absolute;
+      animation: out 0.6s ease;
     }
   </style>
   <body>
-    <template d-transition="transition" d-render="createElement()"></template>
-
     <button @click="show = !show">Show modal</button>
+
+    <template
+      d-transition="transition"
+      d-render="show ? createElement('Hello World 1!') : createElement('Hello World 2!')"
+    ></template>
   </body>
   <script>
     DOMY.createApp({
@@ -50,9 +51,9 @@
         };
       },
       methods: {
-        createElement() {
+        createElement(content) {
           const p = document.createElement('p');
-          p.textContent = 'd-render';
+          p.textContent = content;
           p.setAttribute('d-if', '5 === 5');
           return p;
         }

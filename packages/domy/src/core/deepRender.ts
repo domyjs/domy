@@ -2,10 +2,7 @@ import { Components } from '../types/Component';
 import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
-import {
-  sortAttributesBasedOnSortedDirectives,
-  getDomyAttributeInformations
-} from '../utils/domyAttrUtils';
+import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
 import { isNormalAttr } from '../utils/isSpecialAttribute';
 import { error } from '../utils/logs';
 import { DomyHelper } from './DomyHelper';
@@ -55,8 +52,9 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       if (props.onRenderedElementChange)
         props.onRenderedElementChange(typeof render === 'function' ? render() : render);
     };
-    const getSetEl = (currentEl: Element) =>
-      currentEl === props.element ? (element: Element) => setRenderedElement(element) : () => {};
+    const getSetEl = (currentEl: Element) => (element: Element) => {
+      currentEl === props.element && setRenderedElement(element);
+    };
 
     while (toRenderList.length > 0) {
       let skipChildRendering = props.isComponentRendering || props.skipChildRendering;
@@ -65,6 +63,8 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
       const toRender = toRenderList.pop() as Elem;
       const element = toRender.element;
+
+      const setEl = getSetEl(element);
 
       const safeDeepRender = (args: Props) => {
         // If it's the same element we are currently deepRendering we keep the byPassAtributes to avoid infinite loop
@@ -87,7 +87,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       let domyHelper = new DomyHelper(
         safeDeepRender,
         element,
-        getSetEl(element),
+        setEl,
         state,
         toRender.scopedNodeData,
         config
@@ -127,22 +127,9 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
         // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData (but we still need it for later)
         // We also need a new domy helper because every attribute need his own call effect
-        domyHelper = new DomyHelper(
-          safeDeepRender,
-          element,
-          getSetEl(element),
-          state,
-          [...domyHelper.scopedNodeData],
-          config
-        );
+        domyHelper = domyHelper.copy();
 
-        const attrInfos = getDomyAttributeInformations(attr);
-        domyHelper.prefix = attrInfos.prefix;
-        domyHelper.directive = attrInfos.directive;
-        domyHelper.modifiers = attrInfos.modifiers;
-        domyHelper.attrName = attrInfos.attrName; // The attribute name without the modifiers and prefix (examples: d-on:click.{enter} -> click)
-        domyHelper.attr.name = attr.name; // the full attribute name
-        domyHelper.attr.value = attr.value;
+        domyHelper.setAttrInfos(attr);
 
         // We render the attribute
         // It's the main logic of DOMY

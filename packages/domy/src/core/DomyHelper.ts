@@ -9,6 +9,7 @@ import { Config } from '../types/Config';
 import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { createDeepRenderFn } from './deepRender';
+import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 
 let domyHelperId = 0;
 
@@ -85,10 +86,31 @@ export class DomyHelper {
     };
   }
 
+  copy() {
+    return new DomyHelper(
+      this.deepRenderFn,
+      this.el,
+      this.setEl,
+      this.state,
+      [...this.scopedNodeData], // Ensure the scoped node data of the current node are not affected by the next operations (like removing the scoped data in d-for)
+      this.config
+    );
+  }
+
+  setAttrInfos(attr: Attr) {
+    const attrInfos = getDomyAttributeInformations(attr);
+    this.prefix = attrInfos.prefix;
+    this.directive = attrInfos.directive;
+    this.modifiers = attrInfos.modifiers;
+    this.attrName = attrInfos.attrName; // The attribute name without the modifiers and prefix (examples: d-on:click.{enter} -> click)
+    this.attr.name = attr.name; // the full attribute name
+    this.attr.value = attr.value;
+  }
+
   attachOnSetListener() {
     if (this.onSetListener) return;
 
-    // Allow us to call the cleanup and effect when a dependencie value change
+    // Allow us to call the effect when a dependencie change
     this.onSetListener = {
       type: 'onSet',
       fn: ({ path, objectId }) => {
