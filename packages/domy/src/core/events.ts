@@ -39,10 +39,6 @@ export function events(domy: DomyDirectiveHelper) {
     domy.removeLastAddedScope();
   };
 
-  // We register the event into the state
-  if (!domy.state.events[eventName]) domy.state.events[eventName] = [];
-  domy.state.events[eventName].push(originalFn);
-
   // We add wrappers to the listener to ensure we can add modifiers
   const wrap = on({
     el: domy.el,

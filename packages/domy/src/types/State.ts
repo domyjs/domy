@@ -6,7 +6,7 @@ export type State = {
   data: Record<string, unknown>;
   props?: ComponentProps;
   methods: { [fnName: string]: Method };
-  events: { [eventName: string]: Method[] };
+
   transitions: Map<Element, { enterTransition: string; outTransition: string; init: boolean }>;
   refs: Record<string, Element>;
 };

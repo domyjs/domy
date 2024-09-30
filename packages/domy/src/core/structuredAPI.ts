@@ -49,7 +49,6 @@ export async function structuredAPI(params: Params) {
     data: reactive(app.data?.() ?? {}),
     props,
     methods: {},
-    events: {},
     refs: {},
     transitions: new Map()
   };

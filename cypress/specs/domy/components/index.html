@@ -24,7 +24,10 @@
       html: `
             <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white', position: 'relative' }">
               <p>Error Message:</p>
-              <template d-render="$childrens[0]"></template>
+
+              <div d-for="children, index of $childrens">
+                  <template :key="index" d-render="children"></template>
+              </div>
 
               <button @click="$props.close()" :style="{ position: 'absolute', right: '0.5rem', top: '0.5rem' }">X</button>
             </div>

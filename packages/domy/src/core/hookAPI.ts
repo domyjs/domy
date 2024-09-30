@@ -57,7 +57,6 @@ export async function hookAPI(params: Params) {
     data: {},
     props,
     methods: {},
-    events: {},
     refs: {},
     transitions: new Map()
   };
