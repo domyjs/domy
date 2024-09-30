@@ -130,9 +130,8 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         continue;
       }
 
-      if (skipChildRendering) continue;
-
       // Rendering childs
+      if (skipChildRendering) continue;
       for (const child of element.childNodes) {
         if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We ensure we never render script
 

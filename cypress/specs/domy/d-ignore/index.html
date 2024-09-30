@@ -10,8 +10,13 @@
     <div d-ignore d-if="count > 0">
       <p>{{ msg }}</p>
     </div>
+    <Component d-ignore></Component>
   </body>
   <script>
+    const Component = DOMY.createComponent({
+      html: '<p id="component">Component</p>'
+    });
+
     DOMY.createApp({
       data() {
         return {
@@ -19,6 +24,10 @@
           msg: 'Hello World!'
         };
       }
-    }).mount();
+    })
+      .components({
+        Component
+      })
+      .mount();
   </script>
 </html>
