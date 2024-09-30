@@ -8,7 +8,7 @@
   </head>
   <body>
     <Component d-ref="input"></Component>
-    <p d-ref="p"></p>
+    <p d-setup="refName = 'p'" d-ref.dynamic="refName"></p>
   </body>
   <script>
     const Component = DOMY.createComponent({
@@ -16,6 +16,11 @@
     });
 
     DOMY.createApp({
+      data() {
+        return {
+          refName: null
+        };
+      },
       mounted() {
         this.$refs.p.textContent = this.$refs.input.value;
       }

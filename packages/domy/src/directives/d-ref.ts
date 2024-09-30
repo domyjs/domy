@@ -8,7 +8,8 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const refName = domy.attr.value;
+  const isDynamic = domy.modifiers.includes('dynamic');
+  let refName = isDynamic ? domy.evaluateWithoutListening(domy.attr.value) : domy.attr.value;
 
   if (domy.state.refs[domy.attr.value])
     throw new Error(`A ref with the name "${refName}" already exist.`);
@@ -26,6 +27,14 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
       setRef(element);
     }
   });
+
+  // If the ref is dynamic
+  if (domy.modifiers.includes('dynamic')) {
+    domy.effect(() => {
+      refName = domy.evaluate(domy.attr.value);
+      setRef(render.getRenderedElement());
+    });
+  }
 
   setRef(render.getRenderedElement());
 
