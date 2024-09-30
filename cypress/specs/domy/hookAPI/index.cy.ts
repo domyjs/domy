@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('methods test', () => {
+describe('HookAPI test', () => {
   it('Check the watcher return unwatch method', () => {
     cy.get('#count1 h1').should('have.text', '1');
     cy.get('#count1 #inc').click();

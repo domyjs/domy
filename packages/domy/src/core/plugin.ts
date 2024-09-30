@@ -10,7 +10,6 @@ import { dRefImplementation } from '../directives/d-ref';
 import { dShowImplementation } from '../directives/d-show';
 import { dTextImplementation } from '../directives/d-text';
 import { dTransitionImplementation } from '../directives/d-transition';
-import { $dispatch } from '../helpers/$dispatch';
 import { $el } from '../helpers/$el';
 import { $nextTick } from '../helpers/$nextTick';
 import { $refs } from '../helpers/$refs';
@@ -87,7 +86,6 @@ export const PLUGINS: Plugins = {
     el: $el,
     refs: $refs,
     root: $root,
-    dispatch: $dispatch,
     nextTick: $nextTick,
     childrens: $childrens,
     props: $props,

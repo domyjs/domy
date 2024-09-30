@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>$fn</title>
+    <title>hookAPI</title>
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
     <div id="count1">
       <h1>{{ count }}</h1>
-      <button id="inc" @click="increment" @increment="increment">+</button>
+      <button id="inc" @click="increment">+</button>
       <button id="dec" @click="decrement">-</button>
     </div>
     <div id="count2">
       <h1>{{ count }}</h1>
-      <button id="inc" @click="increment" @increment="increment">+</button>
+      <button id="inc" @click="increment">+</button>
       <button id="dec" @click="decrement">-</button>
     </div>
   </body>
@@ -47,7 +47,7 @@
       const { count, increment, decrement } = useCount();
 
       onMounted(({ helpers }) => {
-        helpers.$dispatch('increment');
+        helpers.$data.count++;
       });
 
       return {
@@ -61,7 +61,7 @@
       const { count, increment, decrement } = useCount();
 
       onMounted(({ helpers }) => {
-        helpers.$dispatch('increment');
+        helpers.$data.count++;
       });
 
       return {
