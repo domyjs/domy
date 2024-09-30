@@ -97,5 +97,5 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     if (lastRender) lastRender.unmount();
   });
 
-  return { skipChildsRendering: true };
+  return { skipChildsRendering: true, skipComponentRendering: true };
 }
