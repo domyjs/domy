@@ -23,5 +23,9 @@ export function dMountedImplementation(domy: DomyDirectiveHelper): DomyDirective
   const executedValue = domy.evaluateWithoutListening(domy.attr.value);
   if (typeof executedValue === 'function') domy.queueJob(() => executedValue());
 
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

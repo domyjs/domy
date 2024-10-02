@@ -25,7 +25,6 @@ export const isSignalSymbol = Symbol();
  */
 export class ReactiveVariable {
   public id = ++objectId;
-  public isLock = false;
   public name = '';
   private proxy: any = null;
 
@@ -34,6 +33,8 @@ export class ReactiveVariable {
 
   private proxyQueue: (() => void)[] = [];
   private queued = false;
+
+  public static IS_GLOBAL_LOCK = false;
 
   constructor(private target: any) {}
 
@@ -224,7 +225,7 @@ export class ReactiveVariable {
   }
 
   private callOnGetListeners(path: string[]) {
-    if (!this.isLock) {
+    if (!ReactiveVariable.IS_GLOBAL_LOCK) {
       const params = { path: this.name + path.join('.'), objectId: this.id };
       for (const listener of this.onGetListeners) {
         listener(params);
@@ -233,7 +234,7 @@ export class ReactiveVariable {
   }
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
-    if (!this.isLock) {
+    if (!ReactiveVariable.IS_GLOBAL_LOCK) {
       const params = { path: this.name + path.join('.'), prevValue, newValue, objectId: this.id };
       for (const listener of this.onSetListeners) {
         listener(params);

@@ -1,4 +1,4 @@
-import { reactivesVariablesList } from './data';
+import { ReactiveVariable } from './ReactiveVariable';
 
 /**
  * Unlock every watchers
@@ -6,7 +6,5 @@ import { reactivesVariablesList } from './data';
  * @author yoannchb-pro
  */
 export function unlockWatchers() {
-  for (const reactiveVariable of reactivesVariablesList.values()) {
-    reactiveVariable.isLock = false;
-  }
+  ReactiveVariable.IS_GLOBAL_LOCK = false;
 }

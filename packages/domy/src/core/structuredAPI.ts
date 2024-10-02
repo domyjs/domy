@@ -50,7 +50,8 @@ export async function structuredAPI(params: Params) {
     props,
     methods: {},
     refs: {},
-    transitions: new Map()
+    transitions: new Map(),
+    keys: []
   };
 
   // Methods

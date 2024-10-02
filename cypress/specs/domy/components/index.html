@@ -10,7 +10,7 @@
     <main d-for="i of [1, 2, 3]">
       <Count
         d-if="i % 2 === 1"
-        :key="i"
+        d-key="i"
         :id="'count-' + i"
         :show-error="showError"
         :close="close"
@@ -26,7 +26,7 @@
               <p>Error Message:</p>
 
               <div d-for="children, index of $childrens">
-                  <template :key="index" d-render="children"></template>
+                  <template d-key="index" d-render="children"></template>
               </div>
 
               <button @click="$props.close()" :style="{ position: 'absolute', right: '0.5rem', top: '0.5rem' }">X</button>

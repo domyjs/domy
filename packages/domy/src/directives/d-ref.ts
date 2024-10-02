@@ -43,5 +43,9 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     render.unmount();
   });
 
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

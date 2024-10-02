@@ -58,7 +58,8 @@ export async function hookAPI(params: Params) {
     props,
     methods: {},
     refs: {},
-    transitions: new Map()
+    transitions: new Map(),
+    keys: []
   };
 
   // Initialisation event dispatch

@@ -37,21 +37,21 @@
     <div>
       <p>{{ selectedColor }}</p>
       <select d-for="color of ['red', 'blue', 'green']" d-model="selectedColor">
-        <option :key="color" :value="color">{{ color }}</option>
+        <option d-key="color" :value="color">{{ color }}</option>
       </select>
     </div>
 
     <div>
       <p>{{ selectedColor2 }}</p>
       <select d-for="color of ['red', 'blue', 'green']" d-model="selectedColor2" multiple>
-        <option :key="color" :value="color">{{ color }}</option>
+        <option d-key="color" :value="color">{{ color }}</option>
       </select>
     </div>
 
     <div>
       <p>{{ selectedColor3 }}</p>
       <div d-for="color of ['red', 'blue', 'green']">
-        <div :key="color">
+        <div d-key="color">
           <input type="radio" name="color" :value="color" d-model="selectedColor3" />
           <span>{{ color }}</span>
         </div>
@@ -67,7 +67,7 @@
     <div>
       <p>{{ checkedColors }}</p>
       <div d-for="color of ['red', 'blue', 'green']">
-        <div :key="color">
+        <div d-key="color">
           <input type="checkbox" name="color" :value="color" d-model="checkedColors" />
           <span>{{ color }}</span>
         </div>

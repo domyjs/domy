@@ -17,5 +17,9 @@ export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
 
   domy.cleanup(unmount);
 
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

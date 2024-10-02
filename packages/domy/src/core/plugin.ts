@@ -34,6 +34,7 @@ import { $methods } from '../helpers/$methods';
 import { dMountedImplementation } from '../directives/d-mounted';
 import { dUnMountedImplementation } from '../directives/d-unmounted';
 import { dAttrsImplementation } from '../directives/d-attrs';
+import { dKeyImplementation } from '../directives/d-key';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -60,6 +61,7 @@ export const PLUGINS: Plugins = {
     on: events
   },
   directives: {
+    key: dKeyImplementation,
     attrs: dAttrsImplementation,
     teleport: dTeleportImplementation,
     render: dRenderImplementation,

@@ -1,7 +1,8 @@
 # TODO
 
-- Test d-show and d-ref with component
-- Make dispatch work even for components to parent
+- Fixe d-show
+- $attrs for component
+- d-component and d-keep-alive
 - Error boundary test with onError
 - Fixe typing (App, createApp, createComponent, params in watcher)
 

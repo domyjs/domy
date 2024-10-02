@@ -29,7 +29,7 @@
     <button @click="randomSort">Random sort</button>
 
     <ul d-for="value of filtered()">
-      <li :key="value">{{ value }}</li>
+      <li d-key="value">{{ value }}</li>
     </ul>
   </body>
 </html>

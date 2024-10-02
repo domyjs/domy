@@ -11,7 +11,7 @@
       Some text that shouldn't be rendered
       <li
         d-if="user.id"
-        :key="user.id"
+        d-key="user.id"
         @click="user.isClient = !user.isClient"
         :style="{ color: user.isClient ? 'blue' : 'red' }"
       >
@@ -21,7 +21,7 @@
           <span style="display: none" d-ignore>{{ index }}</span>
         </p>
         <ul d-for="car, index of user.cars">
-          <li class="cars" :key="car + index" @click="user.cars.shift()">
+          <li class="cars" d-key="car + index" @click="user.cars.shift()">
             <p>{{ index }}: {{ car }}</p>
           </li>
         </ul>

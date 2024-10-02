@@ -40,22 +40,27 @@ function renderer(props: RendererProps) {
     const initialChild = props.initialChilds[childIndex] as Element;
     const currentIndex = props.valueIndex * props.initialChilds.length + childIndex;
 
-    const keyAttr = initialChild.getAttribute(':key');
+    const keyAttr = initialChild.getAttribute('d-key');
     if (keyAttr) {
       // Check if the key already exist so we can skip render
       const keyValue = domy.evaluateWithoutListening(keyAttr);
-      const elementWithKeyIndex = currentChildrens.findIndex(
-        el => el.getAttribute('key') === keyValue.toString()
+      const oldRenderRenderedKey = domy.state.keys.find(
+        registeredKey =>
+          registeredKey.key === keyValue && registeredKey.getRenderedElement().parentNode === el
       );
 
-      if (elementWithKeyIndex !== -1) {
-        const elementWithKey = currentChildrens[elementWithKeyIndex];
-        if (elementWithKeyIndex !== currentIndex) {
-          // If the index of the element changed we move it to the new position
-          domy.utils.moveElement(el, elementWithKey, currentIndex);
+      if (oldRenderRenderedKey) {
+        const oldRender = oldRenderRenderedKey.getRenderedElement();
+        const oldRenderIndex = currentChildrens.findIndex(
+          currentChild => currentChild === oldRender
+        );
+
+        // If the index of the element changed we move it to the new position
+        if (oldRenderIndex !== currentIndex) {
+          domy.utils.moveElement(el, oldRender, currentIndex);
         }
 
-        currentRenders.push(elementWithKey);
+        currentRenders.push(oldRender);
         continue;
       }
     }
@@ -88,11 +93,11 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   const initialChilds = Array.from(el.children);
   const lastRenders: ReturnType<DomyDirectiveHelper['deepRender']>[] = [];
 
-  // Display a warning message if the childrens don't have a :key attribute
+  // Display a warning message if the childrens don't have a d-key attribute
   for (const child of initialChilds) {
-    if (!child.getAttribute(':key')) {
+    if (!child.getAttribute('d-key')) {
       warn(
-        `Elements inside the "${domy.directive}" directive should be rendered with :key attribute.`
+        `Elements inside the "${domy.directive}" directive should be rendered with "key" directive.`
       );
       break;
     }

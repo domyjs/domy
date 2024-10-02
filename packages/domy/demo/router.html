@@ -11,7 +11,7 @@
     <header>
       <nav>
         <ul d-for="route of routes">
-          <li d-if="!route.hide" :key="route.name">
+          <li d-if="!route.hide" d-key="route.name">
             <router-link :to="route.route">{{ route.name }}</router-link>
           </li>
         </ul>

@@ -124,5 +124,9 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     }
   });
 
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }
