@@ -4,32 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>d-show</title>
-    <script src="/packages/domy/dist/index.js"></script>
+    <script src="../dist/index.js"></script>
   </head>
   <body>
-    <component d-show="show" :show-inside="showInside"></component>
-    <modal id="modal" style="display: flex" d-show="show"> Hello from a modal </modal>
+    <component d-show="show"></component>
 
     <button @click="show = !show">Hide/Show modal</button>
   </body>
   <script>
     const Component = DOMY.createComponent({
-      props: ['!showInside'],
       html: `<modal id="inside-modal" style="display: flex"> Hello from a modal </modal>`,
       app: {
-        data() {
-          return {
-            show: false
-          };
-        }
+        data() {}
       }
     });
 
     DOMY.createApp({
       data() {
         return {
-          show: false,
-          showInside: true
+          show: false
         };
       }
     })

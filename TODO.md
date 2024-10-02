@@ -1,6 +1,5 @@
 # TODO
 
-- Fixe d-show
 - $attrs for component
 - d-component and d-keep-alive
 - Error boundary test with onError

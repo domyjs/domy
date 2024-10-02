@@ -10,6 +10,8 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  const needRender = domy.modifiers.includes('render');
+
   let render: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
   let lastAttrs: Record<string, string> = {};
 
@@ -28,7 +30,7 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     }
 
     // In case we need to render DOMY attributes
-    if (domy.modifiers.includes('render')) {
+    if (needRender) {
       render = domy.deepRender({
         element: el,
         scopedNodeData: domy.scopedNodeData
@@ -41,4 +43,10 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   domy.cleanup(() => {
     if (render) render.unmount();
   });
+
+  return {
+    skipChildsRendering: needRender,
+    skipComponentRendering: needRender,
+    skipOtherAttributesRendering: needRender
+  };
 }

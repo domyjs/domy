@@ -9,20 +9,23 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  const originalEl = domy.el;
+
   // Ensure we deep render the element first for handling component/d-render for example
   const render = domy.deepRender({
-    element: domy.el,
+    element: originalEl,
     scopedNodeData: domy.scopedNodeData
   });
 
-  const el = render.getRenderedElement() as HTMLElement;
+  let el = render.getRenderedElement() as HTMLElement;
   const originalDisplay = el.style.display ?? '';
 
   let isInitialised = false;
   let cleanupTransition: null | (() => void) = null;
 
   domy.effect(() => {
-    const transition = domy.state.transitions.get(el);
+    el = render.getRenderedElement() as HTMLElement;
+    const transition = domy.state.transitions.get(originalEl);
     const needTransition = transition && (isInitialised || transition.init);
 
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
@@ -56,8 +59,11 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     isInitialised = true;
   });
 
+  domy.cleanup(() => render.unmount());
+
   return {
     skipChildsRendering: true,
-    skipOtherAttributesRendering: true
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
   };
 }

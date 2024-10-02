@@ -18,6 +18,7 @@ export function dCloakImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
 
   return {
     skipChildsRendering: true,
-    skipOtherAttributesRendering: true
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
   };
 }
