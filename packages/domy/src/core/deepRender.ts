@@ -23,6 +23,10 @@ type Props = {
   onRenderedElementChange?: (renderedElement: Element) => void;
 };
 
+function createGetRenderedElement(rendererElement: Element | (() => Element)) {
+  return () => (typeof rendererElement === 'function' ? rendererElement() : rendererElement);
+}
+
 /**
  * Deep render an element (with the childs and textContent)
  * It will keep the config for all the specified target only
@@ -47,7 +51,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     const setRenderedElement = (render: Element | (() => Element)) => {
       renderedElement = render;
       if (props.onRenderedElementChange)
-        props.onRenderedElementChange(typeof render === 'function' ? render() : render);
+        props.onRenderedElementChange(createGetRenderedElement(render)());
     };
     const getSetEl = (currentEl: Element) => (element: Element) => {
       currentEl === props.element && setRenderedElement(element);
@@ -63,9 +67,14 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       const element = toRender.element;
 
       const setEl = getSetEl(element);
+      const safeDeepRender = (args: Props) => {
+        const render = deepRender(args);
+        if (args.element === renderedElement) setRenderedElement(render.getRenderedElement); // We keep trace of the rendered element
+        return render;
+      };
 
       let domyHelper = new DomyHelper(
-        deepRender,
+        safeDeepRender,
         element,
         setEl,
         state,
@@ -144,9 +153,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
     // Deep render helpers
     return {
-      getRenderedElement() {
-        return typeof renderedElement === 'function' ? renderedElement() : renderedElement;
-      },
+      getRenderedElement: createGetRenderedElement(renderedElement),
       unmount() {
         for (const cleanupFn of cleanupFnList) {
           try {

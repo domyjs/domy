@@ -13,36 +13,27 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dKeyImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  let render: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
-  let registeredKey: { key: string; getRenderedElement: () => Element } | null = null;
+  const render: ReturnType<DomyDirectiveHelper['deepRender']> = domy.deepRender({
+    element: domy.el,
+    scopedNodeData: domy.scopedNodeData
+  });
+  const registeredKey: { key: string; getRenderedElement: () => Element } = {
+    key: domy.evaluateWithoutListening(domy.attr.value),
+    getRenderedElement: render.getRenderedElement
+  };
+
+  domy.state.keys.push(registeredKey);
 
   domy.effect(() => {
     const key = domy.evaluate(domy.attr.value);
-
-    if (!registeredKey) {
-      // First render of the key
-      render = domy.deepRender({
-        element: domy.el,
-        scopedNodeData: domy.scopedNodeData
-      });
-      registeredKey = {
-        key,
-        getRenderedElement: render.getRenderedElement
-      };
-      domy.state.keys.push(registeredKey);
-    } else {
-      // Updating the key
-      registeredKey.key = key;
-    }
+    registeredKey.key = key;
   });
 
   domy.cleanup(() => {
-    if (registeredKey && render) {
-      const index = domy.state.keys.indexOf(registeredKey);
-      domy.state.keys.splice(index, 1);
+    const index = domy.state.keys.indexOf(registeredKey);
+    domy.state.keys.splice(index, 1);
 
-      render.unmount();
-    }
+    render.unmount();
   });
 
   return {

@@ -1,5 +1,6 @@
 # TODO
 
+- On peut surement faire en sorte que skipchild, skipAttr, skipComponent ce fassent tout seul lors du call de deep render
 - $attrs for component
 - d-component and d-keep-alive
 - Error boundary test with onError
