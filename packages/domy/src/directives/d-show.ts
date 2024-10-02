@@ -14,7 +14,8 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
   // Ensure we deep render the element first for handling component/d-render for example
   const render = domy.deepRender({
     element: originalEl,
-    scopedNodeData: domy.scopedNodeData
+    scopedNodeData: domy.scopedNodeData,
+    onRenderedElementChange: handleDisplay
   });
 
   let el = render.getRenderedElement() as HTMLElement;
@@ -23,7 +24,7 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
   let isInitialised = false;
   let cleanupTransition: null | (() => void) = null;
 
-  domy.effect(() => {
+  function handleDisplay() {
     el = render.getRenderedElement() as HTMLElement;
     const transition = domy.state.transitions.get(originalEl);
     const needTransition = transition && (isInitialised || transition.init);
@@ -57,7 +58,9 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     }
 
     isInitialised = true;
-  });
+  }
+
+  domy.effect(handleDisplay);
 
   domy.cleanup(() => render.unmount());
 
