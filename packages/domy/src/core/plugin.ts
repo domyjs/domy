@@ -47,14 +47,15 @@ export const PLUGINS: Plugins = {
   sortedDirectives: [
     'ignore',
     'once',
-    'cloak',
-    'ref',
     'transition',
 
     'scope',
+    'key',
     'if',
     'else-if',
-    'else'
+    'else',
+    'ref',
+    'cloak'
   ],
   prefixes: {
     bind: binding,
