@@ -12,6 +12,7 @@ import on from '../utils/on';
  */
 export function events(domy: DomyDirectiveHelper) {
   const eventName = domy.attrName;
+  const el = domy.getRenderedElement();
 
   const originalFn = async (...args: any[]) => {
     const executedValue = await domy.evaluateWithoutListening(domy.attr.value);
@@ -24,7 +25,7 @@ export function events(domy: DomyDirectiveHelper) {
 
   const eventListener: EventListenerOrEventListenerObject = async event => {
     // If the element is not present in the dom we don't execute the event
-    if (!domy.el.isConnected) {
+    if (!el.isConnected) {
       return;
     }
 
@@ -41,7 +42,7 @@ export function events(domy: DomyDirectiveHelper) {
 
   // We add wrappers to the listener to ensure we can add modifiers
   const wrap = on({
-    el: domy.el,
+    el: el,
     eventName,
     listener: eventListener,
     modifiers: domy.modifiers

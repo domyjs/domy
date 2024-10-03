@@ -10,6 +10,7 @@
     <ul d-for="user, index of list">
       Some text that shouldn't be rendered
       <li
+        d-if="user.id"
         d-key="user.id"
         @click="user.isClient = !user.isClient"
         :style="{ color: user.isClient ? 'blue' : 'red' }"
@@ -35,9 +36,11 @@
       setup() {
         this.list.push(this.generateElement());
       },
-      data: {
-        id: 0,
-        list: []
+      data() {
+        return {
+          id: 0,
+          list: []
+        };
       },
       methods: {
         generateElement() {
@@ -56,6 +59,6 @@
           this.list.pop();
         }
       }
-    });
+    }).mount();
   </script>
 </html>

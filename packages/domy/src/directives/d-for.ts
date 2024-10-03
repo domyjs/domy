@@ -18,7 +18,7 @@ type RendererProps = {
  */
 function renderer(props: RendererProps) {
   const domy = props.domy;
-  const el = domy.el;
+  const el = domy.getRenderedElement();
   const currentChildrens = Array.from(el.children);
   const currentRenders: (ReturnType<DomyDirectiveHelper['deepRender']> | Element)[] = [];
 
@@ -89,7 +89,7 @@ function renderer(props: RendererProps) {
  * @author yoannchb-pro
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el;
+  const el = domy.getRenderedElement();
   const initialChilds = Array.from(el.children);
   const lastRenders: ReturnType<DomyDirectiveHelper['deepRender']>[] = [];
 

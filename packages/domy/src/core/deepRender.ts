@@ -23,10 +23,6 @@ type Props = {
   onRenderedElementChange?: (renderedElement: Element) => void;
 };
 
-function createGetRenderedElement(rendererElement: Element | (() => Element)) {
-  return () => (typeof rendererElement === 'function' ? rendererElement() : rendererElement);
-}
-
 /**
  * Deep render an element (with the childs and textContent)
  * It will keep the config for all the specified target only
@@ -46,18 +42,10 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     ];
 
     // Ensure we get the rendered element even if it cloned or replaced
-    // Usefull for d-render or d-for which need to keep a trace of the element
-    let renderedElement: Element | (() => Element) = props.element;
-    const setRenderedElement = (render: Element | (() => Element)) => {
-      renderedElement = render;
-      if (props.onRenderedElementChange)
-        props.onRenderedElementChange(createGetRenderedElement(render)());
-    };
-    const getSetEl = (currentEl: Element) => (element: Element) => {
-      currentEl === props.element && setRenderedElement(element);
-    };
+    let renderedRootElement: Element | (() => Element) = props.element;
 
     while (toRenderList.length > 0) {
+      let skipOtherAttributesRendering = false;
       let skipChildRendering = props.skipChildRendering ?? false;
       let skipComponentRendering = false;
 
@@ -65,18 +53,54 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
       const toRender = toRenderList.pop() as Elem;
       const element = toRender.element;
+      const isRootRendering = element === props.element;
 
-      const setEl = getSetEl(element);
+      // Ensure we get the rendered element even if it cloned or replace
+      let renderedElement: Element | (() => Element) = element;
+      const onRenderedElementChangeCallbacks =
+        isRootRendering && props.onRenderedElementChange ? [props.onRenderedElementChange] : [];
+      const getRenderedElement = () =>
+        typeof renderedElement === 'function' ? renderedElement() : renderedElement;
+      const setRenderedElement = (render: Element | (() => Element)) => {
+        if (element === props.element) renderedRootElement = render;
+        renderedElement = render;
+
+        for (const onRenderedElementChangeCallback of onRenderedElementChangeCallbacks) {
+          try {
+            onRenderedElementChangeCallback(getRenderedElement());
+          } catch (err: any) {
+            error(err);
+          }
+        }
+      };
+      const onRenderedElementChange = (cb: (newRenderedElement: Element) => void) => {
+        onRenderedElementChangeCallbacks.push(cb);
+      };
+
       const safeDeepRender = (args: Props) => {
         const render = deepRender(args);
-        if (args.element === renderedElement) setRenderedElement(render.getRenderedElement); // We keep trace of the rendered element
+
+        const isCurrentElement = args.element === getRenderedElement();
+        if (isCurrentElement) {
+          // We keep trace of the rendered element
+          setRenderedElement(render.getRenderedElement);
+
+          // If deep render is called on the current element we skip the current rendering to avoid errors
+          skipChildRendering = true;
+          skipComponentRendering = true;
+          skipOtherAttributesRendering = true;
+        }
+
+        cleanupFnList.push(render.unmount); // We ensure to unmount the new rendered element
+
         return render;
       };
 
       let domyHelper = new DomyHelper(
         safeDeepRender,
-        element,
-        setEl,
+        getRenderedElement,
+        setRenderedElement,
+        onRenderedElementChange,
         state,
         toRender.scopedNodeData,
         config
@@ -122,10 +146,11 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           if (options.skipComponentRendering) skipComponentRendering = true;
           if (options.skipOtherAttributesRendering) break;
         }
+        if (skipOtherAttributesRendering) break;
       }
 
       // Rendering component
-      if (isComponent && !skipComponentRendering) {
+      if (!skipComponentRendering && isComponent) {
         const componentSetup = components[element.localName];
         const getRenderElement = componentSetup({
           name: element.localName,
@@ -153,7 +178,11 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
     // Deep render helpers
     return {
-      getRenderedElement: createGetRenderedElement(renderedElement),
+      getRenderedElement() {
+        return typeof renderedRootElement === 'function'
+          ? renderedRootElement()
+          : renderedRootElement;
+      },
       unmount() {
         for (const cleanupFn of cleanupFnList) {
           try {

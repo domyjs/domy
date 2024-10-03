@@ -16,7 +16,7 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   let lastAttrs: Record<string, string> = {};
 
   domy.effect(() => {
-    const el = render?.getRenderedElement() ?? domy.el;
+    const el = render?.getRenderedElement() ?? domy.getRenderedElement();
     const attrs: Record<string, string> = domy.evaluate(domy.attr.value);
 
     if (render) render.unmount();
@@ -39,14 +39,4 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
 
     lastAttrs = { ...attrs };
   });
-
-  domy.cleanup(() => {
-    if (render) render.unmount();
-  });
-
-  return {
-    skipChildsRendering: needRender,
-    skipComponentRendering: needRender,
-    skipOtherAttributesRendering: needRender
-  };
 }

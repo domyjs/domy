@@ -13,12 +13,10 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dMountedImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // Ensure the element with the childrens are mounted first
-  const { unmount } = domy.deepRender({
-    element: domy.el,
+  domy.deepRender({
+    element: domy.getRenderedElement(),
     scopedNodeData: domy.scopedNodeData
   });
-
-  domy.cleanup(unmount);
 
   const executedValue = domy.evaluateWithoutListening(domy.attr.value);
   if (typeof executedValue === 'function') domy.queueJob(() => executedValue());

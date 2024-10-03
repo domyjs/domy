@@ -19,33 +19,25 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   };
   const setRef = (el: Element) => (domy.state.refs[refName] = el);
 
-  // Ensure we update the ref when the element change
-  const render = domy.deepRender({
-    element: domy.el,
-    scopedNodeData: domy.scopedNodeData,
-    onRenderedElementChange(element) {
-      setRef(element);
-    }
-  });
-
   // If the ref is dynamic
   if (domy.modifiers.includes('dynamic')) {
     domy.effect(() => {
+      cleanRef();
       refName = domy.evaluate(domy.attr.value);
-      setRef(render.getRenderedElement());
+      setRef(domy.getRenderedElement());
     });
   }
 
-  setRef(render.getRenderedElement());
+  // If the element change we ensure to update the ref
+  domy.onRenderedElementChange(newRenderedElement => {
+    cleanRef();
+    setRef(newRenderedElement);
+  });
+
+  // Set the initial ref
+  setRef(domy.getRenderedElement());
 
   domy.cleanup(() => {
     cleanRef();
-    render.unmount();
   });
-
-  return {
-    skipChildsRendering: true,
-    skipOtherAttributesRendering: true,
-    skipComponentRendering: true
-  };
 }

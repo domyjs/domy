@@ -8,7 +8,10 @@ type Value = string | number | boolean | string[] | undefined;
  * @author yoannchb-pro
  */
 function changeValue(domy: DomyDirectiveHelper) {
-  const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+  const el = domy.getRenderedElement() as
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | HTMLSelectElement;
 
   let value: Value = el.value;
   const prevValue = domy.evaluateWithoutListening(domy.attr.value);
@@ -78,12 +81,15 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // We ensure to render the element/childs first so we can access to their value
   // For example select need to know the options value
   // So in case the value is a binding we need to ensure domy rendered the childs before handling d-model
-  const { unmount, getRenderedElement } = domy.deepRender({
-    element: domy.el,
+  domy.deepRender({
+    element: domy.getRenderedElement(),
     scopedNodeData: domy.scopedNodeData
   });
 
-  const el = getRenderedElement() as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+  const el = domy.getRenderedElement() as
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | HTMLSelectElement;
 
   // We look at change made by the user
   const eventName = domy.modifiers.includes('lazy') ? 'change' : 'input';
@@ -92,7 +98,6 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
 
   domy.cleanup(() => {
     el.removeEventListener(eventName, listenChangeCallback);
-    unmount();
   });
 
   domy.effect(() => {
@@ -123,10 +128,4 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
       el.value = executedValue;
     }
   });
-
-  return {
-    skipChildsRendering: true,
-    skipOtherAttributesRendering: true,
-    skipComponentRendering: true
-  };
 }

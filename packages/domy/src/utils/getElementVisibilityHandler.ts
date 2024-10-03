@@ -14,7 +14,7 @@ type Props = {
  */
 export function getElementVisibilityHandler(props: Props) {
   const domy = props.domy;
-  const originalEl = domy.el;
+  const originalEl = domy.getRenderedElement();
   const parent = originalEl.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
@@ -23,7 +23,7 @@ export function getElementVisibilityHandler(props: Props) {
   // Clone the original element and let domy know the new element
   function clone() {
     const clone = originalEl.cloneNode(true) as Element;
-    domy.setEl(clone);
+    domy.setRenderedElement(clone);
     return clone;
   }
 
@@ -40,10 +40,11 @@ export function getElementVisibilityHandler(props: Props) {
    * @author yoannchb-pro
    */
   function handleVisibility() {
-    const transition = domy.state.transitions.get(originalEl);
+    const el = lastRender ? lastRender.getRenderedElement() : currentEl;
+
+    const transition = domy.state.transitions.get(el);
     const needTransition = transition && (isInitialised || transition.init);
 
-    const el = lastRender ? lastRender.getRenderedElement() : currentEl;
     const isConnected = el.isConnected;
     const shouldBeDisplay = props.shouldBeDisplay();
 

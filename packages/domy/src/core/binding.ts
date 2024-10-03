@@ -10,7 +10,7 @@ import { DomyDirectiveHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle: string) {
-  const el = domy.el as HTMLElement;
+  const el = domy.getRenderedElement() as HTMLElement;
 
   el.setAttribute('style', defaultStyle);
 
@@ -31,9 +31,9 @@ function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle
  * @author yoannchb-pro
  */
 function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass: string) {
-  const el = domy.el as HTMLElement;
+  const el = domy.getRenderedElement() as HTMLElement;
 
-  domy.el.className = defaultClass;
+  el.className = defaultClass;
 
   if (Array.isArray(executedValue)) {
     for (const className of executedValue) {
@@ -58,15 +58,16 @@ function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass
  * @author yoannchb-pro
  */
 export function binding(domy: DomyDirectiveHelper) {
+  const el = domy.getRenderedElement();
   const attrName = domy.attrName;
 
   // We register the default style and default class
   // To handle :class with class as same time (same for style)
-  const defaultStyle = attrName === 'style' && domy.el.getAttribute('style');
-  const defaultClass = attrName === 'class' && domy.el.getAttribute('class');
+  const defaultStyle = attrName === 'style' && el.getAttribute('style');
+  const defaultClass = attrName === 'class' && el.getAttribute('class');
 
   // We check the attribute is not already present (only class and style can already be there)
-  if (attrName !== 'class' && attrName !== 'style' && domy.el.getAttribute(attrName))
+  if (attrName !== 'class' && attrName !== 'style' && el.getAttribute(attrName))
     throw new Error(`Binding failed. The attribute "${attrName}" already exist on the element.`);
 
   domy.effect(() => {
@@ -78,9 +79,9 @@ export function binding(domy: DomyDirectiveHelper) {
     } else if (isExecutedValueObject && attrName === 'class') {
       handleClass(domy, executedValue, defaultClass as string);
     } else {
-      domy.el.setAttribute(attrName, executedValue);
+      el.setAttribute(attrName, executedValue);
     }
   });
 
-  domy.cleanup(() => domy.el.removeAttribute(attrName));
+  domy.cleanup(() => el.removeAttribute(attrName));
 }

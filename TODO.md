@@ -1,6 +1,8 @@
 # TODO
 
-- On peut surement faire en sorte que skipchild, skipAttr, skipComponent ce fassent tout seul lors du call de deep render
+- helpers el to getRenderedElement (Fixe $el, do test for $root)
+- test d-if sur d-render dans d-transition
+
 - $attrs for component
 - d-component and d-keep-alive
 - Error boundary test with onError

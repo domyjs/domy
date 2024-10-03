@@ -10,6 +10,6 @@ import { DomyDirectiveHelper } from '../types/Domy';
  */
 export function dTextImplementation(domy: DomyDirectiveHelper) {
   domy.effect(() => {
-    domy.el.textContent = domy.evaluate(domy.attr.value);
+    domy.getRenderedElement().textContent = domy.evaluate(domy.attr.value);
   });
 }

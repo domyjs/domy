@@ -43,8 +43,9 @@ export class DomyHelper {
 
   constructor(
     private deepRenderFn: ReturnType<typeof createDeepRenderFn>,
-    public el: Element,
-    public setEl: (element: Element) => void,
+    public getRenderedElement: () => Element,
+    public setRenderedElement: (element: Element) => void,
+    public onRenderedElementChange: (cb: (newRenderedElelement: Element) => void) => void,
     public state: State,
     public scopedNodeData: Record<string, any>[] = [],
     public config: Config
@@ -55,7 +56,9 @@ export class DomyHelper {
 
     return {
       domyHelperId: this.domyHelperId,
-      el: this.el,
+      getRenderedElement: this.getRenderedElement,
+      setRenderedElement: this.setRenderedElement,
+      onRenderedElementChange: this.onRenderedElementChange,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       config: this.config,
@@ -70,7 +73,6 @@ export class DomyHelper {
       ...ReactiveUtils,
       utils: directivesUtils,
 
-      setEl: this.setEl,
       queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
@@ -89,8 +91,9 @@ export class DomyHelper {
   copy() {
     return new DomyHelper(
       this.deepRenderFn,
-      this.el,
-      this.setEl,
+      this.getRenderedElement,
+      this.setRenderedElement,
+      this.onRenderedElementChange,
       this.state,
       [...this.scopedNodeData], // Ensure the scoped node data of the current node are not affected by the next operations (like removing the scoped data in d-for)
       this.config
@@ -139,7 +142,7 @@ export class DomyHelper {
     const evaluator = this.config.CSP ? cspEvaluate : evaluate;
     const context = getContext({
       domyHelperId: this.domyHelperId,
-      el: this.el,
+      el: this.getRenderedElement(),
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       config: this.config

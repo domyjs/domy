@@ -9,13 +9,11 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const { unmount } = domy.deepRender({
-    element: domy.el,
+  domy.deepRender({
+    element: domy.getRenderedElement(),
     scopedNodeData: domy.scopedNodeData,
     renderWithoutListeningToChange: true
   });
-
-  domy.cleanup(unmount);
 
   return {
     skipChildsRendering: true,

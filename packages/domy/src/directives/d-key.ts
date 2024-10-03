@@ -13,13 +13,9 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dKeyImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const render: ReturnType<DomyDirectiveHelper['deepRender']> = domy.deepRender({
-    element: domy.el,
-    scopedNodeData: domy.scopedNodeData
-  });
   const registeredKey: { key: string; getRenderedElement: () => Element } = {
     key: domy.evaluateWithoutListening(domy.attr.value),
-    getRenderedElement: render.getRenderedElement
+    getRenderedElement: domy.getRenderedElement
   };
 
   domy.state.keys.push(registeredKey);
@@ -32,13 +28,5 @@ export function dKeyImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   domy.cleanup(() => {
     const index = domy.state.keys.indexOf(registeredKey);
     domy.state.keys.splice(index, 1);
-
-    render.unmount();
   });
-
-  return {
-    skipChildsRendering: true,
-    skipOtherAttributesRendering: true,
-    skipComponentRendering: true
-  };
 }

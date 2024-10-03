@@ -18,10 +18,11 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const parent = domy.el.parentNode as Element;
+  const parent = domy.getRenderedElement().parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
-  const el = domy.el;
+  const el = domy.getRenderedElement();
+  let transition = domy.state.transitions.get(el);
 
   if (el.tagName !== 'TEMPLATE')
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
@@ -30,7 +31,6 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
   let isInitialised = false;
 
   domy.effect(() => {
-    const transition = domy.state.transitions.get(el);
     const elementToRender: Element | null | undefined = domy.evaluate(domy.attr.value.trim());
 
     if (Array.isArray(elementToRender))
@@ -43,6 +43,7 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
         currLastRender.unmount();
       }
     };
+
     // Handle remove transition
     if (lastRender) {
       if (transition) {
@@ -72,7 +73,7 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
     // We replace the element
     el.replaceWith(elementToRender);
-    domy.setEl(elementToRender);
+    domy.setRenderedElement(elementToRender);
 
     // Render the element
     lastRender = domy.deepRender({
@@ -81,12 +82,13 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     });
 
     // Handle transition
+    transition = domy.state.transitions.get(lastRender.getRenderedElement());
     const needTransition = transition && (isInitialised || transition.init);
     if (needTransition) {
       const { getRenderedElement } = lastRender;
-      elementToRender.classList.add(transition.enterTransition);
+      elementToRender.classList.add(transition!.enterTransition);
       domy.utils.executeActionAfterAnimation(elementToRender, () =>
-        getRenderedElement().classList.remove(transition.enterTransition)
+        getRenderedElement().classList.remove(transition!.enterTransition)
       );
     }
 

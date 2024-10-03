@@ -27,7 +27,9 @@ export type DomySpecialHelper = {
 
 export type DomyDirectiveHelper = {
   domyHelperId: number;
-  el: Element;
+  getRenderedElement(): Element;
+  setRenderedElement(element: Element): void;
+  onRenderedElementChange(cb: (newRenderedElement: Element) => void): void;
   config: Config;
   state: State;
   scopedNodeData: Record<string, any>[];
@@ -39,12 +41,11 @@ export type DomyDirectiveHelper = {
 
   utils: typeof directivesUtils;
 
-  setEl: (element: Element) => void;
   queueJob: typeof queueJob;
-  effect: (cb: () => void | Promise<void>) => void;
-  cleanup: (cb: () => void | Promise<void>) => void;
-  evaluate: (code: string) => any;
-  evaluateWithoutListening: (code: string) => any;
+  effect(cb: () => void | Promise<void>): void;
+  cleanup(cb: () => void | Promise<void>): void;
+  evaluate(code: string): any;
+  evaluateWithoutListening(code: string): any;
   deepRender: ReturnType<typeof createDeepRenderFn>;
   addScopeToNode(obj: Record<string, any>): void;
   removeScopeToNode(obj: Record<string, any>): void;

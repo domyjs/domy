@@ -10,11 +10,12 @@
     <div
       d-scope="{ count: 0, createP: () => {
         const p = document.createElement('p');
+        p.setAttribute('d-if', 'count < 10');
         p.textContent = 'Count: {{ count }}';
         return p;
       } }"
     >
-      <template d-if="5 === 5" d-render="renderElement ? createP() : null"></template>
+      <template d-render="renderElement ? createP() : null"></template>
       <button id="inc" @click="++count">+</button>
       <button id="dec" @click="--count">-</button>
 
