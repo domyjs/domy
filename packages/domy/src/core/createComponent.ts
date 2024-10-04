@@ -178,6 +178,7 @@ export function createComponent<
       domy.cleanup(() => {
         if (unmountComponent) unmountComponent();
         cleanup(unmountFns);
+        domy.unReactive(data);
       });
 
       return getRenderedElement;
