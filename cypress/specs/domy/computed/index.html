@@ -16,7 +16,7 @@
   <script>
     DOMY.createApp({
       watch: {
-        count(prevValue, newValue) {
+        count({ prevValue, newValue }) {
           if (newValue < 0) this.count = prevValue;
         }
       },

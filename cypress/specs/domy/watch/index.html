@@ -23,19 +23,20 @@
   <script>
     DOMY.createApp({
       watch: {
-        countby2(prevValue, newValue) {
+        countby2({ prevValue, newValue }) {
           if (newValue < prevValue) {
             this.countby2--;
           } else {
             this.countby2++;
           }
         },
-        count(prevValue, newValue) {
+        count({ prevValue, newValue }) {
           if (newValue < 0) this.count = prevValue;
         },
-        'todos.{index}'(prevValue, newValue, { path, params }) {
+        'todos.{index}'({ prevValue, newValue, path }) {
+          const matcher = DOMY.matchPath('todos.{index}', path);
           this.path = path;
-          this.index = params.index;
+          this.index = matcher.params.index;
         }
       },
       data() {

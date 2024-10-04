@@ -54,7 +54,7 @@
         setup() {},
         mounted() {},
         watch: {
-          count(prevValue, newValue) {
+          count({ prevValue, newValue }) {
             if (newValue < 0) {
               this.$props.open();
             } else {

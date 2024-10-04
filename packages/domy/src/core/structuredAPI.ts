@@ -1,4 +1,4 @@
-import { StructuredAPIApp, WatcherFn } from '../types/App';
+import { StructuredAPIApp } from '../types/App';
 import { Config } from '../types/Config';
 import {
   DomyMountedEventDetails,
@@ -14,6 +14,7 @@ import { createDeepRenderFn } from './deepRender';
 import { reactive, watch, matchPath, unReactive } from '@domyjs/reactive';
 import { getRender } from './getRender';
 import { ComponentProps, Components } from '../types/Component';
+import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
 type Params = {
   app?: StructuredAPIApp;
@@ -69,7 +70,7 @@ export async function structuredAPI(params: Params) {
   }
 
   // Watchers
-  const watchers: Record<string, { locked: boolean; fn: WatcherFn }> = {};
+  const watchers: Record<string, { locked: boolean; fn: OnSetListener['fn'] }> = {};
   // We convert all watcher function to regular function so we can change the context
   for (const watcherName in app.watch) {
     watchers[watcherName] = { fn: toRegularFn(app.watch[watcherName]), locked: false };
@@ -78,11 +79,11 @@ export async function structuredAPI(params: Params) {
   const unwatch = watch(
     {
       type: 'onSet',
-      fn: async ({ path, prevValue, newValue }) => {
+      fn: async props => {
         for (const watcherName in app.watch) {
           const isWatcherLocked = watchers[watcherName].locked; // We ensure the watcher can't call it self (act like a lock)
 
-          const match = matchPath(watcherName, path);
+          const match = matchPath(watcherName, props.path);
 
           if (match.isMatching) {
             if (!isWatcherLocked) {
@@ -90,10 +91,7 @@ export async function structuredAPI(params: Params) {
 
               try {
                 const watcherfn = watchers[watcherName].fn;
-                await watcherfn.call(getContext(contextProps), prevValue, newValue, {
-                  path,
-                  params: match.params
-                });
+                await watcherfn.call(getContext(contextProps), props);
               } catch (err: any) {
                 error(err);
               }

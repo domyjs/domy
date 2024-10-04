@@ -1,5 +1,6 @@
 import { ComponentProps } from './Component';
 import { Helpers } from './Helpers';
+import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
 export type Data = { [depName: string]: any };
 
@@ -22,12 +23,6 @@ type Methods<
   [fnName in M]: MethodFn<D, Methods<D, M, A, P>, A, P>;
 };
 
-export type WatcherFn = (
-  prevValue: any,
-  newValue: any,
-  utils: { path: string; params: Record<string, string> }
-) => void | Promise<void>;
-
 // The generic types are usefull here for createApp because it allow us to keep the typing of this into the methods
 export type StructuredAPIApp<
   D extends Data = any,
@@ -39,7 +34,7 @@ export type StructuredAPIApp<
   mounted?: () => void | Promise<void>;
   unmounted?: () => void | Promise<void>;
   watch?: {
-    [depName: string]: WatcherFn;
+    [depName: string]: OnSetListener['fn'];
   };
   data?: () => D;
   methods?: Methods<D, M, A, P>;
