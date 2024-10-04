@@ -2,7 +2,19 @@ import { reactivesVariablesList } from './data';
 import { globalWatch } from './globalWatch';
 import { matchPath } from './matchPath';
 import { Listener, ReactiveVariable } from './ReactiveVariable';
-import { unwatch } from './unwatch';
+
+/**
+ * Remove a listener from some reactives variables
+ * @param fn
+ * @param objsToWatch
+ *
+ * @author yoannchb-pro
+ */
+function unwatch(listener: Listener, reactivesInstancesToUnwatch: ReactiveVariable[]) {
+  for (const reactiveVariable of reactivesInstancesToUnwatch) {
+    reactiveVariable?.removeListener(listener);
+  }
+}
 
 /**
  * Attach a listener to some reactives variables
