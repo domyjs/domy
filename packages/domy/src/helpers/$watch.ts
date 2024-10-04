@@ -9,27 +9,14 @@ import { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
  * @author yoannchb-pro
  */
 export function $watch(domy: DomySpecialHelper) {
-  return (listener: OnSetListener['fn'], getListenedObjs: () => any) => {
-    const objs: any[] = [];
-
-    const removeGlobalWatcher = domy.globalWatch({
-      type: 'onGet',
-      fn: ({ proxy }) => {
-        objs.push(proxy);
-      }
-    });
-    getListenedObjs();
-    removeGlobalWatcher();
-
+  return (listener: OnSetListener['fn'], effect: () => any) => {
     const unwatch = domy.watch(
       {
         type: 'onSet',
         fn: listener
       },
-      objs
+      effect
     );
-
-    domy.cleanup(unwatch);
 
     return unwatch;
   };

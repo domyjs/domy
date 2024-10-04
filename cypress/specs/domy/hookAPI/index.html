@@ -29,7 +29,7 @@
           if (newValue < 0) count.value = prevValue;
           if (newValue === 2) unwatch();
         },
-        [count]
+        () => count
       );
 
       const increment = () => {

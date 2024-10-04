@@ -7,7 +7,6 @@ import { getReactiveHandler } from './getReactiveHandler';
 type Props = {
   domyHelperId?: number;
   el?: Element | Text;
-  cleanup(cb: () => void | Promise<void>): void;
   state: State;
   scopedNodeData: Record<string, any>[];
   config: Config;

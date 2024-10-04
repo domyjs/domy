@@ -11,7 +11,7 @@ import { getHelpers } from '../utils/getHelpers';
 import { error } from '../utils/logs';
 import { createDeepRenderFn } from './deepRender';
 import { DOMY_EVENTS } from './DomyEvents';
-import { isReactive, registerName } from '@domyjs/reactive';
+import { isReactive, registerName, unReactive } from '@domyjs/reactive';
 import { getRender } from './getRender';
 import { ComponentProps, Components } from '../types/Component';
 
@@ -72,7 +72,6 @@ export async function hookAPI(params: Params) {
 
   const helpersProps: Parameters<typeof getHelpers>[0] = {
     state,
-    cleanup: cb => unmountFns.push(cb),
     scopedNodeData: [],
     config
   };
@@ -158,6 +157,10 @@ export async function hookAPI(params: Params) {
         } catch (err: any) {
           error(err);
         }
+      }
+
+      for (const obj of Object.values(state.data)) {
+        unReactive(obj);
       }
 
       // Unmount event

@@ -11,7 +11,7 @@ import { error } from '../utils/logs';
 import { toRegularFn } from '../utils/toRegularFn';
 import { DOMY_EVENTS } from './DomyEvents';
 import { createDeepRenderFn } from './deepRender';
-import { reactive, watch, matchPath } from '@domyjs/reactive';
+import { reactive, watch, matchPath, unReactive } from '@domyjs/reactive';
 import { getRender } from './getRender';
 import { ComponentProps, Components } from '../types/Component';
 
@@ -56,7 +56,6 @@ export async function structuredAPI(params: Params) {
 
   const contextProps: Parameters<typeof getContext>[0] = {
     state,
-    cleanup: cb => unmountFns.push(cb),
     scopedNodeData: [],
     config
   };
@@ -105,7 +104,7 @@ export async function structuredAPI(params: Params) {
         }
       }
     },
-    [state.data]
+    () => state.data
   );
   unmountFns.push(unwatch);
 
@@ -175,6 +174,8 @@ export async function structuredAPI(params: Params) {
           error(err);
         }
       }
+
+      unReactive(state.data);
 
       // Unmount event
       document.dispatchEvent(

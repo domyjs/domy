@@ -17,7 +17,7 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
       `At least one key has to be provided for the "${domy.directive}" directive (example: d-watch.count="...").`
     );
 
-  const objsToWatch = new Set<any>();
+  const objsToWatch: any[] = [];
   const keysToWatch = new Set<string>();
 
   // We find the key to watch and the object to watch
@@ -34,11 +34,12 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
       continue;
     }
 
-    objsToWatch.add(objToWatch);
+    objsToWatch.push(objToWatch);
     keysToWatch.add(keyToWatch);
   }
 
-  if (keysToWatch.size === 0 || objsToWatch.size === 0) return;
+  if (keysToWatch.size === 0 || objsToWatch.length === 0)
+    throw Error(`No valide scoped data was provided for "${domy.attr.name}".`);
 
   // We add the watcher on the watched scoped data with a lock to avoid calling it self
   let isLock = false;
@@ -68,7 +69,7 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
         isLock = false;
       }
     },
-    Array.from(objsToWatch)
+    () => objsToWatch
   );
 
   domy.cleanup(unwatch);

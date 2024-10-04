@@ -9,11 +9,9 @@ import { Listener } from './ReactiveVariable';
  * @author yoannchb-pro
  */
 export function unwatch(listener: Listener, objsToUnwatch: unknown[]) {
-  const variablesToUnwatch = objsToUnwatch
-    .map(obj => reactivesVariablesList.get(obj))
-    .filter(obj => !!obj);
+  const variablesToUnwatch = objsToUnwatch.map(obj => reactivesVariablesList.get(obj));
 
   for (const reactiveVariable of variablesToUnwatch) {
-    reactiveVariable.removeListener(listener);
+    reactiveVariable?.removeListener(listener);
   }
 }

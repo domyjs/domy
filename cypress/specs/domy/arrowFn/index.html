@@ -23,6 +23,7 @@
       },
       watch: {
         count: () => {
+          console.log('Watcher called');
           this.count = Math.max(this.count, 0);
         }
       },

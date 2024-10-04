@@ -7,12 +7,12 @@ import { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
  * @param objsToWatch
  * @returns
  */
-export function watch(callback: OnSetListener['fn'], objsToWatch: unknown[]) {
+export function watch(callback: OnSetListener['fn'], effect: () => any) {
   return initialWatch(
     {
       type: 'onSet',
       fn: callback
     },
-    objsToWatch
+    effect
   );
 }

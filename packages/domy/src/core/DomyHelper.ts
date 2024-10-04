@@ -3,14 +3,13 @@ import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import * as ReactiveUtils from '@domyjs/reactive';
 import { queueJob } from './scheduler';
-import { Listener, OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
+import { Listener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { State } from '../types/State';
 import { Config } from '../types/Config';
 import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { createDeepRenderFn } from './deepRender';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
-import { error } from '../utils/logs';
 
 let domyHelperId = 0;
 
@@ -22,7 +21,7 @@ let domyHelperId = 0;
 export class DomyHelper {
   private domyHelperId = ++domyHelperId;
 
-  private onSetListener: OnSetListener | null = null;
+  private unwatchSetListener: (() => void) | null = null;
 
   private cleanupFn: (() => Promise<void> | void) | null = null;
   private effectFn: (() => Promise<void> | void) | null = null;
@@ -111,14 +110,21 @@ export class DomyHelper {
     this.attr.value = attr.value;
   }
 
+  clearOnSetListener() {
+    if (this.unwatchSetListener) {
+      this.unwatchSetListener();
+      this.unwatchSetListener = null;
+    }
+  }
+
   attachOnSetListener() {
-    if (this.onSetListener) return;
+    if (this.unwatchSetListener) return;
 
     // Allow us to call the effect when a dependencie change
-    this.onSetListener = {
+    this.unwatchSetListener = ReactiveUtils.globalWatch({
       type: 'onSet',
-      fn: ({ path, proxy }) => {
-        if (!this.objectsToListen.has(proxy)) return;
+      fn: ({ path, obj }) => {
+        if (!this.objectsToListen.has(obj)) return;
 
         for (const listenedPath of this.paths) {
           if (ReactiveUtils.matchPath(listenedPath, path).isMatching) {
@@ -126,9 +132,7 @@ export class DomyHelper {
           }
         }
       }
-    };
-
-    ReactiveUtils.globalWatch(this.onSetListener);
+    });
   }
 
   effect(cb: () => void | Promise<void>) {
@@ -136,25 +140,7 @@ export class DomyHelper {
   }
 
   cleanup(cb: () => void | Promise<void>) {
-    const oldFn = this.cleanupFn?.bind(this);
-
-    // If the cleanup function already exist we wrap it
-    // Usefull in case a helper define a cleanup fn
-    this.cleanupFn =
-      typeof oldFn === 'function'
-        ? async () => {
-            try {
-              await oldFn();
-            } catch (err: any) {
-              error(err);
-            }
-            try {
-              await cb();
-            } catch (err: any) {
-              error(err);
-            }
-          }
-        : cb;
+    this.cleanupFn = cb;
   }
 
   eval(code: string) {
@@ -162,7 +148,6 @@ export class DomyHelper {
     const context = getContext({
       domyHelperId: this.domyHelperId,
       el: this.getRenderedElement(),
-      cleanup: this.cleanup.bind(this),
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       config: this.config
@@ -180,10 +165,10 @@ export class DomyHelper {
   evaluate(code: string) {
     const listener: Listener = {
       type: 'onGet',
-      fn: ({ path, proxy }) => {
-        this.attachOnSetListener(); // Only attach a onSet listener if we have a dependencie
-        this.objectsToListen.add(proxy);
+      fn: ({ path, obj }) => {
+        this.objectsToListen.add(obj);
         this.paths.add(path);
+        this.attachOnSetListener(); // Only attach a onSet listener if we have a dependencie
       }
     };
 
@@ -227,7 +212,7 @@ export class DomyHelper {
 
   callCleanup() {
     queueJob(() => {
-      if (this.onSetListener) ReactiveUtils.removeGlobalWatch(this.onSetListener);
+      this.clearOnSetListener();
       this.effectFn = null; // Ensure we don't have effect on the element anymore
       if (typeof this.cleanupFn === 'function') this.cleanupFn();
       this.cleanupFn = null;
@@ -237,7 +222,6 @@ export class DomyHelper {
   callEffect() {
     // We remove every paths/objectsIdToListen every times the effect is called because the dependencies to watch can be differents
     this.paths = new Set();
-    this.objectsToListen = new Set();
     if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
   }
 }

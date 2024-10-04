@@ -10,11 +10,13 @@ import { unwatch } from './core/unwatch';
 import { watch } from './core/watch';
 import { lockWatchers } from './core/lockWatchers';
 import { unlockWatchers } from './core/unlockWatchers';
+import { unReactive } from './core/unReactive';
 
 export {
   lockWatchers,
   unlockWatchers,
   reactive,
+  unReactive,
   signal,
   globalWatch,
   removeGlobalWatch,

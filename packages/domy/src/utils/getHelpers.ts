@@ -9,7 +9,6 @@ import { Config } from '../types/Config';
 type Props = {
   domyHelperId?: number;
   el?: Element | Text;
-  cleanup(cb: () => void | Promise<void>): void;
   state: State;
   config: Config;
   scopedNodeData: Record<string, any>[];
