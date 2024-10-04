@@ -10,6 +10,7 @@ import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { createDeepRenderFn } from './deepRender';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
+import { error } from '../utils/logs';
 
 let domyHelperId = 0;
 
@@ -34,7 +35,7 @@ export class DomyHelper {
 
   // The name of a variable don't make it unique because we can declare the same variable name for an other DOMY instance
   // It happend because domy have a globalWatcher when it evaluate a code to check dependencies
-  private objectsIdToListen = new Set<number>();
+  private objectsToListen = new Set<any>();
   // Allow us to only update if a the correct property have been update
   // Let's imagine a deep property has been updated data.todoList.0
   // We wan't to update only if this property has been update and not when an other property has been modified (example: data.todoList.1)
@@ -116,8 +117,8 @@ export class DomyHelper {
     // Allow us to call the effect when a dependencie change
     this.onSetListener = {
       type: 'onSet',
-      fn: ({ path, objectId }) => {
-        if (!this.objectsIdToListen.has(objectId)) return;
+      fn: ({ path, proxy }) => {
+        if (!this.objectsToListen.has(proxy)) return;
 
         for (const listenedPath of this.paths) {
           if (ReactiveUtils.matchPath(listenedPath, path).isMatching) {
@@ -135,7 +136,25 @@ export class DomyHelper {
   }
 
   cleanup(cb: () => void | Promise<void>) {
-    this.cleanupFn = cb;
+    const oldFn = this.cleanupFn?.bind(this);
+
+    // If the cleanup function already exist we wrap it
+    // Usefull in case a helper define a cleanup fn
+    this.cleanupFn =
+      typeof oldFn === 'function'
+        ? async () => {
+            try {
+              await oldFn();
+            } catch (err: any) {
+              error(err);
+            }
+            try {
+              await cb();
+            } catch (err: any) {
+              error(err);
+            }
+          }
+        : cb;
   }
 
   eval(code: string) {
@@ -143,6 +162,7 @@ export class DomyHelper {
     const context = getContext({
       domyHelperId: this.domyHelperId,
       el: this.getRenderedElement(),
+      cleanup: this.cleanup.bind(this),
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       config: this.config
@@ -160,9 +180,9 @@ export class DomyHelper {
   evaluate(code: string) {
     const listener: Listener = {
       type: 'onGet',
-      fn: ({ path, objectId }) => {
+      fn: ({ path, proxy }) => {
         this.attachOnSetListener(); // Only attach a onSet listener if we have a dependencie
-        this.objectsIdToListen.add(objectId);
+        this.objectsToListen.add(proxy);
         this.paths.add(path);
       }
     };
@@ -217,7 +237,7 @@ export class DomyHelper {
   callEffect() {
     // We remove every paths/objectsIdToListen every times the effect is called because the dependencies to watch can be differents
     this.paths = new Set();
-    this.objectsIdToListen = new Set();
+    this.objectsToListen = new Set();
     if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
   }
 }

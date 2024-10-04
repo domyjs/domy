@@ -35,6 +35,7 @@ import { dMountedImplementation } from '../directives/d-mounted';
 import { dUnMountedImplementation } from '../directives/d-unmounted';
 import { dAttrsImplementation } from '../directives/d-attrs';
 import { dKeyImplementation } from '../directives/d-key';
+import { $watch } from '../helpers/$watch';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -96,7 +97,8 @@ export const PLUGINS: Plugins = {
     data: $data,
     scopedData: $scopedData,
     allData: $allData,
-    methods: $methods
+    methods: $methods,
+    watch: $watch
   }
 };
 

@@ -19,30 +19,26 @@
   </body>
   <script>
     const ErrorMessage = DOMY.createComponent({
-      html: `
+      html: `<div>
             <p>Error Message:</p>
             <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white' }">
                 <template d-render="$childrens?.[0]"></template>    
             </div>
             <p>contact admin for more infos</p>
-        `
+        </div>`
     });
 
     const Count = DOMY.createComponent({
-      html: `
+      props: ["title"],
+      html: `<div>
             <h1>{{ $props.title ?? "Counter default title" }}</h1>
             <p>Count: {{ count }}</p>
             <button @click="increment">+</button>
             <button @click="decrement">-</button>
-            <button @click="$props.sayhello()">say hello</button>
-        `,
+      </div>`,
       app: {
-        setup() {
-          console.log(this.$props, this.$childrens);
-        },
-        mounted() {},
-        data: {
-          count: 0
+        data(){
+          return { count: 0 }
         },
         methods: {
           increment: () => ++this.count,
@@ -52,10 +48,12 @@
     });
 
     DOMY.createApp({
-      data: {
-        message: 'An error occured',
-        name: 'yoann',
-        test: {}
+      data(){
+        return {
+	  message: 'An error occured',
+          name: 'yoann',
+          test: {}
+	}
       },
       methods: {
         sayHello() {

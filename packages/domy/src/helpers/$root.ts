@@ -8,5 +8,7 @@ import { DomySpecialHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function $root(domy: DomySpecialHelper) {
-  return domy.el?.parentNode;
+  return domy.el?.nodeType === Node.TEXT_NODE
+    ? domy.el?.parentNode?.parentNode
+    : domy.el?.parentNode;
 }

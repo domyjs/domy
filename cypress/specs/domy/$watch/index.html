@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$watch</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1 id="watcherCall">0</h1>
+
+    <Count d-if="show" :count="count"></Count>
+
+    <button id="inc" @click="++count">Increment</button>
+    <button id="show" @click="show = !show">Show/Hide</button>
+  </body>
+  <script>
+    const Count = DOMY.createComponent({
+      props: ['count'],
+      html: `
+        <div>
+          <p>{{ $props.count }}</p>
+        </div>
+      `,
+      app: {
+        mounted() {
+          this.$watch(
+            () => {
+              console.log('Watcher called');
+              const el = document.querySelector('#watcherCall');
+              el.textContent = Number(el.textContent) + 1;
+            },
+            () => this.$props.count
+          );
+        },
+        unmounted() {
+          console.log('unmount');
+        }
+      }
+    });
+
+    DOMY.createApp({
+      data() {
+        return {
+          show: false,
+          count: 0
+        };
+      }
+    })
+      .components({
+        Count
+      })
+      .mount();
+  </script>
+</html>

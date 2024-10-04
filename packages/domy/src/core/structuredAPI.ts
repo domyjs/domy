@@ -54,11 +54,18 @@ export async function structuredAPI(params: Params) {
     keys: []
   };
 
+  const contextProps: Parameters<typeof getContext>[0] = {
+    state,
+    cleanup: cb => unmountFns.push(cb),
+    scopedNodeData: [],
+    config
+  };
+
   // Methods
   for (const key in app.methods) {
     const method = toRegularFn(app.methods[key]);
     state.methods[key] = function (...args: any[]) {
-      return method.call(getContext({ state, scopedNodeData: [], config }), ...args);
+      return method.call(getContext(contextProps), ...args);
     };
   }
 
@@ -84,15 +91,10 @@ export async function structuredAPI(params: Params) {
 
               try {
                 const watcherfn = watchers[watcherName].fn;
-                await watcherfn.call(
-                  getContext({ state, scopedNodeData: [], config }),
-                  prevValue,
-                  newValue,
-                  {
-                    path,
-                    params: match.params
-                  }
-                );
+                await watcherfn.call(getContext(contextProps), prevValue, newValue, {
+                  path,
+                  params: match.params
+                });
               } catch (err: any) {
                 error(err);
               }
@@ -111,7 +113,7 @@ export async function structuredAPI(params: Params) {
   if (app.setup) {
     try {
       const setupFn = toRegularFn(app.setup);
-      await setupFn.call(getContext({ state, scopedNodeData: [], config }));
+      await setupFn.call(getContext(contextProps));
     } catch (err: any) {
       error(err);
       return;
@@ -143,7 +145,7 @@ export async function structuredAPI(params: Params) {
   if (app.mounted) {
     try {
       const mountedFn = toRegularFn(app.mounted);
-      await mountedFn.call(getContext({ state, scopedNodeData: [], config }));
+      await mountedFn.call(getContext(contextProps));
     } catch (err: any) {
       error(err);
     }
@@ -168,7 +170,7 @@ export async function structuredAPI(params: Params) {
       if (app.unmounted) {
         try {
           const unmountedFn = toRegularFn(app.unmounted);
-          await unmountedFn.call(getContext({ state, scopedNodeData: [], config }));
+          await unmountedFn.call(getContext(contextProps));
         } catch (err: any) {
           error(err);
         }

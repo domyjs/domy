@@ -19,6 +19,7 @@ export type DomyDirectiveReturn = {
 export type DomySpecialHelper = {
   domyHelperId?: number;
   el?: Element | Text;
+  cleanup(cb: () => void | Promise<void>): void;
   state: State;
   scopedNodeData: Record<string, any>[];
   config: Config;

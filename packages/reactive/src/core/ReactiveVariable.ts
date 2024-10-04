@@ -3,19 +3,13 @@
 export type Listener = OnGetListener | OnSetListener;
 export type OnGetListener = {
   type: 'onGet';
-  fn: (props: { path: string; objectId: number }) => void;
+  fn: (props: { proxy: any; path: string }) => void;
 };
 export type OnSetListener = {
   type: 'onSet';
-  fn: (props: {
-    path: string;
-    prevValue: any;
-    newValue: any;
-    objectId: number;
-  }) => void | Promise<void>;
+  fn: (props: { proxy: any; path: string; prevValue: any; newValue: any }) => void | Promise<void>;
 };
 
-let objectId = 0;
 export const isProxySymbol = Symbol();
 export const isSignalSymbol = Symbol();
 
@@ -24,7 +18,6 @@ export const isSignalSymbol = Symbol();
  * @author yoannchb-pro
  */
 export class ReactiveVariable {
-  public id = ++objectId;
   public name = '';
   private proxy: any = null;
 
@@ -226,7 +219,11 @@ export class ReactiveVariable {
 
   private callOnGetListeners(path: string[]) {
     if (!ReactiveVariable.IS_GLOBAL_LOCK) {
-      const params = { path: this.name + path.join('.'), objectId: this.id };
+      const params = {
+        path: this.name + path.join('.'),
+        proxy: this.getProxy()
+      };
+
       for (const listener of this.onGetListeners) {
         listener(params);
       }
@@ -235,7 +232,13 @@ export class ReactiveVariable {
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
     if (!ReactiveVariable.IS_GLOBAL_LOCK) {
-      const params = { path: this.name + path.join('.'), prevValue, newValue, objectId: this.id };
+      const params = {
+        path: this.name + path.join('.'),
+        prevValue,
+        newValue,
+        proxy: this.getProxy()
+      };
+
       for (const listener of this.onSetListeners) {
         listener(params);
       }

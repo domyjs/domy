@@ -70,6 +70,13 @@ export async function hookAPI(params: Params) {
     })
   );
 
+  const helpersProps: Parameters<typeof getHelpers>[0] = {
+    state,
+    cleanup: cb => unmountFns.push(cb),
+    scopedNodeData: [],
+    config
+  };
+
   // We call the setup
   const data = await fn({
     props,
@@ -79,11 +86,7 @@ export async function hookAPI(params: Params) {
     onUnMounted: callback => {
       app.unmounted = callback;
     },
-    helpers: getHelpers({
-      state,
-      scopedNodeData: [],
-      config
-    })
+    helpers: getHelpers(helpersProps)
   });
 
   // We set the data and methods of the app
@@ -127,7 +130,7 @@ export async function hookAPI(params: Params) {
   // Mounted
   if (app.mounted) {
     try {
-      await app.mounted({ helpers: getHelpers({ state, scopedNodeData: [], config }) });
+      await app.mounted({ helpers: getHelpers(helpersProps) });
     } catch (err: any) {
       error(err);
     }
@@ -151,7 +154,7 @@ export async function hookAPI(params: Params) {
       // Unmount
       if (app.unmounted) {
         try {
-          await app.unmounted({ helpers: getHelpers({ state, scopedNodeData: [], config }) });
+          await app.unmounted({ helpers: getHelpers(helpersProps) });
         } catch (err: any) {
           error(err);
         }
