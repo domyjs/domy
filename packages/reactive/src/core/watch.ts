@@ -1,5 +1,6 @@
 import { reactivesVariablesList } from './data';
 import { globalWatch } from './globalWatch';
+import { matchPath } from './matchPath';
 import { Listener, ReactiveVariable } from './ReactiveVariable';
 import { unwatch } from './unwatch';
 
@@ -12,24 +13,26 @@ import { unwatch } from './unwatch';
  * @author yoannchb-pro
  */
 export function watch(listener: Listener, effect: () => any) {
-  const objsToWatch: any[] = [];
+  const objsToWatch: { path?: string; obj: unknown }[] = [];
 
   const removeEffect = globalWatch({
     type: 'onGet',
-    fn: ({ obj }) => objsToWatch.push(obj)
+    fn: ({ obj, path }) => objsToWatch.push({ path, obj })
   });
 
-  // We listen to deep property
+  // We listen to deep property call
   // Example:
-  // const todo = reactive({ title: "Fork Domy On Github" })
+  // const todo = reactive({ title: "Fork Domy On Github", isCompleted: false })
   // watch(..., () => todo.title)
   const obj = effect();
 
   removeEffect();
 
-  // We add the current object to the watcher and handle the case it's an array of reactive variable
-  const registerObj = (o: any) =>
-    ReactiveVariable.isReactive(o) && objsToWatch.indexOf(o) === -1 && objsToWatch.push(o);
+  // We add the current reactive variable to the watcher or handle the case it's an array of reactive variable
+  const registerObj = (o: unknown) =>
+    ReactiveVariable.isReactive(o) &&
+    !objsToWatch.find(({ obj }) => obj === o) &&
+    objsToWatch.push({ obj: o });
   if (!ReactiveVariable.isReactive(obj) && Array.isArray(obj)) {
     for (const o of obj) {
       registerObj(o);
@@ -38,11 +41,33 @@ export function watch(listener: Listener, effect: () => any) {
     registerObj(obj);
   }
 
-  const reactiveInstances = objsToWatch.map(obj => reactivesVariablesList.get(obj));
+  // We create a wrapper on the current listener to ensure to only run the watcher function on a depp property change
+  // For example when we watch todo.title we only want to call the watcher if title is modifier not isCompleted
+  const watcherListener: Listener = {
+    type: listener.type,
+    fn: (props: Parameters<Listener['fn']>[0]) => {
+      for (const objToWatch of objsToWatch) {
+        if (!objToWatch.path && props.obj === objToWatch.obj) {
+          listener.fn(props as any);
+          break;
+        } else if (objToWatch.path) {
+          const matcher = matchPath(objToWatch.path, props.path);
+          if (matcher.isMatching) {
+            listener.fn(props as any);
+            break;
+          }
+        }
+      }
+    }
+  };
+
+  const reactiveInstances = objsToWatch.map(
+    ({ obj }) => reactivesVariablesList.get(obj) as ReactiveVariable
+  );
 
   for (const reactiveInstance of reactiveInstances) {
-    reactiveInstance?.attachListener(listener);
+    reactiveInstance?.attachListener(watcherListener);
   }
 
-  return () => unwatch(listener, objsToWatch);
+  return () => unwatch(watcherListener, reactiveInstances);
 }

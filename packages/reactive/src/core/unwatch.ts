@@ -1,5 +1,4 @@
-import { reactivesVariablesList } from './data';
-import { Listener } from './ReactiveVariable';
+import { Listener, ReactiveVariable } from './ReactiveVariable';
 
 /**
  * Remove a listener from some reactives variables
@@ -8,10 +7,8 @@ import { Listener } from './ReactiveVariable';
  *
  * @author yoannchb-pro
  */
-export function unwatch(listener: Listener, objsToUnwatch: unknown[]) {
-  const variablesToUnwatch = objsToUnwatch.map(obj => reactivesVariablesList.get(obj));
-
-  for (const reactiveVariable of variablesToUnwatch) {
+export function unwatch(listener: Listener, reactivesInstancesToUnwatch: ReactiveVariable[]) {
+  for (const reactiveVariable of reactivesInstancesToUnwatch) {
     reactiveVariable?.removeListener(listener);
   }
 }

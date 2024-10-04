@@ -17,6 +17,11 @@
       <button id="inc" @click="increment">+</button>
       <button id="dec" @click="decrement">-</button>
     </div>
+    <div id="todo">
+      <h1>{{ todo.title }}</h1>
+      <h2>{{ todo.isCompleted }}</h2>
+      <p>{{ todo.updates }}</p>
+    </div>
   </body>
   <script>
     const { signal, reactive, watch } = DOMY;
@@ -70,5 +75,21 @@
         decrement
       };
     }).mount(document.querySelector('#count2'));
+
+    DOMY.createApp(() => {
+      const todo = reactive({ title: 'Yoann', isCompleted: false, updates: 0 });
+
+      watch(
+        () => ++todo.updates,
+        () => todo.title
+      );
+
+      todo.isCompleted = true;
+      todo.title = 'Pierre';
+
+      return {
+        todo
+      };
+    }).mount(document.querySelector('#todo'));
   </script>
 </html>
