@@ -29,7 +29,7 @@
     });
 
     const Count = DOMY.createComponent({
-      props: ["title"],
+      props: ['title'],
       html: `<div>
             <h1>{{ $props.title ?? "Counter default title" }}</h1>
             <p>Count: {{ count }}</p>
@@ -37,8 +37,8 @@
             <button @click="decrement">-</button>
       </div>`,
       app: {
-        data(){
-          return { count: 0 }
+        data() {
+          return { count: 0 };
         },
         methods: {
           increment: () => ++this.count,
@@ -48,12 +48,12 @@
     });
 
     DOMY.createApp({
-      data(){
+      data() {
         return {
-	  message: 'An error occured',
+          message: 'An error occured',
           name: 'yoann',
           test: {}
-	}
+        };
       },
       methods: {
         sayHello() {
