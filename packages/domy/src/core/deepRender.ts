@@ -3,7 +3,7 @@ import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
-import { isDomyAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 import { error } from '../utils/logs';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
@@ -123,7 +123,11 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           props.byPassAttributes && props.byPassAttributes.includes(attr.name);
 
         if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
-        if (isComponent && !isDomyAttr(attr.name)) continue; //  We only render the directives for a component
+        if (
+          isComponent &&
+          (isEventAttr(attr.name) || isBindAttr(attr.name) || isNormalAttr(attr.name))
+        )
+          continue; //  We only render the directives for a component
 
         // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData (but we still need it for later)
         // We also need a new domy helper because every attribute need his own call effect

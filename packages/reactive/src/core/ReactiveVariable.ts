@@ -12,6 +12,7 @@ export type OnSetListener = {
 
 export const isProxySymbol = Symbol();
 export const isSignalSymbol = Symbol();
+export const skipReactivitySymbol = Symbol();
 
 /**
  * Allow to create a DeepProxy to listen to any change into an object
@@ -70,7 +71,12 @@ export class ReactiveVariable {
   }
 
   private canAttachProxy(target: any) {
-    return target !== null && typeof target === 'object' && !ReactiveVariable.isReactive(target);
+    return (
+      target !== null &&
+      typeof target === 'object' &&
+      !ReactiveVariable.isReactive(target) &&
+      !target?.[skipReactivitySymbol]
+    );
   }
 
   private isCollection(target: any) {

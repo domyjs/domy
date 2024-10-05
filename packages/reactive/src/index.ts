@@ -9,8 +9,12 @@ import { watch } from './core/watch';
 import { lockWatchers } from './core/lockWatchers';
 import { unlockWatchers } from './core/unlockWatchers';
 import { unReactive } from './core/unReactive';
+import { effectFn } from './core/effectFn';
+import { skipReactive } from './core/skipReactivity';
 
 export {
+  skipReactive,
+  effectFn,
   lockWatchers,
   unlockWatchers,
   reactive,

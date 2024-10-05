@@ -1,10 +1,19 @@
 # TODO
 
+- Make the queue async and better effect (using effectFn ?)
+
+  ```js
+  // We make the job asynchrone for some performances issues
+  // It allow us to regroup all the job as same time to avoid to many dom modifications
+  Promise.resolve()
+    .then(job)
+    .catch(err => error(err));
+  ```
+
 - test d-if sur d-render dans d-transition
 
-- $attrs for component
-- d-component and d-keep-alive
-- Make watch in reactive support function too instead of just objs because we cant do [todo.name.deepProperty]
+- d-keep-alive
+- plugins proper to the instance
 - Error boundary test with onError
 - Fixe typing (App, createApp, createComponent, params in watcher)
 

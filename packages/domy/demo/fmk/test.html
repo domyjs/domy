@@ -7,11 +7,13 @@
     <script src="../../dist/index.js"></script>
   </head>
   <body>
-    <p>Domy Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
-    <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
-    <button @click="increment">+</button>
-    <button @click="decrement">-</button>
-    <button @click="supert">++</button>
+    <div id="app">
+      <p>Domy Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
+      <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
+      <button @click="increment">+</button>
+      <button @click="decrement">-</button>
+      <button @click="supert">++</button>
+    </div>
   </body>
   <script>
     window.DOMY.createApp({
@@ -43,6 +45,6 @@
           this.count--;
         }
       }
-    }).mount();
+    }).mount(document.querySelector('#app'));
   </script>
 </html>

@@ -37,7 +37,7 @@
     const Count = DOMY.createComponent({
       props: ['showError', 'open', 'close'],
       html: `
-            <div>
+            <div d-attrs="$attrs">
               <h1>Props: {{ Object.keys($props).join(',') }}</h1>
               <p>Count: {{ count }}</p>
               <button @click="increment">+</button>

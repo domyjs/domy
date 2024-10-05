@@ -36,6 +36,8 @@ import { dUnMountedImplementation } from '../directives/d-unmounted';
 import { dAttrsImplementation } from '../directives/d-attrs';
 import { dKeyImplementation } from '../directives/d-key';
 import { $watch } from '../helpers/$watch';
+import { dComponentImplementation } from '../directives/d-component';
+import { $attrs } from '../helpers/$attrs';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -47,14 +49,16 @@ type Plugins = {
 export const PLUGINS: Plugins = {
   sortedDirectives: [
     'ignore',
+    'component',
     'once',
     'transition',
-
-    'scope',
     'key',
+
     'if',
     'else-if',
     'else',
+
+    'scope',
     'ref',
     'cloak'
   ],
@@ -84,7 +88,8 @@ export const PLUGINS: Plugins = {
     ignore: dIgnoreImplementation,
     once: dOnceImplementation,
     show: dShowImplementation,
-    cloak: dCloakImplementation
+    cloak: dCloakImplementation,
+    component: dComponentImplementation
   },
   helpers: {
     el: $el,
@@ -98,7 +103,8 @@ export const PLUGINS: Plugins = {
     scopedData: $scopedData,
     allData: $allData,
     methods: $methods,
-    watch: $watch
+    watch: $watch,
+    attrs: $attrs
   }
 };
 

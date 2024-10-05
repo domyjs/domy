@@ -26,6 +26,7 @@ function parseHTMl(html: string) {
 
 /**
  * Allow the user to create component
+ * This function get the component without the directives which has already been rendered
  * Example:
  * createComponent({
  *  props: ['title'],
@@ -71,17 +72,21 @@ export function createComponent<
         props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
       );
 
-      const data = domy.reactive({ props: {} as ComponentProps['props'] });
+      const data = domy.reactive({
+        props: {} as ComponentProps['props'],
+        attrs: {} as ComponentProps['attrs']
+      });
       const root = tree[0] as HTMLElement;
 
       const propsAttributes: Attr[] = [];
+      const attrsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
       const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
       const childrens = Array.from(componentElement.children) as Element[];
 
       // We handle the attributes
       for (const attr of componentElement.attributes) {
-        const attrNameWithoutBinding = attr.name.replace(/^:/, '');
+        const attrNameWithoutBinding = attr.name.replace(/^(:|d-bind:)/, '');
         const propName = domy.utils.kebabToCamelCase(attrNameWithoutBinding);
 
         // In case it's a prop
@@ -93,21 +98,14 @@ export function createComponent<
 
         // Attaching events
         if (isEventAttr(attr.name)) {
-          const fixedName = attr.name.replace(/^@/, 'd-on:');
+          const fixedName = domy.utils.fixeAttrName(attr.name);
           componentAttributes.push(fixedName);
           root.setAttribute(fixedName, attr.value);
           continue;
         }
 
-        if (root.hasAttribute(attr.name)) {
-          warn(
-            `The attribute "${attr.name}" has been skiped because he is already present on the component "${name}"`
-          );
-          continue;
-        }
-
-        componentAttributes.push(attr.name);
-        root.setAttribute(attr.name, attr.value);
+        // Handling attrs
+        attrsAttributes.push(attr);
       }
 
       // Error handling for required props
@@ -117,6 +115,7 @@ export function createComponent<
 
       // We ensure the props are reactive
       domy.effect(() => {
+        // reactive props
         for (const attr of propsAttributes) {
           const attrInfos = getDomyAttributeInformations(attr);
           const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
@@ -124,6 +123,16 @@ export function createComponent<
             data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
           } else {
             data.props[propName] = attr.value === '' ? true : attr.value;
+          }
+        }
+
+        // reactive attributes
+        for (const attr of attrsAttributes) {
+          const { attrName } = getDomyAttributeInformations(attr);
+          if (isBindAttr(attr.name)) {
+            data.attrs[attrName] = domy.evaluate(attr.value);
+          } else {
+            data.attrs[attrName] = attr.value;
           }
         }
       });
@@ -148,6 +157,7 @@ export function createComponent<
             componentDefinition.app,
             {
               props: data.props,
+              attrs: data.attrs,
               childrens
             },
             componentAttributes
@@ -162,11 +172,11 @@ export function createComponent<
       };
 
       // Ensure we can add some domy attribute to the component and render them on the component root
-      // Example: <Count d-if="showCount"></Count>
+      // Example: <Count @click="counterCliked"></Count>
       const { unmount, getRenderedElement } = domy.deepRender({
         element: root,
         scopedNodeData: domy.scopedNodeData,
-        byPassAttributes: [...propsAttributes.map(attr => attr.name), ...rootAttributes],
+        byPassAttributes: rootAttributes,
         skipChildRendering: true,
         onRenderedElementChange: newRoot => mountComponent(newRoot as HTMLElement)
       });

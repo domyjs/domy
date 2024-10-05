@@ -1,5 +1,6 @@
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
 import { findElementIndex } from './findElementIndex';
+import { fixeAttrName } from './fixeAttrName';
 import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
@@ -25,5 +26,6 @@ export const helpersUtils = {
   toRegularFn,
   executeActionAfterAnimation,
   getReactiveHandler,
-  mergeToNegativeCondition
+  mergeToNegativeCondition,
+  fixeAttrName
 };

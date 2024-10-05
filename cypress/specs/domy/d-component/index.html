@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-component</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <ul d-for="page of pages">
+      <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
+    </ul>
+
+    <template :title="currPage.title" d-component="currPage.component">
+      <span>{{ msg }}</span>
+    </template>
+  </body>
+  <script>
+    const Home = DOMY.createComponent({
+      props: ['title'],
+      html: `<p id="home"><template d-render="$childrens[0]"></template>{{ $props.title }}</p>`
+    });
+
+    const About = DOMY.createComponent({
+      props: ['title'],
+      html: `<p id="about"><template d-render="$childrens[0]"></template>{{ $props.title }}</p>`
+    });
+
+    DOMY.createApp({
+      data() {
+        return {
+          msg: 'Page: ',
+          currPage: null,
+          pages: [
+            { title: 'Home', component: 'Home' },
+            { title: 'About', component: 'About' },
+            { title: 'Not Exist', component: null }
+          ]
+        };
+      },
+      setup() {
+        this.currPage = this.pages[0];
+      }
+    })
+      .components({
+        Home,
+        About
+      })
+      .mount();
+  </script>
+</html>
