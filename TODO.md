@@ -1,6 +1,7 @@
 # TODO
 
-- Make the queue async and better effect (using effectFn ?)
+- test d-if sur d-render dans d-transition et test d-transaction sur d-component
+- Make the queue async and better effect (using effectFn ?) / Check we can queue the directive it self not just the effect
 
   ```js
   // We make the job asynchrone for some performances issues
@@ -9,8 +10,6 @@
     .then(job)
     .catch(err => error(err));
   ```
-
-- test d-if sur d-render dans d-transition
 
 - d-keep-alive
 - plugins proper to the instance

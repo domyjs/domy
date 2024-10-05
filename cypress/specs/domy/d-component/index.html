@@ -5,13 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>d-component</title>
     <script src="/packages/domy/dist/index.js"></script>
+    <style>
+      @keyframes enter {
+        0% {
+          opacity: 0;
+          transform: translateX(3rem);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(0rem);
+        }
+      }
+
+      @keyframes out {
+        0% {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-3rem);
+        }
+      }
+
+      .transition-enter {
+        animation: enter 0.3s ease-out;
+      }
+
+      .transition-out {
+        animation: out 0.3s ease-in;
+      }
+    </style>
   </head>
   <body>
     <ul d-for="page of pages">
       <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
     </ul>
 
-    <template :title="currPage.title" d-component="currPage.component">
+    <template :title="currPage.title" d-component="currPage.component" d-transition="transition">
       <span>{{ msg }}</span>
     </template>
   </body>

@@ -49,18 +49,17 @@ type Plugins = {
 export const PLUGINS: Plugins = {
   sortedDirectives: [
     'ignore',
-    'component',
     'once',
-    'transition',
+
     'key',
+    'transition',
 
     'if',
     'else-if',
     'else',
 
-    'scope',
-    'ref',
-    'cloak'
+    'component',
+    'scope'
   ],
   prefixes: {
     bind: binding,

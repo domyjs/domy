@@ -21,6 +21,7 @@ export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirecti
   const render = document.createElement('template');
   render.setAttribute('d-render', '$$component');
   el.replaceWith(render);
+  domy.setRenderedElement(render);
 
   const renderedDRender: ReturnType<DomyDirectiveHelper['deepRender']> = domy.deepRender({
     element: render,
