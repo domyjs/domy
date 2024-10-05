@@ -1,6 +1,7 @@
 # TODO
 
 - test d-if sur d-render dans d-transition et test d-transaction sur d-component
+- unmounted to unmount
 - Make the queue async and better effect (using effectFn ?) / Check we can queue the directive it self not just the effect
 
   ```js
@@ -11,8 +12,8 @@
     .catch(err => error(err));
   ```
 
-- d-keep-alive
 - plugins proper to the instance
+- d-keep-alive
 - Error boundary test with onError
 - Fixe typing (App, createApp, createComponent, params in watcher)
 
