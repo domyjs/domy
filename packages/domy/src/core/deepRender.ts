@@ -3,7 +3,7 @@ import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
-import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { isBindAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 import { error } from '../utils/logs';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
@@ -125,7 +125,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
         if (
           isComponent &&
-          (isEventAttr(attr.name) || isBindAttr(attr.name) || isNormalAttr(attr.name))
+          (isEventAttr(attr.name) || isBindAttr(attr.name) || isNormalAttr(attr.name)) // We want to only render domy attr but we don't use isDomyAttr because d-bind:class is a domy attr but not :class
         )
           continue; //  We only render the directives for a component
 

@@ -2,7 +2,7 @@ import { Data } from '../types/App';
 import { ComponentDefinition, ComponentProps, Components } from '../types/Component';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 import { isBindAttr, isEventAttr } from '../utils/isSpecialAttribute';
-import { error, warn } from '../utils/logs';
+import { error } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
 
 function cleanup(unmountFns: (() => void)[]) {
