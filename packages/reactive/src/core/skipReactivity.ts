@@ -11,7 +11,10 @@ import { skipReactivitySymbol } from './ReactiveVariable';
  */
 export function skipReactive<T = any>(obj: T): T {
   Object.defineProperty(obj, skipReactivitySymbol, {
-    value: true
+    enumerable: false,
+    writable: false,
+    value: true,
+    configurable: true
   });
   return obj;
 }

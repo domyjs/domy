@@ -18,8 +18,8 @@ const toBuild = process.argv[2];
     return fs.statSync(path.join('./packages', dir)).isDirectory();
   });
 
-  // Ensure domy is build first because plugin depends of it
-  const sorted = ['reactive', 'domy'];
+  // Ensure domy is build first because plugin depends of it (same for reactive)
+  const sorted = ['domy', 'reactive'];
   const sortedPackages = toBuild
     ? packages
     : [...sorted, ...packages.filter(name => !sorted.includes(name))];
@@ -27,34 +27,30 @@ const toBuild = process.argv[2];
   console.log('Building packages: ', sortedPackages.join(','));
 
   for (const packageName of sortedPackages) {
-    try {
-      // Read and parse the package.json file
-      const packageJsonPath = `./packages/${packageName}/package.json`;
-      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    // Read and parse the package.json file
+    const packageJsonPath = `./packages/${packageName}/package.json`;
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
-      // Rollup configuration for each package
-      const options: RollupOptions = {
-        input: `./packages/${packageName}/src/index.ts`,
-        output: {
-          name: packageJson.buildName ?? packageName,
-          file: `./packages/${packageName}/dist/index.js`,
-          format: 'umd',
-          sourcemap: true
-        },
-        plugins: [ts(config), terser()]
-      };
+    // Rollup configuration for each package
+    const options: RollupOptions = {
+      input: `./packages/${packageName}/src/index.ts`,
+      output: {
+        name: packageJson.buildName ?? packageName,
+        file: `./packages/${packageName}/dist/index.js`,
+        format: 'umd',
+        sourcemap: true
+      },
+      plugins: [ts(config), terser()]
+    };
 
-      // Create a bundle
-      const bundle = await rollup(options);
+    // Create a bundle
+    const bundle = await rollup(options);
 
-      // Write the bundle to disk
-      if (options.output) {
-        await bundle.write(options.output as OutputOptions);
-      }
-
-      console.log(`[SUCESS] Successfully built ${packageName}`);
-    } catch (error) {
-      console.error(`[ERROR] Error configuring the package ${packageName}:`, error);
+    // Write the bundle to disk
+    if (options.output) {
+      await bundle.write(options.output as OutputOptions);
     }
+
+    console.log(`[SUCESS] Successfully built ${packageName}`);
   }
 })();

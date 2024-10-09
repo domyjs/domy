@@ -1,5 +1,4 @@
-import { HookAPIFnDefinition } from '../core/hookAPI';
-import { Data, StructuredAPIApp } from './App';
+import { App, Data } from './App';
 import { DomyDirectiveHelper } from './Domy';
 
 export type ComponentProps = {
@@ -26,6 +25,6 @@ export type ComponentDefinition<
 > = {
   html: string;
   props?: string[];
-  app?: StructuredAPIApp<D, M, A, P> | HookAPIFnDefinition;
+  app?: App<D, M, A, P>;
   components?: Components;
 };

@@ -10,7 +10,7 @@
     "sourceMap": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "typeRoots": ["node_modules/@types"],
     "strictBindCallApply": true,
     "declaration": true,
@@ -19,5 +19,5 @@
       "@domyjs/*": ["packages/*/src"]
     }
   },
-  "include": ["packages/**/*"]
+  "include": ["packages/**/*", "test/jest/**/*"]
 }

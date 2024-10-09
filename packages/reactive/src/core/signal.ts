@@ -9,5 +9,12 @@ import { isSignalSymbol } from './ReactiveVariable';
  * @author yoannchb-pro
  */
 export function signal<T>(obj: T): { value: T } {
-  return reactive({ value: obj, [isSignalSymbol]: true });
+  const sig = { value: obj };
+  Object.defineProperty(sig, isSignalSymbol, {
+    enumerable: false,
+    writable: false,
+    value: true,
+    configurable: true
+  });
+  return reactive(sig);
 }

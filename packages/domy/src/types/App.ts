@@ -24,7 +24,7 @@ type Methods<
 };
 
 // The generic types are usefull here for createApp because it allow us to keep the typing of this into the methods
-export type StructuredAPIApp<
+export type App<
   D extends Data = any,
   M extends string = any,
   A extends any[] = any[],
@@ -39,12 +39,3 @@ export type StructuredAPIApp<
   data?: () => D;
   methods?: Methods<D, M, A, P>;
 };
-
-export type HookAPIApp = {
-  unmounted?: (props: { helpers: Helpers }) => void | Promise<void>;
-  mounted?: (props: { helpers: Helpers }) => void | Promise<void>;
-  data?: { [depName: string]: any };
-  methods?: { [fnName: string]: (...args: any[]) => any | Promise<any> };
-};
-
-export type App = StructuredAPIApp | HookAPIApp;

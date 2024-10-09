@@ -50,10 +50,6 @@ export class ReactiveVariable {
     return this.target;
   }
 
-  public clearProxy() {
-    this.proxy = null;
-  }
-
   public clearListeners() {
     this.onGetListeners = [];
     this.onSetListeners = [];
@@ -217,14 +213,22 @@ export class ReactiveVariable {
 
     try {
       for (const key in target) {
-        if (this.canAttachProxy(target[key]))
+        if (this.canAttachProxy(target[key])) {
           this.proxyQueueAction(
             () => (target[key] = this.createProxy(target[key], [...path, key]))
           );
+        }
       }
 
       const isCollection = this.isCollection(target);
-      target[isProxySymbol] = true;
+
+      Object.defineProperty(target, isProxySymbol, {
+        enumerable: false,
+        writable: true,
+        value: true,
+        configurable: true
+      });
+
       const prox = new Proxy(
         target,
         isCollection ? this.createCollectionHandler(path) : this.createHandler(path)

@@ -11,6 +11,13 @@ module.exports = {
   ignorePatterns: ['node_modules/', 'dist'],
   overrides: [
     {
+      files: ['test/**/*.ts'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        'no-constant-condition': 'off'
+      }
+    },
+    {
       files: ['packages/**/*.ts'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',

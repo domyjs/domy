@@ -1,4 +1,3 @@
-import { StructuredAPIApp } from '../types/App';
 import { Config } from '../types/Config';
 import {
   DomyMountedEventDetails,
@@ -15,9 +14,10 @@ import { reactive, watch, matchPath, unReactive } from '@domyjs/reactive';
 import { getRender } from './getRender';
 import { ComponentProps, Components } from '../types/Component';
 import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
+import { App } from '../types/App';
 
 type Params = {
-  app?: StructuredAPIApp;
+  app?: App;
   target: HTMLElement;
   config: Config;
   components: Components;
@@ -26,14 +26,13 @@ type Params = {
 };
 
 /**
- * Structured API
- * Create a DOMY App with an object structure
+ * App initialisation
  * @param app
  * @returns
  *
  * @author yoannchb-pro
  */
-export async function structuredAPI(params: Params) {
+export async function initApp(params: Params) {
   const unmountFns: (() => void)[] = [];
   const { components, config, target, app = {}, props } = params;
 

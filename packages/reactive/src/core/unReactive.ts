@@ -14,8 +14,6 @@ export function unReactive<T = any>(obj: T): T {
   const reactiveInstance = reactivesVariablesList.get(obj) as ReactiveVariable;
 
   reactiveInstance.clearListeners();
-  reactiveInstance.clearProxy();
-
   reactivesVariablesList.delete(obj);
 
   return reactiveInstance.getInitialObj();

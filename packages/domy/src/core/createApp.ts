@@ -1,10 +1,9 @@
-import { Data, StructuredAPIApp } from '../types/App';
+import { App, Data } from '../types/App';
 import { Components, ComponentProps } from '../types/Component';
 import { Config } from '../types/Config';
 import { toKebabCase } from '../utils/toKebabCase';
 import { getRender } from './getRender';
-import { hookAPI, HookAPIFnDefinition } from './hookAPI';
-import { structuredAPI } from './structuredAPI';
+import { initApp } from './initApp';
 
 /**
  * Initialise domy on a target (by default the body)
@@ -18,11 +17,7 @@ export function createAdvancedApp<
   M extends string,
   A extends any[],
   P extends ComponentProps['props']
->(
-  appDefinition?: StructuredAPIApp<D, M, A, P> | HookAPIFnDefinition,
-  props?: ComponentProps,
-  byPassAttributes?: string[]
-) {
+>(appDefinition?: App<D, M, A, P>, props?: ComponentProps, byPassAttributes?: string[]) {
   let config: Config = {};
   let componentsList: Components = {};
 
@@ -46,26 +41,14 @@ export function createAdvancedApp<
       const build = async () => {
         const domTarget = target ?? document.body;
 
-        let render;
-        const params = {
+        const render = await initApp({
+          app: appDefinition,
           components: componentsList,
           config,
           target: domTarget,
           props,
           byPassAttributes
-        };
-
-        if (typeof appDefinition === 'function') {
-          render = await hookAPI({
-            fn: appDefinition,
-            ...params
-          });
-        } else {
-          render = await structuredAPI({
-            app: appDefinition,
-            ...params
-          });
-        }
+        });
 
         resolve(render);
       };
@@ -97,7 +80,7 @@ export function createAdvancedApp<
  * @author yoannchb-pro
  */
 export function createApp<D extends Data, M extends string, A extends any[]>(
-  appDefinition?: StructuredAPIApp<D, M, A> | HookAPIFnDefinition
+  appDefinition?: App<D, M, A>
 ) {
   return createAdvancedApp<D, M, A, Record<string, never>>(appDefinition);
 }

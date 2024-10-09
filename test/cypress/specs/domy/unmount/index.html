@@ -34,11 +34,10 @@
               <p>Imbriqued Component</p>
             </div>
         `,
-      app: ({ onUnMounted }) => {
-        onUnMounted(({ helpers }) => {
-          console.log('Unmount imbriqued component');
-          helpers.$props.unmountUpdate();
-        });
+      app: {
+        unmounted() {
+          this.$props.unmountUpdate();
+        }
       }
     });
 
