@@ -33,7 +33,7 @@ type Params = {
  * @author yoannchb-pro
  */
 export async function initApp(params: Params) {
-  const unmountFns: (() => void)[] = [];
+  let unmountRender: (() => void) | null = null;
   const { components, config, target, app = {}, props } = params;
 
   // Initialisation event dispatch
@@ -75,7 +75,7 @@ export async function initApp(params: Params) {
     watchers[watcherName] = { fn: toRegularFn(app.watch[watcherName]), locked: false };
   }
   // We attach a watcher to data (so a global watcher) to call the correct watcher based on the path
-  const unwatch = watch(
+  watch(
     {
       type: 'onSet',
       fn: async props => {
@@ -103,7 +103,6 @@ export async function initApp(params: Params) {
     },
     () => state.data
   );
-  unmountFns.push(unwatch);
 
   // Setup
   if (app.setup) {
@@ -132,7 +131,7 @@ export async function initApp(params: Params) {
       scopedNodeData: [],
       byPassAttributes: params.byPassAttributes
     });
-    unmountFns.push(unmount);
+    unmountRender = unmount;
   } catch (err: any) {
     error(err);
   }
@@ -158,9 +157,7 @@ export async function initApp(params: Params) {
   return {
     render: getRender(deepRender),
     async unmount() {
-      for (const unmount of unmountFns) {
-        unmount();
-      }
+      if (unmountRender) unmountRender();
 
       // Unmount
       if (app.unmount) {

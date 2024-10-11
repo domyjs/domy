@@ -56,7 +56,7 @@ export function createComponent<
   const propsName = new Set(props.map(prop => prop.replace(/^!/, '')));
 
   return ({ name, componentElement, domy }) => {
-    const unmountFns: (() => void)[] = [];
+    const unmountChilds: (() => void)[] = [];
 
     try {
       const tree = parseHTMl(componentDefinition.html.trim());
@@ -78,7 +78,6 @@ export function createComponent<
       const propsAttributes: Attr[] = [];
       const attrsAttributes: Attr[] = [];
       const componentAttributes: string[] = [];
-      const rootAttributes = Array.from(root.attributes).map(attr => attr.name);
       const childrens = Array.from(componentElement.children) as Element[];
 
       // We handle the attributes
@@ -143,7 +142,7 @@ export function createComponent<
           element: child as Element,
           scopedNodeData: domy.scopedNodeData
         });
-        unmountFns.push(unmount);
+        unmountChilds.push(unmount);
       }
 
       let unmountComponent: (() => void) | undefined;
@@ -168,30 +167,23 @@ export function createComponent<
         });
       };
 
-      // Ensure we can add some domy attribute to the component and render them on the component root
-      // Example: <Count @click="counterCliked"></Count>
-      const { unmount, getRenderedElement } = domy.deepRender({
-        element: root,
-        scopedNodeData: domy.scopedNodeData,
-        byPassAttributes: rootAttributes,
-        skipChildRendering: true,
-        onRenderedElementChange: newRoot => mountComponent(newRoot as HTMLElement)
-      });
-      unmountFns.push(unmount);
-
       // We mount the new app on the component
-      mountComponent(getRenderedElement() as HTMLElement);
+      mountComponent(root as HTMLElement);
+
+      domy.setRenderedElement(root);
+
+      domy.onRenderedElementChange(newEl => {
+        mountComponent(newEl as HTMLElement);
+      });
 
       domy.cleanup(() => {
         if (unmountComponent) unmountComponent();
-        cleanup(unmountFns);
+        cleanup(unmountChilds);
         domy.unReactive(data);
       });
-
-      return getRenderedElement;
     } catch (err: any) {
       componentElement.remove();
-      cleanup(unmountFns);
+      cleanup(unmountChilds);
 
       domy.utils.error(`Component "${name}":`, err);
     }

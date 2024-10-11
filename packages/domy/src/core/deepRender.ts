@@ -3,7 +3,7 @@ import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
-import { isBindAttr, isEventAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { isBindAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 import { error } from '../utils/logs';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
@@ -62,14 +62,18 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       const getRenderedElement = () =>
         typeof renderedElement === 'function' ? renderedElement() : renderedElement;
       const setRenderedElement = (render: Element | (() => Element)) => {
+        const lastRenderedElement = getRenderedElement();
+
         if (element === props.element) renderedRootElement = render;
         renderedElement = render;
 
-        for (const onRenderedElementChangeCallback of onRenderedElementChangeCallbacks) {
-          try {
-            onRenderedElementChangeCallback(getRenderedElement());
-          } catch (err: any) {
-            error(err);
+        if (lastRenderedElement !== getRenderedElement()) {
+          for (const onRenderedElementChangeCallback of onRenderedElementChangeCallbacks) {
+            try {
+              onRenderedElementChangeCallback(getRenderedElement());
+            } catch (err: any) {
+              error(err);
+            }
           }
         }
       };
@@ -123,11 +127,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           props.byPassAttributes && props.byPassAttributes.includes(attr.name);
 
         if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
-        if (
-          isComponent &&
-          (isEventAttr(attr.name) || isBindAttr(attr.name) || isNormalAttr(attr.name)) // We want to only render domy attr but we don't use isDomyAttr because d-bind:class is a domy attr but not :class
-        )
-          continue; //  We only render the directives for a component
+        if (isComponent && (isBindAttr(attr.name) || isNormalAttr(attr.name))) continue; //  We only render the directives/events for a component
 
         // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData (but we still need it for later)
         // We also need a new domy helper because every attribute need his own call effect
@@ -156,14 +156,12 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       // Rendering component
       if (!skipComponentRendering && isComponent) {
         const componentSetup = components[element.localName];
-        const getRenderElement = componentSetup({
+        componentSetup({
           name: element.localName,
           componentElement: element as HTMLElement,
           domy: domyHelper.getPluginHelper()
         });
-
         domyHelper.callEffect();
-        if (getRenderElement) setRenderedElement(getRenderElement);
         cleanupFnList.push(domyHelper.getUnmountFn());
         continue;
       }

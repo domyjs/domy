@@ -7,10 +7,13 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
+    <p id="componentClick">{{ componentClick }}</p>
+
     <main d-for="i of [1, 2, 3]">
       <Count
         d-if="i % 2 === 1"
         d-key="i"
+        @click="++componentClick"
         :id="'count-' + i"
         :show-error="showError"
         :close="close"
@@ -78,7 +81,8 @@
     DOMY.createApp({
       data() {
         return {
-          showError: false
+          showError: false,
+          componentClick: 0
         };
       },
       methods: {

@@ -11,6 +11,19 @@ describe('Components tests', () => {
     cy.get('#count-3').should('exist');
   });
 
+  it('Check we can add listener to components', () => {
+    cy.get('#count-1').should('exist');
+    cy.get('#count-3').should('exist');
+
+    cy.get('#componentClick').contains('0');
+
+    cy.get('#count-1').click();
+    cy.get('#componentClick').contains('1');
+
+    cy.get('#count-3').click();
+    cy.get('#componentClick').contains('2');
+  });
+
   it('should increment the count when the "+" button is clicked', () => {
     cy.get('#count-1 p').contains('Count: 0');
     cy.get('#count-1 button').contains('+').click();

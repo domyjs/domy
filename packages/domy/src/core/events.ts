@@ -12,45 +12,62 @@ import on from '../utils/on';
  */
 export function events(domy: DomyDirectiveHelper) {
   const eventName = domy.attrName;
-  const el = domy.el;
+  let el = domy.el;
 
-  const originalFn = async (...args: any[]) => {
-    const executedValue = await domy.evaluateWithoutListening(domy.attr.value);
+  let removeEventListener: (() => void) | null = null;
 
-    // Ensure $nextTick is called after changing variable state
-    if (typeof executedValue === 'function') {
-      domy.queueJob(() => executedValue(...args));
-    }
-  };
+  function setUpEvent() {
+    const originalFn = async (...args: any[]) => {
+      const executedValue = await domy.evaluateWithoutListening(domy.attr.value);
 
-  const eventListener: EventListenerOrEventListenerObject = async event => {
-    // If the element is not present in the dom we don't execute the event
-    if (!el.isConnected) {
-      return;
-    }
-
-    const scope = {
-      $event: event
+      // Ensure $nextTick is called after changing variable state
+      if (typeof executedValue === 'function') {
+        domy.queueJob(() => executedValue(...args));
+      }
     };
 
-    domy.addScopeToNode(scope);
+    const eventListener: EventListenerOrEventListenerObject = async event => {
+      // If the element is not present in the dom we don't execute the event
+      if (!el.isConnected) {
+        return;
+      }
 
-    originalFn(event);
+      const scope = {
+        $event: event
+      };
 
-    domy.removeLastAddedScope();
+      domy.addScopeToNode(scope);
+
+      originalFn(event);
+
+      domy.removeLastAddedScope();
+    };
+
+    // We add wrappers to the listener to ensure we can add modifiers
+    const wrap = on({
+      el: el,
+      eventName,
+      listener: eventListener,
+      modifiers: domy.modifiers
+    });
+
+    wrap.listenerTarget.addEventListener(wrap.eventName, wrap.listener, wrap.options);
+
+    removeEventListener = () =>
+      wrap.listenerTarget.removeEventListener(wrap.eventName, wrap.listener, wrap.options);
+  }
+
+  setUpEvent();
+
+  const cleanup = () => {
+    if (removeEventListener) removeEventListener();
   };
 
-  // We add wrappers to the listener to ensure we can add modifiers
-  const wrap = on({
-    el: el,
-    eventName,
-    listener: eventListener,
-    modifiers: domy.modifiers
+  domy.onRenderedElementChange(newEl => {
+    cleanup();
+    el = newEl;
+    setUpEvent();
   });
 
-  wrap.listenerTarget.addEventListener(wrap.eventName, wrap.listener, wrap.options);
-
-  domy.cleanup(() =>
-    wrap.listenerTarget.removeEventListener(wrap.eventName, wrap.listener, wrap.options)
-  );
+  domy.cleanup(cleanup);
 }

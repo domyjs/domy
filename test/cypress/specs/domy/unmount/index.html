@@ -36,6 +36,7 @@
         `,
       app: {
         unmount() {
+          console.log('Unmount imbriqued');
           this.$props.unmountUpdate();
         }
       }
