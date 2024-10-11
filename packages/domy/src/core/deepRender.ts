@@ -98,7 +98,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
 
       let domyHelper = new DomyHelper(
         safeDeepRender,
-        getRenderedElement,
+        getRenderedElement(),
         setRenderedElement,
         onRenderedElementChange,
         state,

@@ -12,7 +12,7 @@ import on from '../utils/on';
  */
 export function events(domy: DomyDirectiveHelper) {
   const eventName = domy.attrName;
-  const el = domy.getRenderedElement();
+  const el = domy.el;
 
   const originalFn = async (...args: any[]) => {
     const executedValue = await domy.evaluateWithoutListening(domy.attr.value);

@@ -16,7 +16,7 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   let lastAttrs: Record<string, string> = {};
 
   domy.effect(() => {
-    const el = render?.getRenderedElement() ?? domy.getRenderedElement();
+    const el = render?.getRenderedElement() ?? domy.el;
     const attrs: Record<string, string> = domy.evaluate(domy.attr.value);
 
     if (render) render.unmount();

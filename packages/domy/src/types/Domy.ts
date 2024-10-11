@@ -27,7 +27,7 @@ export type DomySpecialHelper = {
 
 export type DomyDirectiveHelper = {
   domyHelperId: number;
-  getRenderedElement(): Element;
+  el: Element;
   setRenderedElement(element: Element): void;
   onRenderedElementChange(cb: (newRenderedElement: Element) => void): void;
   config: Config;

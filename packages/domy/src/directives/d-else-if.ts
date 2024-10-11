@@ -10,7 +10,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dElseIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.getRenderedElement() as HTMLElement;
+  const el = domy.el as HTMLElement;
 
   const allPreviousConditions = domy.utils.getPreviousConditionsElements(el, ['d-if', 'd-else-if']);
 

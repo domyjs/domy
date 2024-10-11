@@ -14,7 +14,7 @@ type Props = {
  */
 export function getElementVisibilityHandler(props: Props) {
   const domy = props.domy;
-  const originalEl = domy.getRenderedElement();
+  const originalEl = domy.el;
   const parent = originalEl.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 

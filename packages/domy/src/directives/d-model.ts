@@ -8,10 +8,7 @@ type Value = string | number | boolean | string[] | undefined;
  * @author yoannchb-pro
  */
 function changeValue(domy: DomyDirectiveHelper) {
-  const el = domy.getRenderedElement() as
-    | HTMLInputElement
-    | HTMLTextAreaElement
-    | HTMLSelectElement;
+  const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
   let value: Value = el.value;
   const prevValue = domy.evaluateWithoutListening(domy.attr.value);
@@ -82,14 +79,11 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // For example select need to know the options value
   // So in case the value is a binding we need to ensure domy rendered the childs before handling d-model
   domy.deepRender({
-    element: domy.getRenderedElement(),
+    element: domy.el,
     scopedNodeData: domy.scopedNodeData
   });
 
-  const el = domy.getRenderedElement() as
-    | HTMLInputElement
-    | HTMLTextAreaElement
-    | HTMLSelectElement;
+  const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
   // We look at change made by the user
   const eventName = domy.modifiers.includes('lazy') ? 'change' : 'input';

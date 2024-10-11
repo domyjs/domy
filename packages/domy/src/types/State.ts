@@ -9,5 +9,5 @@ export type State = {
 
   transitions: Map<Element, { enterTransition: string; outTransition: string; init: boolean }>;
   refs: Record<string, Element>;
-  keys: { key: string; getRenderedElement: () => Element }[];
+  keys: { key: string; element: Element }[];
 };

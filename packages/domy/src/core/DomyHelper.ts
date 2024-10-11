@@ -43,7 +43,7 @@ export class DomyHelper {
 
   constructor(
     private deepRenderFn: ReturnType<typeof createDeepRenderFn>,
-    public getRenderedElement: () => Element,
+    public el: Element,
     public setRenderedElement: (element: Element) => void,
     public onRenderedElementChange: (cb: (newRenderedElelement: Element) => void) => void,
     public state: State,
@@ -56,7 +56,7 @@ export class DomyHelper {
 
     return {
       domyHelperId: this.domyHelperId,
-      getRenderedElement: this.getRenderedElement,
+      el: this.el,
       setRenderedElement: this.setRenderedElement,
       onRenderedElementChange: this.onRenderedElementChange,
       state: this.state,
@@ -91,7 +91,7 @@ export class DomyHelper {
   copy() {
     return new DomyHelper(
       this.deepRenderFn,
-      this.getRenderedElement,
+      this.el,
       this.setRenderedElement,
       this.onRenderedElementChange,
       this.state,
@@ -147,7 +147,7 @@ export class DomyHelper {
     const evaluator = this.config.CSP ? cspEvaluate : evaluate;
     const context = getContext({
       domyHelperId: this.domyHelperId,
-      el: this.getRenderedElement(),
+      el: this.el,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       config: this.config

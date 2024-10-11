@@ -14,7 +14,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dMountedImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // Ensure the element with the childrens are mounted first
   domy.deepRender({
-    element: domy.getRenderedElement(),
+    element: domy.el,
     scopedNodeData: domy.scopedNodeData
   });
 

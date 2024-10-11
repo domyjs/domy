@@ -18,10 +18,11 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const parent = domy.getRenderedElement().parentNode as Element;
+  const el = domy.el;
+
+  const parent = el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
-  const el = domy.getRenderedElement();
   let transition = domy.state.transitions.get(el);
 
   if (el.tagName !== 'TEMPLATE')

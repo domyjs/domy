@@ -8,13 +8,13 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.getRenderedElement() as HTMLTemplateElement;
+  const el = domy.el as HTMLTemplateElement;
 
   if (el.tagName !== 'TEMPLATE')
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
 
   const childs = Array.from(el.content.childNodes);
-  const attrs = domy.getRenderedElement().attributes;
+  const attrs = el.attributes;
   const reactiveComponent = domy.reactive({ $$component: null as null | Element });
 
   // We replace the current element by a d-render

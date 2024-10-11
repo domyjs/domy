@@ -11,7 +11,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // We deep render the element first to ensure to get the correct initial style (in particular if the style is binded with :style)
   const render = domy.deepRender({
-    element: domy.getRenderedElement(),
+    element: domy.el,
     scopedNodeData: domy.scopedNodeData
   });
 
@@ -21,8 +21,7 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
   let isInitialised = false;
   let cleanupTransition: null | (() => void) = null;
 
-  domy.effect(() => {
-    el = render.getRenderedElement() as HTMLElement;
+  function visibilityHandler() {
     const transition = domy.state.transitions.get(el);
     const needTransition = transition && (isInitialised || transition.init);
 
@@ -55,5 +54,12 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     }
 
     isInitialised = true;
+  }
+
+  domy.onRenderedElementChange(newEl => {
+    el = newEl as HTMLElement;
+    visibilityHandler();
   });
+
+  domy.effect(visibilityHandler);
 }

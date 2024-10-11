@@ -9,7 +9,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.getRenderedElement() as HTMLTemplateElement;
+  const el = domy.el as HTMLTemplateElement;
 
   if (el.tagName !== 'TEMPLATE')
     throw Error(`The directive "${domy.directive}" should only be use on template element.`);

@@ -10,7 +10,7 @@ import { DomyDirectiveHelper } from '../types/Domy';
  */
 export function dTransitionImplementation(domy: DomyDirectiveHelper) {
   const isDynamic = domy.modifiers.includes('dynamic');
-  let transitionEl = domy.getRenderedElement();
+  let transitionEl = domy.el;
 
   const updateTransition = () => {
     const transitionName = isDynamic ? domy.evaluate(domy.attr.value) : domy.attr.value;

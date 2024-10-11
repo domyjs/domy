@@ -14,6 +14,7 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   if (domy.state.refs[domy.attr.value])
     throw new Error(`A ref with the name "${refName}" already exist.`);
 
+  const getRef = () => domy.state.refs[refName];
   const cleanRef = () => {
     delete domy.state.refs[refName];
   };
@@ -22,9 +23,10 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   // If the ref is dynamic
   if (domy.modifiers.includes('dynamic')) {
     domy.effect(() => {
+      const lastEl = getRef();
       cleanRef();
       refName = domy.evaluate(domy.attr.value);
-      setRef(domy.getRenderedElement());
+      setRef(lastEl);
     });
   }
 
@@ -35,7 +37,7 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   });
 
   // Set the initial ref
-  setRef(domy.getRenderedElement());
+  setRef(domy.el);
 
   domy.cleanup(() => {
     cleanRef();

@@ -10,7 +10,7 @@ import { DomyDirectiveHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle: string) {
-  const el = domy.getRenderedElement() as HTMLElement;
+  const el = domy.el as HTMLElement;
 
   el.setAttribute('style', defaultStyle);
 
@@ -31,7 +31,7 @@ function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle
  * @author yoannchb-pro
  */
 function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass: string) {
-  const el = domy.getRenderedElement() as HTMLElement;
+  const el = domy.el as HTMLElement;
 
   el.className = defaultClass;
 
@@ -58,7 +58,7 @@ function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass
  * @author yoannchb-pro
  */
 export function binding(domy: DomyDirectiveHelper) {
-  const el = domy.getRenderedElement();
+  const el = domy.el;
   const attrName = domy.attrName;
 
   // We register the default style and default class

@@ -17,7 +17,7 @@ type RendererProps = {
  */
 function renderer(props: RendererProps) {
   const domy = props.domy;
-  const el = domy.getRenderedElement();
+  const el = domy.el;
   const currentChildrens = Array.from(el.children);
   const currentRenders: (ReturnType<DomyDirectiveHelper['deepRender']> | Element)[] = [];
 
@@ -44,12 +44,11 @@ function renderer(props: RendererProps) {
       // Check if the key already exist so we can skip render
       const keyValue = domy.evaluateWithoutListening(keyAttr);
       const oldRenderRenderedKey = domy.state.keys.find(
-        registeredKey =>
-          registeredKey.key === keyValue && registeredKey.getRenderedElement().parentNode === el
+        registeredKey => registeredKey.key === keyValue && registeredKey.element.parentNode === el
       );
 
       if (oldRenderRenderedKey) {
-        const oldRender = oldRenderRenderedKey.getRenderedElement();
+        const oldRender = oldRenderRenderedKey.element;
         const oldRenderIndex = currentChildrens.findIndex(
           currentChild => currentChild === oldRender
         );
@@ -88,7 +87,7 @@ function renderer(props: RendererProps) {
  * @author yoannchb-pro
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.getRenderedElement();
+  const el = domy.el;
   const initialChilds = Array.from(el.children);
   const lastRenders: ReturnType<DomyDirectiveHelper['deepRender']>[] = [];
 
