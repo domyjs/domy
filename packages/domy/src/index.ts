@@ -1,18 +1,11 @@
-import { globalWatch } from './api/globalWatch';
-import { watch } from './api/watch';
 import { createApp } from './core/createApp';
 import { createComponent } from './core/createComponent';
 import { DOMY_EVENTS } from './core/DomyEvents';
 import { plugin } from './core/plugin';
-import { matchPath, reactive, signal } from '@domyjs/reactive';
+import { matchPath } from '@domyjs/reactive';
 
 const DOMY = {
-  signal,
-  reactive,
-  watch,
   matchPath,
-  globalWatch,
-
   createApp,
   createComponent,
   plugin
