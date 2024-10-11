@@ -1,7 +1,6 @@
 # TODO
 
 - test d-if sur d-render dans d-transition et test d-transaction sur d-component
-- unmounted to unmount
 - Make the queue async and better effect (using effectFn ?) / Check we can queue the directive it self not just the effect
 
   ```js
@@ -19,9 +18,8 @@
 
 - Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests
 
-- Toast plugin ?
-- Collapse, anchor, intersect, mutation, persist (localStorage), i18n, router plugins, (jsx)
-- Jest tests for reactive
+- Toast plugin ?, anchor, intersect, persist (localStorage), router plugins
+
 - script auto build, release ...
 - benchmark
 - Documentation

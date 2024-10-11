@@ -32,7 +32,7 @@ import { $scopedData } from '../helpers/$scopedData';
 import { $allData } from '../helpers/$allData';
 import { $methods } from '../helpers/$methods';
 import { dMountedImplementation } from '../directives/d-mounted';
-import { dUnMountedImplementation } from '../directives/d-unmounted';
+import { dUnMountImplementation } from '../directives/d-unmount';
 import { dAttrsImplementation } from '../directives/d-attrs';
 import { dKeyImplementation } from '../directives/d-key';
 import { $watch } from '../helpers/$watch';
@@ -71,7 +71,7 @@ export const PLUGINS: Plugins = {
     teleport: dTeleportImplementation,
     render: dRenderImplementation,
     mounted: dMountedImplementation,
-    unmounted: dUnMountedImplementation,
+    unmount: dUnMountImplementation,
     watch: dWatchImplementation,
     setup: dSetupImplementation,
     scope: dScopeImplementation,

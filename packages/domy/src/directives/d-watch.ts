@@ -1,5 +1,4 @@
 import { DomyDirectiveHelper } from '../types/Domy';
-import { warn } from '../utils/logs';
 
 /**
  * d-watch implementation
@@ -22,14 +21,16 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
   // We find the key to watch and the object to watch
   for (const keyToWatch of domy.modifiers) {
     if (keysToWatch.has(keyToWatch)) {
-      warn(`Duplicate key to watch "${keyToWatch}".`);
+      domy.utils.warn(`Duplicate key to watch "${keyToWatch}".`);
       continue;
     }
 
     const objToWatch = domy.scopedNodeData.find(obj => keyToWatch in obj);
 
     if (!objToWatch) {
-      warn(`WATCH: Unable to find "${keyToWatch}". Note you can only watch scoped data.`);
+      domy.utils.warn(
+        `WATCH: Unable to find "${keyToWatch}". Note you can only watch scoped data.`
+      );
       continue;
     }
 

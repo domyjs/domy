@@ -23,7 +23,7 @@
   <script>
     const unMountEventsCount = document.querySelector('#unmount-events-count');
 
-    document.addEventListener('domy:app:unmounted', () => {
+    document.addEventListener('domy:app:unmount', () => {
       unMountEventsCount.textContent = Number(unMountEventsCount.textContent) + 1;
     });
 
@@ -35,7 +35,7 @@
             </div>
         `,
       app: {
-        unmounted() {
+        unmount() {
           this.$props.unmountUpdate();
         }
       }
@@ -61,7 +61,7 @@
             count: 0
           };
         },
-        unmounted() {
+        unmount() {
           console.log('Unmount count');
           this.$props.unmountUpdate();
         },

@@ -37,8 +37,8 @@ class I18NHelper {
         let destinationLangage = newLangage;
         if (!(newLangage in this.settings.messages)) {
           destinationLangage = this.settings.defaultCallbackLangage;
-          console.warn(
-            `(I18N) The langage "${newLangage}" doesn't exist. Switched to "${destinationLangage}".`
+          domy.utils.warn(
+            `I18N: The langage "${newLangage}" doesn't exist. Switched to "${destinationLangage}".`
           );
         }
         this.langage!.lang = destinationLangage;
@@ -71,7 +71,7 @@ class I18NHelper {
       let message = domy.utils.get<string>(messages, key);
 
       if (!message) {
-        console.warn(`(I18N) Invalide key "${key}".`);
+        domy.utils.warn(`I18N: Invalide key "${key}".`);
         return defaultMessage;
       }
 
@@ -97,12 +97,12 @@ class I18NHelper {
  */
 function i18n(options: Settings) {
   if (!(options.currentLangage in options.messages)) {
-    throw new Error(`(I18N) The current langage "${options.currentLangage}" must be in messages.`);
+    throw new Error(`I18N: The current langage "${options.currentLangage}" must be in messages.`);
   }
 
   if (!(options.defaultCallbackLangage in options.messages)) {
     throw new Error(
-      `(I18N) The default callback langage "${options.defaultCallbackLangage}" must be in messages.`
+      `I18N: The default callback langage "${options.defaultCallbackLangage}" must be in messages.`
     );
   }
 

@@ -2,7 +2,7 @@ import { Config } from '../types/Config';
 import {
   DomyMountedEventDetails,
   DomyReadyEventDetails,
-  DomyUnMountedEventDetails
+  DomyUnMountEventDetails
 } from '../types/Events';
 import { State } from '../types/State';
 import { getContext } from '../utils/getContext';
@@ -163,9 +163,9 @@ export async function initApp(params: Params) {
       }
 
       // Unmount
-      if (app.unmounted) {
+      if (app.unmount) {
         try {
-          const unmountedFn = toRegularFn(app.unmounted);
+          const unmountedFn = toRegularFn(app.unmount);
           await unmountedFn.call(getContext(contextProps));
         } catch (err: any) {
           error(err);
@@ -176,9 +176,9 @@ export async function initApp(params: Params) {
 
       // Unmount event
       document.dispatchEvent(
-        new CustomEvent(DOMY_EVENTS.App.UnMounted, {
+        new CustomEvent(DOMY_EVENTS.App.UnMount, {
           bubbles: true,
-          detail: { app, state, target } as DomyUnMountedEventDetails
+          detail: { app, state, target } as DomyUnMountEventDetails
         })
       );
     }

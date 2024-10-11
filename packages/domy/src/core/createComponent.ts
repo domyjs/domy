@@ -1,8 +1,5 @@
 import { Data } from '../types/App';
 import { ComponentDefinition, ComponentProps, Components } from '../types/Component';
-import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
-import { isBindAttr, isEventAttr } from '../utils/isSpecialAttribute';
-import { error } from '../utils/logs';
 import { createAdvancedApp } from './createApp';
 
 function cleanup(unmountFns: (() => void)[]) {
@@ -97,7 +94,7 @@ export function createComponent<
         }
 
         // Attaching events
-        if (isEventAttr(attr.name)) {
+        if (domy.utils.isEventAttr(attr.name)) {
           const fixedName = domy.utils.fixeAttrName(attr.name);
           componentAttributes.push(fixedName);
           root.setAttribute(fixedName, attr.value);
@@ -117,9 +114,9 @@ export function createComponent<
       domy.effect(() => {
         // reactive props
         for (const attr of propsAttributes) {
-          const attrInfos = getDomyAttributeInformations(attr);
+          const attrInfos = domy.utils.getDomyAttributeInformations(attr);
           const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
-          if (isBindAttr(attr.name)) {
+          if (domy.utils.isBindAttr(attr.name)) {
             data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
           } else {
             data.props[propName] = attr.value === '' ? true : attr.value;
@@ -128,8 +125,8 @@ export function createComponent<
 
         // reactive attributes
         for (const attr of attrsAttributes) {
-          const { attrName } = getDomyAttributeInformations(attr);
-          if (isBindAttr(attr.name)) {
+          const { attrName } = domy.utils.getDomyAttributeInformations(attr);
+          if (domy.utils.isBindAttr(attr.name)) {
             data.attrs[attrName] = domy.evaluate(attr.value);
           } else {
             data.attrs[attrName] = attr.value;
@@ -196,7 +193,7 @@ export function createComponent<
       componentElement.remove();
       cleanup(unmountFns);
 
-      error(`Component "${name}":`, err);
+      domy.utils.error(`Component "${name}":`, err);
     }
   };
 }

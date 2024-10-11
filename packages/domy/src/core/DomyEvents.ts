@@ -4,6 +4,6 @@ export const DOMY_EVENTS = {
     Initialisation: 'domy:app:initialisation',
     Setuped: 'domy:app:setuped',
     Mounted: 'domy:app:mounted',
-    UnMounted: 'domy:app:unmounted'
+    UnMount: 'domy:app:unmount'
   }
 };

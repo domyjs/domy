@@ -1,6 +1,17 @@
 import { PLUGINS } from '../core/plugin';
 
 /**
+ * Fixe an attribute name to avoid setAttribute throwing error
+ * @param attrName
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function fixeAttrName(attrName: string) {
+  return attrName.replace(/^@/, 'd-on:').replace(/^:/, 'd-bind:');
+}
+
+/**
  * Get the name of a domy attribute/prefix
  * It will remove the domy "d-" prefix of a string
  * Otherwise it retun an empty string

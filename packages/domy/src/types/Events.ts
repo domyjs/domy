@@ -12,7 +12,7 @@ export type DomyMountedEventDetails = {
   state: State;
 };
 
-export type DomyUnMountedEventDetails = {
+export type DomyUnMountEventDetails = {
   app: App;
   target: Element;
   state: State;

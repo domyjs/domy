@@ -1,5 +1,4 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
-import { warn } from '../utils/logs';
 
 type RendererProps = {
   value: any;
@@ -96,7 +95,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   // Display a warning message if the childrens don't have a d-key attribute
   for (const child of initialChilds) {
     if (!child.getAttribute('d-key')) {
-      warn(
+      domy.utils.warn(
         `Elements inside the "${domy.directive}" directive should be rendered with "key" directive.`
       );
       break;

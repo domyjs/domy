@@ -4,9 +4,9 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-unmounted test', () => {
+describe('Attribute d-unmount test', () => {
   it('Check attribute is removed', () => {
-    cy.get('div').should('not.have.attr', 'd-unmounted');
+    cy.get('div').should('not.have.attr', 'd-unmount');
   });
 
   it('Check unmount function is called', () => {

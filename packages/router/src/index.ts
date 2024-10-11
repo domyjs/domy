@@ -50,7 +50,7 @@ class Router {
     this.hashMode = settings.hashMode;
     this.DOMY = settings.DOMY;
 
-    this.currentRoute = this.DOMY.reactive({ path: '' });
+    this.currentRoute = { path: '' }; // TODO: Make it reactive
 
     this.init();
   }
