@@ -1,4 +1,4 @@
-import { error } from './logs';
+import { error, warn } from './logs';
 
 const AsyncFunction = async function () {}.constructor;
 
@@ -20,6 +20,9 @@ export function toRegularFn<T extends (...args: any[]) => any>(arrowFn: T): T {
       const fn = isAsync ? AsyncFunction : Function;
       const params = match.groups?.params.split(',') ?? [];
       const code = match.groups!.code;
+      warn(
+        `Deprecated use of arrow function (use regular function instead). The arrow function has been transform into a regular function but will loose external data.`
+      );
       return fn(...params, isAsync ? `return (async () => { ${code} })()` : code) as T;
     }
   } catch (err: any) {

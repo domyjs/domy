@@ -1,6 +1,6 @@
 import {
   skipReactive,
-  effectFn,
+  watchEffect,
   lockWatchers,
   unlockWatchers,
   reactive,
@@ -32,18 +32,27 @@ describe('Reactive System Tests', () => {
 
   it('should trigger effect when reactive data changes', () => {
     const todo = reactive({ name: 'Yoann' });
-    const mockEffect = jest.fn(() => console.log(todo.name));
-    const unEffect = effectFn(mockEffect);
+    const mockEffect = jest.fn();
+    const unEffect = watchEffect(() => {
+      console.log(todo.name);
+      mockEffect();
+    });
 
     expect(mockEffect).toHaveBeenCalled();
 
     mockEffect.mockReset();
     todo.name = 'New Name';
     expect(mockEffect).toHaveBeenCalled();
-    unEffect();
 
     mockEffect.mockReset();
     todo.name = 'new Name 2';
+    expect(mockEffect).toHaveBeenCalled();
+
+    // Stop watching changes
+    unEffect();
+
+    mockEffect.mockReset();
+    todo.name = 'new Name 3';
     expect(mockEffect).not.toHaveBeenCalled();
   });
 
