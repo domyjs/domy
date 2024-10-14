@@ -8,10 +8,10 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el as HTMLTemplateElement;
-
-  if (el.tagName !== 'TEMPLATE')
+  if (!domy.block.isTemplate())
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
+
+  const el = domy.block.el as HTMLTemplateElement;
 
   const childs = Array.from(el.content.childNodes);
   const attrs = el.attributes;
@@ -20,8 +20,7 @@ export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirecti
   // We replace the current element by a d-render
   const render = document.createElement('template');
   render.setAttribute('d-render', '$$component');
-  el.replaceWith(render);
-  domy.setRenderedElement(render);
+  domy.block.replaceWith(render);
 
   const renderedDRender: ReturnType<DomyDirectiveHelper['deepRender']> = domy.deepRender({
     element: render,

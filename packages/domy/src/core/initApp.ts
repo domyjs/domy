@@ -49,9 +49,7 @@ export async function initApp(params: Params) {
     data: reactive(app.data?.() ?? {}),
     props,
     methods: {},
-    refs: {},
-    transitions: new Map(),
-    keys: []
+    refs: {}
   };
 
   const contextProps: Parameters<typeof getContext>[0] = {

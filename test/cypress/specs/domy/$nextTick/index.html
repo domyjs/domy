@@ -7,14 +7,21 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
+    <p id="checkNextTick"></p>
+
     <button
       id="updateMessage"
-      @click="async () => {
+      @click="() => {
         const p = $el.querySelector('p');
+        const checkNextTick = document.querySelector('#checkNextTick');
+
         msg = 'Hello World!';
-        console.log(p.textContent);
-        await $nextTick();
-        console.log(p.textContent)
+
+        checkNextTick.textContent = p.textContent;
+        $nextTick(() => {
+          console.log('Next tick called');
+          checkNextTick.textContent = p.textContent;
+        });
     }"
     >
       <p id="messageText">{{ msg }}</p>

@@ -13,11 +13,11 @@ const reg = /\{\{\s*(?<org>.+?)\s*\}\}/gi;
  * @author yoannchb-pro
  */
 export function renderText(domy: DomyDirectiveHelper) {
-  const originalTextContent = domy.el.textContent ?? '';
+  const originalTextContent = domy.block.el.textContent ?? '';
 
   domy.effect(() => {
     if (reg.test(originalTextContent)) {
-      domy.el.textContent = originalTextContent.replace(reg, function (_, code) {
+      domy.block.el.textContent = originalTextContent.replace(reg, function (_, code) {
         return domy.evaluate(code);
       });
     }

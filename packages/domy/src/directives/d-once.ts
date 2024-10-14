@@ -10,14 +10,8 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dOnceImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   domy.deepRender({
-    element: domy.el,
+    element: domy.block,
     scopedNodeData: domy.scopedNodeData,
     renderWithoutListeningToChange: true
   });
-
-  return {
-    skipChildsRendering: true,
-    skipOtherAttributesRendering: true,
-    skipComponentRendering: true
-  };
 }

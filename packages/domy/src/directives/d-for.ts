@@ -1,11 +1,14 @@
+import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 type RendererProps = {
   value: any;
   valueIndex: number;
-  initialChilds: Element[];
-  domy: DomyDirectiveHelper;
+
   forPattern: RegExpExecArray;
+  initialChilds: Element[];
+  lastRenders: Block[];
+  domy: DomyDirectiveHelper;
 };
 
 /**
@@ -17,9 +20,9 @@ type RendererProps = {
  */
 function renderer(props: RendererProps) {
   const domy = props.domy;
-  const el = domy.el;
+  const el = domy.block.el;
   const currentChildrens = Array.from(el.children);
-  const currentRenders: (ReturnType<DomyDirectiveHelper['deepRender']> | Element)[] = [];
+  const currentRenders: (Block | Element)[] = [];
 
   // Add the value to the scope
   let scope = {
@@ -42,13 +45,11 @@ function renderer(props: RendererProps) {
     const keyAttr = initialChild.getAttribute('d-key');
     if (keyAttr) {
       // Check if the key already exist so we can skip render
-      const keyValue = domy.evaluateWithoutListening(keyAttr);
-      const oldRenderRenderedKey = domy.state.keys.find(
-        registeredKey => registeredKey.key === keyValue && registeredKey.element.parentNode === el
-      );
+      const currentKeyValue = domy.evaluate(keyAttr);
+      const oldRenderBlock = props.lastRenders.find(block => block.key === currentKeyValue);
 
-      if (oldRenderRenderedKey) {
-        const oldRender = oldRenderRenderedKey.element;
+      if (oldRenderBlock) {
+        const oldRender = oldRenderBlock.el;
         const oldRenderIndex = currentChildrens.findIndex(
           currentChild => currentChild === oldRender
         );
@@ -73,8 +74,6 @@ function renderer(props: RendererProps) {
     currentRenders.push(render);
   }
 
-  domy.removeLastAddedScope();
-
   return currentRenders;
 }
 
@@ -87,9 +86,9 @@ function renderer(props: RendererProps) {
  * @author yoannchb-pro
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el;
+  const el = domy.block.el;
   const initialChilds = Array.from(el.children);
-  const lastRenders: ReturnType<DomyDirectiveHelper['deepRender']>[] = [];
+  const lastRenders: Block[] = [];
 
   // Display a warning message if the childrens don't have a d-key attribute
   for (const child of initialChilds) {
@@ -122,14 +121,15 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         domy,
         forPattern,
         initialChilds,
+        lastRenders,
         value,
         valueIndex
       });
 
       for (const render of renderedChildForCurrentValue) {
-        if ('getRenderedElement' in render) {
+        if (render instanceof Block) {
           lastRenders.push(render);
-          renderedChildrensForCurrentRender.add(render.getRenderedElement());
+          renderedChildrensForCurrentRender.add(render.el);
         } else {
           renderedChildrensForCurrentRender.add(render);
         }
@@ -151,7 +151,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
       if (!renderedChildrensForCurrentRender.has(child)) {
         child.remove();
 
-        const renderIndex = lastRenders.findIndex(render => render.getRenderedElement() === child);
+        const renderIndex = lastRenders.findIndex(block => block.el === child);
 
         if (renderIndex !== -1) {
           const render = lastRenders[renderIndex];

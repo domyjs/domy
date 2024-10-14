@@ -1,5 +1,7 @@
 import { DomySpecialHelper } from '../types/Domy';
 
+type Refs = Record<string, Element>;
+
 /**
  * Get a registered ref element
  * Example:
@@ -10,6 +12,10 @@ import { DomySpecialHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function $refs(domy: DomySpecialHelper) {
-  return domy.state.refs;
+export function $refs(domy: DomySpecialHelper): Refs {
+  const refs: Refs = {};
+  for (const [name, block] of Object.entries(domy.state.refs)) {
+    refs[name] = block.el;
+  }
+  return refs;
 }

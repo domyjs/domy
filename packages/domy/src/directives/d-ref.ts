@@ -9,35 +9,28 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const isDynamic = domy.modifiers.includes('dynamic');
-  let refName = isDynamic ? domy.evaluateWithoutListening(domy.attr.value) : domy.attr.value;
+  let refName = isDynamic ? domy.evaluate(domy.attr.value) : domy.attr.value;
 
-  if (domy.state.refs[domy.attr.value])
-    throw new Error(`A ref with the name "${refName}" already exist.`);
-
-  const getRef = () => domy.state.refs[refName];
   const cleanRef = () => {
     delete domy.state.refs[refName];
   };
-  const setRef = (el: Element) => (domy.state.refs[refName] = el);
+  const setRef = () => {
+    if (domy.state.refs[refName])
+      throw new Error(`A ref with the name "${refName}" already exist.`);
+
+    domy.state.refs[refName] = domy.block;
+  };
 
   // If the ref is dynamic
   if (domy.modifiers.includes('dynamic')) {
     domy.effect(() => {
-      const lastEl = getRef();
       cleanRef();
       refName = domy.evaluate(domy.attr.value);
-      setRef(lastEl);
+      setRef();
     });
   }
 
-  // If the element change we ensure to update the ref
-  domy.onRenderedElementChange(newRenderedElement => {
-    cleanRef();
-    setRef(newRenderedElement);
-  });
-
-  // Set the initial ref
-  setRef(domy.el);
+  setRef();
 
   domy.cleanup(() => {
     cleanRef();

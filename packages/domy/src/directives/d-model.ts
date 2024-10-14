@@ -8,10 +8,10 @@ type Value = string | number | boolean | string[] | undefined;
  * @author yoannchb-pro
  */
 function changeValue(domy: DomyDirectiveHelper) {
-  const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+  const el = domy.block.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
   let value: Value = el.value;
-  const prevValue = domy.evaluateWithoutListening(domy.attr.value);
+  const prevValue = domy.evaluate(domy.attr.value);
   const isPrevValueArray = Array.isArray(prevValue);
 
   if (el.tagName === 'SELECT') {
@@ -62,7 +62,7 @@ function changeValue(domy: DomyDirectiveHelper) {
     const objPath = avoidDeprecatedWith ? domy.attr.value.replace(/^this\./g, '') : domy.attr.value;
     domy.utils.set(domy.state.data, objPath, value);
   } else {
-    const setter = domy.evaluateWithoutListening(`(__val) => (${domy.attr.value}) = __val`);
+    const setter = domy.evaluate(`(__val) => (${domy.attr.value}) = __val`);
     setter(value);
   }
 }
@@ -79,11 +79,11 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
   // For example select need to know the options value
   // So in case the value is a binding we need to ensure domy rendered the childs before handling d-model
   domy.deepRender({
-    element: domy.el,
+    element: domy.block,
     scopedNodeData: domy.scopedNodeData
   });
 
-  const el = domy.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+  const el = domy.block.el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
   // We look at change made by the user
   const eventName = domy.modifiers.includes('lazy') ? 'change' : 'input';

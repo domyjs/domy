@@ -14,23 +14,19 @@ type Props = {
  */
 export function getElementVisibilityHandler(props: Props) {
   const domy = props.domy;
-  const originalEl = domy.el;
+  const originalEl = domy.block.el;
   const parent = originalEl.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
   originalEl.remove();
 
-  // Clone the original element and let domy know the new element
-  function clone() {
+  function cloneOrignalEl() {
     const clone = originalEl.cloneNode(true) as Element;
-    domy.setRenderedElement(clone);
-    return clone;
+    domy.block.setEl(clone);
   }
 
-  let currentEl = clone();
   let isInitialised = false;
-  let cleanupTransition: null | (() => void) = null;
-  let lastRender: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
+  cloneOrignalEl();
 
   /**
    * Check if an element should be display
@@ -40,51 +36,28 @@ export function getElementVisibilityHandler(props: Props) {
    * @author yoannchb-pro
    */
   function handleVisibility() {
-    const el = lastRender ? lastRender.getRenderedElement() : currentEl;
-
-    const transition = domy.state.transitions.get(el);
-    const needTransition = transition && (isInitialised || transition.init);
+    const el = domy.block.el;
 
     const isConnected = el.isConnected;
     const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {
       // Remove the element and unmount it
-      const disconnectAction = () => {
-        el.remove();
-        if (lastRender) lastRender.unmount();
-      };
-
-      // Handle out transition
-      if (needTransition) {
-        if (cleanupTransition) cleanupTransition();
-        el.classList.add(transition.outTransition);
-        cleanupTransition = domy.utils.executeActionAfterAnimation(el, () => {
-          el.classList.remove(transition.outTransition);
-          disconnectAction();
-        });
-      } else {
-        disconnectAction();
-      }
+      domy.block.remove();
+      domy.block.unmount();
     } else if ((!isConnected && shouldBeDisplay) || (isConnected && !isInitialised)) {
       // If the element is not connected and we are adding it to the dom then we clone the node to create a new instance
-      if (!isConnected) currentEl = clone();
+      if (!isConnected) cloneOrignalEl();
 
       // Handle enter transition
-      if (needTransition) {
-        if (cleanupTransition) cleanupTransition();
-        currentEl.classList.add(transition.enterTransition);
-        cleanupTransition = domy.utils.executeActionAfterAnimation(currentEl, () =>
-          currentEl.classList.remove(transition.enterTransition)
-        );
-      }
+      domy.block.applyTransition('enterTransition');
 
       // Restore the element to his original position
       const indexToInsert = props.domy.utils.findElementIndex(parentChilds, originalEl);
-      domy.utils.restoreElement(parent, currentEl, indexToInsert);
+      domy.utils.restoreElement(parent, el, indexToInsert);
 
-      lastRender = domy.deepRender({
-        element: currentEl,
+      domy.deepRender({
+        element: domy.block,
         scopedNodeData: domy.scopedNodeData
       });
     }
@@ -93,7 +66,7 @@ export function getElementVisibilityHandler(props: Props) {
   }
 
   domy.cleanup(() => {
-    if (lastRender) lastRender.unmount();
+    domy.block.unmount();
   });
 
   return handleVisibility;

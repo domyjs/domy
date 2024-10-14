@@ -19,13 +19,11 @@ const SETTINGS_ATTRIBUTE = 'd-collapse-settings';
  * @author yoannchb-pro
  */
 export function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el as HTMLElement;
+  const el = domy.block.el as HTMLElement;
 
   // We get the settings first to ensure it will not throw an error in the following deep render
   const settingsAttr = el.getAttribute(SETTINGS_ATTRIBUTE);
-  const settings: CollapseSettings = settingsAttr
-    ? domy.evaluateWithoutListening(settingsAttr)
-    : {};
+  const settings: CollapseSettings = settingsAttr ? domy.evaluate(settingsAttr) : {};
 
   el.removeAttribute(SETTINGS_ATTRIBUTE);
 

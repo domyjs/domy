@@ -10,37 +10,26 @@ import { DomyDirectiveHelper } from '../types/Domy';
  */
 export function dTransitionImplementation(domy: DomyDirectiveHelper) {
   const isDynamic = domy.modifiers.includes('dynamic');
-  let transitionEl = domy.el;
 
   const updateTransition = () => {
     const transitionName = isDynamic ? domy.evaluate(domy.attr.value) : domy.attr.value;
 
     // If no transition is provided we remove it
     if (!transitionName) {
-      domy.state.transitions.delete(transitionEl);
+      domy.block.transition = null;
       return;
     }
 
     const enterTransition = `${transitionName}-enter`;
     const outTransition = `${transitionName}-out`;
 
-    domy.state.transitions.set(transitionEl, {
+    domy.block.transition = {
       enterTransition,
       outTransition,
       init: domy.modifiers.includes('init')
-    });
+    };
   };
 
   if (isDynamic) domy.effect(updateTransition);
   else updateTransition();
-
-  domy.onRenderedElementChange(newRenderedElement => {
-    domy.state.transitions.delete(transitionEl);
-    transitionEl = newRenderedElement;
-    updateTransition();
-  });
-
-  domy.cleanup(() => {
-    domy.state.transitions.delete(transitionEl);
-  });
 }

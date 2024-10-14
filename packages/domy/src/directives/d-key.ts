@@ -13,26 +13,8 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dKeyImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const registeredKey: { key: string; element: Element } = {
-    key: domy.evaluateWithoutListening(domy.attr.value),
-    element: domy.el
-  };
-
-  // Add the key to the state
-  domy.state.keys.push(registeredKey);
-
-  // React to elemment change
-  domy.onRenderedElementChange(newEl => {
-    registeredKey.element = newEl;
-  });
-
   domy.effect(() => {
     const key = domy.evaluate(domy.attr.value);
-    registeredKey.key = key;
-  });
-
-  domy.cleanup(() => {
-    const index = domy.state.keys.indexOf(registeredKey);
-    domy.state.keys.splice(index, 1);
+    domy.block.key = key;
   });
 }

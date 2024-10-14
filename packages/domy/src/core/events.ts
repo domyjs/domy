@@ -12,26 +12,17 @@ import on from '../utils/on';
  */
 export function events(domy: DomyDirectiveHelper) {
   const eventName = domy.attrName;
-  let el = domy.el;
+  let el = domy.block.el;
 
   let removeEventListener: (() => void) | null = null;
 
   function setUpEvent() {
     const originalFn = async (...args: any[]) => {
-      const executedValue = await domy.evaluateWithoutListening(domy.attr.value);
-
-      // Ensure $nextTick is called after changing variable state
-      if (typeof executedValue === 'function') {
-        domy.queueJob(() => executedValue(...args));
-      }
+      const executedValue = await domy.evaluate(domy.attr.value);
+      if (typeof executedValue === 'function') domy.queueJob(() => executedValue(...args));
     };
 
     const eventListener: EventListenerOrEventListenerObject = async event => {
-      // If the element is not present in the dom we don't execute the event
-      if (!el.isConnected) {
-        return;
-      }
-
       const scope = {
         $event: event
       };
@@ -63,7 +54,7 @@ export function events(domy: DomyDirectiveHelper) {
     if (removeEventListener) removeEventListener();
   };
 
-  domy.onRenderedElementChange(newEl => {
+  domy.block.onElementChange(newEl => {
     cleanup();
     el = newEl;
     setUpEvent();

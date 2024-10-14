@@ -6,6 +6,7 @@ import { queueJob } from '../core/scheduler';
 import { helpersUtils } from '../utils/helpersUtils';
 import { directivesUtils } from '../utils/directivesUtils';
 import { createDeepRenderFn } from '../core/deepRender';
+import type { Block } from '../core/Block';
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -27,9 +28,7 @@ export type DomySpecialHelper = {
 
 export type DomyDirectiveHelper = {
   domyHelperId: number;
-  el: Element;
-  setRenderedElement(element: Element): void;
-  onRenderedElementChange(cb: (newRenderedElement: Element) => void): void;
+  block: Block;
   config: Config;
   state: State;
   scopedNodeData: Record<string, any>[];
@@ -42,10 +41,9 @@ export type DomyDirectiveHelper = {
   utils: typeof directivesUtils;
 
   queueJob: typeof queueJob;
-  effect(cb: () => void | Promise<void>): void;
-  cleanup(cb: () => void | Promise<void>): void;
+  effect(cb: () => void): void;
+  cleanup(cb: () => void): void;
   evaluate(code: string): any;
-  evaluateWithoutListening(code: string): any;
   deepRender: ReturnType<typeof createDeepRenderFn>;
   addScopeToNode(obj: Record<string, any>): void;
   removeScopeToNode(obj: Record<string, any>): void;

@@ -14,16 +14,10 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dMountedImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // Ensure the element with the childrens are mounted first
   domy.deepRender({
-    element: domy.el,
+    element: domy.block,
     scopedNodeData: domy.scopedNodeData
   });
 
-  const executedValue = domy.evaluateWithoutListening(domy.attr.value);
+  const executedValue = domy.evaluate(domy.attr.value);
   if (typeof executedValue === 'function') domy.queueJob(() => executedValue());
-
-  return {
-    skipChildsRendering: true,
-    skipOtherAttributesRendering: true,
-    skipComponentRendering: true
-  };
 }

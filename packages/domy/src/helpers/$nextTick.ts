@@ -14,11 +14,11 @@ import { queueJob } from '../core/scheduler';
  * @author yoannchb-pro
  */
 export function $nextTick() {
-  return (cb: () => void | Promise<void>) => {
+  return (cb?: () => void | Promise<void>) => {
     return new Promise(resolve => {
       queueJob(() => {
         if (typeof cb === 'function') cb();
-        resolve(undefined);
+        resolve(true);
       });
     });
   };

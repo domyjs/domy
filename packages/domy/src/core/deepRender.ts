@@ -4,7 +4,7 @@ import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
 import { isBindAttr, isNormalAttr } from '../utils/isSpecialAttribute';
-import { error } from '../utils/logs';
+import { Block } from './Block';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
@@ -15,12 +15,11 @@ type Elem = {
 };
 
 type Props = {
-  element: Element;
+  element: Element | Block;
   scopedNodeData: Record<string, any>[];
   byPassAttributes?: string[];
   skipChildRendering?: boolean;
   renderWithoutListeningToChange?: boolean;
-  onRenderedElementChange?: (renderedElement: Element) => void;
 };
 
 /**
@@ -32,20 +31,17 @@ type Props = {
  */
 export function createDeepRenderFn(state: State, config: Config, components: Components) {
   return function deepRender(props: Props) {
-    const cleanupFnList: DomyHelper['callCleanup'][] = [];
+    const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
 
     const toRenderList: Elem[] = [
       {
-        element: props.element,
+        element: rootBlock.el,
         scopedNodeData: props.scopedNodeData ?? []
       }
     ];
 
-    // Ensure we get the rendered element even if it cloned or replaced
-    let renderedRootElement: Element | (() => Element) = props.element;
-
     while (toRenderList.length > 0) {
-      let skipOtherAttributesRendering = false;
+      const skipOtherAttributesRendering = false;
       let skipChildRendering = props.skipChildRendering ?? false;
       let skipComponentRendering = false;
 
@@ -55,66 +51,40 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       const element = toRender.element;
       const isRootRendering = element === props.element;
 
-      // Ensure we get the rendered element even if it cloned or replace
-      let renderedElement: Element | (() => Element) = element;
-      const onRenderedElementChangeCallbacks =
-        isRootRendering && props.onRenderedElementChange ? [props.onRenderedElementChange] : [];
-      const getRenderedElement = () =>
-        typeof renderedElement === 'function' ? renderedElement() : renderedElement;
-      const setRenderedElement = (render: Element | (() => Element)) => {
-        const lastRenderedElement = getRenderedElement();
+      const block = isRootRendering ? rootBlock : new Block(element);
 
-        if (element === props.element) renderedRootElement = render;
-        renderedElement = render;
+      // const safeDeepRender = (args: Props) => {
+      //   const render = deepRender(args);
 
-        if (lastRenderedElement !== getRenderedElement()) {
-          for (const onRenderedElementChangeCallback of onRenderedElementChangeCallbacks) {
-            try {
-              onRenderedElementChangeCallback(getRenderedElement());
-            } catch (err: any) {
-              error(err);
-            }
-          }
-        }
-      };
-      const onRenderedElementChange = (cb: (newRenderedElement: Element) => void) => {
-        onRenderedElementChangeCallbacks.push(cb);
-      };
+      //   const isCurrentElement = args.element === getRenderedElement();
+      //   if (isCurrentElement) {
+      //     // We keep trace of the rendered element
+      //     setRenderedElement(render.getRenderedElement);
 
-      const safeDeepRender = (args: Props) => {
-        const render = deepRender(args);
+      //     // If deep render is called on the current element we skip the current rendering to avoid errors
+      //     skipChildRendering = true;
+      //     skipComponentRendering = true;
+      //     skipOtherAttributesRendering = true;
+      //   }
 
-        const isCurrentElement = args.element === getRenderedElement();
-        if (isCurrentElement) {
-          // We keep trace of the rendered element
-          setRenderedElement(render.getRenderedElement);
+      //   cleanupFnList.push(render.unmount); // We ensure to unmount the new rendered element
 
-          // If deep render is called on the current element we skip the current rendering to avoid errors
-          skipChildRendering = true;
-          skipComponentRendering = true;
-          skipOtherAttributesRendering = true;
-        }
-
-        cleanupFnList.push(render.unmount); // We ensure to unmount the new rendered element
-
-        return render;
-      };
+      //   return render;
+      // };
 
       let domyHelper = new DomyHelper(
-        safeDeepRender,
-        getRenderedElement(),
-        setRenderedElement,
-        onRenderedElementChange,
+        deepRender,
+        block,
         state,
         toRender.scopedNodeData,
-        config
+        config,
+        props.renderWithoutListeningToChange ?? false
       );
 
       // Rendering textContent
       if (element.nodeType === Node.TEXT_NODE) {
         renderText(domyHelper.getPluginHelper());
-        domyHelper.callEffect();
-        cleanupFnList.push(domyHelper.getUnmountFn());
+        block.addCleanup(domyHelper.getCleanupFn());
         continue;
       }
 
@@ -138,11 +108,8 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         // We render the attribute
         // It's the main logic of DOMY
         element.removeAttribute(attr.name);
-        const options: DomyDirectiveReturn = renderAttribute(
-          domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
-        );
-        domyHelper.callEffect();
-        cleanupFnList.push(domyHelper.getUnmountFn());
+        const options: DomyDirectiveReturn = renderAttribute(domyHelper.getPluginHelper());
+        block.addCleanup(domyHelper.getCleanupFn());
 
         // Handling options returned by the attribute
         if (options) {
@@ -161,8 +128,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
           componentElement: element as HTMLElement,
           domy: domyHelper.getPluginHelper()
         });
-        domyHelper.callEffect();
-        cleanupFnList.push(domyHelper.getUnmountFn());
+        block.addCleanup(domyHelper.getCleanupFn());
         continue;
       }
 
@@ -178,22 +144,6 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       }
     }
 
-    // Deep render helpers
-    return {
-      getRenderedElement() {
-        return typeof renderedRootElement === 'function'
-          ? renderedRootElement()
-          : renderedRootElement;
-      },
-      unmount() {
-        for (const cleanupFn of cleanupFnList) {
-          try {
-            cleanupFn();
-          } catch (err: any) {
-            error(err);
-          }
-        }
-      }
-    };
+    return rootBlock;
   };
 }

@@ -3,13 +3,13 @@ import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import * as ReactiveUtils from '@domyjs/reactive';
 import { queueJob } from './scheduler';
-import { Listener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { State } from '../types/State';
 import { Config } from '../types/Config';
 import { directivesUtils } from '../utils/directivesUtils';
 import { DomyDirectiveHelper } from '../types/Domy';
 import { createDeepRenderFn } from './deepRender';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
+import type { Block } from './Block';
 
 let domyHelperId = 0;
 
@@ -21,10 +21,8 @@ let domyHelperId = 0;
 export class DomyHelper {
   private domyHelperId = ++domyHelperId;
 
-  private unwatchSetListener: (() => void) | null = null;
-
-  private cleanupFn: (() => Promise<void> | void) | null = null;
-  private effectFn: (() => Promise<void> | void) | null = null;
+  private cleanupFn: (() => void) | null = null;
+  private clearEffectList: (() => void)[] = [];
 
   public prefix: string = '';
   public directive: string = '';
@@ -32,33 +30,19 @@ export class DomyHelper {
   public attr: { name: string; value: string } = { name: '', value: '' };
   public modifiers: string[] = [];
 
-  // The name of a variable don't make it unique because we can declare the same variable name for an other DOMY instance
-  // It happend because domy have a globalWatcher when it evaluate a code to check dependencies
-  private objectsToListen = new Set<any>();
-  // Allow us to only update if a the correct property have been update
-  // Let's imagine a deep property has been updated data.todoList.0
-  // We wan't to update only if this property has been update and not when an other property has been modified (example: data.todoList.1)
-  // It happend because the id only identifie the first level (so data and data.todoList have the same id)
-  private paths = new Set<string>();
-
   constructor(
     private deepRenderFn: ReturnType<typeof createDeepRenderFn>,
-    public el: Element,
-    public setRenderedElement: (element: Element) => void,
-    public onRenderedElementChange: (cb: (newRenderedElelement: Element) => void) => void,
+    public block: Block,
     public state: State,
     public scopedNodeData: Record<string, any>[] = [],
-    public config: Config
+    public config: Config,
+    public renderWithoutListeningToChange: boolean
   ) {}
 
-  getPluginHelper(renderWithoutListeningToChange = false): DomyDirectiveHelper {
-    const evaluateWithoutListening = this.evaluateWithoutListening.bind(this);
-
+  getPluginHelper(): DomyDirectiveHelper {
     return {
       domyHelperId: this.domyHelperId,
-      el: this.el,
-      setRenderedElement: this.setRenderedElement,
-      onRenderedElementChange: this.onRenderedElementChange,
+      block: this.block,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       config: this.config,
@@ -76,10 +60,7 @@ export class DomyHelper {
       queueJob,
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
-      evaluate: renderWithoutListeningToChange
-        ? evaluateWithoutListening
-        : this.evaluate.bind(this),
-      evaluateWithoutListening,
+      evaluate: this.evaluate.bind(this),
       deepRender: this.deepRenderFn,
       addScopeToNode: this.addScopeToNode.bind(this),
       removeScopeToNode: this.removeScopeToNode.bind(this),
@@ -91,12 +72,11 @@ export class DomyHelper {
   copy() {
     return new DomyHelper(
       this.deepRenderFn,
-      this.el,
-      this.setRenderedElement,
-      this.onRenderedElementChange,
+      this.block,
       this.state,
       [...this.scopedNodeData], // Ensure the scoped node data of the current node are not affected by the next operations (like removing the scoped data in d-for)
-      this.config
+      this.config,
+      this.renderWithoutListeningToChange
     );
   }
 
@@ -110,44 +90,33 @@ export class DomyHelper {
     this.attr.value = attr.value;
   }
 
-  clearOnSetListener() {
-    if (this.unwatchSetListener) {
-      this.unwatchSetListener();
-      this.unwatchSetListener = null;
+  clearEffects() {
+    for (const clearEffect of this.clearEffectList) {
+      clearEffect();
     }
   }
 
-  attachOnSetListener() {
-    if (this.unwatchSetListener) return;
-
-    // Allow us to call the effect when a dependencie change
-    this.unwatchSetListener = ReactiveUtils.globalWatch({
-      type: 'onSet',
-      fn: ({ path, obj }) => {
-        if (!this.objectsToListen.has(obj)) return;
-
-        for (const listenedPath of this.paths) {
-          if (ReactiveUtils.matchPath(listenedPath, path).isMatching) {
-            this.callEffect();
-          }
-        }
-      }
-    });
+  effect(fn: () => void) {
+    if (!this.renderWithoutListeningToChange) {
+      queueJob(() => {
+        const uneffect = ReactiveUtils.watchEffect(fn);
+        this.clearEffectList.push(uneffect);
+      });
+    } else {
+      queueJob(fn);
+    }
   }
 
-  effect(cb: () => void | Promise<void>) {
-    this.effectFn = cb;
-  }
-
-  cleanup(cb: () => void | Promise<void>) {
+  cleanup(cb: () => void) {
     this.cleanupFn = cb;
   }
 
-  eval(code: string) {
+  evaluate(code: string) {
     const evaluator = this.config.CSP ? cspEvaluate : evaluate;
+
     const context = getContext({
       domyHelperId: this.domyHelperId,
-      el: this.el,
+      el: this.block.el,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
       config: this.config
@@ -159,38 +128,8 @@ export class DomyHelper {
       context,
       returnResult: true
     });
+
     return executedValued;
-  }
-
-  evaluate(code: string) {
-    const listener: Listener = {
-      type: 'onGet',
-      fn: ({ path, obj }) => {
-        this.objectsToListen.add(obj);
-        this.paths.add(path);
-        this.attachOnSetListener(); // Only attach a onSet listener if we have a dependencie
-      }
-    };
-
-    const unwatch = ReactiveUtils.globalWatch(listener);
-
-    let executedValue;
-    let errorMsg;
-    try {
-      executedValue = this.eval(code);
-    } catch (err: any) {
-      errorMsg = err;
-    }
-
-    unwatch();
-
-    if (errorMsg) throw errorMsg; // We want to throw the error later to ensure we removed the global watcher
-
-    return executedValue;
-  }
-
-  evaluateWithoutListening(code: string) {
-    return this.eval(code);
   }
 
   addScopeToNode(obj: Record<string, any>) {
@@ -206,22 +145,15 @@ export class DomyHelper {
     this.scopedNodeData.pop();
   }
 
-  getUnmountFn() {
+  getCleanupFn() {
     return this.callCleanup.bind(this);
   }
 
   callCleanup() {
     queueJob(() => {
-      this.clearOnSetListener();
-      this.effectFn = null; // Ensure we don't have effect on the element anymore
+      this.clearEffects();
       if (typeof this.cleanupFn === 'function') this.cleanupFn();
       this.cleanupFn = null;
     });
-  }
-
-  callEffect() {
-    // We remove every paths/objectsIdToListen every times the effect is called because the dependencies to watch can be differents
-    this.paths = new Set();
-    if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
   }
 }

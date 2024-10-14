@@ -1,3 +1,4 @@
+import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
@@ -18,46 +19,25 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el;
-
-  const parent = el.parentNode as Element;
-  const parentChilds = Array.from(parent.childNodes);
-
-  let transition = domy.state.transitions.get(el);
-
-  if (el.tagName !== 'TEMPLATE')
+  if (!domy.block.isTemplate())
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
 
-  let lastRender: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
-  let isInitialised = false;
+  const parent = domy.block.el.parentNode as Element;
+  const parentChilds = Array.from(parent.childNodes);
+
+  let lastRender: Block | null = null;
 
   domy.effect(() => {
+    const el = domy.block.el;
     const elementToRender: Element | null | undefined = domy.evaluate(domy.attr.value.trim());
 
     if (Array.isArray(elementToRender))
       throw new Error(`The directive "${domy.directive}" only support one element as parameter.`);
 
-    // We unmount the  last render
-    const disconnectAction = (currLastRender: typeof lastRender) => {
-      if (currLastRender) {
-        currLastRender.getRenderedElement().remove();
-        currLastRender.unmount();
-      }
-    };
-
-    // Handle remove transition
+    // Handle remove transition and unmount the last render
     if (lastRender) {
-      if (transition) {
-        const currentLastRender = lastRender;
-        const transitionEl = lastRender.getRenderedElement();
-        transitionEl.classList.remove(transition.enterTransition);
-        transitionEl.classList.add(transition.outTransition);
-        domy.utils.executeActionAfterAnimation(transitionEl, () =>
-          disconnectAction(currentLastRender)
-        );
-      } else {
-        disconnectAction(lastRender);
-      }
+      domy.block.remove();
+      domy.block.unmount();
     }
 
     // Handle the case we don't have any element to render
@@ -73,31 +53,20 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     }
 
     // We replace the element
-    el.replaceWith(elementToRender);
-    domy.setRenderedElement(elementToRender);
+    domy.block.replaceWith(elementToRender);
 
     // Render the element
     lastRender = domy.deepRender({
-      element: elementToRender,
+      element: domy.block,
       scopedNodeData: domy.scopedNodeData
     });
 
-    // Handle transition
-    transition = domy.state.transitions.get(lastRender.getRenderedElement());
-    const needTransition = transition && (isInitialised || transition.init);
-    if (needTransition) {
-      const { getRenderedElement } = lastRender;
-      elementToRender.classList.add(transition!.enterTransition);
-      domy.utils.executeActionAfterAnimation(elementToRender, () =>
-        getRenderedElement().classList.remove(transition!.enterTransition)
-      );
-    }
-
-    isInitialised = true;
+    // Handle enter transition
+    domy.block.applyTransition('enterTransition');
   });
 
   domy.cleanup(() => {
-    if (lastRender) lastRender.unmount();
+    domy.block.unmount();
   });
 
   return {

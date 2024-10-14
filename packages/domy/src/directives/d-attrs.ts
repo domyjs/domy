@@ -1,3 +1,4 @@
+import type { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
@@ -12,11 +13,11 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const needRender = domy.modifiers.includes('render');
 
-  let render: ReturnType<DomyDirectiveHelper['deepRender']> | null = null;
+  let render: Block | null = null;
   let lastAttrs: Record<string, string> = {};
 
   domy.effect(() => {
-    const el = render?.getRenderedElement() ?? domy.el;
+    const el = render?.el ?? domy.block.el;
     const attrs: Record<string, string> = domy.evaluate(domy.attr.value);
 
     if (render) render.unmount();

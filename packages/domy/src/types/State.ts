@@ -1,3 +1,4 @@
+import type { Block } from '../core/Block';
 import { ComponentProps } from './Component';
 
 type Method = (...args: any[]) => any | Promise<any>;
@@ -7,7 +8,5 @@ export type State = {
   props?: ComponentProps;
   methods: { [fnName: string]: Method };
 
-  transitions: Map<Element, { enterTransition: string; outTransition: string; init: boolean }>;
-  refs: Record<string, Element>;
-  keys: { key: string; element: Element }[];
+  refs: Record<string, Block>;
 };

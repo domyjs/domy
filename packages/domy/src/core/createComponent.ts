@@ -169,10 +169,9 @@ export function createComponent<
 
       // We mount the new app on the component
       mountComponent(root as HTMLElement);
+      domy.block.setEl(root);
 
-      domy.setRenderedElement(root);
-
-      domy.onRenderedElementChange(newEl => {
+      domy.block.onElementChange(newEl => {
         mountComponent(newEl as HTMLElement);
       });
 
