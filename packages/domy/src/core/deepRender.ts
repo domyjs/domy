@@ -10,6 +10,7 @@ import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
 
 type Elem = {
+  parentBlock?: Block;
   element: Element;
   scopedNodeData?: Record<string, any>[];
 };
@@ -31,6 +32,7 @@ type Props = {
  */
 export function createDeepRenderFn(state: State, config: Config, components: Components) {
   return function deepRender(props: Props) {
+    const rootElement = props.element instanceof Block ? props.element.el : props.element;
     const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
 
     const toRenderList: Elem[] = [
@@ -41,7 +43,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
     ];
 
     while (toRenderList.length > 0) {
-      const skipOtherAttributesRendering = false;
+      let skipOtherAttributesRendering = false;
       let skipChildRendering = props.skipChildRendering ?? false;
       let skipComponentRendering = false;
 
@@ -49,31 +51,28 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
       const toRender = toRenderList.pop() as Elem;
       const element = toRender.element;
-      const isRootRendering = element === props.element;
+      const isRootRendering = element === rootElement;
 
       const block = isRootRendering ? rootBlock : new Block(element);
+      if (toRender.parentBlock) block.parentBlock = toRender.parentBlock;
 
-      // const safeDeepRender = (args: Props) => {
-      //   const render = deepRender(args);
+      const safeDeepRender = (args: Props) => {
+        const render = deepRender(args);
 
-      //   const isCurrentElement = args.element === getRenderedElement();
-      //   if (isCurrentElement) {
-      //     // We keep trace of the rendered element
-      //     setRenderedElement(render.getRenderedElement);
+        const argElement = args.element instanceof Block ? args.element.el : args.element;
+        const isCurrentElement = argElement === block.el;
+        if (isCurrentElement) {
+          // If deep render is called on the current element we skip the current rendering to avoid errors
+          skipChildRendering = true;
+          skipComponentRendering = true;
+          skipOtherAttributesRendering = true;
+        }
 
-      //     // If deep render is called on the current element we skip the current rendering to avoid errors
-      //     skipChildRendering = true;
-      //     skipComponentRendering = true;
-      //     skipOtherAttributesRendering = true;
-      //   }
-
-      //   cleanupFnList.push(render.unmount); // We ensure to unmount the new rendered element
-
-      //   return render;
-      // };
+        return render;
+      };
 
       let domyHelper = new DomyHelper(
-        deepRender,
+        safeDeepRender,
         block,
         state,
         toRender.scopedNodeData,
@@ -138,6 +137,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
         if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We ensure we never render script
 
         toRenderList.push({
+          parentBlock: block,
           element: child as Element,
           scopedNodeData: domyHelper.scopedNodeData
         });

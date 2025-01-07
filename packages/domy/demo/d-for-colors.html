@@ -14,21 +14,21 @@
     <button id="rm" @click="removeElement()">Remove</button>
   </body>
   <script>
+    const colors = ['red', 'blue', 'purple', 'yellow', 'white', 'black'];
+
     DOMY.createApp({
       setup() {
-        this.list.push(this.generateElement());
+        this.addElement();
       },
       data() {
         return {
+          index: 0,
           list: []
         };
       },
       methods: {
-        generateElement() {
-          return (Math.random() * 10000).toString(36);
-        },
         addElement() {
-          this.list.push(this.generateElement());
+          this.list.push(colors[this.index++ % colors.length]);
         },
         removeElement() {
           this.list.pop();

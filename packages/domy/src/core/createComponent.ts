@@ -69,11 +69,15 @@ export function createComponent<
         props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
       );
 
+      const root = tree[0] as HTMLElement;
+
+      // Replace the component by the root
+      domy.block.replaceWith(root);
+
       const data = domy.reactive({
         props: {} as ComponentProps['props'],
         attrs: {} as ComponentProps['attrs']
       });
-      const root = tree[0] as HTMLElement;
 
       const propsAttributes: Attr[] = [];
       const attrsAttributes: Attr[] = [];
@@ -89,14 +93,6 @@ export function createComponent<
         if (propsName.has(propName)) {
           requiredProps.delete(propName);
           propsAttributes.push(attr);
-          continue;
-        }
-
-        // Attaching events
-        if (domy.utils.isEventAttr(attr.name)) {
-          const fixedName = domy.utils.fixeAttrName(attr.name);
-          componentAttributes.push(fixedName);
-          root.setAttribute(fixedName, attr.value);
           continue;
         }
 
@@ -133,16 +129,13 @@ export function createComponent<
         }
       });
 
-      // Remplace the component
-      componentElement.replaceWith(root);
-
       // // We render the childs first to ensure they keep the current state and not the component state
       for (const child of componentElement.childNodes) {
-        const { unmount } = domy.deepRender({
+        const childBlock = domy.deepRender({
           element: child as Element,
           scopedNodeData: domy.scopedNodeData
         });
-        unmountChilds.push(unmount);
+        unmountChilds.push(childBlock.unmount.bind(childBlock));
       }
 
       let unmountComponent: (() => void) | undefined;
@@ -169,7 +162,6 @@ export function createComponent<
 
       // We mount the new app on the component
       mountComponent(root as HTMLElement);
-      domy.block.setEl(root);
 
       domy.block.onElementChange(newEl => {
         mountComponent(newEl as HTMLElement);

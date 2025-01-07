@@ -7,31 +7,36 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <p id="checkNextTick"></p>
+    <p>Actual msg: <span id="messageText">{{ msg }}</span></p>
+
+    <p id="before"></p>
+    <p id="after"></p>
 
     <button
       id="updateMessage"
       @click="() => {
-        const p = $el.querySelector('p');
+        const p = document.querySelector('#messageText');
         const checkNextTick = document.querySelector('#checkNextTick');
 
-        msg = 'Hello World!';
+        msg = 'After';
 
-        checkNextTick.textContent = p.textContent;
+        console.log('Before next tick:', p.textContent);
+        document.querySelector('#before').textContent = p.textContent;
+
         $nextTick(() => {
-          console.log('Next tick called');
-          checkNextTick.textContent = p.textContent;
+          console.log('Next tick called:', p.textContent);
+          document.querySelector('#after').textContent = p.textContent;
         });
     }"
     >
-      <p id="messageText">{{ msg }}</p>
+      Update message
     </button>
   </body>
   <script>
     DOMY.createApp({
       data() {
         return {
-          msg: 'Say hi'
+          msg: 'Before'
         };
       }
     }).mount();

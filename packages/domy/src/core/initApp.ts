@@ -124,12 +124,12 @@ export async function initApp(params: Params) {
   const deepRender = createDeepRenderFn(state, config, components);
   try {
     // Render the dom with DOMY
-    const { unmount } = deepRender({
+    const block = deepRender({
       element: target,
       scopedNodeData: [],
       byPassAttributes: params.byPassAttributes
     });
-    unmountRender = unmount;
+    unmountRender = block.unmount.bind(block);
   } catch (err: any) {
     error(err);
   }

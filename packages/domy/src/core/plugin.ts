@@ -22,7 +22,6 @@ import { dScopeImplementation } from '../directives/d-scope';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 import { dSetupImplementation } from '../directives/d-setup';
 import { dWatchImplementation } from '../directives/d-watch';
-import { dRenderImplementation } from '../directives/d-render';
 import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
 import { dTeleportImplementation } from '../directives/d-teleport';
@@ -38,6 +37,7 @@ import { dKeyImplementation } from '../directives/d-key';
 import { $watch } from '../helpers/$watch';
 import { dComponentImplementation } from '../directives/d-component';
 import { $attrs } from '../helpers/$attrs';
+import { dInsertImplementation } from '../directives/d-insert';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -69,7 +69,7 @@ export const PLUGINS: Plugins = {
     key: dKeyImplementation,
     attrs: dAttrsImplementation,
     teleport: dTeleportImplementation,
-    render: dRenderImplementation,
+    insert: dInsertImplementation,
     mounted: dMountedImplementation,
     unmount: dUnMountImplementation,
     watch: dWatchImplementation,

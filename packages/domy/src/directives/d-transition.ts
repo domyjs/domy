@@ -3,7 +3,7 @@ import { DomyDirectiveHelper } from '../types/Domy';
 /**
  * d-transition implementation
  * Register a transition name for an element
- * It's really usefull when we render it with d-show, d-if, d-else-if, d-else, d-render
+ * It's really usefull when we render it with d-show, d-if, d-else-if, d-else, d-insert
  * @param domy
  *
  * @author yoannchb-pro

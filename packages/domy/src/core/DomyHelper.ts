@@ -64,7 +64,6 @@ export class DomyHelper {
       deepRender: this.deepRenderFn,
       addScopeToNode: this.addScopeToNode.bind(this),
       removeScopeToNode: this.removeScopeToNode.bind(this),
-      removeLastAddedScope: this.removeLastAddedScope.bind(this),
       getContext
     };
   }
@@ -98,10 +97,13 @@ export class DomyHelper {
 
   effect(fn: () => void) {
     if (!this.renderWithoutListeningToChange) {
-      queueJob(() => {
-        const uneffect = ReactiveUtils.watchEffect(fn);
-        this.clearEffectList.push(uneffect);
+      const uneffect = ReactiveUtils.watchEffect(() => {
+        return new Promise(resolve => {
+          queueJob(fn);
+          queueJob(() => resolve(true));
+        });
       });
+      this.clearEffectList.push(uneffect);
     } else {
       queueJob(fn);
     }
@@ -139,10 +141,6 @@ export class DomyHelper {
   removeScopeToNode(obj: Record<string, any>) {
     const index = this.scopedNodeData.findIndex(o => o === obj);
     if (index !== -1) this.scopedNodeData.splice(index, 1);
-  }
-
-  removeLastAddedScope() {
-    this.scopedNodeData.pop();
   }
 
   getCleanupFn() {

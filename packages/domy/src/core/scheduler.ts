@@ -11,18 +11,18 @@ const queue: QueueElement[] = [];
  * @author yoannchb-pro
  */
 function flushJobs() {
+  if (queued || queue.length === 0) return;
+
   queued = true;
 
   for (const job of queue) {
-    try {
-      job();
-    } catch (err: any) {
-      error(err);
-    }
+    // Use Promise.resolve to defer the execution and regroup DOM updates
+    Promise.resolve()
+      .then(job)
+      .catch(err => error(err));
   }
 
   queue.length = 0;
-
   queued = false;
 }
 
@@ -33,7 +33,7 @@ function flushJobs() {
  * @author yoannchb-pro
  */
 export function queueJob(job: QueueElement) {
-  queue.push(job);
+  if (!queue.includes(job)) queue.push(job);
 
   if (!queued) {
     flushJobs();

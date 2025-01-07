@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>d-render</title>
+    <title>d-insert</title>
     <script src="../dist/index.js"></script>
   </head>
   <body>
@@ -15,7 +15,7 @@
         return p;
       } }"
     >
-      <template d-render="renderElement ? createP() : null"></template>
+      <template d-insert.render="renderElement ? createP() : null"></template>
       <button id="inc" @click="++count">+</button>
       <button id="dec" @click="--count">-</button>
 

@@ -4,6 +4,9 @@ import { error } from '../utils/logs';
 type Transition = { enterTransition: string; outTransition: string; init: boolean };
 type TransitionType = 'enterTransition' | 'outTransition';
 
+/**
+ * Utilitary class to handle properly an element
+ */
 export class Block {
   public key: string | null = null;
 
@@ -13,7 +16,13 @@ export class Block {
   private cleanups: (() => void)[] = [];
   private onElChangeCbList: ((newEl: Element) => void)[] = [];
 
-  constructor(public el: Element) {}
+  public parentBlock: Block | null = null;
+
+  constructor(private element: Element | Block) {}
+
+  get el(): Element {
+    return this.element instanceof Block ? this.element.el : this.element;
+  }
 
   private callCbForElementChange(newEl: Element) {
     for (const cb of this.onElChangeCbList) {
@@ -25,9 +34,9 @@ export class Block {
     this.onElChangeCbList.push(cb);
   }
 
-  setEl(newEl: Element) {
-    this.el = newEl;
-    this.callCbForElementChange(newEl);
+  setEl(newEl: Element | Block) {
+    this.element = newEl;
+    this.callCbForElementChange(this.el);
   }
 
   applyTransition(transitionType: TransitionType, action?: () => void) {
@@ -42,15 +51,10 @@ export class Block {
     });
   }
 
-  cloneEl(deep: boolean = false) {
-    const clone = this.el.cloneNode(deep) as Element;
-    this.el = clone;
-    return clone;
-  }
-
-  replaceWith(newEl: Element) {
-    this.el.replaceWith(newEl);
-    this.el = newEl;
+  replaceWith(newEl: Element | Block) {
+    const oldEl = this.el;
+    this.setEl(newEl);
+    oldEl.replaceWith(this.el);
   }
 
   remove() {
@@ -63,6 +67,7 @@ export class Block {
 
   addCleanup(cleanup: () => void) {
     this.cleanups.push(cleanup);
+    if (this.parentBlock) this.parentBlock.addCleanup(cleanup);
   }
 
   unmount() {
@@ -73,5 +78,7 @@ export class Block {
         error(err);
       }
     }
+
+    if (this.element instanceof Block) this.element.unmount();
   }
 }

@@ -2,8 +2,8 @@ import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
- * d-render implementation
- * Allow to replace the current element by an other element and to render it
+ * d-insert implementation
+ * Allow to replace the current element by an other element and to render it with a modifier
  * Example:
  * <div
  *   d-scope="{ count: 0, createP: () => {
@@ -12,16 +12,18 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  *     return p;
  *   } }"
  * >
- *  <template d-render="createP()"></template>
+ *  <template d-insert.render="createP()"></template>
  * </di>
  * @param domy
  *
  * @author yoannchb-pro
  */
-export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   if (!domy.block.isTemplate())
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
 
+  const shouldBeRender = domy.modifiers.includes('render');
+  const originalEl = domy.block.el;
   const parent = domy.block.el.parentNode as Element;
   const parentChilds = Array.from(parent.childNodes);
 
@@ -36,8 +38,9 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
     // Handle remove transition and unmount the last render
     if (lastRender) {
-      domy.block.remove();
-      domy.block.unmount();
+      // We unmount the current lastRender not the current block otherwise this effect will be unmount too
+      lastRender.remove();
+      lastRender.unmount();
     }
 
     // Handle the case we don't have any element to render
@@ -48,25 +51,25 @@ export function dRenderImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
     // We restore the element if the childrens change and it have been remove
     if (!el.isConnected) {
-      const indexToInsert = domy.utils.findElementIndex(parentChilds, el);
+      const indexToInsert = domy.utils.findElementIndex(parentChilds, originalEl);
       domy.utils.restoreElement(parent, el, indexToInsert);
     }
 
-    // We replace the element
     domy.block.replaceWith(elementToRender);
 
     // Render the element
-    lastRender = domy.deepRender({
-      element: domy.block,
-      scopedNodeData: domy.scopedNodeData
-    });
+    if (shouldBeRender) {
+      lastRender = domy.deepRender({
+        element: domy.block.el,
+        scopedNodeData: domy.scopedNodeData
+      });
+
+      // We replace the element with the new block
+      domy.block.replaceWith(lastRender);
+    }
 
     // Handle enter transition
     domy.block.applyTransition('enterTransition');
-  });
-
-  domy.cleanup(() => {
-    domy.block.unmount();
   });
 
   return {

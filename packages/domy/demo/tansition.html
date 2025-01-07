@@ -40,7 +40,7 @@
 
     <template
       d-transition.init="transition"
-      d-render="show ? createElement('Hello World 1!') : createElement('Hello World 2!')"
+      d-insert.render="show ? createElement('Hello World 1!') : createElement('Hello World 2!')"
     ></template>
 
     <div d-transition.init="transition" d-if="show">d-if</div>

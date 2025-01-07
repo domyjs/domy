@@ -36,16 +36,18 @@ function renderer(props: RendererProps) {
     };
   }
 
-  domy.addScopeToNode(scope);
-
   for (let childIndex = 0; childIndex < props.initialChilds.length; ++childIndex) {
     const initialChild = props.initialChilds[childIndex] as Element;
     const currentIndex = props.valueIndex * props.initialChilds.length + childIndex;
 
     const keyAttr = initialChild.getAttribute('d-key');
+
     if (keyAttr) {
       // Check if the key already exist so we can skip render
+      domy.addScopeToNode(scope);
       const currentKeyValue = domy.evaluate(keyAttr);
+      domy.removeScopeToNode(scope);
+
       const oldRenderBlock = props.lastRenders.find(block => block.key === currentKeyValue);
 
       if (oldRenderBlock) {
@@ -65,11 +67,11 @@ function renderer(props: RendererProps) {
     }
 
     // Create and render the new element
-    const newChild = initialChild.cloneNode(true);
+    const newChild = initialChild.cloneNode(true) as Element;
     el.appendChild(newChild);
     const render = domy.deepRender({
-      element: newChild as Element,
-      scopedNodeData: domy.scopedNodeData
+      element: newChild,
+      scopedNodeData: [...domy.scopedNodeData, scope]
     });
     currentRenders.push(render);
   }
@@ -100,17 +102,21 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     }
   }
 
+  // Checking "for" pattern
+  const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)/gi;
+  const forPattern = forRegex.exec(domy.attr.value);
+
+  if (!forPattern)
+    throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
+
+  const isForIn = forPattern.groups!.type === 'in';
+
   // Remove the original content
   el.innerHTML = '';
 
-  domy.effect(() => {
-    const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)/gi;
-    const forPattern = forRegex.exec(domy.attr.value);
+  const handleChilds = () => {
+    const el = domy.block.el;
 
-    if (!forPattern)
-      throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
-
-    const isForIn = forPattern.groups!.type === 'in';
     const executedValue = domy.evaluate(forPattern.groups!.org);
 
     let valueIndex = 0;
@@ -147,7 +153,8 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     }
 
     // Remove remaining childs that shouldn't be there
-    for (const child of el.childNodes) {
+    const currChildrens = Array.from(el.children);
+    for (const child of currChildrens) {
       if (!renderedChildrensForCurrentRender.has(child)) {
         child.remove();
 
@@ -160,11 +167,13 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         }
       }
     }
-  });
+  };
+
+  domy.effect(handleChilds);
 
   domy.cleanup(() => {
-    for (const { unmount } of lastRenders) {
-      unmount();
+    for (const block of lastRenders) {
+      block.unmount();
     }
   });
 

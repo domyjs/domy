@@ -10,15 +10,15 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // We deep render the element first to ensure to get the correct initial style (in particular if the style is binded with :style)
-  const render = domy.deepRender({
+  domy.deepRender({
     element: domy.block,
     scopedNodeData: domy.scopedNodeData
   });
 
-  let el = render.el as HTMLElement;
-  const originalDisplay = el.style.display ?? '';
+  const originalDisplay = (domy.block.el as HTMLElement).style.display ?? '';
 
   function visibilityHandler() {
+    const el = domy.block.el as HTMLElement;
     const shouldBeDisplay = domy.evaluate(domy.attr.value);
     const isAlreadyShow = el.style.display !== 'none';
 
@@ -34,8 +34,7 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     }
   }
 
-  domy.block.onElementChange(newEl => {
-    el = newEl as HTMLElement;
+  domy.block.onElementChange(() => {
     visibilityHandler();
   });
 

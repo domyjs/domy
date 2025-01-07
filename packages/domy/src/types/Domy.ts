@@ -47,7 +47,6 @@ export type DomyDirectiveHelper = {
   deepRender: ReturnType<typeof createDeepRenderFn>;
   addScopeToNode(obj: Record<string, any>): void;
   removeScopeToNode(obj: Record<string, any>): void;
-  removeLastAddedScope(): void;
   getContext: typeof getContext;
 } & typeof ReactiveUtils;
 

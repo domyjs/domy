@@ -1,3 +1,4 @@
+import { DOMY_EVENTS } from '../core/DomyEvents';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 type Value = string | number | boolean | string[] | undefined;
@@ -94,6 +95,7 @@ export function dModelImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     el.removeEventListener(eventName, listenChangeCallback);
   });
 
+  // On a un pb car le effect s'ajoute avant les effects creer par le effect du d-for
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);
     const isValueArray = Array.isArray(executedValue);

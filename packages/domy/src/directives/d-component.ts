@@ -12,28 +12,19 @@ export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirecti
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
 
   const el = domy.block.el as HTMLTemplateElement;
-
   const childs = Array.from(el.content.childNodes);
   const attrs = el.attributes;
-  const reactiveComponent = domy.reactive({ $$component: null as null | Element });
 
-  // We replace the current element by a d-render
+  // We replace the current element by a d-insert.render
   const render = document.createElement('template');
-  render.setAttribute('d-render', '$$component');
+  render.setAttribute('d-insert.render', '$createComponent()');
   domy.block.replaceWith(render);
 
-  const renderedDRender: ReturnType<DomyDirectiveHelper['deepRender']> = domy.deepRender({
-    element: render,
-    scopedNodeData: [...domy.scopedNodeData, reactiveComponent]
-  });
-
-  domy.effect(() => {
+  // Because of d-insert.render watch function dependencie we will automtically re-execute this function when domy.attr.value change
+  function $createComponent() {
     const componentName = domy.evaluate(domy.attr.value);
 
-    if (!componentName) {
-      reactiveComponent.$$component = null;
-      return;
-    }
+    if (!componentName) return null;
 
     const componentElement = document.createElement(domy.utils.kebabToCamelCase(componentName));
     for (const attr of attrs) {
@@ -43,16 +34,12 @@ export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirecti
       componentElement.appendChild(child);
     }
 
-    reactiveComponent.$$component = domy.skipReactive(componentElement);
-  });
+    return componentElement;
+  }
 
-  domy.cleanup(() => {
-    renderedDRender.unmount();
+  // We render d-component as a d-insert.render
+  domy.deepRender({
+    element: domy.block,
+    scopedNodeData: [...domy.scopedNodeData, { $createComponent }]
   });
-
-  return {
-    skipChildsRendering: true,
-    skipComponentRendering: true,
-    skipOtherAttributesRendering: true
-  };
 }

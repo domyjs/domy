@@ -29,7 +29,7 @@
               <p>Error Message:</p>
 
               <div d-for="children, index of $childrens">
-                  <template d-key="index" d-render="children"></template>
+                  <template d-key="index" d-insert.render="children"></template>
               </div>
 
               <button @click="$props.close()" :style="{ position: 'absolute', right: '0.5rem', top: '0.5rem' }">X</button>
@@ -46,7 +46,7 @@
               <button @click="increment">+</button>
               <button @click="decrement">-</button>
               <error-message d-if="$props.showError" :close="$props.close">
-                <p :style="{ fontWeight: 'bold' }">{{ message }}</p>
+                <p :style="{ fontWeight: 'bold' }">{{ message ?? 'Unknown' }}</p>
               </error-message>
             </div>
         `,

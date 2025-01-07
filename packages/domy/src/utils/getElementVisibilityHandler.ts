@@ -1,3 +1,4 @@
+import { Block } from '../core/Block';
 import { DomyDirectiveHelper } from '../types/Domy';
 
 type Props = {
@@ -20,13 +21,7 @@ export function getElementVisibilityHandler(props: Props) {
 
   originalEl.remove();
 
-  function cloneOrignalEl() {
-    const clone = originalEl.cloneNode(true) as Element;
-    domy.block.setEl(clone);
-  }
-
-  let isInitialised = false;
-  cloneOrignalEl();
+  let lastRender: Block = domy.block;
 
   /**
    * Check if an element should be display
@@ -36,38 +31,33 @@ export function getElementVisibilityHandler(props: Props) {
    * @author yoannchb-pro
    */
   function handleVisibility() {
-    const el = domy.block.el;
-
-    const isConnected = el.isConnected;
+    const isConnected = lastRender.el.isConnected;
     const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {
       // Remove the element and unmount it
-      domy.block.remove();
-      domy.block.unmount();
-    } else if ((!isConnected && shouldBeDisplay) || (isConnected && !isInitialised)) {
-      // If the element is not connected and we are adding it to the dom then we clone the node to create a new instance
-      if (!isConnected) cloneOrignalEl();
+      lastRender.remove();
+      lastRender.unmount();
+    } else if (!isConnected && shouldBeDisplay) {
+      const clone = originalEl.cloneNode(true) as Element;
+
+      // Restore the element to his original position
+      const indexToInsert = domy.utils.findElementIndex(parentChilds, originalEl);
+      domy.utils.restoreElement(parent, clone, indexToInsert);
 
       // Handle enter transition
       domy.block.applyTransition('enterTransition');
 
-      // Restore the element to his original position
-      const indexToInsert = props.domy.utils.findElementIndex(parentChilds, originalEl);
-      domy.utils.restoreElement(parent, el, indexToInsert);
-
-      domy.deepRender({
-        element: domy.block,
+      // Render the clone and create a new block
+      lastRender = domy.deepRender({
+        element: clone,
         scopedNodeData: domy.scopedNodeData
       });
+
+      // Replace the current block with the new rendered block
+      domy.block.setEl(lastRender);
     }
-
-    isInitialised = true;
   }
-
-  domy.cleanup(() => {
-    domy.block.unmount();
-  });
 
   return handleVisibility;
 }

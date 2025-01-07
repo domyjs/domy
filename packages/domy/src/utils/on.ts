@@ -65,6 +65,7 @@ export default function on(props: {
 
     listener = wrapListener(listener, (next, event) => {
       if ('key' in event && keys.find(key => key === (event.key as string).toLowerCase())) {
+        event.preventDefault(); // Ensure the pressed key is not happened to the input value
         next(event);
       }
     });

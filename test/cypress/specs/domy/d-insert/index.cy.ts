@@ -4,11 +4,16 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('d-render test', () => {
+describe('d-insert test', () => {
   it('Check we have just the button at first', () => {
     cy.get('p').should('not.exist');
     cy.get('#inc').should('not.exist');
     cy.get('#dec').should('not.exist');
+  });
+
+  it('Check we dont render the element but its only inserted', () => {
+    cy.get('#renderCount').click();
+    cy.get('#norender').should('have.text', 'Count: {{ count }}');
   });
 
   it('Check we can add the count and make it disapear again', () => {
@@ -31,23 +36,19 @@ describe('d-render test', () => {
 
   it('should display the initial count', () => {
     cy.get('#renderCount').click();
-    cy.get('p').should('have.text', 'Count: 0');
+    cy.get('#render').should('have.text', 'Count: 0');
   });
 
-  it('should increment the count when "+" button is clicked', () => {
+  it('should increment/decrement the count when "-" button is clicked', () => {
     cy.get('#renderCount').click();
-    cy.get('#inc').click();
-    cy.get('p').should('have.text', 'Count: 1');
-  });
 
-  it('should decrement the count when "-" button is clicked', () => {
-    cy.get('#renderCount').click();
     cy.get('#inc').click();
-    cy.get('#inc').click();
+    cy.get('#render').should('have.text', 'Count: 1');
 
-    cy.get('p').should('have.text', 'Count: 2');
+    cy.get('#inc').click();
+    cy.get('#render').should('have.text', 'Count: 2');
 
     cy.get('#dec').click();
-    cy.get('p').should('have.text', 'Count: 1');
+    cy.get('#render').should('have.text', 'Count: 1');
   });
 });

@@ -30,22 +30,27 @@ describe('Reactive System Tests', () => {
     expect(mockWatch).not.toHaveBeenCalled();
   });
 
-  it('should trigger effect when reactive data changes', () => {
+  it('should trigger effect when reactive data changes', async () => {
     const todo = reactive({ name: 'Yoann' });
     const mockEffect = jest.fn();
-    const unEffect = watchEffect(() => {
-      console.log(todo.name);
+    const unEffect = watchEffect(async () => {
+      if (todo.name) {
+        // DO SOMETHING
+      }
       mockEffect();
     });
 
+    await Promise.resolve();
     expect(mockEffect).toHaveBeenCalled();
 
     mockEffect.mockReset();
     todo.name = 'New Name';
+    await Promise.resolve();
     expect(mockEffect).toHaveBeenCalled();
 
     mockEffect.mockReset();
     todo.name = 'new Name 2';
+    await Promise.resolve();
     expect(mockEffect).toHaveBeenCalled();
 
     // Stop watching changes
@@ -53,6 +58,7 @@ describe('Reactive System Tests', () => {
 
     mockEffect.mockReset();
     todo.name = 'new Name 3';
+    await Promise.resolve();
     expect(mockEffect).not.toHaveBeenCalled();
   });
 

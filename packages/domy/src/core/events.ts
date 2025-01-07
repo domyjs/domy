@@ -17,11 +17,6 @@ export function events(domy: DomyDirectiveHelper) {
   let removeEventListener: (() => void) | null = null;
 
   function setUpEvent() {
-    const originalFn = async (...args: any[]) => {
-      const executedValue = await domy.evaluate(domy.attr.value);
-      if (typeof executedValue === 'function') domy.queueJob(() => executedValue(...args));
-    };
-
     const eventListener: EventListenerOrEventListenerObject = async event => {
       const scope = {
         $event: event
@@ -29,9 +24,12 @@ export function events(domy: DomyDirectiveHelper) {
 
       domy.addScopeToNode(scope);
 
-      originalFn(event);
+      domy.queueJob(() => {
+        const executedValue = domy.evaluate(domy.attr.value);
+        if (typeof executedValue === 'function') executedValue(event);
+      });
 
-      domy.removeLastAddedScope();
+      domy.queueJob(() => domy.removeScopeToNode(scope));
     };
 
     // We add wrappers to the listener to ensure we can add modifiers

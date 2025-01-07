@@ -205,7 +205,7 @@ class Router {
       props: ['!to', 'queryParams'],
       html: `
         <a :href="getRoute()" @click.prevent="navigate">
-          <template d-render="$childrens"></template>
+          <template d-insert.render="$childrens"></template>
         </a>
       `,
       app: {
@@ -242,7 +242,7 @@ class Router {
 
     return this.DOMY.createComponent({
       props: ['d-transition'],
-      html: `<template d-render="getComponent()"></template>`,
+      html: `<template d-insert.render="getComponent()"></template>`,
       components,
       app: {
         data() {
