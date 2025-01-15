@@ -1,4 +1,3 @@
-import { DOMY_EVENTS } from '../core/DomyEvents';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 type Value = string | number | boolean | string[] | undefined;
