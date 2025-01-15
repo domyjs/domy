@@ -8,6 +8,7 @@ type TransitionType = 'enterTransition' | 'outTransition';
  * Utilitary class to handle properly an element
  */
 export class Block {
+  public name: string | null = null;
   public key: string | null = null;
 
   public transition: Transition | null = null;

@@ -129,13 +129,15 @@ export function createComponent<
         }
       });
 
-      // // We render the childs first to ensure they keep the current state and not the component state
+      //  We render the childs first to ensure they keep the current state and not the component state
+      const names: { [name: string]: Element } = {};
       for (const child of componentElement.childNodes) {
         const childBlock = domy.deepRender({
           element: child as Element,
           scopedNodeData: domy.scopedNodeData
         });
         unmountChilds.push(childBlock.unmount.bind(childBlock));
+        if (childBlock.name) names[childBlock.name] = childBlock.el;
       }
 
       let unmountComponent: (() => void) | undefined;
@@ -147,6 +149,7 @@ export function createComponent<
             {
               props: data.props,
               attrs: data.attrs,
+              names,
               childrens
             },
             componentAttributes

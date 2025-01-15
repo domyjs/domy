@@ -38,6 +38,8 @@ import { $watch } from '../helpers/$watch';
 import { dComponentImplementation } from '../directives/d-component';
 import { $attrs } from '../helpers/$attrs';
 import { dInsertImplementation } from '../directives/d-insert';
+import { dNameImplementation } from '../directives/d-name';
+import { $names } from '../helpers/$names';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -88,7 +90,8 @@ export const PLUGINS: Plugins = {
     once: dOnceImplementation,
     show: dShowImplementation,
     cloak: dCloakImplementation,
-    component: dComponentImplementation
+    component: dComponentImplementation,
+    name: dNameImplementation
   },
   helpers: {
     el: $el,
@@ -103,7 +106,8 @@ export const PLUGINS: Plugins = {
     allData: $allData,
     methods: $methods,
     watch: $watch,
-    attrs: $attrs
+    attrs: $attrs,
+    names: $names
   }
 };
 

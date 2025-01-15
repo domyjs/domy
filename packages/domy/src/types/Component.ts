@@ -4,6 +4,7 @@ import { DomyDirectiveHelper } from './Domy';
 export type ComponentProps = {
   props: { [key: string]: any };
   childrens: Element[];
+  names: { [name: string]: Element };
   attrs: { [key: string]: string };
 };
 
