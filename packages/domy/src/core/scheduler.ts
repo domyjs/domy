@@ -1,9 +1,27 @@
 import { error } from '../utils/logs';
 
-type QueueElement = () => void | Promise<void>;
+type QueueElement = () => any;
 
 let queued = false;
+let queueIndex = 0;
+
 const queue: QueueElement[] = [];
+const resolvedPromise = Promise.resolve();
+
+const queueCallbacks: QueueElement[] = [];
+
+const seen = new Map<QueueElement, number>();
+const MAX_RECURSION = 100;
+
+/**
+ * Wait for the queue to be fully empty
+ * @param job
+ *
+ * @author yoannchb-pro
+ */
+export function queueJobOnQueueEmpty(job: QueueElement) {
+  queueCallbacks.push(job);
+}
 
 /**
  * Flush the queue
@@ -11,19 +29,31 @@ const queue: QueueElement[] = [];
  * @author yoannchb-pro
  */
 function flushJobs() {
-  if (queued || queue.length === 0) return;
-
   queued = true;
 
-  for (const job of queue) {
-    // Use Promise.resolve to defer the execution and regroup DOM updates
-    Promise.resolve()
-      .then(job)
-      .catch(err => error(err));
+  for (; queueIndex < queue.length; ++queueIndex) {
+    const job = queue[queueIndex];
+    try {
+      job();
+    } catch (err: any) {
+      error(err);
+    }
   }
 
-  queue.length = 0;
-  queued = false;
+  if (queueIndex < queue.length) {
+    flushJobs();
+  } else {
+    seen.clear();
+    queueIndex = 0;
+    queue.length = 0;
+    queued = false;
+
+    for (const queueCb of queueCallbacks) {
+      queueJob(queueCb);
+    }
+
+    queueCallbacks.length = 0;
+  }
 }
 
 /**
@@ -33,9 +63,20 @@ function flushJobs() {
  * @author yoannchb-pro
  */
 export function queueJob(job: QueueElement) {
-  if (!queue.includes(job)) queue.push(job);
+  const count = seen.get(job) ?? 0;
+
+  if (count > MAX_RECURSION) {
+    error(
+      `A job as been skipped because it look like he is calling his self a bounch of times and exceed the max recursive amount (${MAX_RECURSION}).`
+    );
+    return;
+  }
+
+  seen.set(job, count + 1);
+  queue.push(job);
 
   if (!queued) {
-    flushJobs();
+    // Use Promise.resolve to defer the execution and regroup DOM updates
+    resolvedPromise.then(flushJobs);
   }
 }

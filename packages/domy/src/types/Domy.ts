@@ -40,6 +40,7 @@ export type DomyDirectiveHelper = {
 
   utils: typeof directivesUtils;
 
+  onMounted(cb: () => void | Promise<void>): void;
   queueJob: typeof queueJob;
   effect(cb: () => void): void;
   cleanup(cb: () => void): void;

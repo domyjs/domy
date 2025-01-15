@@ -10,6 +10,8 @@ import { DomyDirectiveHelper } from '../types/Domy';
 import { createDeepRenderFn } from './deepRender';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 import type { Block } from './Block';
+import { DOMY_EVENTS } from './DomyEvents';
+import { DomyMountedEventDetails } from '../types/Events';
 
 let domyHelperId = 0;
 
@@ -58,6 +60,7 @@ export class DomyHelper {
       utils: directivesUtils,
 
       queueJob,
+      onMounted: this.onMounted.bind(this),
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
       evaluate: this.evaluate.bind(this),
@@ -89,6 +92,17 @@ export class DomyHelper {
     this.attr.value = attr.value;
   }
 
+  onMounted(cb: () => void | Promise<void>) {
+    const listener: EventListenerOrEventListenerObject = event => {
+      const e = event as CustomEvent<DomyMountedEventDetails>;
+      if (e.detail.app) {
+        document.removeEventListener(DOMY_EVENTS.App.Mounted, listener);
+        cb();
+      }
+    };
+    document.addEventListener(DOMY_EVENTS.App.Mounted, listener);
+  }
+
   clearEffects() {
     for (const clearEffect of this.clearEffectList) {
       clearEffect();
@@ -97,13 +111,17 @@ export class DomyHelper {
 
   effect(fn: () => void) {
     if (!this.renderWithoutListeningToChange) {
-      const uneffect = ReactiveUtils.watchEffect(() => {
-        return new Promise(resolve => {
-          queueJob(fn);
-          queueJob(() => resolve(true));
+      queueJob(() => {
+        const uneffect = ReactiveUtils.watchEffect(fn, {
+          onDepChange: () => {
+            uneffect();
+            this.effect(fn);
+          },
+          noSelfUpdate: true
         });
+
+        this.clearEffectList.push(uneffect);
       });
-      this.clearEffectList.push(uneffect);
     } else {
       queueJob(fn);
     }

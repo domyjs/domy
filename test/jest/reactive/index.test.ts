@@ -30,27 +30,57 @@ describe('Reactive System Tests', () => {
     expect(mockWatch).not.toHaveBeenCalled();
   });
 
-  it('should trigger effect when reactive data changes', async () => {
+  it('shouldnt call it self', () => {
+    const counter = reactive({ count: 0 });
+    const mockEffect = jest.fn();
+    const mockDepChange = jest.fn();
+
+    const unEffect = watchEffect(
+      () => {
+        if (counter.count) {
+          // DO NOTHING
+        }
+        mockEffect();
+      },
+      {
+        noSelfUpdate: true,
+        onDepChange() {
+          mockDepChange();
+        }
+      }
+    );
+
+    expect(mockEffect).toHaveBeenCalled();
+    expect(mockDepChange).not.toHaveBeenCalled();
+
+    mockEffect.mockReset();
+    mockDepChange.mockReset();
+    ++counter.count;
+    expect(mockEffect).not.toHaveBeenCalled();
+    expect(mockDepChange).toHaveBeenCalled();
+
+    // Stop watching changes
+    unEffect();
+  });
+
+  it('should trigger effect when reactive data changes', () => {
     const todo = reactive({ name: 'Yoann' });
     const mockEffect = jest.fn();
-    const unEffect = watchEffect(async () => {
+    const unEffect = watchEffect(() => {
       if (todo.name) {
         // DO SOMETHING
       }
       mockEffect();
     });
 
-    await Promise.resolve();
     expect(mockEffect).toHaveBeenCalled();
 
     mockEffect.mockReset();
     todo.name = 'New Name';
-    await Promise.resolve();
     expect(mockEffect).toHaveBeenCalled();
 
     mockEffect.mockReset();
     todo.name = 'new Name 2';
-    await Promise.resolve();
     expect(mockEffect).toHaveBeenCalled();
 
     // Stop watching changes
@@ -58,7 +88,6 @@ describe('Reactive System Tests', () => {
 
     mockEffect.mockReset();
     todo.name = 'new Name 3';
-    await Promise.resolve();
     expect(mockEffect).not.toHaveBeenCalled();
   });
 

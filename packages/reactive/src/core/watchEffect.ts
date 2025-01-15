@@ -1,10 +1,14 @@
 import { globalWatch } from './globalWatch';
 import { matchPath } from './matchPath';
 
-type Effect = () => any | Promise<any>;
+type Effect = () => any;
 type UnEffect = () => void;
+type WatchEffectOptions = {
+  noSelfUpdate?: boolean; // Avoid the effect to launch the function again
+  onDepChange?: () => void;
+};
 
-const watchDepsQueue: (() => Promise<void>)[] = [];
+const watchDepsQueue: (() => void)[] = [];
 let isRunning = false;
 
 /**
@@ -28,10 +32,10 @@ function nextWatchDeps() {
  *
  * @author yoannchb-pro
  */
-export function watchEffect(effect: Effect): UnEffect {
+export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEffect {
   const objsToWatch: { path: string; obj: unknown }[] = [];
 
-  async function watchDeps() {
+  function watchDeps() {
     objsToWatch.length = 0; // We remove the last dependencies
 
     if (isRunning) {
@@ -49,7 +53,7 @@ export function watchEffect(effect: Effect): UnEffect {
     });
 
     try {
-      await effect();
+      effect();
     } finally {
       removeGlobalWatch();
       isRunning = false;
@@ -57,13 +61,14 @@ export function watchEffect(effect: Effect): UnEffect {
     }
   }
 
-  const unwatch = globalWatch({
+  const uneffect = globalWatch({
     type: 'onSet',
     fn: ({ path, obj }) => {
       for (const objToWatch of objsToWatch) {
         const matcher = matchPath(objToWatch.path, path);
         if (matcher.isMatching && obj === objToWatch.obj) {
-          watchDeps();
+          if (opts.onDepChange) opts.onDepChange();
+          if (!opts.noSelfUpdate) watchDeps();
           break;
         }
       }
@@ -72,5 +77,5 @@ export function watchEffect(effect: Effect): UnEffect {
 
   watchDeps();
 
-  return unwatch;
+  return uneffect;
 }
