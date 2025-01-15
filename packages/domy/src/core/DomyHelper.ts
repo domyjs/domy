@@ -113,8 +113,12 @@ export class DomyHelper {
     if (!this.renderWithoutListeningToChange) {
       queueJob(() => {
         const uneffect = ReactiveUtils.watchEffect(fn, {
-          onDepChange: () => {
+          onDepChange: uneffect => {
             uneffect();
+
+            const index = this.clearEffectList.indexOf(uneffect);
+            if (index !== 1) this.clearEffectList.splice(index, 1);
+
             this.effect(fn);
           },
           noSelfUpdate: true

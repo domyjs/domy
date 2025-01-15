@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe.skip('d-component test', () => {
+describe('d-component test', () => {
   it('should render the list of pages with correct titles', () => {
     cy.get('ul > li').should('have.length', 3);
     cy.get('ul > li').eq(0).should('contain', 'Home');

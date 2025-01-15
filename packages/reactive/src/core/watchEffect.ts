@@ -5,7 +5,7 @@ type Effect = () => any;
 type UnEffect = () => void;
 type WatchEffectOptions = {
   noSelfUpdate?: boolean; // Avoid the effect to launch the function again
-  onDepChange?: () => void;
+  onDepChange?: (uneffect: UnEffect) => void;
 };
 
 const watchDepsQueue: (() => void)[] = [];
@@ -61,21 +61,21 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
     }
   }
 
+  watchDeps();
+
   const uneffect = globalWatch({
     type: 'onSet',
     fn: ({ path, obj }) => {
       for (const objToWatch of objsToWatch) {
         const matcher = matchPath(objToWatch.path, path);
         if (matcher.isMatching && obj === objToWatch.obj) {
-          if (opts.onDepChange) opts.onDepChange();
+          if (opts.onDepChange) opts.onDepChange(uneffect);
           if (!opts.noSelfUpdate) watchDeps();
           break;
         }
       }
     }
   });
-
-  watchDeps();
 
   return uneffect;
 }
