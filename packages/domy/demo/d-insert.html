@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-insert</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <div
+      d-scope="{ count: 0, createP: (id) => {
+        const p = document.createElement('p');
+        p.setAttribute('d-if', 'count < 10');
+        p.textContent = 'Count: {{ count }}';
+        if (id) p.id = id;
+        return p;
+      } }"
+    >
+      <template
+        d-if="5 === 5"
+        d-insert.render="renderElement ? createP('render') : null"
+      ></template>
+      <template d-if="5 === 5" d-insert="renderElement ? createP('norender') : null"></template>
+
+      <button d-if="renderElement" id="inc" @click="++count">+</button>
+      <button d-if="renderElement" id="dec" @click="--count">-</button>
+
+      <button id="renderCount" @click="renderElement = !renderElement">Render element</button>
+    </div>
+  </body>
+  <script>
+    DOMY.createApp({
+      data() {
+        return {
+          renderElement: false
+        };
+      }
+    }).mount();
+  </script>
+</html>

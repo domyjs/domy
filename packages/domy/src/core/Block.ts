@@ -48,6 +48,7 @@ export class Block {
     this.cleanupTransition = executeActionAfterAnimation(this.el, () => {
       this.el.classList.remove(transitionName);
       if (action) action();
+      this.cleanupTransition = null;
     });
   }
 

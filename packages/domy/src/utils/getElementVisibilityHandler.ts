@@ -16,9 +16,9 @@ type Props = {
 export function getElementVisibilityHandler(props: Props) {
   const domy = props.domy;
   const originalEl = domy.block.el;
-  const parent = originalEl.parentNode as Element;
-  const parentChilds = Array.from(parent.childNodes);
 
+  const tracePositionComment = new Comment('d-if position tracking, do not remove');
+  originalEl.before(tracePositionComment);
   originalEl.remove();
 
   let lastRender: Block = domy.block;
@@ -36,17 +36,14 @@ export function getElementVisibilityHandler(props: Props) {
 
     if (isConnected && !shouldBeDisplay) {
       // Remove the element and unmount it
+      lastRender.transition = domy.block.transition;
       lastRender.remove();
       lastRender.unmount();
     } else if (!isConnected && shouldBeDisplay) {
       const clone = originalEl.cloneNode(true) as Element;
 
       // Restore the element to his original position
-      const indexToInsert = domy.utils.findElementIndex(parentChilds, originalEl);
-      domy.utils.restoreElement(parent, clone, indexToInsert);
-
-      // Handle enter transition
-      domy.block.applyTransition('enterTransition');
+      tracePositionComment.before(clone);
 
       // Render the clone and create a new block
       lastRender = domy.deepRender({
@@ -56,6 +53,10 @@ export function getElementVisibilityHandler(props: Props) {
 
       // Replace the current block with the new rendered block
       domy.block.setEl(lastRender);
+
+      // Handle enter transition
+      // Need to be apply after the block know the new element
+      domy.block.applyTransition('enterTransition');
     }
   }
 

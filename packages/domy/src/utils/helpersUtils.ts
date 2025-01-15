@@ -1,6 +1,5 @@
 import { fixeAttrName, getDomyAttributeInformations } from './domyAttrUtils';
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
-import { findElementIndex } from './findElementIndex';
 import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
@@ -10,13 +9,11 @@ import { kebabToCamelCase } from './kebabToCamelCase';
 import { error, warn } from './logs';
 import { mergeToNegativeCondition } from './mergeToNegativeCondition';
 import { moveElement } from './moveElement';
-import { restoreElement } from './restoreElement';
 import { toKebabCase } from './toKebabCase';
 import { toRegularFn } from './toRegularFn';
 
 // A list of utils we can access in helpers
 export const helpersUtils = {
-  findElementIndex,
   toKebabCase,
   kebabToCamelCase,
   getElementVisibilityHandler,
@@ -24,7 +21,6 @@ export const helpersUtils = {
   set,
   getPreviousConditionsElements,
   moveElement,
-  restoreElement,
   toRegularFn,
   executeActionAfterAnimation,
   getReactiveHandler,

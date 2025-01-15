@@ -24,8 +24,10 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
   const shouldBeRender = domy.modifiers.includes('render');
   const originalEl = domy.block.el;
-  const parent = domy.block.el.parentNode as Element;
-  const parentChilds = Array.from(parent.childNodes);
+
+  const tracePositionComment = new Comment('d-insert position tracking, do not remove');
+  originalEl.before(tracePositionComment);
+  originalEl.remove();
 
   let lastRender: Block | null = null;
 
@@ -39,6 +41,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     // Handle remove transition and unmount the last render
     if (lastRender) {
       // We unmount the current lastRender not the current block otherwise this effect will be unmount too
+      lastRender.transition = domy.block.transition;
       lastRender.remove();
       lastRender.unmount();
     }
@@ -49,23 +52,19 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
       return;
     }
 
-    // We restore the element if the childrens change and it have been remove
-    if (!el.isConnected) {
-      const indexToInsert = domy.utils.findElementIndex(parentChilds, originalEl);
-      domy.utils.restoreElement(parent, el, indexToInsert);
-    }
-
-    domy.block.replaceWith(elementToRender);
+    // We restore the element to his original position
+    tracePositionComment.before(elementToRender);
 
     // Render the element
     if (shouldBeRender) {
       lastRender = domy.deepRender({
-        element: domy.block.el,
+        element: elementToRender,
         scopedNodeData: domy.scopedNodeData
       });
 
-      // We replace the element with the new block
-      domy.block.replaceWith(lastRender);
+      domy.block.setEl(lastRender);
+    } else {
+      domy.block.setEl(elementToRender);
     }
 
     // Handle enter transition

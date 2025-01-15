@@ -15,6 +15,8 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     scopedNodeData: domy.scopedNodeData
   });
 
+  let isInit = false;
+  const needInitTransition = domy.block.transition?.init;
   const originalDisplay = (domy.block.el as HTMLElement).style.display ?? '';
 
   function visibilityHandler() {
@@ -23,15 +25,20 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     const isAlreadyShow = el.style.display !== 'none';
 
     if (shouldBeDisplay && !isAlreadyShow) {
-      // We display the element first otherwise the animation is not going to be visible
       el.style.display = originalDisplay;
 
-      domy.block.applyTransition('enterTransition');
+      if (needInitTransition || isInit) domy.block.applyTransition('enterTransition');
     } else if (isAlreadyShow && !shouldBeDisplay) {
-      domy.block.applyTransition('outTransition', () => {
+      if (needInitTransition || isInit) {
+        domy.block.applyTransition('outTransition', () => {
+          el.style.display = 'none';
+        });
+      } else {
         el.style.display = 'none';
-      });
+      }
     }
+
+    isInit = true;
   }
 
   domy.block.onElementChange(() => {
