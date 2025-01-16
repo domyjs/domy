@@ -1,7 +1,5 @@
 # TODO
 
-- d-name like slot
-
 - plugins proper to the instance
 - d-keep-alive
 - Error boundary test with onError

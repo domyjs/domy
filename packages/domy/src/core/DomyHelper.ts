@@ -33,6 +33,7 @@ export class DomyHelper {
   public modifiers: string[] = [];
 
   constructor(
+    private appId: number,
     private deepRenderFn: ReturnType<typeof createDeepRenderFn>,
     public block: Block,
     public state: State,
@@ -73,6 +74,7 @@ export class DomyHelper {
 
   copy() {
     return new DomyHelper(
+      this.appId,
       this.deepRenderFn,
       this.block,
       this.state,
@@ -95,7 +97,7 @@ export class DomyHelper {
   onMounted(cb: () => void | Promise<void>) {
     const listener: EventListenerOrEventListenerObject = event => {
       const e = event as CustomEvent<DomyMountedEventDetails>;
-      if (e.detail.app) {
+      if (e.detail.appId === this.appId) {
         document.removeEventListener(DOMY_EVENTS.App.Mounted, listener);
         cb();
       }

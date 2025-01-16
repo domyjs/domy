@@ -5,6 +5,8 @@ import { toKebabCase } from '../utils/toKebabCase';
 import { getRender } from './getRender';
 import { initApp } from './initApp';
 
+let appId = 0;
+
 /**
  * Initialise domy on a target (by default the body)
  * @param appDefinition
@@ -18,6 +20,8 @@ export function createAdvancedApp<
   A extends any[],
   P extends ComponentProps['props']
 >(appDefinition?: App<D, M, A, P>, props?: ComponentProps, byPassAttributes?: string[]) {
+  ++appId;
+
   let config: Config = {};
   let componentsList: Components = {};
 
@@ -42,6 +46,7 @@ export function createAdvancedApp<
         const domTarget = target ?? document.body;
 
         const render = await initApp({
+          appId,
           app: appDefinition,
           components: componentsList,
           config,
@@ -66,6 +71,7 @@ export function createAdvancedApp<
   }
 
   return {
+    appId,
     mount,
     configure,
     components

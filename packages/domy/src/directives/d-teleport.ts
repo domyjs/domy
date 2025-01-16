@@ -12,29 +12,34 @@ export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiv
   if (!domy.block.isTemplate())
     throw Error(`The directive "${domy.directive}" should only be use on template element.`);
 
-  const el = domy.block.el as HTMLTemplateElement;
+  function teleport() {
+    const el = domy.block.el as HTMLTemplateElement;
 
-  const childs = Array.from(el.content.childNodes);
-  const target = document.querySelector(domy.attr.value);
+    const childs = Array.from(el.content.childNodes);
+    const target = document.querySelector(domy.attr.value);
 
-  if (!target) throw Error(`Teleport canceled: can't find target "${domy.attr.value}".`);
+    if (!target) throw Error(`Teleport canceled: can't find target "${domy.attr.value}".`);
 
-  const unmountFns: (() => void)[] = [];
+    const unmountFns: (() => void)[] = [];
 
-  for (const child of childs) {
-    target.appendChild(child);
-    const { unmount } = domy.deepRender({
-      element: child as Element,
-      scopedNodeData: domy.scopedNodeData
+    for (const child of childs) {
+      target.appendChild(child);
+      const { unmount } = domy.deepRender({
+        element: child as Element,
+        scopedNodeData: domy.scopedNodeData
+      });
+      unmountFns.push(unmount);
+    }
+
+    domy.cleanup(() => {
+      for (const unmountFn of unmountFns) {
+        unmountFn();
+      }
     });
-    unmountFns.push(unmount);
+
+    el.remove();
   }
 
-  domy.cleanup(() => {
-    for (const unmountFn of unmountFns) {
-      unmountFn();
-    }
-  });
-
-  el.remove();
+  if (domy.modifiers.includes('defer')) domy.onMounted(teleport);
+  else teleport();
 }

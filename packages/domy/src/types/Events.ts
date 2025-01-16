@@ -7,6 +7,7 @@ export type DomyReadyEventDetails = {
 };
 
 export type DomyMountedEventDetails = {
+  appId: number;
   app: App;
   target: Element;
   state: State;

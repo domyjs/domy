@@ -18,6 +18,7 @@ import { App } from '../types/App';
 import { queueJobOnQueueEmpty } from './scheduler';
 
 type Params = {
+  appId: number;
   app?: App;
   target: HTMLElement;
   config: Config;
@@ -122,7 +123,7 @@ export async function initApp(params: Params) {
     })
   );
 
-  const deepRender = createDeepRenderFn(state, config, components);
+  const deepRender = createDeepRenderFn(params.appId, state, config, components);
   try {
     // Render the dom with DOMY
     const block = deepRender({
@@ -152,7 +153,7 @@ export async function initApp(params: Params) {
   document.dispatchEvent(
     new CustomEvent(DOMY_EVENTS.App.Mounted, {
       bubbles: true,
-      detail: { app, state, target } as DomyMountedEventDetails
+      detail: { appId: params.appId, app, state, target } as DomyMountedEventDetails
     })
   );
 

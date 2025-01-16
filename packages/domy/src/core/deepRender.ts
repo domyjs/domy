@@ -30,7 +30,12 @@ type Props = {
  *
  * @author yoannchb-pro
  */
-export function createDeepRenderFn(state: State, config: Config, components: Components) {
+export function createDeepRenderFn(
+  appId: number,
+  state: State,
+  config: Config,
+  components: Components
+) {
   return function deepRender(props: Props) {
     const rootElement = props.element instanceof Block ? props.element.el : props.element;
     const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
@@ -72,6 +77,7 @@ export function createDeepRenderFn(state: State, config: Config, components: Com
       };
 
       let domyHelper = new DomyHelper(
+        appId,
         safeDeepRender,
         block,
         state,
