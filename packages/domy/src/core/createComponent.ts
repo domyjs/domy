@@ -105,29 +105,30 @@ export function createComponent<
         throw Error(`The prop "${requiredProp}" is required on the component "${name}".`);
       }
 
-      // We ensure the props are reactive
-      domy.effect(() => {
-        // reactive props
-        for (const attr of propsAttributes) {
-          const attrInfos = domy.utils.getDomyAttributeInformations(attr);
-          const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
-          if (domy.utils.isBindAttr(attr.name)) {
+      // reactive props
+      for (const attr of propsAttributes) {
+        const attrInfos = domy.utils.getDomyAttributeInformations(attr);
+        const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
+        if (domy.utils.isBindAttr(attr.name)) {
+          domy.effect(() => {
             data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
-          } else {
-            data.props[propName] = attr.value === '' ? true : attr.value;
-          }
+          });
+        } else {
+          data.props[propName] = attr.value === '' ? true : attr.value;
         }
+      }
 
-        // reactive attributes
-        for (const attr of attrsAttributes) {
-          const { attrName } = domy.utils.getDomyAttributeInformations(attr);
-          if (domy.utils.isBindAttr(attr.name)) {
+      // reactive attributes
+      for (const attr of attrsAttributes) {
+        const { attrName } = domy.utils.getDomyAttributeInformations(attr);
+        if (domy.utils.isBindAttr(attr.name)) {
+          domy.effect(() => {
             data.attrs[attrName] = domy.evaluate(attr.value);
-          } else {
-            data.attrs[attrName] = attr.value;
-          }
+          });
+        } else {
+          data.attrs[attrName] = attr.value;
         }
-      });
+      }
 
       //  We render the childs first to ensure they keep the current state and not the component state
       const names: { [name: string]: Element } = {};
