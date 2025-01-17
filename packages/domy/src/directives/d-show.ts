@@ -15,6 +15,7 @@ export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     scopedNodeData: domy.scopedNodeData
   });
 
+  // Ensure the code is started after the effects of the previous deepRender
   let isInit = false;
   const needInitTransition = domy.block.transition?.init;
   const originalDisplay = (domy.block.el as HTMLElement).style.display ?? '';

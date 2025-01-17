@@ -28,9 +28,9 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
       refName = domy.evaluate(domy.attr.value);
       setRef();
     });
+  } else {
+    setRef();
   }
-
-  setRef();
 
   domy.cleanup(() => {
     cleanRef();

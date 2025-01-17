@@ -1,3 +1,4 @@
+import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { error } from '../utils/logs';
 
 type QueueElement = () => any;
@@ -33,11 +34,7 @@ function flushJobs() {
 
   for (; queueIndex < queue.length; ++queueIndex) {
     const job = queue[queueIndex];
-    try {
-      job();
-    } catch (err: any) {
-      error(err);
-    }
+    callWithErrorHandling(job, err => error(err));
   }
 
   if (queueIndex < queue.length) {

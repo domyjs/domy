@@ -7,14 +7,18 @@
     <script src="../dist/index.js"></script>
   </head>
   <body>
-    <main
-      d-scope=" { showModal: false, msg: 'An other message' }"
-      d-if="msg === 'An other message'"
-    >
-      <p id="override">{{ msg }}</p>
-      <div id="modal" d-if="showModal">Hello World</div>
-      <button @click="showModal = !showModal">Show modal</button>
-    </main>
+    <div d-scope=" { showModal: false, msg: 'An other message' }">
+      <main d-if="msg === 'An other message'">
+        <p id="override">{{ msg }}</p>
+        <div id="modal" d-if="showModal">Hello World</div>
+        <button @click="showModal = !showModal">Show modal</button>
+      </main>
+    </div>
+
+    <p id="err">{{ showModal }}</p>
+    <p id="initialMsg">{{ msg }}</p>
+
+    <p id="watcherCalled" d-ref="watcherCalled">false</p>
   </body>
   <script>
     DOMY.createApp({

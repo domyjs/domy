@@ -10,6 +10,6 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dUnMountImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   domy.cleanup(() => {
     const executedValue = domy.evaluate(domy.attr.value);
-    if (typeof executedValue === 'function') domy.queueJob(() => executedValue());
+    if (typeof executedValue === 'function') executedValue();
   });
 }

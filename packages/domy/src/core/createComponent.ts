@@ -1,5 +1,6 @@
 import { Data } from '../types/App';
 import { ComponentDefinition, ComponentProps, Components } from '../types/Component';
+import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { createAdvancedApp } from './createApp';
 
 function cleanup(unmountFns: (() => void)[]) {
@@ -58,130 +59,137 @@ export function createComponent<
   return ({ name, componentElement, domy }) => {
     const unmountChilds: (() => void)[] = [];
 
-    try {
-      const tree = parseHTMl(componentDefinition.html.trim());
+    callWithErrorHandling(
+      () => {
+        const tree = parseHTMl(componentDefinition.html.trim());
 
-      if (tree.length !== 1) {
-        throw new Error(`The component "${name}" need to have one element as root.`);
-      }
-
-      const requiredProps = new Set(
-        props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
-      );
-
-      const root = tree[0] as HTMLElement;
-
-      // Replace the component by the root
-      domy.block.replaceWith(root);
-
-      const data = domy.reactive({
-        props: {} as ComponentProps['props'],
-        attrs: {} as ComponentProps['attrs']
-      });
-
-      const propsAttributes: Attr[] = [];
-      const attrsAttributes: Attr[] = [];
-      const componentAttributes: string[] = [];
-      const childrens = Array.from(componentElement.children) as Element[];
-
-      // We handle the attributes
-      for (const attr of componentElement.attributes) {
-        const attrNameWithoutBinding = attr.name.replace(/^(:|d-bind:)/, '');
-        const propName = domy.utils.kebabToCamelCase(attrNameWithoutBinding);
-
-        // In case it's a prop
-        if (propsName.has(propName)) {
-          requiredProps.delete(propName);
-          propsAttributes.push(attr);
-          continue;
+        if (tree.length !== 1) {
+          throw new Error(`The component "${name}" need to have one element as root.`);
         }
 
-        // Handling attrs
-        attrsAttributes.push(attr);
-      }
+        const requiredProps = new Set(
+          props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
+        );
 
-      // Error handling for required props
-      for (const requiredProp of requiredProps) {
-        throw Error(`The prop "${requiredProp}" is required on the component "${name}".`);
-      }
+        const root = tree[0] as HTMLElement;
 
-      // reactive props
-      for (const attr of propsAttributes) {
-        const attrInfos = domy.utils.getDomyAttributeInformations(attr);
-        const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
-        if (domy.utils.isBindAttr(attr.name)) {
-          domy.effect(() => {
-            data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
-          });
-        } else {
-          data.props[propName] = attr.value === '' ? true : attr.value;
-        }
-      }
+        // Replace the component by the root
+        domy.block.replaceWith(root);
 
-      // reactive attributes
-      for (const attr of attrsAttributes) {
-        const { attrName } = domy.utils.getDomyAttributeInformations(attr);
-        if (domy.utils.isBindAttr(attr.name)) {
-          domy.effect(() => {
-            data.attrs[attrName] = domy.evaluate(attr.value);
-          });
-        } else {
-          data.attrs[attrName] = attr.value;
-        }
-      }
-
-      //  We render the childs first to ensure they keep the current state and not the component state
-      const names: { [name: string]: Element } = {};
-      for (const child of componentElement.childNodes) {
-        const childBlock = domy.deepRender({
-          element: child as Element,
-          scopedNodeData: domy.scopedNodeData
+        const data = domy.reactive({
+          props: {} as ComponentProps['props'],
+          attrs: {} as ComponentProps['attrs']
         });
-        unmountChilds.push(childBlock.unmount.bind(childBlock));
-        if (childBlock.name) names[childBlock.name] = childBlock.el;
-      }
 
-      let unmountComponent: (() => void) | undefined;
-      const mountComponent = (target: HTMLElement) => {
-        domy.queueJob(() => {
-          if (unmountComponent) unmountComponent();
-          createAdvancedApp(
-            componentDefinition.app,
-            {
-              props: data.props,
-              attrs: data.attrs,
-              names,
-              childrens
-            },
-            componentAttributes
-          )
-            .configure(domy.config)
-            .components(componentDefinition.components ?? {})
-            .mount(target)
-            .then(render => {
-              unmountComponent = render?.unmount;
+        const propsAttributes: Attr[] = [];
+        const attrsAttributes: Attr[] = [];
+        const componentAttributes: string[] = [];
+        const childrens = Array.from(componentElement.children) as Element[];
+
+        // We handle the attributes
+        for (const attr of componentElement.attributes) {
+          const attrNameWithoutBinding = attr.name.replace(/^(:|d-bind:)/, '');
+          const propName = domy.utils.kebabToCamelCase(attrNameWithoutBinding);
+
+          // In case it's a prop
+          if (propsName.has(propName)) {
+            requiredProps.delete(propName);
+            propsAttributes.push(attr);
+            continue;
+          }
+
+          // Handling attrs
+          attrsAttributes.push(attr);
+        }
+
+        // Error handling for required props
+        for (const requiredProp of requiredProps) {
+          throw Error(`The prop "${requiredProp}" is required on the component "${name}".`);
+        }
+
+        // reactive props
+        for (const attr of propsAttributes) {
+          const attrInfos = domy.utils.getDomyAttributeInformations(attr);
+          const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
+          if (domy.utils.isBindAttr(attr.name)) {
+            domy.effect(() => {
+              data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
             });
+          } else {
+            data.props[propName] = attr.value === '' ? true : attr.value;
+          }
+        }
+
+        // reactive attributes
+        for (const attr of attrsAttributes) {
+          const { attrName } = domy.utils.getDomyAttributeInformations(attr);
+          if (domy.utils.isBindAttr(attr.name)) {
+            domy.effect(() => {
+              data.attrs[attrName] = domy.evaluate(attr.value);
+            });
+          } else {
+            data.attrs[attrName] = attr.value;
+          }
+        }
+
+        //  We render the childs first to ensure they keep the current state and not the component state
+        const names: { [name: string]: Element } = {};
+        for (const child of componentElement.childNodes) {
+          const childBlock = domy.deepRender({
+            element: child as Element,
+            scopedNodeData: domy.scopedNodeData
+          });
+          unmountChilds.push(childBlock.unmount.bind(childBlock));
+          if (childBlock.name) names[childBlock.name] = childBlock.el;
+        }
+
+        let unmountComponent: (() => void) | undefined;
+        const mountComponent = (target: HTMLElement) => {
+          const makeComponent = () => {
+            if (unmountComponent) unmountComponent();
+            createAdvancedApp(
+              componentDefinition.app,
+              {
+                props: data.props,
+                attrs: data.attrs,
+                names,
+                childrens
+              },
+              componentAttributes
+            )
+              .configure(domy.config)
+              .components(componentDefinition.components ?? {})
+              .mount(target)
+              .then(render => {
+                unmountComponent = render?.unmount;
+              });
+          };
+
+          if (domy.appState.isAppMounted) domy.queueJob(makeComponent);
+          else makeComponent();
+        };
+
+        // We mount the new app on the component
+        mountComponent(root as HTMLElement);
+
+        domy.block.onElementChange(newEl => {
+          mountComponent(newEl as HTMLElement);
         });
-      };
 
-      // We mount the new app on the component
-      mountComponent(root as HTMLElement);
-
-      domy.block.onElementChange(newEl => {
-        mountComponent(newEl as HTMLElement);
-      });
-
-      domy.cleanup(() => {
-        if (unmountComponent) unmountComponent();
+        domy.cleanup(() => {
+          if (unmountComponent) unmountComponent();
+          cleanup(unmountChilds);
+          domy.unReactive(data);
+        });
+      },
+      err => {
+        // In cas we had an error creating the component we remove it and unmount his childs
+        componentElement.remove();
         cleanup(unmountChilds);
-        domy.unReactive(data);
-      });
-    } catch (err: any) {
-      componentElement.remove();
-      cleanup(unmountChilds);
 
-      domy.utils.error(`Component "${name}":`, err);
-    }
+        domy.utils.error(`Component "${name}":`, err);
+      }
+    );
   };
 }
 

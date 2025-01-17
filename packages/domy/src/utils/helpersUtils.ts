@@ -1,3 +1,4 @@
+import { callWithErrorHandling } from './callWithErrorHandling';
 import { fixeAttrName, getDomyAttributeInformations } from './domyAttrUtils';
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
 import { get, set } from './getAndSet';
@@ -14,6 +15,7 @@ import { toRegularFn } from './toRegularFn';
 
 // A list of utils we can access in helpers
 export const helpersUtils = {
+  callWithErrorHandling,
   toKebabCase,
   kebabToCamelCase,
   getElementVisibilityHandler,

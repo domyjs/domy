@@ -40,6 +40,7 @@ import { $attrs } from '../helpers/$attrs';
 import { dInsertImplementation } from '../directives/d-insert';
 import { dNameImplementation } from '../directives/d-name';
 import { $names } from '../helpers/$names';
+import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -53,6 +54,7 @@ export const PLUGINS: Plugins = {
     'ignore',
     'once',
 
+    'scope',
     'key',
     'transition',
 
@@ -60,8 +62,7 @@ export const PLUGINS: Plugins = {
     'else-if',
     'else',
 
-    'component',
-    'scope'
+    'component'
   ],
   prefixes: {
     bind: binding,
@@ -162,9 +163,8 @@ const pluginDefinition: DomyPluginDefinition = {
  * @author yoannchb-pro
  */
 export function plugin(pluginMaker: DomyPlugin) {
-  try {
-    pluginMaker(pluginDefinition);
-  } catch (err: any) {
-    error(err);
-  }
+  callWithErrorHandling(
+    () => pluginMaker(pluginDefinition),
+    err => error(err)
+  );
 }

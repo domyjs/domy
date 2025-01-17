@@ -1,4 +1,5 @@
-import { error, warn } from './logs';
+import { callWithErrorHandling } from './callWithErrorHandling';
+import { warn } from './logs';
 
 const AsyncFunction = async function () {}.constructor;
 
@@ -11,7 +12,7 @@ const AsyncFunction = async function () {}.constructor;
  * @author yoannchb-pro
  */
 export function toRegularFn<T extends (...args: any[]) => any>(arrowFn: T): T {
-  try {
+  const errorHandler = callWithErrorHandling(() => {
     const fnString = arrowFn.toString();
     const match =
       /^(?<isAsync>async)?\s*\((?<params>[^)]*?)\)\s*=>\s*\{?(?<code>[\s\S]*?)\}?$/.exec(fnString);
@@ -25,9 +26,9 @@ export function toRegularFn<T extends (...args: any[]) => any>(arrowFn: T): T {
       );
       return fn(...params, isAsync ? `return (async () => { ${code} })()` : code) as T;
     }
-  } catch (err: any) {
-    error(err);
-  }
 
-  return arrowFn;
+    return arrowFn;
+  });
+
+  return errorHandler.hasError ? arrowFn : errorHandler.result;
 }

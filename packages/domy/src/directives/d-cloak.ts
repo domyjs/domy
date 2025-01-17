@@ -13,4 +13,6 @@ export function dCloakImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     element: domy.block,
     scopedNodeData: domy.scopedNodeData
   });
+
+  domy.block.el.removeAttribute(domy.attr.name);
 }

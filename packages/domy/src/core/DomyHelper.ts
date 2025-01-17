@@ -12,6 +12,7 @@ import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 import type { Block } from './Block';
 import { DOMY_EVENTS } from './DomyEvents';
 import { DomyMountedEventDetails } from '../types/Events';
+import { error } from '../utils/logs';
 
 let domyHelperId = 0;
 
@@ -39,12 +40,14 @@ export class DomyHelper {
     public state: State,
     public scopedNodeData: Record<string, any>[] = [],
     public config: Config,
-    public renderWithoutListeningToChange: boolean
+    public renderWithoutListeningToChange: boolean,
+    public appState: { isAppMounted: boolean }
   ) {}
 
   getPluginHelper(): DomyDirectiveHelper {
     return {
       domyHelperId: this.domyHelperId,
+      appState: this.appState,
       block: this.block,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
@@ -80,7 +83,8 @@ export class DomyHelper {
       this.state,
       [...this.scopedNodeData], // Ensure the scoped node data of the current node are not affected by the next operations (like removing the scoped data in d-for)
       this.config,
-      this.renderWithoutListeningToChange
+      this.renderWithoutListeningToChange,
+      this.appState
     );
   }
 
@@ -112,8 +116,14 @@ export class DomyHelper {
   }
 
   effect(fn: () => void) {
+    // If the app is not mounted yet we don't need to queue the job
+    const start = (fn: () => void) =>
+      this.appState.isAppMounted
+        ? queueJob(fn)
+        : directivesUtils.callWithErrorHandling(fn, err => error(err));
+
     if (!this.renderWithoutListeningToChange) {
-      queueJob(() => {
+      start(() => {
         const uneffect = ReactiveUtils.watchEffect(fn, {
           onDepChange: uneffect => {
             uneffect();
@@ -129,7 +139,7 @@ export class DomyHelper {
         this.clearEffectList.push(uneffect);
       });
     } else {
-      queueJob(fn);
+      start(fn);
     }
   }
 

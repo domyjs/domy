@@ -1,3 +1,4 @@
+import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimation';
 import { error } from '../utils/logs';
 
@@ -74,11 +75,7 @@ export class Block {
 
   unmount() {
     for (const cleanup of this.cleanups) {
-      try {
-        cleanup();
-      } catch (err: any) {
-        error(err);
-      }
+      callWithErrorHandling(cleanup, err => error(err));
     }
 
     if (this.element instanceof Block) this.element.unmount();

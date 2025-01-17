@@ -7,11 +7,27 @@
     <script src="../dist/index.js"></script>
   </head>
   <body>
-    <input type="text" d-ref="text" value="Hello World!" />
-    <p>{{ Object.keys($refs) }}</p>
-    <p>{{ $refs.text.value }}</p>
+    <Component d-ref="input"></Component>
+    <p d-setup="refName = 'p'" d-ref.dynamic="refName"></p>
   </body>
   <script>
-    DOMY.createApp({});
+    const Component = DOMY.createComponent({
+      html: `<input type="text" value="Hello World!" />`
+    });
+
+    DOMY.createApp({
+      data() {
+        return {
+          refName: null
+        };
+      },
+      mounted() {
+        this.$refs.p.textContent = this.$refs.input.value;
+      }
+    })
+      .components({
+        Component
+      })
+      .mount();
   </script>
 </html>

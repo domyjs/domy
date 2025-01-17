@@ -8,8 +8,14 @@
   </head>
   <body>
     <h1>{{ text }}</h1>
-    <div d-mounted="() => text = $refs.text.textContent">
+    <div id="helloWorld" d-mounted="() => text = $refs.text.textContent">
       <p d-ref="text">Hello World!</p>
+    </div>
+
+    <div id="dFor" d-mounted="this.$el.querySelector('li').textContent = '{{ text }}'">
+      <ul d-for="color of ['red']">
+        <li>{{ color }}</li>
+      </ul>
     </div>
   </body>
   <script>

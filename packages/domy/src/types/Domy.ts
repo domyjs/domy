@@ -28,6 +28,7 @@ export type DomySpecialHelper = {
 
 export type DomyDirectiveHelper = {
   domyHelperId: number;
+  appState: { isAppMounted: boolean };
   block: Block;
   config: Config;
   state: State;

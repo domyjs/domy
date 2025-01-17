@@ -1,10 +1,12 @@
 import { Components } from '../types/Component';
 import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
+import { DomyMountedEventDetails } from '../types/Events';
 import { State } from '../types/State';
 import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
 import { isBindAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 import { Block } from './Block';
+import { DOMY_EVENTS } from './DomyEvents';
 import { DomyHelper } from './DomyHelper';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
@@ -36,6 +38,18 @@ export function createDeepRenderFn(
   config: Config,
   components: Components
 ) {
+  // Track if the app is mounted or not so we can add to the queue the jobs when the app is mounted
+  const appState = { isAppMounted: false };
+  const isMountedListener: EventListenerOrEventListenerObject = event => {
+    const e = event as CustomEvent<DomyMountedEventDetails>;
+    if (e.detail.appId === appId) {
+      appState.isAppMounted = true;
+      document.removeEventListener(DOMY_EVENTS.App.Mounted, isMountedListener);
+    }
+  };
+  document.addEventListener(DOMY_EVENTS.App.Mounted, isMountedListener);
+
+  // Deep render function for a specific block/element
   return function deepRender(props: Props) {
     const rootElement = props.element instanceof Block ? props.element.el : props.element;
     const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
@@ -83,7 +97,8 @@ export function createDeepRenderFn(
         state,
         toRender.scopedNodeData,
         config,
-        props.renderWithoutListeningToChange ?? false
+        props.renderWithoutListeningToChange ?? false,
+        appState
       );
 
       // Rendering textContent
@@ -112,7 +127,7 @@ export function createDeepRenderFn(
 
         // We render the attribute
         // It's the main logic of DOMY
-        element.removeAttribute(attr.name);
+        if (attr.name !== 'd-cloak') element.removeAttribute(attr.name);
         const options: DomyDirectiveReturn = renderAttribute(domyHelper.getPluginHelper());
         block.addCleanup(domyHelper.getCleanupFn());
 

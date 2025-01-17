@@ -15,7 +15,6 @@ import { getRender } from './getRender';
 import { ComponentProps, Components } from '../types/Component';
 import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { App } from '../types/App';
-import { queueJobOnQueueEmpty } from './scheduler';
 
 type Params = {
   appId: number;
@@ -135,9 +134,6 @@ export async function initApp(params: Params) {
   } catch (err: any) {
     error(err);
   }
-
-  // We wait for the queue to be empty to ensure the DOM is fully mounted
-  await new Promise(resolve => queueJobOnQueueEmpty(() => resolve(true)));
 
   // Mounted
   if (app.mounted) {

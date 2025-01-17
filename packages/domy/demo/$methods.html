@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$methods</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ $methods.sayHello() }}</h1>
+  </body>
+  <script>
+    DOMY.createApp({
+      data() {
+        return {
+          msg: 'Hello World!'
+        };
+      },
+      methods: {
+        sayHello() {
+          return this.msg;
+        }
+      }
+    }).mount();
+  </script>
+</html>
