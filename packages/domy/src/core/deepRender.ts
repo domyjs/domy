@@ -51,12 +51,12 @@ export function createDeepRenderFn(
 
   // Deep render function for a specific block/element
   return function deepRender(props: Props) {
-    const rootElement = props.element instanceof Block ? props.element.el : props.element;
     const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
+    const rootElement = rootBlock.el;
 
     const toRenderList: Elem[] = [
       {
-        element: rootBlock.el,
+        element: rootElement,
         scopedNodeData: props.scopedNodeData ?? []
       }
     ];
@@ -159,7 +159,7 @@ export function createDeepRenderFn(
           componentElement: element as HTMLElement,
           domy: domyHelper.getPluginHelper()
         });
-        block.addCleanup(domyHelper.getCleanupFn());
+        block.addCleanup(domyHelper.getCleanupFn()); // TODO: make a bug
         continue;
       }
 

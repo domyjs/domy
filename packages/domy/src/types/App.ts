@@ -1,4 +1,4 @@
-import { ComponentProps } from './Component';
+import { ComponentInfos } from './Component';
 import { Helpers } from './Helpers';
 import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
@@ -8,7 +8,7 @@ type MethodFn<
   D extends Data,
   M extends Methods<D, string, A, P>,
   A extends any[],
-  P extends ComponentProps['props']
+  P extends ComponentInfos['componentData']['$props'] = Record<string, never>
 > = (
   this: D & M & { $props: P } & { $childrens: Element[] } & Helpers,
   ...args: A
@@ -18,7 +18,7 @@ type Methods<
   D extends Data,
   M extends string,
   A extends any[],
-  P extends ComponentProps['props']
+  P extends ComponentInfos['componentData']['$props'] = Record<string, never>
 > = {
   [fnName in M]: MethodFn<D, Methods<D, M, A, P>, A, P>;
 };
@@ -28,7 +28,7 @@ export type App<
   D extends Data = any,
   M extends string = any,
   A extends any[] = any[],
-  P extends ComponentProps['props'] = Record<string, never>
+  P extends ComponentInfos['componentData']['$props'] = Record<string, never>
 > = {
   setup?: () => void | Promise<void>;
   mounted?: () => void | Promise<void>;

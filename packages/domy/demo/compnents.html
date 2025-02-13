@@ -4,21 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>components</title>
-    <script src="/packages/domy/dist/index.js"></script>
+    <script src="../dist/index.js"></script>
   </head>
   <body>
     <p id="componentClick">{{ componentClick }}</p>
 
-    <main d-for="i of [1, 2, 3]">
-      <Count
-        d-if="i % 2 === 1"
-        d-key="i"
-        @click="++componentClick"
-        :id="'count-' + i"
-        :show-error="showError"
-        :close="close"
-        :open="open"
-      ></Count>
+    <main>
+      <Count @click="++componentClick" :show-error="showError" :close="close" :open="open"></Count>
     </main>
   </body>
   <script>
@@ -39,11 +31,7 @@
 
     const Count = DOMY.createComponent({
       props: ['showError', 'open', 'close'],
-      watch: {
-        $props() {
-          console.log('props change');
-        }
-      },
+
       html: `
             <div d-attrs="$attrs">
               <h1>Props: {{ Object.keys($props).join(',') }}</h1>
@@ -53,17 +41,17 @@
               <error-message d-if="$props.showError" :close="$props.close">
                 <p :style="{ fontWeight: 'bold' }">{{ message ?? 'Unknown' }}</p>
               </error-message>
+              <p>{{ $props.showError }}</p>
             </div>
         `,
       components: {
         ErrorMessage
       },
       app: {
-        setup() {},
-        mounted() {},
         watch: {
           count({ prevValue, newValue }) {
             if (newValue < 0) {
+              console.log('open');
               this.$props.open();
             } else {
               this.$props.close();

@@ -1,11 +1,14 @@
 import { App, Data } from './App';
 import { DomyDirectiveHelper } from './Domy';
 
-export type ComponentProps = {
-  props: { [key: string]: any };
+export type ComponentInfos = {
+  componentData: {
+    $props: { [key: string]: any };
+    $attrs: { [key: string]: string };
+  };
+
   childrens: Element[];
   names: { [name: string]: Element };
-  attrs: { [key: string]: string };
 };
 
 export type Component = (props: {
@@ -22,7 +25,7 @@ export type ComponentDefinition<
   D extends Data,
   M extends string,
   A extends any[],
-  P extends ComponentProps['props']
+  P extends ComponentInfos['componentData']['$props'] = Record<string, never>
 > = {
   html: string;
   props?: string[];

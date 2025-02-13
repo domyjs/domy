@@ -1,5 +1,5 @@
 import { Data } from '../types/App';
-import { ComponentDefinition, ComponentProps, Components } from '../types/Component';
+import { ComponentDefinition, ComponentInfos, Components } from '../types/Component';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { createAdvancedApp } from './createApp';
 
@@ -48,7 +48,7 @@ function parseHTMl(html: string) {
  * @author yoannchb-pro
  */
 export function createComponent<
-  P extends ComponentProps['props'],
+  P extends ComponentInfos['componentData']['$props'],
   D extends Data,
   M extends string,
   A extends any[]
@@ -77,8 +77,8 @@ export function createComponent<
         domy.block.replaceWith(root);
 
         const data = domy.reactive({
-          props: {} as ComponentProps['props'],
-          attrs: {} as ComponentProps['attrs']
+          $props: {} as ComponentInfos['componentData']['$props'],
+          $attrs: {} as ComponentInfos['componentData']['$attrs']
         });
 
         const propsAttributes: Attr[] = [];
@@ -113,10 +113,10 @@ export function createComponent<
           const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
           if (domy.utils.isBindAttr(attr.name)) {
             domy.effect(() => {
-              data.props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
+              data.$props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
             });
           } else {
-            data.props[propName] = attr.value === '' ? true : attr.value;
+            data.$props[propName] = attr.value === '' ? true : attr.value;
           }
         }
 
@@ -125,10 +125,10 @@ export function createComponent<
           const { attrName } = domy.utils.getDomyAttributeInformations(attr);
           if (domy.utils.isBindAttr(attr.name)) {
             domy.effect(() => {
-              data.attrs[attrName] = domy.evaluate(attr.value);
+              data.$attrs[attrName] = domy.evaluate(attr.value);
             });
           } else {
-            data.attrs[attrName] = attr.value;
+            data.$attrs[attrName] = attr.value;
           }
         }
 
@@ -150,8 +150,7 @@ export function createComponent<
             createAdvancedApp(
               componentDefinition.app,
               {
-                props: data.props,
-                attrs: data.attrs,
+                componentData: data,
                 names,
                 childrens
               },

@@ -12,7 +12,7 @@ import { DOMY_EVENTS } from './DomyEvents';
 import { createDeepRenderFn } from './deepRender';
 import { reactive, watch, matchPath, unReactive } from '@domyjs/reactive';
 import { getRender } from './getRender';
-import { ComponentProps, Components } from '../types/Component';
+import { ComponentInfos, Components } from '../types/Component';
 import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { App } from '../types/App';
 
@@ -22,7 +22,7 @@ type Params = {
   target: HTMLElement;
   config: Config;
   components: Components;
-  props?: ComponentProps;
+  componentInfos?: ComponentInfos;
   byPassAttributes?: string[]; // Some attribute have to be handled by an other DOMY instance in some components
 };
 
@@ -35,7 +35,7 @@ type Params = {
  */
 export async function initApp(params: Params) {
   let unmountRender: (() => void) | null = null;
-  const { components, config, target, app = {}, props } = params;
+  const { components, config, target, app = {}, componentInfos } = params;
 
   // Initialisation event dispatch
   document.dispatchEvent(
@@ -48,7 +48,7 @@ export async function initApp(params: Params) {
   // State of the app
   const state: State = {
     data: reactive(app.data?.() ?? {}),
-    props,
+    componentInfos,
     methods: {},
     refs: {}
   };
@@ -100,7 +100,7 @@ export async function initApp(params: Params) {
         }
       }
     },
-    () => state.data
+    () => [state.data, state.componentInfos?.componentData]
   );
 
   // Setup

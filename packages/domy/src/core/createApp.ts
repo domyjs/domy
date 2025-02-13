@@ -1,5 +1,5 @@
 import { App, Data } from '../types/App';
-import { Components, ComponentProps } from '../types/Component';
+import { Components, ComponentInfos } from '../types/Component';
 import { Config } from '../types/Config';
 import { toKebabCase } from '../utils/toKebabCase';
 import { getRender } from './getRender';
@@ -18,8 +18,8 @@ export function createAdvancedApp<
   D extends Data,
   M extends string,
   A extends any[],
-  P extends ComponentProps['props']
->(appDefinition?: App<D, M, A, P>, props?: ComponentProps, byPassAttributes?: string[]) {
+  P extends ComponentInfos['componentData']['$props'] = Record<string, never>
+>(appDefinition?: App<D, M, A, P>, componentInfos?: ComponentInfos, byPassAttributes?: string[]) {
   ++appId;
 
   let config: Config = {};
@@ -51,7 +51,7 @@ export function createAdvancedApp<
           components: componentsList,
           config,
           target: domTarget,
-          props,
+          componentInfos,
           byPassAttributes
         });
 

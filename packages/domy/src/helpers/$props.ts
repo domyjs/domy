@@ -13,5 +13,5 @@ import { DomySpecialHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function $props(domy: DomySpecialHelper) {
-  return domy.state.props?.props;
+  return domy.state.componentInfos?.componentData.$props;
 }

@@ -1,11 +1,11 @@
 import type { Block } from '../core/Block';
-import { ComponentProps } from './Component';
+import { ComponentInfos } from './Component';
 
 type Method = (...args: any[]) => any | Promise<any>;
 
 export type State = {
   data: Record<string, unknown>;
-  props?: ComponentProps;
+  componentInfos?: ComponentInfos;
   methods: { [fnName: string]: Method };
 
   refs: Record<string, Block>;

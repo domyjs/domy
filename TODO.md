@@ -1,6 +1,6 @@
 # TODO
 
-- $props, $attrs pour watch
+- $props, $attrs pour watch and fixe bug in components.html (// TODO: make a bug)
 - Add effects
 - plugins proper to the instance
 - Fixe typing (App, createApp, createComponent, params in watcher)

@@ -98,6 +98,8 @@ export class Block {
       callWithErrorHandling(cleanup, err => error(err));
     }
 
+    this.cleanups.length = 0;
+
     if (this.element instanceof Block) this.element.unmount();
   }
 }
