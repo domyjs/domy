@@ -2,6 +2,9 @@
 
 - Fixe bug in components.html (// TODO: make a bug, component d-if marche pas check $watch test)
 - plugins proper to the instance
+
+- To hooks
+- Make i18n hook, make i18n dict reactive in case we add translations from the back
 - Fixe typing (App, createApp, createComponent, params in watcher)
 
 - Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests

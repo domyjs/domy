@@ -21,7 +21,6 @@ import { events } from './events';
 import { dScopeImplementation } from '../directives/d-scope';
 import { DomyDirectiveFn, DomyPlugin, DomyPluginDefinition, DomySpecialFn } from '../types/Domy';
 import { dSetupImplementation } from '../directives/d-setup';
-import { dWatchImplementation } from '../directives/d-watch';
 import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
 import { dTeleportImplementation } from '../directives/d-teleport';
@@ -42,7 +41,6 @@ import { dNameImplementation } from '../directives/d-name';
 import { $names } from '../helpers/$names';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { $effect } from '../helpers/$effect';
-import { dEffectImplementation } from '../directives/d-effect';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -77,8 +75,6 @@ export const PLUGINS: Plugins = {
     insert: dInsertImplementation,
     mounted: dMountedImplementation,
     unmount: dUnMountImplementation,
-    watch: dWatchImplementation,
-    effect: dEffectImplementation,
     setup: dSetupImplementation,
     scope: dScopeImplementation,
     if: dIfImplementation,
