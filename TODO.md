@@ -1,6 +1,5 @@
 # TODO
 
-- Fixe d-insert and the fact the title still change even if it's an other component
 - Fixe $attrs with :class, :style / $props, $attrs pour watch
 - Add effects
 - plugins proper to the instance

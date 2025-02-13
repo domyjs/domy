@@ -30,7 +30,8 @@ export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveRet
     domy
   });
 
-  domy.effect(visibilityHandler);
+  domy.effect(visibilityHandler.effect);
+  domy.cleanup(visibilityHandler.cleanup);
 
   return {
     skipChildsRendering: true,

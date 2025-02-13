@@ -64,22 +64,22 @@
     }
   </style>
   <body>
-    <!-- <div id="if" d-if="show" d-transition="transition">Modal Content... (by d-if)</div>
+    <div id="if" d-if="show" d-transition="transition">Modal Content... (by d-if)</div>
     <div id="show" style="display: flex" d-show="show" d-transition="transition">
       Modal Content... (by d-show)
-    </div> -->
+    </div>
     <template
       d-transition="transition"
       d-insert.render="show ? createElement('Hello World1') : createElement('Hello World2')"
     ></template>
 
     <!-- INIT TEST -->
-    <!-- <div id="init" d-if="!show" d-transition.init="transition">Modal content... (init)</div> -->
+    <div id="init" d-if="!show" d-transition.init="transition">Modal content... (init)</div>
 
     <!-- DYNAMIC TEST -->
-    <!-- <div id="dynamic" d-if="show" d-transition.dynamic="show ? 'transition' : 'op-transition'">
+    <div id="dynamic" d-if="show" d-transition.dynamic="show ? 'transition' : 'op-transition'">
       Modal content... (dynamic)
-    </div> -->
+    </div>
 
     <button @click="show = !show">Show modal</button>
   </body>

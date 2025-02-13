@@ -32,6 +32,10 @@ export class Block {
     }
   }
 
+  createNewElementBlock() {
+    return new Block(this.el);
+  }
+
   attachListener(
     type: string,
     listener: EventListenerOrEventListenerObject,

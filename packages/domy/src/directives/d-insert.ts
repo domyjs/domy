@@ -31,6 +31,10 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
   let lastRender: Block | null = null;
 
+  domy.cleanup(() => {
+    tracePositionComment.remove();
+  });
+
   domy.effect(() => {
     const elementToRender: Element | null | undefined = domy.evaluate(domy.attr.value.trim());
 
@@ -63,6 +67,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
       domy.block.setEl(lastRender);
     } else {
       domy.block.setEl(elementToRender);
+      lastRender = domy.block.createNewElementBlock(); // avoid unmounting the template
     }
 
     // Handle enter transition
