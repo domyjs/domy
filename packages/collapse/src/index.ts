@@ -54,7 +54,7 @@ document.addEventListener('domy:ready', event => {
   const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
   DOMYOBJ.plugin(domyPluginSetter => {
     domyPluginSetter.directive('collapse', collapsePlugin);
-    domyPluginSetter.directive('collapse-settings', (domy: DomyDirectiveHelper) => {
+    domyPluginSetter.directive('collapse-settings', () => {
       throw new Error(`The directive "collapse-settings" as to be use with "collapse" directive.`);
     });
 
