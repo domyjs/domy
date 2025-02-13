@@ -47,6 +47,48 @@ function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass
 }
 
 /**
+ * Remove styles from the style attribute if they are in executedValue
+ * { backgroundColor: true, color: true .... }
+ * @param domy
+ * @param executedValue
+ *
+ * @author yoannchb-pro
+ */
+function handleRemoveStyle(domy: DomyDirectiveHelper, executedValue: any) {
+  const el = domy.block.el as HTMLElement;
+
+  for (const styleName in executedValue) {
+    if (executedValue[styleName]) {
+      el.style.removeProperty(styleName);
+    }
+  }
+}
+
+/**
+ * Remove class attribute if it's an object like
+ * { show: true }
+ * or
+ * ["show"]
+ * @param domy
+ * @param executedValue
+ *
+ * @author yoannchb-pro
+ */
+function handleRemoveClass(domy: DomyDirectiveHelper, executedValue: any) {
+  const el = domy.block.el as HTMLElement;
+
+  if (Array.isArray(executedValue)) {
+    for (const className of executedValue) {
+      el.classList.remove(className);
+    }
+  } else {
+    for (const [className, shouldBeRemoved] of Object.entries(executedValue)) {
+      if (shouldBeRemoved) el.classList.remove(className);
+    }
+  }
+}
+
+/**
  * Handle binding attributes like :class or d-bind:class
  * It will catch the value into the attribute
  * Example: with isOpen = true
@@ -70,9 +112,13 @@ export function binding(domy: DomyDirectiveHelper) {
   if (attrName !== 'class' && attrName !== 'style' && el.getAttribute(attrName))
     throw new Error(`Binding failed. The attribute "${attrName}" already exist on the element.`);
 
+  let lastExecutedValue: any = null;
+
   domy.effect(() => {
     const executedValue = domy.evaluate(domy.attr.value);
     const isExecutedValueObject = typeof executedValue === 'object' && executedValue !== null;
+
+    lastExecutedValue = executedValue;
 
     if (isExecutedValueObject && attrName === 'style') {
       handleStyle(domy, executedValue, defaultStyle as string);
@@ -83,5 +129,16 @@ export function binding(domy: DomyDirectiveHelper) {
     }
   });
 
-  domy.cleanup(() => el.removeAttribute(attrName));
+  domy.cleanup(() => {
+    const isExecutedValueObject =
+      typeof lastExecutedValue === 'object' && lastExecutedValue !== null;
+
+    if (isExecutedValueObject && attrName === 'style') {
+      handleRemoveStyle(domy, lastExecutedValue);
+    } else if (isExecutedValueObject && attrName === 'class') {
+      handleRemoveClass(domy, lastExecutedValue);
+    } else {
+      el.removeAttribute(attrName);
+    }
+  });
 }

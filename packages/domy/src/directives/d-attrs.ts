@@ -22,8 +22,11 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
 
     if (render) render.unmount();
 
-    for (const attrName in lastAttrs) {
-      el.removeAttribute(attrName);
+    // handled the cleanup in by binding.ts
+    if (!needRender) {
+      for (const attrName in lastAttrs) {
+        el.removeAttribute(attrName);
+      }
     }
 
     for (const attrName in attrs) {

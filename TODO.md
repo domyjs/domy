@@ -1,6 +1,6 @@
 # TODO
 
-- Fixe $attrs with :class, :style / $props, $attrs pour watch
+- $props, $attrs pour watch
 - Add effects
 - plugins proper to the instance
 - Fixe typing (App, createApp, createComponent, params in watcher)
