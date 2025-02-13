@@ -33,6 +33,7 @@ export type App<
   setup?: () => void | Promise<void>;
   mounted?: () => void | Promise<void>;
   unmount?: () => void | Promise<void>;
+  effect?: (() => any)[];
   watch?: {
     [depName: string]: OnSetListener['fn'];
   };

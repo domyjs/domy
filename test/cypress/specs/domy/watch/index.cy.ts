@@ -18,17 +18,11 @@ describe('watch test', () => {
     cy.get('h1').should('have.text', 'Count: 0');
   });
 
-  it('Check the watcher cant call it self', () => {
+  it('Check the watcher cant call it self more than 100 times', () => {
     cy.get('h2').should('have.text', 'Count by 2: 0');
 
     cy.get('#dec2').click();
-    cy.get('h2').should('have.text', 'Count by 2: -2');
-
-    cy.get('#inc2').click();
-    cy.get('h2').should('have.text', 'Count by 2: 0');
-
-    cy.get('#inc2').click();
-    cy.get('h2').should('have.text', 'Count by 2: 2');
+    cy.get('h2').should('have.text', 'Count by 2: -100');
   });
 
   it('Check path and params work', () => {

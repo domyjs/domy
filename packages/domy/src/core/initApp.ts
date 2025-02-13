@@ -15,6 +15,8 @@ import { getRender } from './getRender';
 import { ComponentInfos, Components } from '../types/Component';
 import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { App } from '../types/App';
+import { getUniqueQueueId, queueJob } from './scheduler';
+import { queuedWatchEffect } from '../utils/queuedWatchEffect';
 
 type Params = {
   appId: number;
@@ -68,10 +70,13 @@ export async function initApp(params: Params) {
   }
 
   // Watchers
-  const watchers: Record<string, { locked: boolean; fn: OnSetListener['fn'] }> = {};
+  const watchers: Record<string, { fn: OnSetListener['fn']; id: number }> = {};
   // We convert all watcher function to regular function so we can change the context
   for (const watcherName in app.watch) {
-    watchers[watcherName] = { fn: toRegularFn(app.watch[watcherName]), locked: false };
+    watchers[watcherName] = {
+      id: getUniqueQueueId(),
+      fn: toRegularFn(app.watch[watcherName])
+    };
   }
   // We attach a watcher to data (so a global watcher) to call the correct watcher based on the path
   watch(
@@ -79,23 +84,18 @@ export async function initApp(params: Params) {
       type: 'onSet',
       fn: async props => {
         for (const watcherName in app.watch) {
-          const isWatcherLocked = watchers[watcherName].locked; // We ensure the watcher can't call it self (act like a lock)
-
           const match = matchPath(watcherName, props.path);
 
           if (match.isMatching) {
-            if (!isWatcherLocked) {
-              watchers[watcherName].locked = true;
+            const watcher = watchers[watcherName];
 
+            queueJob(async () => {
               try {
-                const watcherfn = watchers[watcherName].fn;
-                await watcherfn.call(getContext(contextProps), props);
+                await watcher.fn.call(getContext(contextProps), props);
               } catch (err: any) {
                 error(err);
               }
-            }
-
-            watchers[watcherName].locked = false;
+            }, watcher.id);
           }
         }
       }
@@ -143,6 +143,12 @@ export async function initApp(params: Params) {
     } catch (err: any) {
       error(err);
     }
+  }
+
+  // Effects
+  for (const effect of app.effect ?? []) {
+    const fn = toRegularFn(effect);
+    queuedWatchEffect(fn.bind(getContext(contextProps)));
   }
 
   // Mounted event dispatch

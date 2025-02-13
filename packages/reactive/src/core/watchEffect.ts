@@ -77,5 +77,9 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
 
   watchDeps();
 
-  return uneffect;
+  return () => {
+    const index = watchDepsQueue.indexOf(watchDeps);
+    if (index !== -1) watchDepsQueue.splice(index, 1);
+    uneffect();
+  };
 }

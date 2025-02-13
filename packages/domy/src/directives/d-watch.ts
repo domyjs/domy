@@ -15,6 +15,7 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
       `At least one key has to be provided for the "${domy.directive}" directive (example: d-watch.count="...").`
     );
 
+  const queueId = domy.getUniqueQueueId();
   const objsToWatch: any[] = [];
   const keysToWatch = new Set<string>();
 
@@ -55,7 +56,8 @@ export function dWatchImplementation(domy: DomyDirectiveHelper) {
           const matcher = domy.matchPath(keyToWatch, props.path);
           if (matcher.isMatching) {
             const executedValue = domy.evaluate(domy.attr.value);
-            if (typeof executedValue === 'function') domy.queueJob(() => executedValue(props));
+            if (typeof executedValue === 'function')
+              domy.queueJob(() => executedValue(props), queueId);
             break;
           }
         }

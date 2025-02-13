@@ -2,7 +2,7 @@ import { cspEvaluate } from '../utils/cspEvaluate';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
 import * as ReactiveUtils from '@domyjs/reactive';
-import { queueJob } from './scheduler';
+import { getUniqueQueueId, queueJob } from './scheduler';
 import { State } from '../types/State';
 import { Config } from '../types/Config';
 import { directivesUtils } from '../utils/directivesUtils';
@@ -66,6 +66,7 @@ export class DomyHelper {
       utils: directivesUtils,
 
       queueJob,
+      getUniqueQueueId,
       onElementMounted: this.onElementMounted.bind(this),
       onAppMounted: this.onAppMounted.bind(this),
       effect: this.effect.bind(this),
@@ -128,34 +129,16 @@ export class DomyHelper {
   effect(fn: () => void) {
     // Unsure to not make the effect if the app is unmounted
     const fixedFn = () => {
-      if (!this.unmount) fn();
+      if (!this.unmount) directivesUtils.callWithErrorHandling(fn, err => error(err));
     };
 
-    // If the app is not mounted yet we don't need to queue the job
-    const start = (fn: () => void) =>
-      this.appState.isAppMounted
-        ? queueJob(fn)
-        : directivesUtils.callWithErrorHandling(fn, err => error(err));
-
     if (!this.renderWithoutListeningToChange) {
-      start(() => {
-        const uneffect = ReactiveUtils.watchEffect(fixedFn, {
-          // make sure the job is queue again and we listen for dep changes
-          onDepChange: uneffect => {
-            uneffect();
-
-            const index = this.clearEffectList.indexOf(uneffect);
-            if (index !== 1) this.clearEffectList.splice(index, 1);
-
-            this.effect(fn);
-          },
-          noSelfUpdate: true
-        });
-
-        this.clearEffectList.push(uneffect);
+      const uneffect = directivesUtils.queuedWatchEffect(fixedFn, {
+        dontQueueOnFirstExecution: !this.appState.isAppMounted
       });
+      this.clearEffectList.push(uneffect);
     } else {
-      start(fixedFn);
+      fixedFn();
     }
   }
 

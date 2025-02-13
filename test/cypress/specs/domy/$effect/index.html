@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>$watch</title>
+    <title>$effect</title>
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <h1 id="watcherCall">0</h1>
+    <h1 id="effectCall">0</h1>
 
     <Count d-if="show" :count="count"></Count>
 
@@ -26,14 +26,11 @@
       `,
       app: {
         mounted() {
-          this.$watch(
-            () => {
-              console.log('Watcher called');
-              const el = document.querySelector('#watcherCall');
-              el.textContent = Number(el.textContent) + 1;
-            },
-            () => this.$props.count
-          );
+          this.$effect(() => {
+            console.log('Effect called', this.$props.count);
+            const el = document.querySelector('#effectCall');
+            el.textContent = Number(el.textContent) + 1;
+          });
         },
         unmounted() {
           console.log('unmount');

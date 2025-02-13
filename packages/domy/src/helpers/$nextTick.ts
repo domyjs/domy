@@ -1,4 +1,4 @@
-import { queueJob } from '../core/scheduler';
+import { getUniqueQueueId, queueJob } from '../core/scheduler';
 
 /**
  * Wait until domy finished updating dependencies
@@ -14,12 +14,14 @@ import { queueJob } from '../core/scheduler';
  * @author yoannchb-pro
  */
 export function $nextTick() {
+  const queueId = getUniqueQueueId();
+
   return (cb?: () => void | Promise<void>) => {
     return new Promise(resolve => {
       queueJob(() => {
         if (typeof cb === 'function') cb();
         resolve(true);
-      });
+      }, queueId);
     });
   };
 }

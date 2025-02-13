@@ -1,7 +1,6 @@
 # TODO
 
-- Fixe bug in components.html (// TODO: make a bug)
-- Add effects
+- Fixe bug in components.html (// TODO: make a bug, component d-if marche pas check $watch test)
 - plugins proper to the instance
 - Fixe typing (App, createApp, createComponent, params in watcher)
 

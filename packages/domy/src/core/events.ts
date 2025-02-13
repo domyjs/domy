@@ -11,6 +11,7 @@ import on from '../utils/on';
  * @author yoannchb-pro
  */
 export function events(domy: DomyDirectiveHelper) {
+  const queueId = domy.getUniqueQueueId();
   const eventName = domy.attrName;
   let el = domy.block.el;
 
@@ -27,9 +28,9 @@ export function events(domy: DomyDirectiveHelper) {
       domy.queueJob(() => {
         const executedValue = domy.evaluate(domy.attr.value);
         if (typeof executedValue === 'function') executedValue(event);
-      });
+      }, queueId);
 
-      domy.queueJob(() => domy.removeScopeToNode(scope));
+      domy.queueJob(() => domy.removeScopeToNode(scope), queueId);
     };
 
     // We add wrappers to the listener to ensure we can add modifiers

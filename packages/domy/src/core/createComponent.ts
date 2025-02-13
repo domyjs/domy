@@ -2,6 +2,7 @@ import { Data } from '../types/App';
 import { ComponentDefinition, ComponentInfos, Components } from '../types/Component';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { createAdvancedApp } from './createApp';
+import { getUniqueQueueId } from './scheduler';
 
 function cleanup(unmountFns: (() => void)[]) {
   for (const unmountFn of unmountFns) {
@@ -144,6 +145,8 @@ export function createComponent<
         }
 
         let unmountComponent: (() => void) | undefined;
+        const queueId = getUniqueQueueId();
+
         const mountComponent = (target: HTMLElement) => {
           const makeComponent = () => {
             if (unmountComponent) unmountComponent();
@@ -164,7 +167,7 @@ export function createComponent<
               });
           };
 
-          if (domy.appState.isAppMounted) domy.queueJob(makeComponent);
+          if (domy.appState.isAppMounted) domy.queueJob(makeComponent, queueId);
           else makeComponent();
         };
 

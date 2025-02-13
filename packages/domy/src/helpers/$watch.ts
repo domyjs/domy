@@ -1,3 +1,4 @@
+import { getUniqueQueueId, queueJob } from '../core/scheduler';
 import { DomySpecialHelper } from '../types/Domy';
 import { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 
@@ -9,11 +10,13 @@ import { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
  * @author yoannchb-pro
  */
 export function $watch(domy: DomySpecialHelper) {
+  const queueId = getUniqueQueueId();
+
   return (listener: OnSetListener['fn'], effect: () => any) => {
     const unwatch = domy.watch(
       {
         type: 'onSet',
-        fn: listener
+        fn: props => queueJob(() => listener(props), queueId)
       },
       effect
     );

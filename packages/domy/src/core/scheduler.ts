@@ -5,13 +5,14 @@ type QueueElement = () => any;
 
 let queued = false;
 let queueIndex = 0;
+let queueId = 0;
 
 const queue: QueueElement[] = [];
 const resolvedPromise = Promise.resolve();
 
-const queueCallbacks: QueueElement[] = [];
+const queueCallbacks: { job: QueueElement; id: number }[] = [];
 
-const seen = new Map<QueueElement, number>();
+const seen = new Map<number, number>(); // <id, count>
 const MAX_RECURSION = 100;
 
 /**
@@ -20,8 +21,8 @@ const MAX_RECURSION = 100;
  *
  * @author yoannchb-pro
  */
-export function queueJobOnQueueEmpty(job: QueueElement) {
-  queueCallbacks.push(job);
+export function queueJobOnQueueEmpty(job: QueueElement, id: number) {
+  queueCallbacks.push({ job, id });
 }
 
 /**
@@ -46,7 +47,7 @@ function flushJobs() {
     queued = false;
 
     for (const queueCb of queueCallbacks) {
-      queueJob(queueCb);
+      queueJob(queueCb.job, queueCb.id);
     }
 
     queueCallbacks.length = 0;
@@ -59,17 +60,17 @@ function flushJobs() {
  *
  * @author yoannchb-pro
  */
-export function queueJob(job: QueueElement) {
-  const count = seen.get(job) ?? 0;
+export function queueJob(job: QueueElement, id: number) {
+  const count = seen.get(id) ?? 1;
 
   if (count > MAX_RECURSION) {
     error(
-      `A job as been skipped because it look like he is calling his self a bounch of times and exceed the max recursive amount (${MAX_RECURSION}).`
+      `A job as been skipped because it look like he is calling it self a bounch of times and exceed the max recursive amount (${MAX_RECURSION}).`
     );
     return;
   }
 
-  seen.set(job, count + 1);
+  seen.set(id, count + 1);
 
   queue.push(job);
 
@@ -77,4 +78,14 @@ export function queueJob(job: QueueElement) {
     // Use Promise.resolve to defer the execution and regroup DOM updates
     resolvedPromise.then(flushJobs);
   }
+}
+
+/**
+ * Return an unique queue id
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function getUniqueQueueId() {
+  return ++queueId;
 }

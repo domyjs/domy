@@ -41,6 +41,8 @@ import { dInsertImplementation } from '../directives/d-insert';
 import { dNameImplementation } from '../directives/d-name';
 import { $names } from '../helpers/$names';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
+import { $effect } from '../helpers/$effect';
+import { dEffectImplementation } from '../directives/d-effect';
 
 type Plugins = {
   sortedDirectives: string[];
@@ -76,6 +78,7 @@ export const PLUGINS: Plugins = {
     mounted: dMountedImplementation,
     unmount: dUnMountImplementation,
     watch: dWatchImplementation,
+    effect: dEffectImplementation,
     setup: dSetupImplementation,
     scope: dScopeImplementation,
     if: dIfImplementation,
@@ -108,7 +111,8 @@ export const PLUGINS: Plugins = {
     methods: $methods,
     watch: $watch,
     attrs: $attrs,
-    names: $names
+    names: $names,
+    effect: $effect
   }
 };
 

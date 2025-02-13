@@ -2,7 +2,7 @@ import type { State } from './State';
 import type * as ReactiveUtils from '@domyjs/reactive';
 import { Config } from './Config';
 import { getContext } from '../utils/getContext';
-import { queueJob } from '../core/scheduler';
+import { getUniqueQueueId, queueJob } from '../core/scheduler';
 import { helpersUtils } from '../utils/helpersUtils';
 import { directivesUtils } from '../utils/directivesUtils';
 import { createDeepRenderFn } from '../core/deepRender';
@@ -43,6 +43,7 @@ export type DomyDirectiveHelper = {
 
   onElementMounted(cb: () => void): void;
   onAppMounted(cb: () => void): void;
+  getUniqueQueueId: typeof getUniqueQueueId;
   queueJob: typeof queueJob;
   effect(cb: () => void): void;
   cleanup(cb: () => void): void;

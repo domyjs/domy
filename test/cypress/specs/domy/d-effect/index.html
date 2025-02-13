@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-effect</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <div d-scope="{ count: 0, somethingElse: 0 }">
+      <p id="count" d-effect="() => { if(count < 0) count = 0; }">Count: {{ count }}</p>
+      <p id="count2">Count2: {{ count2 }}</p>
+
+      <button id="inc" @click="++count">Increment</button>
+      <button id="dec" @click="--count">Decrement</button>
+      <button id="inc2" @click="++count2">Increment2</button>
+      <button id="dec2" @click="--count2">Decrement2</button>
+
+      <button id="somethingElse" @click="--somethingElse">Something else</button>
+    </div>
+  </body>
+  <script>
+    DOMY.createApp({
+      data() {
+        return {
+          count2: 0
+        };
+      },
+      effect: [
+        function () {
+          // Ensure scoped data can't call this effect
+          this.count = 999;
+        }
+      ]
+    }).mount();
+  </script>
+</html>
