@@ -7,6 +7,7 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
+    <p id="propChanges">0</p>
     <p id="componentClick">{{ componentClick }}</p>
 
     <main d-for="i of [1, 2, 3]">
@@ -39,11 +40,6 @@
 
     const Count = DOMY.createComponent({
       props: ['showError', 'open', 'close'],
-      watch: {
-        $props() {
-          console.log('props change');
-        }
-      },
       html: `
             <div d-attrs="$attrs">
               <h1>Props: {{ Object.keys($props).join(',') }}</h1>
@@ -62,6 +58,11 @@
         setup() {},
         mounted() {},
         watch: {
+          '$props.showError'() {
+            const p = document.querySelector('#propChanges');
+            p.textContent = Number(p.textContent) + 1;
+          },
+
           count({ prevValue, newValue }) {
             if (newValue < 0) {
               this.$props.open();
