@@ -22,6 +22,7 @@ export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiv
 
     const unmountFns: (() => void)[] = [];
 
+    // We mount the child after teleoportation to ensure they have correct parent and everything
     for (const child of childs) {
       target.appendChild(child);
       const { unmount } = domy.deepRender({
@@ -40,7 +41,7 @@ export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiv
     el.remove();
   }
 
-  if (domy.modifiers.includes('defer')) domy.onMounted(teleport);
+  if (domy.modifiers.includes('defer')) domy.onAppMounted(teleport);
   else teleport();
 
   return { skipChildsRendering: true };

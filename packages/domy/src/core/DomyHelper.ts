@@ -24,6 +24,8 @@ let domyHelperId = 0;
 export class DomyHelper {
   private domyHelperId = ++domyHelperId;
 
+  private unmount = false;
+
   private cleanupFn: (() => void) | null = null;
   private clearEffectList: (() => void)[] = [];
 
@@ -64,7 +66,8 @@ export class DomyHelper {
       utils: directivesUtils,
 
       queueJob,
-      onMounted: this.onMounted.bind(this),
+      onElementMounted: this.onElementMounted.bind(this),
+      onAppMounted: this.onAppMounted.bind(this),
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
       evaluate: this.evaluate.bind(this),
@@ -76,7 +79,7 @@ export class DomyHelper {
   }
 
   copy() {
-    return new DomyHelper(
+    const copy = new DomyHelper(
       this.appId,
       this.deepRenderFn,
       this.block,
@@ -86,6 +89,7 @@ export class DomyHelper {
       this.renderWithoutListeningToChange,
       this.appState
     );
+    return copy;
   }
 
   setAttrInfos(attr: Attr) {
@@ -98,7 +102,12 @@ export class DomyHelper {
     this.attr.value = attr.value;
   }
 
-  onMounted(cb: () => void | Promise<void>) {
+  onElementMounted(cb: () => void) {
+    if (this.appState.isAppMounted) cb();
+    else this.block.attachListener(DOMY_EVENTS.ElementMounted, cb, { once: true });
+  }
+
+  onAppMounted(cb: () => void) {
     const listener: EventListenerOrEventListenerObject = event => {
       const e = event as CustomEvent<DomyMountedEventDetails>;
       if (e.detail.appId === this.appId) {
@@ -113,9 +122,15 @@ export class DomyHelper {
     for (const clearEffect of this.clearEffectList) {
       clearEffect();
     }
+    this.clearEffectList.length = 0;
   }
 
   effect(fn: () => void) {
+    // Unsure to not make the effect if the app is unmounted
+    const fixedFn = () => {
+      if (!this.unmount) fn();
+    };
+
     // If the app is not mounted yet we don't need to queue the job
     const start = (fn: () => void) =>
       this.appState.isAppMounted
@@ -124,7 +139,8 @@ export class DomyHelper {
 
     if (!this.renderWithoutListeningToChange) {
       start(() => {
-        const uneffect = ReactiveUtils.watchEffect(fn, {
+        const uneffect = ReactiveUtils.watchEffect(fixedFn, {
+          // make sure the job is queue again and we listen for dep changes
           onDepChange: uneffect => {
             uneffect();
 
@@ -139,7 +155,7 @@ export class DomyHelper {
         this.clearEffectList.push(uneffect);
       });
     } else {
-      start(fn);
+      start(fixedFn);
     }
   }
 
@@ -182,10 +198,10 @@ export class DomyHelper {
   }
 
   callCleanup() {
-    queueJob(() => {
-      this.clearEffects();
-      if (typeof this.cleanupFn === 'function') this.cleanupFn();
-      this.cleanupFn = null;
-    });
+    // not queued to ensure it start before childs update
+    this.unmount = true;
+    this.clearEffects();
+    if (typeof this.cleanupFn === 'function') this.cleanupFn();
+    this.cleanupFn = null;
   }
 }

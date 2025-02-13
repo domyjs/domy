@@ -34,7 +34,8 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     if (needRender) {
       render = domy.deepRender({
         element: el,
-        scopedNodeData: domy.scopedNodeData
+        scopedNodeData: domy.scopedNodeData,
+        skipChildRendering: true
       });
     }
 

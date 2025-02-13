@@ -10,41 +10,38 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // We deep render the element first to ensure to get the correct initial style (in particular if the style is binded with :style)
-  domy.deepRender({
-    element: domy.block,
-    scopedNodeData: domy.scopedNodeData
-  });
+  domy.onElementMounted(() => {
+    // Ensure the code is started after the effects of the previous deepRender
+    let isInit = false;
+    const needInitTransition = domy.block.transition?.init;
+    const originalDisplay = (domy.block.el as HTMLElement).style.display ?? '';
 
-  // Ensure the code is started after the effects of the previous deepRender
-  let isInit = false;
-  const needInitTransition = domy.block.transition?.init;
-  const originalDisplay = (domy.block.el as HTMLElement).style.display ?? '';
+    function visibilityHandler() {
+      const el = domy.block.el as HTMLElement;
+      const shouldBeDisplay = domy.evaluate(domy.attr.value);
+      const isAlreadyShow = el.style.display !== 'none';
 
-  function visibilityHandler() {
-    const el = domy.block.el as HTMLElement;
-    const shouldBeDisplay = domy.evaluate(domy.attr.value);
-    const isAlreadyShow = el.style.display !== 'none';
+      if (shouldBeDisplay && !isAlreadyShow) {
+        el.style.display = originalDisplay;
 
-    if (shouldBeDisplay && !isAlreadyShow) {
-      el.style.display = originalDisplay;
-
-      if (needInitTransition || isInit) domy.block.applyTransition('enterTransition');
-    } else if (isAlreadyShow && !shouldBeDisplay) {
-      if (needInitTransition || isInit) {
-        domy.block.applyTransition('outTransition', () => {
+        if (needInitTransition || isInit) domy.block.applyTransition('enterTransition');
+      } else if (isAlreadyShow && !shouldBeDisplay) {
+        if (needInitTransition || isInit) {
+          domy.block.applyTransition('outTransition', () => {
+            el.style.display = 'none';
+          });
+        } else {
           el.style.display = 'none';
-        });
-      } else {
-        el.style.display = 'none';
+        }
       }
+
+      isInit = true;
     }
 
-    isInit = true;
-  }
+    domy.block.onElementChange(() => {
+      visibilityHandler();
+    });
 
-  domy.block.onElementChange(() => {
-    visibilityHandler();
+    domy.effect(visibilityHandler);
   });
-
-  domy.effect(visibilityHandler);
 }

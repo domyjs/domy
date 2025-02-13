@@ -72,6 +72,12 @@ export function createDeepRenderFn(
       const element = toRender.element;
       const isRootRendering = element === rootElement;
 
+      // If we are to the previous element then the next element is rendered because we go from bottom to top
+      const lastRenderedElement = toRender.element.nextElementSibling;
+      if (lastRenderedElement) {
+        lastRenderedElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.ElementMounted));
+      }
+
       const block = isRootRendering ? rootBlock : new Block(element);
       if (toRender.parentBlock) block.parentBlock = toRender.parentBlock;
 
@@ -116,6 +122,8 @@ export function createDeepRenderFn(
       const isComponent = element.localName in components;
 
       for (const attr of sortedAttributes) {
+        if (!block.el.hasAttribute(attr.name)) continue;
+
         const shouldByPassAttribute =
           props.byPassAttributes && props.byPassAttributes.includes(attr.name);
 

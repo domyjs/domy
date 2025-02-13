@@ -27,29 +27,26 @@ export function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
 
   el.removeAttribute(SETTINGS_ATTRIBUTE);
 
-  // We deep render the element first to get his initial height
-  domy.deepRender({
-    element: el,
-    scopedNodeData: domy.scopedNodeData
-  });
+  // We wait the element to be mounted first to get his initial height
+  domy.onElementMounted(() => {
+    const initialHeight = settings.height ?? el.getBoundingClientRect().height;
 
-  const initialHeight = settings.height ?? el.getBoundingClientRect().height;
+    let isInitialised = false;
+    el.style.overflowY = 'hidden';
 
-  let isInitialised = false;
-  el.style.overflowY = 'hidden';
+    domy.effect(() => {
+      const isShow = domy.evaluate(domy.attr.value);
 
-  domy.effect(() => {
-    const isShow = domy.evaluate(domy.attr.value);
+      if (isInitialised) el.style.transition = settings.transition ?? 'height 250ms ease-out';
 
-    if (isInitialised) el.style.transition = settings.transition ?? 'height 250ms ease-out';
+      if (isShow) {
+        el.style.height = `${initialHeight}px`;
+      } else {
+        el.style.height = `${settings.defaultHeight ?? 0}px`;
+      }
 
-    if (isShow) {
-      el.style.height = `${initialHeight}px`;
-    } else {
-      el.style.height = `${settings.defaultHeight ?? 0}px`;
-    }
-
-    isInitialised = true;
+      isInitialised = true;
+    });
   });
 }
 
@@ -57,7 +54,7 @@ document.addEventListener('domy:ready', event => {
   const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
   DOMYOBJ.plugin(domyPluginSetter => {
     domyPluginSetter.directive('collapse', collapsePlugin);
-    domyPluginSetter.directive('collapse-settings', () => {
+    domyPluginSetter.directive('collapse-settings', (domy: DomyDirectiveHelper) => {
       throw new Error(`The directive "collapse-settings" as to be use with "collapse" directive.`);
     });
 

@@ -61,8 +61,6 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
     }
   }
 
-  watchDeps();
-
   const uneffect = globalWatch({
     type: 'onSet',
     fn: ({ path, obj }) => {
@@ -76,6 +74,8 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
       }
     }
   });
+
+  watchDeps();
 
   return uneffect;
 }

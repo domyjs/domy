@@ -32,6 +32,22 @@ export class Block {
     }
   }
 
+  attachListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ) {
+    let backEl = this.el;
+
+    this.el.addEventListener(type, listener, options);
+
+    this.onElementChange(newEl => {
+      backEl.removeEventListener(type, listener, options);
+      newEl.addEventListener(type, listener, options);
+      backEl = newEl;
+    });
+  }
+
   onElementChange(cb: (newEl: Element) => void) {
     this.onElChangeCbList.push(cb);
   }

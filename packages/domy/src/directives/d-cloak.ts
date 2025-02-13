@@ -9,10 +9,8 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dCloakImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   // We render the element and child first so we know the d-cloak attribute will be remove after child rendered
-  domy.deepRender({
-    element: domy.block,
-    scopedNodeData: domy.scopedNodeData
+  domy.onElementMounted(() => {
+    // This is the only attribute which is not remove by default
+    domy.block.el.removeAttribute(domy.attr.name);
   });
-
-  domy.block.el.removeAttribute(domy.attr.name);
 }

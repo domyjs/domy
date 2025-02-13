@@ -70,6 +70,7 @@ export function queueJob(job: QueueElement) {
   }
 
   seen.set(job, count + 1);
+
   queue.push(job);
 
   if (!queued) {

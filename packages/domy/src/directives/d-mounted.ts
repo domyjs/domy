@@ -12,12 +12,8 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dMountedImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  // Ensure the element with the childrens are mounted first
-  domy.deepRender({
-    element: domy.block,
-    scopedNodeData: domy.scopedNodeData
+  domy.onElementMounted(() => {
+    const executedValue = domy.evaluate(domy.attr.value);
+    if (typeof executedValue === 'function') executedValue();
   });
-
-  const executedValue = domy.evaluate(domy.attr.value);
-  if (typeof executedValue === 'function') executedValue();
 }
