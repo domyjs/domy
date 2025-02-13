@@ -1,5 +1,8 @@
-import type DOMY from '@domyjs/core/src';
-import type { DomyDirectiveHelper, DomyDirectiveReturn } from '@domyjs/core/src/types/Domy';
+import type {
+  DomyDirectiveHelper,
+  DomyDirectiveReturn,
+  DomyPlugin
+} from '@domyjs/core/src/types/Domy';
 
 type CollapseSettings = {
   height?: number;
@@ -18,7 +21,7 @@ const SETTINGS_ATTRIBUTE = 'd-collapse-settings';
  *
  * @author yoannchb-pro
  */
-export function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.block.el as HTMLElement;
 
   // We get the settings first to ensure it will not throw an error in the following deep render
@@ -50,14 +53,13 @@ export function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   });
 }
 
-document.addEventListener('domy:ready', event => {
-  const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
-  DOMYOBJ.plugin(domyPluginSetter => {
-    domyPluginSetter.directive('collapse', collapsePlugin);
-    domyPluginSetter.directive('collapse-settings', () => {
-      throw new Error(`The directive "collapse-settings" as to be use with "collapse" directive.`);
-    });
-
-    domyPluginSetter.prioritise(['collapse', 'collapse-settings']);
+const collapsePluginDefinition: DomyPlugin = domyPluginSetter => {
+  domyPluginSetter.directive('collapse', collapsePlugin);
+  domyPluginSetter.directive('collapse-settings', () => {
+    throw new Error(`The directive "collapse-settings" as to be use with "collapse" directive.`);
   });
-});
+
+  domyPluginSetter.prioritise(['collapse', 'collapse-settings']);
+};
+
+export default collapsePluginDefinition;

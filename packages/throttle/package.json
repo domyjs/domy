@@ -4,6 +4,7 @@
   "description": "Domyjs throttle plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "buildName": "throttle",
   "files": [
     "/dist",
     "package.json",

@@ -17,6 +17,7 @@ import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
 import { App } from '../types/App';
 import { getUniqueQueueId, queueJob } from './scheduler';
 import { queuedWatchEffect } from '../utils/queuedWatchEffect';
+import { PluginHelper } from './plugin';
 
 type Params = {
   appId: number;
@@ -25,6 +26,7 @@ type Params = {
   config: Config;
   components: Components;
   componentInfos?: ComponentInfos;
+  pluginHelper: PluginHelper;
   byPassAttributes?: string[]; // Some attribute have to be handled by an other DOMY instance in some components
 };
 
@@ -58,7 +60,8 @@ export async function initApp(params: Params) {
   const contextProps: Parameters<typeof getContext>[0] = {
     state,
     scopedNodeData: [],
-    config
+    config,
+    pluginHelper: params.pluginHelper
   };
 
   // Methods
@@ -122,7 +125,13 @@ export async function initApp(params: Params) {
     })
   );
 
-  const deepRender = createDeepRenderFn(params.appId, state, config, components);
+  const deepRender = createDeepRenderFn(
+    params.appId,
+    state,
+    config,
+    components,
+    params.pluginHelper
+  );
   try {
     // Render the dom with DOMY
     const block = deepRender({

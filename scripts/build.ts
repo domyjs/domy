@@ -9,7 +9,7 @@ import config from '../tsconfig.json';
 const filters = ['docs'];
 
 // Argument to target a specific package to build
-const toBuild = process.argv[2].split(',');
+const toBuild = process.argv[2]?.split(',');
 
 (async () => {
   // Read directories within the packages folder

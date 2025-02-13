@@ -1,7 +1,6 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { binding } from './binding';
 import { events } from './events';
-import { PLUGINS } from './plugin';
 
 /**
  * Render a special attribute
@@ -11,6 +10,8 @@ import { PLUGINS } from './plugin';
  * @author yoannchb-pro
  */
 export function renderAttribute(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  const PLUGINS = domy.pluginHelper.PLUGINS;
+
   // Handle prefix attribute (example: d-on:click)
   if (domy.prefix.length > 0) {
     const prefixImplementation = PLUGINS.prefixes[domy.prefix];
@@ -29,7 +30,7 @@ export function renderAttribute(domy: DomyDirectiveHelper): DomyDirectiveReturn 
 
   // Handle domy attribute like d-for, d-if, ...
   // Every attributes starting by "d-"
-  if (domy.utils.isDomyAttr(domy.attr.name)) {
+  if (domy.utils.isDomyAttr(PLUGINS, domy.attr.name)) {
     const directiveImplementation = PLUGINS.directives[domy.directive];
     return directiveImplementation?.(domy);
   }

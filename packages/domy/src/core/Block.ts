@@ -93,6 +93,10 @@ export class Block {
     if (this.parentBlock) this.parentBlock.addCleanup(cleanup);
   }
 
+  isTextNode() {
+    return this.el.nodeType === Node.TEXT_NODE;
+  }
+
   unmount() {
     for (const cleanup of this.cleanups) {
       callWithErrorHandling(cleanup, err => error(err));

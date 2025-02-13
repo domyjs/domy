@@ -13,6 +13,7 @@ import type { Block } from './Block';
 import { DOMY_EVENTS } from './DomyEvents';
 import { DomyMountedEventDetails } from '../types/Events';
 import { error } from '../utils/logs';
+import { PluginHelper } from './plugin';
 
 let domyHelperId = 0;
 
@@ -43,12 +44,14 @@ export class DomyHelper {
     public scopedNodeData: Record<string, any>[] = [],
     public config: Config,
     public renderWithoutListeningToChange: boolean,
-    public appState: { isAppMounted: boolean }
+    public appState: { isAppMounted: boolean },
+    public pluginHelper: PluginHelper
   ) {}
 
   getPluginHelper(): DomyDirectiveHelper {
     return {
       domyHelperId: this.domyHelperId,
+      pluginHelper: this.pluginHelper,
       appState: this.appState,
       block: this.block,
       state: this.state,
@@ -88,7 +91,8 @@ export class DomyHelper {
       [...this.scopedNodeData], // Ensure the scoped node data of the current node are not affected by the next operations (like removing the scoped data in d-for)
       this.config,
       this.renderWithoutListeningToChange,
-      this.appState
+      this.appState,
+      this.pluginHelper
     );
     return copy;
   }
@@ -105,7 +109,7 @@ export class DomyHelper {
 
   onElementMounted(cb: () => void) {
     if (this.appState.isAppMounted) cb();
-    else this.block.attachListener(DOMY_EVENTS.ElementMounted, cb, { once: true });
+    else this.block.attachListener(DOMY_EVENTS.Element.Mounted, cb, { once: true });
   }
 
   onAppMounted(cb: () => void) {
@@ -154,7 +158,8 @@ export class DomyHelper {
       el: this.block.el,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
-      config: this.config
+      config: this.config,
+      pluginHelper: this.pluginHelper
     });
 
     const executedValued = evaluator({

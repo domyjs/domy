@@ -1,5 +1,4 @@
-import type DOMY from '@domyjs/core/src';
-import type { DomySpecialHelper } from '@domyjs/core/src/types/Domy';
+import type { DomyPlugin, DomySpecialHelper } from '@domyjs/core/src/types/Domy';
 
 /**
  * Throttle utility implementation
@@ -8,7 +7,7 @@ import type { DomySpecialHelper } from '@domyjs/core/src/types/Domy';
  *
  * @author yoannchb-pro
  */
-export function throttlePlugin() {
+function throttlePlugin() {
   const throttleCache = new Map<number, (...args: any[]) => void>();
 
   return function (domy: DomySpecialHelper) {
@@ -37,10 +36,8 @@ export function throttlePlugin() {
   };
 }
 
-document.addEventListener('domy:ready', event => {
-  const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
+const throttlePluginDefintion: DomyPlugin = domyPluginSetter => {
+  domyPluginSetter.helper('throttle', throttlePlugin());
+};
 
-  DOMYOBJ.plugin(domyPluginSetter => {
-    domyPluginSetter.helper('throttle', throttlePlugin());
-  });
-});
+export default throttlePluginDefintion;

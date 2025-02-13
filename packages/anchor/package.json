@@ -1,6 +1,7 @@
 {
   "name": "@domyjs/anchor",
   "version": "1.0.0",
+  "buildName": "anchor",
   "description": "Domyjs anchor plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -3,6 +3,7 @@ import { Config } from '../types/Config';
 import { State } from '../types/State';
 import { getHelpers } from './getHelpers';
 import { getReactiveHandler } from './getReactiveHandler';
+import { PluginHelper } from '../core/plugin';
 
 type Props = {
   domyHelperId?: number;
@@ -10,6 +11,7 @@ type Props = {
   state: State;
   scopedNodeData: Record<string, any>[];
   config: Config;
+  pluginHelper: PluginHelper;
 };
 
 /**

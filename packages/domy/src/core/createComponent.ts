@@ -135,7 +135,7 @@ export function createComponent<
         //  We render the childs first to ensure they keep the current state and not the component state
         const names: { [name: string]: Element } = {};
         const childrens: Element[] = [];
-        for (const child of componentElement.childNodes) {
+        for (const child of componentElement.children) {
           const childBlock = domy.deepRender({
             element: child as Element,
             scopedNodeData: domy.scopedNodeData
@@ -156,7 +156,8 @@ export function createComponent<
               {
                 componentData: data,
                 names,
-                childrens
+                childrens,
+                parentPluginHelper: domy.pluginHelper
               },
               componentAttributes
             )

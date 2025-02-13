@@ -1,3 +1,4 @@
+import { PluginHelper } from '../core/plugin';
 import { App, Data } from './App';
 import { DomyDirectiveHelper } from './Domy';
 
@@ -9,6 +10,7 @@ export type ComponentInfos = {
 
   childrens: Element[];
   names: { [name: string]: Element };
+  parentPluginHelper: PluginHelper;
 };
 
 export type Component = (props: {

@@ -1,5 +1,4 @@
-import type DOMY from '@domyjs/core/src';
-import type { DomyDirectiveHelper } from '@domyjs/core/src/types/Domy';
+import type { DomyDirectiveHelper, DomyPlugin } from '@domyjs/core/src/types/Domy';
 
 enum POSITION {
   BOTTOM = 'b',
@@ -42,9 +41,8 @@ export function anchorPlugin(domy: DomyDirectiveHelper) {
   // TODO
 }
 
-document.addEventListener('domy:ready', event => {
-  const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
-  DOMYOBJ.plugin(domyPluginSetter => {
-    domyPluginSetter.directive('anchor', anchorPlugin);
-  });
-});
+const anchorPluginDefinition: DomyPlugin = domyPluginSetter => {
+  domyPluginSetter.directive('anchor', anchorPlugin);
+};
+
+export default anchorPluginDefinition;

@@ -42,14 +42,15 @@ import { $names } from '../helpers/$names';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { $effect } from '../helpers/$effect';
 
-type Plugins = {
+export type PluginHelper = ReturnType<typeof createPluginRegistrer>;
+export type Plugins = {
   sortedDirectives: string[];
   prefixes: Record<string, DomyDirectiveFn>;
   directives: Record<string, DomyDirectiveFn>;
   helpers: Record<string, DomySpecialFn>;
 };
 
-export const PLUGINS: Plugins = {
+export const DEFAULT_PLUGINS: Plugins = {
   sortedDirectives: [
     'ignore',
     'once',
@@ -112,59 +113,85 @@ export const PLUGINS: Plugins = {
   }
 };
 
-const pluginDefinition: DomyPluginDefinition = {
-  prefix(name, fn) {
-    if (name in PLUGINS.prefixes) {
-      throw new Error(`A prefix with the name "${name}" already exist.`);
-    }
-    PLUGINS.prefixes[name] = fn;
-  },
-  directive(name, fn) {
-    if (name in PLUGINS.directives) {
-      throw new Error(`A directive with the name "${name}" already exist.`);
-    }
-    PLUGINS.directives[name] = fn;
-  },
-  helper(name, fn) {
-    if (name in PLUGINS.helpers) {
-      throw new Error(`A special with the name "${name}" already exist.`);
-    }
-    PLUGINS.helpers[name] = fn;
-  },
-  prioritise(directives) {
-    for (const directive of directives) {
-      // Check the directive exist
-      if (!(directive in PLUGINS.directives)) {
-        error(
-          new Error(
-            `The directive "${directive}" can't be prioritise because it doesn't exist. Ensure to register it with domy.directive() first.`
-          )
-        );
-        continue;
-      }
-
-      // Check the directive is not already prioritised
-      if (PLUGINS.sortedDirectives.includes(directive)) {
-        warn(
-          `The directive "${directive}" is already prioritised. The prioritisation has been skipped.`
-        );
-        continue;
-      }
-
-      PLUGINS.sortedDirectives.push(directive);
-    }
-  }
-};
-
 /**
- * Allow the user to register a custom directive or special
- * @param plugin
+ * Allow to register plugin for the current instance
+ * @returns
  *
  * @author yoannchb-pro
  */
-export function plugin(pluginMaker: DomyPlugin) {
-  callWithErrorHandling(
-    () => pluginMaker(pluginDefinition),
-    err => error(err)
-  );
+export function createPluginRegistrer() {
+  const PLUGINS: Plugins = {
+    directives: {
+      ...DEFAULT_PLUGINS.directives
+    },
+    prefixes: {
+      ...DEFAULT_PLUGINS.prefixes
+    },
+    helpers: {
+      ...DEFAULT_PLUGINS.helpers
+    },
+    sortedDirectives: [...DEFAULT_PLUGINS.sortedDirectives]
+  };
+
+  const pluginDefinition: DomyPluginDefinition = {
+    prefix(name, fn) {
+      if (name in PLUGINS.prefixes) {
+        throw new Error(`A prefix with the name "${name}" already exist.`);
+      }
+      PLUGINS.prefixes[name] = fn;
+    },
+    directive(name, fn) {
+      if (name in PLUGINS.directives) {
+        throw new Error(`A directive with the name "${name}" already exist.`);
+      }
+      PLUGINS.directives[name] = fn;
+    },
+    helper(name, fn) {
+      if (name in PLUGINS.helpers) {
+        throw new Error(`A special with the name "${name}" already exist.`);
+      }
+      PLUGINS.helpers[name] = fn;
+    },
+    prioritise(directives) {
+      for (const directive of directives) {
+        // Check the directive exist
+        if (!(directive in PLUGINS.directives)) {
+          error(
+            new Error(
+              `The directive "${directive}" can't be prioritise because it doesn't exist. Ensure to register it with domy.directive() first.`
+            )
+          );
+          continue;
+        }
+
+        // Check the directive is not already prioritised
+        if (PLUGINS.sortedDirectives.includes(directive)) {
+          warn(
+            `The directive "${directive}" is already prioritised. The prioritisation has been skipped.`
+          );
+          continue;
+        }
+
+        PLUGINS.sortedDirectives.push(directive);
+      }
+    }
+  };
+
+  /**
+   * Allow the user to register a custom directive or special
+   * @param plugin
+   *
+   * @author yoannchb-pro
+   */
+  function plugin(pluginMaker: DomyPlugin) {
+    callWithErrorHandling(
+      () => pluginMaker(pluginDefinition),
+      err => error(err)
+    );
+  }
+
+  return {
+    PLUGINS,
+    plugin
+  };
 }

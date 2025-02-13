@@ -24,28 +24,26 @@
     <button id="uk" @click="$i18n.setLangage('uk')">Change to UK</button>
   </body>
   <script>
-    DOMY.plugin(
-      i18n({
-        messages: {
-          en: {
-            title: 'Hello World!',
-            greeting: {
-              hello: 'Hello, {{ name }}',
-              bye: 'Bye, {{ name }}'
-            }
-          },
-          fr: {
-            title: 'Bonjour le monde!',
-            greeting: {
-              hello: 'Bonjour, {{ name }}',
-              bye: 'Aurevoir, {{ name }}'
-            }
+    const i18nPlugin = i18n({
+      messages: {
+        en: {
+          title: 'Hello World!',
+          greeting: {
+            hello: 'Hello, {{ name }}',
+            bye: 'Bye, {{ name }}'
           }
         },
-        currentLangage: 'en',
-        defaultCallbackLangage: 'en'
-      })
-    );
+        fr: {
+          title: 'Bonjour le monde!',
+          greeting: {
+            hello: 'Bonjour, {{ name }}',
+            bye: 'Aurevoir, {{ name }}'
+          }
+        }
+      },
+      currentLangage: 'en',
+      defaultCallbackLangage: 'en'
+    });
 
     DOMY.createApp({
       data() {
@@ -53,6 +51,8 @@
           name: 'Yoann'
         };
       }
-    }).mount();
+    })
+      .plugins([i18nPlugin])
+      .mount();
   </script>
 </html>

@@ -8,6 +8,7 @@ import { isBindAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 import { Block } from './Block';
 import { DOMY_EVENTS } from './DomyEvents';
 import { DomyHelper } from './DomyHelper';
+import { PluginHelper } from './plugin';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
 
@@ -36,7 +37,8 @@ export function createDeepRenderFn(
   appId: number,
   state: State,
   config: Config,
-  components: Components
+  components: Components,
+  pluginHelper: PluginHelper
 ) {
   // Track if the app is mounted or not so we can add to the queue the jobs when the app is mounted
   const appState = { isAppMounted: false };
@@ -75,7 +77,7 @@ export function createDeepRenderFn(
       // If we are to the previous element then the next element is rendered because we go from bottom to top
       const lastRenderedElement = toRender.element.nextElementSibling;
       if (lastRenderedElement) {
-        lastRenderedElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.ElementMounted));
+        lastRenderedElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
       }
 
       const block = isRootRendering ? rootBlock : new Block(element);
@@ -104,7 +106,8 @@ export function createDeepRenderFn(
         toRender.scopedNodeData,
         config,
         props.renderWithoutListeningToChange ?? false,
-        appState
+        appState,
+        pluginHelper
       );
 
       // Rendering textContent
@@ -118,7 +121,10 @@ export function createDeepRenderFn(
       }
 
       // Rendering attributes if it's an element
-      const sortedAttributes = sortAttributesBasedOnSortedDirectives(element.attributes);
+      const sortedAttributes = sortAttributesBasedOnSortedDirectives(
+        pluginHelper.PLUGINS,
+        element.attributes
+      );
       const isComponent = element.localName in components;
 
       for (const attr of sortedAttributes) {
@@ -127,8 +133,9 @@ export function createDeepRenderFn(
         const shouldByPassAttribute =
           props.byPassAttributes && props.byPassAttributes.includes(attr.name);
 
-        if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
-        if (isComponent && (isBindAttr(attr.name) || isNormalAttr(attr.name))) continue; //  We only render the directives/events for a component
+        if (shouldByPassAttribute || isNormalAttr(pluginHelper.PLUGINS, attr.name)) continue;
+        if (isComponent && (isBindAttr(attr.name) || isNormalAttr(pluginHelper.PLUGINS, attr.name)))
+          continue; //  We only render the directives/events for a component
 
         // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData (but we still need it for later)
         // We also need a new domy helper because every attribute need his own call effect

@@ -18,6 +18,8 @@
           count: 0
         };
       }
-    }).mount();
+    })
+      .plugins([debounce])
+      .mount();
   </script>
 </html>

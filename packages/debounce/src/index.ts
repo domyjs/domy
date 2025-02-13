@@ -1,5 +1,4 @@
-import type DOMY from '@domyjs/core/src';
-import type { DomySpecialHelper } from '@domyjs/core/src/types/Domy';
+import type { DomyPlugin, DomySpecialHelper } from '@domyjs/core/src/types/Domy';
 
 /**
  * Debounce utility implementation
@@ -8,7 +7,7 @@ import type { DomySpecialHelper } from '@domyjs/core/src/types/Domy';
  *
  * @author yoannchb-pro
  */
-export function debouncePlugin() {
+function debouncePlugin() {
   const debounceCache = new Map<number, (...args: any[]) => void>();
 
   return function (domy: DomySpecialHelper) {
@@ -36,9 +35,8 @@ export function debouncePlugin() {
   };
 }
 
-document.addEventListener('domy:ready', event => {
-  const { detail: DOMYOBJ } = event as CustomEvent<typeof DOMY>;
-  DOMYOBJ.plugin(domyPluginSetter => {
-    domyPluginSetter.helper('debounce', debouncePlugin());
-  });
-});
+const deboundPluginDefintion: DomyPlugin = domyPluginSetter => {
+  domyPluginSetter.helper('debounce', debouncePlugin());
+};
+
+export default deboundPluginDefintion;

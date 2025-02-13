@@ -1,6 +1,7 @@
 {
   "name": "@domyjs/collapse",
   "version": "1.0.0",
+  "buildName": "collapse",
   "description": "Domyjs collapse plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -4,6 +4,7 @@
   "description": "Domyjs debounce plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "buildName": "debounce",
   "files": [
     "/dist",
     "package.json",

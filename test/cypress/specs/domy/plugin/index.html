@@ -18,32 +18,34 @@
     <p id="prioritise" d-after d-before="Hello World!"></p>
   </body>
   <script>
-    DOMY.plugin(function (domyPluginSetter) {
-      let msg = '';
+    DOMY.createApp()
+      .plugins([
+        function (domyPluginSetter) {
+          let msg = '';
 
-      domyPluginSetter.directive('before', domy => {
-        msg = domy.attr.value;
-      });
+          domyPluginSetter.directive('before', domy => {
+            msg = domy.attr.value;
+          });
 
-      domyPluginSetter.directive('after', domy => {
-        domy.block.el.textContent = msg;
-      });
+          domyPluginSetter.directive('after', domy => {
+            domy.block.el.textContent = msg;
+          });
 
-      domyPluginSetter.directive('uppercase', domy => {
-        domy.block.el.textContent = domy.block.el.textContent.toUpperCase();
-      });
+          domyPluginSetter.directive('uppercase', domy => {
+            domy.block.el.textContent = domy.block.el.textContent.toUpperCase();
+          });
 
-      domyPluginSetter.helper('sayHello', () => 'Hello World!');
+          domyPluginSetter.helper('sayHello', () => 'Hello World!');
 
-      domyPluginSetter.prefix('click', domy => {
-        domy.block.el.addEventListener('click', () => {
-          domy.block.el.setAttribute(domy.attrName, domy.attr.value);
-        });
-      });
+          domyPluginSetter.prefix('click', domy => {
+            domy.block.el.addEventListener('click', () => {
+              domy.block.el.setAttribute(domy.attrName, domy.attr.value);
+            });
+          });
 
-      domyPluginSetter.prioritise(['before', 'after']);
-    });
-
-    DOMY.createApp().mount();
+          domyPluginSetter.prioritise(['before', 'after']);
+        }
+      ])
+      .mount();
   </script>
 </html>

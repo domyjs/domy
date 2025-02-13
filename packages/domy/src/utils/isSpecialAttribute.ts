@@ -1,4 +1,4 @@
-import { PLUGINS } from '../core/plugin';
+import { Plugins } from '../core/plugin';
 
 /**
  * Check if the current attribute is a binding attribute
@@ -31,7 +31,7 @@ export function isEventAttr(attr: string) {
  *
  * @author yoannchb-pro
  */
-export function isDomyAttr(attr: string) {
+export function isDomyAttr(PLUGINS: Plugins, attr: string) {
   const [attrName] = attr.split(/[.:]/gi);
 
   if (!attrName.startsWith('d-')) return false;
@@ -52,6 +52,6 @@ export function isDomyAttr(attr: string) {
  *
  * @author yoannchb-pro
  */
-export function isNormalAttr(attr: string) {
-  return !isBindAttr(attr) && !isDomyAttr(attr) && !isEventAttr(attr);
+export function isNormalAttr(PLUGINS: Plugins, attr: string) {
+  return !isBindAttr(attr) && !isDomyAttr(PLUGINS, attr) && !isEventAttr(attr);
 }

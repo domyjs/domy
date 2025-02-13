@@ -1,9 +1,11 @@
 import { App, Data } from '../types/App';
 import { Components, ComponentInfos } from '../types/Component';
 import { Config } from '../types/Config';
+import { DomyPlugin } from '../types/Domy';
 import { toKebabCase } from '../utils/toKebabCase';
 import { getRender } from './getRender';
 import { initApp } from './initApp';
+import { createPluginRegistrer } from './plugin';
 
 let appId = 0;
 
@@ -22,21 +24,10 @@ export function createAdvancedApp<
 >(appDefinition?: App<D, M, A, P>, componentInfos?: ComponentInfos, byPassAttributes?: string[]) {
   ++appId;
 
+  const pluginHelper = componentInfos?.parentPluginHelper ?? createPluginRegistrer();
+
   let config: Config = {};
   let componentsList: Components = {};
-
-  function components(c: Components) {
-    const kebabCaseComponents: Components = {};
-
-    for (const key in c) {
-      const kebabKey = toKebabCase(key);
-      kebabCaseComponents[kebabKey] = c[key];
-    }
-
-    componentsList = kebabCaseComponents;
-
-    return { configure, mount };
-  }
 
   function mount(
     target?: HTMLElement
@@ -52,7 +43,8 @@ export function createAdvancedApp<
           config,
           target: domTarget,
           componentInfos,
-          byPassAttributes
+          byPassAttributes,
+          pluginHelper
         });
 
         resolve(render);
@@ -67,14 +59,37 @@ export function createAdvancedApp<
 
   function configure(c: Config) {
     config = c;
-    return { mount, components };
+
+    return { plugins, components, mount };
+  }
+
+  function plugins(pluginsList: DomyPlugin[]) {
+    for (const plugin of pluginsList) {
+      pluginHelper.plugin(plugin);
+    }
+
+    return { components, mount };
+  }
+
+  function components(c: Components) {
+    const kebabCaseComponents: Components = {};
+
+    for (const key in c) {
+      const kebabKey = toKebabCase(key);
+      kebabCaseComponents[kebabKey] = c[key];
+    }
+
+    componentsList = kebabCaseComponents;
+
+    return { mount };
   }
 
   return {
     appId,
     mount,
     configure,
-    components
+    components,
+    plugins
   };
 }
 

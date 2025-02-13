@@ -1,5 +1,4 @@
-import { PLUGINS } from '../core/plugin';
-
+import { Plugins } from '../core/plugin';
 /**
  * Fixe an attribute name to avoid setAttribute throwing error
  * @param attrName
@@ -56,7 +55,7 @@ export function getDomyAttributeInformations(attr: Attr) {
  *
  * @author yoannchb-pro
  */
-export function sortAttributesBasedOnSortedDirectives(attrs: NamedNodeMap) {
+export function sortAttributesBasedOnSortedDirectives(PLUGINS: Plugins, attrs: NamedNodeMap) {
   const copy = Array.from(attrs ?? []);
   copy.sort((a, b) => {
     const iA = PLUGINS.sortedDirectives.indexOf(getDomyAttributeInformations(a).directive);
