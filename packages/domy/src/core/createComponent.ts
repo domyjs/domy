@@ -85,7 +85,6 @@ export function createComponent<
         const propsAttributes: Attr[] = [];
         const attrsAttributes: Attr[] = [];
         const componentAttributes: string[] = [];
-        const childrens = Array.from(componentElement.children) as Element[];
 
         // We handle the attributes
         for (const attr of componentElement.attributes) {
@@ -135,12 +134,14 @@ export function createComponent<
 
         //  We render the childs first to ensure they keep the current state and not the component state
         const names: { [name: string]: Element } = {};
+        const childrens: Element[] = [];
         for (const child of componentElement.childNodes) {
           const childBlock = domy.deepRender({
             element: child as Element,
             scopedNodeData: domy.scopedNodeData
           });
           unmountChilds.push(childBlock.unmount.bind(childBlock));
+          childrens.push(childBlock.el);
           if (childBlock.name) names[childBlock.name] = childBlock.el;
         }
 

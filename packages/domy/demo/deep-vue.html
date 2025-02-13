@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue Nested Counts</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <big-count></big-count>
+    </div>
+
+    <script>
+      const { createApp, defineComponent, ref, h } = Vue;
+
+      // Composant Count qui peut contenir un autre Count à l'intérieur
+      const Count = defineComponent({
+        props: ['depth'],
+        setup(props) {
+          const count = ref(0);
+          const increment = () => count.value++;
+          const decrement = () => count.value--;
+
+          return () =>
+            h(
+              'div',
+              { style: 'margin-left: 10px; border-left: 2px solid black; padding-left: 5px;' },
+              [
+                h('p', `Count ${props.depth}: ${count.value}`),
+                h('button', { onClick: increment }, '+'),
+                h('button', { onClick: decrement }, '-'),
+                props.depth > 1 ? h(Count, { depth: props.depth - 1 }) : null
+              ]
+            );
+        }
+      });
+
+      // Composant BigCount qui démarre l'imbrication
+      const BigCount = defineComponent({
+        components: { Count },
+        template: `<Count :depth="10000" />`
+      });
+
+      // Création de l'application Vue
+      createApp({
+        components: { BigCount }
+      }).mount('#app');
+    </script>
+  </body>
+</html>
