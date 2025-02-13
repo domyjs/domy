@@ -9,12 +9,12 @@ import config from '../tsconfig.json';
 const filters = ['docs'];
 
 // Argument to target a specific package to build
-const toBuild = process.argv[2];
+const toBuild = process.argv[2].split(',');
 
 (async () => {
   // Read directories within the packages folder
   const packages = fs.readdirSync('./packages').filter(dir => {
-    if (filters.includes(dir) || (toBuild && toBuild !== dir)) return false;
+    if (filters.includes(dir) || (toBuild && !toBuild.includes(dir))) return false;
     return fs.statSync(path.join('./packages', dir)).isDirectory();
   });
 
