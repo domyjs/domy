@@ -42,4 +42,6 @@ export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiv
 
   if (domy.modifiers.includes('defer')) domy.onMounted(teleport);
   else teleport();
+
+  return { skipChildsRendering: true };
 }
