@@ -103,8 +103,11 @@ export function createDeepRenderFn(
 
       // Rendering textContent
       if (element.nodeType === Node.TEXT_NODE) {
-        renderText(domyHelper.getPluginHelper());
-        block.addCleanup(domyHelper.getCleanupFn());
+        if (/\{\{\s*(?<org>.+?)\s*\}\}/g.test(element.textContent ?? '')) {
+          renderText(domyHelper.getPluginHelper());
+          block.addCleanup(domyHelper.getCleanupFn());
+        }
+
         continue;
       }
 

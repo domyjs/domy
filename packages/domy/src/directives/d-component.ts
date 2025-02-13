@@ -31,7 +31,7 @@ export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirecti
       componentElement.setAttribute(domy.utils.fixeAttrName(attr.name), attr.value);
     }
     for (const child of childs) {
-      componentElement.appendChild(child);
+      componentElement.appendChild(child.cloneNode(true));
     }
 
     return componentElement;

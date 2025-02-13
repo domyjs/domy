@@ -32,7 +32,6 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
   let lastRender: Block | null = null;
 
   domy.effect(() => {
-    const el = domy.block.el;
     const elementToRender: Element | null | undefined = domy.evaluate(domy.attr.value.trim());
 
     if (Array.isArray(elementToRender))
@@ -48,8 +47,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
 
     // Handle the case we don't have any element to render
     if (!elementToRender) {
-      if (el.isConnected) el.remove();
-      return;
+      return (lastRender = null);
     }
 
     // We restore the element to his original position

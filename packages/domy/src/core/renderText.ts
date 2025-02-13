@@ -13,14 +13,12 @@ import { DomyDirectiveHelper } from '../types/Domy';
 export function renderText(domy: DomyDirectiveHelper) {
   const originalTextContent = domy.block.el.textContent ?? '';
 
-  if (/\{\{\s*(?<org>.+?)\s*\}\}/g.test(originalTextContent)) {
-    domy.effect(() => {
-      domy.block.el.textContent = originalTextContent.replace(
-        /\{\{\s*(?<org>.+?)\s*\}\}/g,
-        function (_, code) {
-          return domy.evaluate(code);
-        }
-      );
-    });
-  }
+  domy.effect(() => {
+    domy.block.el.textContent = originalTextContent.replace(
+      /\{\{\s*(?<org>.+?)\s*\}\}/g,
+      function (_, code) {
+        return domy.evaluate(code);
+      }
+    );
+  });
 }

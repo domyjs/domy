@@ -22,6 +22,7 @@ export function getElementVisibilityHandler(props: Props) {
   originalEl.remove();
 
   let lastRender: Block = domy.block;
+  let isInit = false;
 
   /**
    * Check if an element should be display
@@ -56,8 +57,10 @@ export function getElementVisibilityHandler(props: Props) {
 
       // Handle enter transition
       // Need to be apply after the block know the new element
-      domy.block.applyTransition('enterTransition');
+      if (domy.block.transition?.init) domy.block.applyTransition('enterTransition');
     }
+
+    isInit = true;
   }
 
   return handleVisibility;

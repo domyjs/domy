@@ -42,9 +42,13 @@
       <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
     </ul>
 
-    <template :title="currPage.title" d-component="currPage.component" d-transition="transition">
+    <!-- <template :title="currPage.title" d-component="currPage.component" d-transition="transition">
       <span>{{ msg }}</span>
-    </template>
+    </template> -->
+
+    <div d-if="currPage.title==='Home'" d-transition="transition">
+      <p>{{ currPage.title }}</p>
+    </div>
   </body>
   <script>
     const Home = DOMY.createComponent({
