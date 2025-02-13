@@ -7,6 +7,5 @@
 - Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests
 - anchor, intersect, persist (localStorage), suspense
 
-- script auto build, release ...
-- benchmark
+- Auto release ...
 - Documentation
