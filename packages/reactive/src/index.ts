@@ -11,6 +11,7 @@ import { unlockWatchers } from './core/unlockWatchers';
 import { unReactive } from './core/unReactive';
 import { skipReactive } from './core/skipReactivity';
 import { watchEffect } from './core/watchEffect';
+import { trackDeps } from './core/trackDeps';
 
 export {
   skipReactive,
@@ -25,5 +26,6 @@ export {
   matchPath,
   registerName,
   isSignal,
-  isReactive
+  isReactive,
+  trackDeps
 };
