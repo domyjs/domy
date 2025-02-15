@@ -50,68 +50,77 @@ export type Plugins = {
   helpers: Record<string, DomySpecialFn>;
 };
 
-export const DEFAULT_PLUGINS: Plugins = {
-  sortedDirectives: [
-    'ignore',
-    'once',
+/**
+ * Allow to make a copy of the default plugin so each app can add their own plugin
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+function getDefaultsPlugin() {
+  const DEFAULT_PLUGINS: Plugins = {
+    sortedDirectives: [
+      'ignore',
+      'once',
 
-    'scope',
-    'key',
-    'transition',
+      'scope',
+      'key',
+      'transition',
 
-    'if',
-    'else-if',
-    'else',
+      'if',
+      'else-if',
+      'else',
 
-    'component'
-  ],
-  prefixes: {
-    bind: binding,
-    on: events
-  },
-  directives: {
-    key: dKeyImplementation,
-    attrs: dAttrsImplementation,
-    teleport: dTeleportImplementation,
-    insert: dInsertImplementation,
-    mounted: dMountedImplementation,
-    unmount: dUnMountImplementation,
-    setup: dSetupImplementation,
-    scope: dScopeImplementation,
-    if: dIfImplementation,
-    'else-if': dElseIfImplementation,
-    else: dElseImplementation,
-    for: dForImplementation,
-    html: dHtmlImplementation,
-    text: dTextImplementation,
-    model: dModelImplementation,
-    ref: dRefImplementation,
-    transition: dTransitionImplementation,
-    ignore: dIgnoreImplementation,
-    once: dOnceImplementation,
-    show: dShowImplementation,
-    cloak: dCloakImplementation,
-    component: dComponentImplementation,
-    name: dNameImplementation
-  },
-  helpers: {
-    el: $el,
-    refs: $refs,
-    root: $root,
-    nextTick: $nextTick,
-    childrens: $childrens,
-    props: $props,
-    config: $config,
-    data: $data,
-    scopedData: $scopedData,
-    allData: $allData,
-    methods: $methods,
-    watch: $watch,
-    attrs: $attrs,
-    names: $names,
-    effect: $effect
-  }
-};
+      'component'
+    ],
+    prefixes: {
+      bind: binding,
+      on: events
+    },
+    directives: {
+      key: dKeyImplementation,
+      attrs: dAttrsImplementation,
+      teleport: dTeleportImplementation,
+      insert: dInsertImplementation,
+      mounted: dMountedImplementation,
+      unmount: dUnMountImplementation,
+      setup: dSetupImplementation,
+      scope: dScopeImplementation,
+      if: dIfImplementation,
+      'else-if': dElseIfImplementation,
+      else: dElseImplementation,
+      for: dForImplementation,
+      html: dHtmlImplementation,
+      text: dTextImplementation,
+      model: dModelImplementation,
+      ref: dRefImplementation,
+      transition: dTransitionImplementation,
+      ignore: dIgnoreImplementation,
+      once: dOnceImplementation,
+      show: dShowImplementation,
+      cloak: dCloakImplementation,
+      component: dComponentImplementation,
+      name: dNameImplementation
+    },
+    helpers: {
+      el: $el,
+      refs: $refs,
+      root: $root,
+      nextTick: $nextTick,
+      childrens: $childrens,
+      props: $props,
+      config: $config,
+      data: $data,
+      scopedData: $scopedData,
+      allData: $allData,
+      methods: $methods,
+      watch: $watch,
+      attrs: $attrs,
+      names: $names,
+      effect: $effect
+    }
+  };
+  return DEFAULT_PLUGINS;
+}
 
 /**
  * Allow to register plugin for the current instance
@@ -120,18 +129,7 @@ export const DEFAULT_PLUGINS: Plugins = {
  * @author yoannchb-pro
  */
 export function createPluginRegistrer() {
-  const PLUGINS: Plugins = {
-    directives: {
-      ...DEFAULT_PLUGINS.directives
-    },
-    prefixes: {
-      ...DEFAULT_PLUGINS.prefixes
-    },
-    helpers: {
-      ...DEFAULT_PLUGINS.helpers
-    },
-    sortedDirectives: [...DEFAULT_PLUGINS.sortedDirectives]
-  };
+  const PLUGINS: Plugins = getDefaultsPlugin();
 
   const pluginDefinition: DomyPluginDefinition = {
     prefix(name, fn) {
