@@ -13,6 +13,8 @@ let isRunning = false;
 
 /**
  * Drain the effect queue by executing each effect in the order they were added.
+ * We do that because an effect can call an other effect inside
+ * And we don't want this effect to know the other effect dependencies
  */
 function nextWatchDeps() {
   if (watchDepsQueue.length > 0 && !isRunning) {
