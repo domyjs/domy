@@ -1,5 +1,6 @@
 import { globalListenersList } from './data';
 import { Listener } from './ReactiveVariable';
+import { trackCallback } from './trackDeps';
 
 /**
  * Remove a global listener
@@ -18,8 +19,13 @@ function removeGlobalWatch(listener: Listener) {
  *
  * @author yoannchb-pro
  */
-export function globalWatch(listener: Listener) {
+export function globalWatch(listener: Listener, tracking = true) {
   globalListenersList.push(listener);
+  const unwatch = () => removeGlobalWatch(listener);
 
-  return () => removeGlobalWatch(listener);
+  // Tracking global watch
+  if (trackCallback && tracking)
+    trackCallback({ type: 'global_watcher', removeGlobalWatcher: unwatch });
+
+  return unwatch;
 }

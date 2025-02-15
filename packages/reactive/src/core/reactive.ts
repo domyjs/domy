@@ -1,5 +1,6 @@
 import { globalListenersList, reactivesVariablesList } from './data';
 import { Listener, OnGetListener, OnSetListener, ReactiveVariable } from './ReactiveVariable';
+import { trackCallback } from './trackDeps';
 
 type GetListenerByType<T> = T extends 'onGet' ? OnGetListener : OnSetListener;
 
@@ -42,6 +43,9 @@ export function reactive<T>(obj: T): T {
     type: 'onSet',
     fn: createGlobalListener('onSet')
   });
+
+  // Tracking the reactive creation
+  if (trackCallback) trackCallback({ type: 'reactive_variable_creation', reactiveVariable });
 
   return proxy;
 }

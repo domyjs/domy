@@ -2,6 +2,7 @@ import { reactivesVariablesList } from './data';
 import { globalWatch } from './globalWatch';
 import { matchPath } from './matchPath';
 import { Listener, ReactiveVariable } from './ReactiveVariable';
+import { trackCallback } from './trackDeps';
 
 /**
  * Remove a listener from some reactives variables
@@ -27,10 +28,13 @@ function unwatch(listener: Listener, reactivesInstancesToUnwatch: ReactiveVariab
 export function watch(listener: Listener, effect: () => any) {
   const objsToWatch: { path?: string; obj: unknown }[] = [];
 
-  const removeEffect = globalWatch({
-    type: 'onGet',
-    fn: ({ obj, path }) => objsToWatch.push({ path, obj })
-  });
+  const removeEffect = globalWatch(
+    {
+      type: 'onGet',
+      fn: ({ obj, path }) => objsToWatch.push({ path, obj })
+    },
+    false
+  );
 
   // We listen to deep property call
   // Example:
@@ -81,5 +85,10 @@ export function watch(listener: Listener, effect: () => any) {
     reactiveInstance?.attachListener(watcherListener);
   }
 
-  return () => unwatch(watcherListener, reactiveInstances);
+  const unwatchFn = () => unwatch(watcherListener, reactiveInstances);
+
+  // Tracking watcher creation
+  if (trackCallback) trackCallback({ type: 'watcher', unwatch: unwatchFn });
+
+  return unwatchFn;
 }
