@@ -1,5 +1,8 @@
+import { reactivesVariablesList } from './data';
 import { globalWatch } from './globalWatch';
 import { matchPath } from './matchPath';
+import { OnSetListener, ReactiveVariable } from './ReactiveVariable';
+import { trackCallback } from './trackDeps';
 
 type Effect = () => any;
 type UnEffect = () => void;
@@ -35,10 +38,16 @@ function nextWatchDeps() {
  * @author yoannchb-pro
  */
 export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEffect {
-  const objsToWatch: { path: string; obj: unknown }[] = [];
+  const previousListeners: { reactiveVariable: ReactiveVariable; listener: OnSetListener }[] = [];
+
+  function uneffectPrevious() {
+    for (const previousListener of previousListeners) {
+      previousListener.reactiveVariable.removeListener(previousListener.listener);
+    }
+  }
 
   function watchDeps() {
-    objsToWatch.length = 0; // We remove the last dependencies
+    uneffectPrevious(); // We remove the last dependencies
 
     if (isRunning) {
       if (!watchDepsQueue.includes(watchDeps)) {
@@ -49,10 +58,29 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
 
     isRunning = true;
 
-    const removeGlobalWatch = globalWatch({
-      type: 'onGet',
-      fn: ({ path, obj }) => objsToWatch.push({ path, obj })
-    });
+    const removeGlobalWatch = globalWatch(
+      {
+        type: 'onGet',
+        fn: ({ path: getPath, obj }) => {
+          const reactiveVariable = reactivesVariablesList.get(obj);
+          if (!reactiveVariable) return;
+
+          // We attach the listener to the reactive variable
+          const listener: OnSetListener = {
+            type: 'onSet',
+            fn: ({ path: setPath }) => {
+              if (matchPath(getPath, setPath).isMatching) {
+                if (opts.onDepChange) opts.onDepChange(uneffectFn);
+                if (!opts.noSelfUpdate) watchDeps();
+              }
+            }
+          };
+          reactiveVariable.attachListener(listener);
+          previousListeners.push({ reactiveVariable, listener });
+        }
+      },
+      false
+    );
 
     try {
       effect();
@@ -63,25 +91,16 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
     }
   }
 
-  const uneffect = globalWatch({
-    type: 'onSet',
-    fn: ({ path, obj }) => {
-      for (const objToWatch of objsToWatch) {
-        const matcher = matchPath(objToWatch.path, path);
-        if (matcher.isMatching && obj === objToWatch.obj) {
-          if (opts.onDepChange) opts.onDepChange(uneffect);
-          if (!opts.noSelfUpdate) watchDeps();
-          break;
-        }
-      }
-    }
-  });
-
   watchDeps();
 
-  return () => {
+  function uneffectFn() {
     const index = watchDepsQueue.indexOf(watchDeps);
     if (index !== -1) watchDepsQueue.splice(index, 1);
-    uneffect();
-  };
+    uneffectPrevious();
+  }
+
+  // Tracking effect creation
+  if (trackCallback) trackCallback({ type: 'effect', uneffect: uneffectFn });
+
+  return uneffectFn;
 }
