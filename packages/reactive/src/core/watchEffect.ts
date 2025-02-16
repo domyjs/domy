@@ -1,7 +1,5 @@
-import { reactivesVariablesList } from './data';
 import { globalWatch } from './globalWatch';
 import { matchPath } from './matchPath';
-import { OnSetListener, ReactiveVariable } from './ReactiveVariable';
 import { trackCallback } from './trackDeps';
 
 type Effect = () => any;
@@ -16,8 +14,6 @@ let isRunning = false;
 
 /**
  * Drain the effect queue by executing each effect in the order they were added.
- * We do that because an effect can call an other effect inside
- * And we don't want this effect to know the other effect dependencies
  */
 function nextWatchDeps() {
   if (watchDepsQueue.length > 0 && !isRunning) {
@@ -38,16 +34,10 @@ function nextWatchDeps() {
  * @author yoannchb-pro
  */
 export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEffect {
-  const previousListeners: { reactiveVariable: ReactiveVariable; listener: OnSetListener }[] = [];
-
-  function uneffectPrevious() {
-    for (const previousListener of previousListeners) {
-      previousListener.reactiveVariable.removeListener(previousListener.listener);
-    }
-  }
+  const objsToWatch: { path: string; obj: unknown }[] = [];
 
   function watchDeps() {
-    uneffectPrevious(); // We remove the last dependencies
+    objsToWatch.length = 0; // We remove the last dependencies
 
     if (isRunning) {
       if (!watchDepsQueue.includes(watchDeps)) {
@@ -61,23 +51,7 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
     const removeGlobalWatch = globalWatch(
       {
         type: 'onGet',
-        fn: ({ path: getPath, obj }) => {
-          const reactiveVariable = reactivesVariablesList.get(obj);
-          if (!reactiveVariable) return;
-
-          // We attach the listener to the reactive variable
-          const listener: OnSetListener = {
-            type: 'onSet',
-            fn: ({ path: setPath }) => {
-              if (matchPath(getPath, setPath).isMatching) {
-                if (opts.onDepChange) opts.onDepChange(uneffectFn);
-                if (!opts.noSelfUpdate) watchDeps();
-              }
-            }
-          };
-          reactiveVariable.attachListener(listener);
-          previousListeners.push({ reactiveVariable, listener });
-        }
+        fn: ({ path, obj }) => objsToWatch.push({ path, obj })
       },
       false
     );
@@ -91,15 +65,31 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
     }
   }
 
+  const uneffect = globalWatch(
+    {
+      type: 'onSet',
+      fn: ({ path, obj }) => {
+        for (const objToWatch of objsToWatch) {
+          const matcher = matchPath(objToWatch.path, path);
+          if (matcher.isMatching && obj === objToWatch.obj) {
+            if (opts.onDepChange) opts.onDepChange(uneffectFn);
+            if (!opts.noSelfUpdate) watchDeps();
+            break;
+          }
+        }
+      }
+    },
+    false
+  );
+
   watchDeps();
 
   function uneffectFn() {
     const index = watchDepsQueue.indexOf(watchDeps);
     if (index !== -1) watchDepsQueue.splice(index, 1);
-    uneffectPrevious();
+    uneffect();
   }
 
-  // Tracking effect creation
   if (trackCallback) trackCallback({ type: 'effect', uneffect: uneffectFn });
 
   return uneffectFn;
