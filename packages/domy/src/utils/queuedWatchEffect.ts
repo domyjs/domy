@@ -16,7 +16,6 @@ type Options = {
 export function queuedWatchEffect(effect: () => any, opts: Options = {}) {
   let currUnEffect: (() => void) | null = null;
 
-  const isFirstExecution = typeof opts.effectId !== 'number';
   opts.effectId = opts.effectId ?? getUniqueQueueId();
 
   function makeEffect() {
@@ -24,13 +23,13 @@ export function queuedWatchEffect(effect: () => any, opts: Options = {}) {
       // make sure the job is queue again and we listen for dep changes
       onDepChange: uneffect => {
         uneffect();
-        currUnEffect = queuedWatchEffect(effect, opts);
+        queueJob(makeEffect, opts.effectId as number);
       },
       noSelfUpdate: true
     });
   }
 
-  if (isFirstExecution && opts.dontQueueOnFirstExecution) {
+  if (opts.dontQueueOnFirstExecution) {
     makeEffect();
   } else queueJob(makeEffect, opts.effectId);
 
