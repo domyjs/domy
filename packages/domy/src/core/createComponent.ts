@@ -113,7 +113,8 @@ export function createComponent<
           const propName = domy.utils.kebabToCamelCase(attrInfos.attrName);
           if (domy.utils.isBindAttr(attr.name)) {
             domy.effect(() => {
-              data.$props[propName] = attr.value === '' ? true : domy.evaluate(attr.value);
+              const executedValue = attr.value === '' ? true : domy.evaluate(attr.value);
+              data.$props[propName] = executedValue;
             });
           } else {
             data.$props[propName] = attr.value === '' ? true : attr.value;
@@ -125,7 +126,8 @@ export function createComponent<
           const { attrName } = domy.utils.getDomyAttributeInformations(attr);
           if (domy.utils.isBindAttr(attr.name)) {
             domy.effect(() => {
-              data.$attrs[attrName] = domy.evaluate(attr.value);
+              const executedValue = domy.evaluate(attr.value);
+              data.$attrs[attrName] = executedValue;
             });
           } else {
             data.$attrs[attrName] = attr.value;
