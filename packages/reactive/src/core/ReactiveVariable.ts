@@ -20,10 +20,7 @@ export const skipReactivitySymbol = Symbol();
  */
 export class ReactiveVariable {
   public name = '';
-  private proxies: {
-    proxy: any;
-    revoke: () => void;
-  }[] = [];
+  private proxy: any = null;
 
   private onSetListeners: OnSetListener['fn'][] = [];
   private onGetListeners: OnGetListener['fn'][] = [];
@@ -36,14 +33,8 @@ export class ReactiveVariable {
   constructor(private target: any) {}
 
   public getProxy() {
-    if (this.proxies.length === 0) this.createProxy(this.target);
-    return this.proxies[0]?.proxy ?? this.target;
-  }
-
-  public revokeProxies() {
-    for (const proxy of this.proxies) {
-      proxy.revoke();
-    }
+    if (!this.proxy) this.proxy = this.createProxy(this.target);
+    return this.proxy;
   }
 
   /**
@@ -67,7 +58,6 @@ export class ReactiveVariable {
   public attachListener(l: Listener) {
     const listeners = l.type === 'onGet' ? this.onGetListeners : this.onSetListeners;
     listeners.push(l.fn);
-    return () => this.removeListener(l);
   }
 
   public removeListener(l: Listener) {
@@ -239,12 +229,10 @@ export class ReactiveVariable {
         configurable: true
       });
 
-      const prox = Proxy.revocable(
+      const prox = new Proxy(
         target,
         isCollection ? this.createCollectionHandler(path) : this.createHandler(path)
       );
-
-      this.proxies.push(prox);
 
       return prox;
     } catch (err) {
