@@ -20,7 +20,7 @@ export function queuedWatchEffect(effect: () => any, opts: Options = {}) {
   opts.effectId = opts.effectId ?? getUniqueQueueId();
 
   function makeEffect() {
-    const uneffect = watchEffect(effect, {
+    currUnEffect = watchEffect(effect, {
       // make sure the job is queue again and we listen for dep changes
       onDepChange: uneffect => {
         uneffect();
@@ -28,8 +28,6 @@ export function queuedWatchEffect(effect: () => any, opts: Options = {}) {
       },
       noSelfUpdate: true
     });
-
-    currUnEffect = uneffect;
   }
 
   if (isFirstExecution && opts.dontQueueOnFirstExecution) {
