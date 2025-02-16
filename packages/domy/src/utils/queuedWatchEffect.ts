@@ -35,6 +35,9 @@ export function queuedWatchEffect(effect: () => any, opts: Options = {}) {
   } else queueJob(makeEffect, opts.effectId);
 
   return () => {
-    if (currUnEffect) currUnEffect();
+    if (currUnEffect) {
+      currUnEffect();
+      currUnEffect = null;
+    }
   };
 }
