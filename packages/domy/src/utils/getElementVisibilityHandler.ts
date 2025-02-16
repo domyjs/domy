@@ -63,5 +63,10 @@ export function getElementVisibilityHandler(props: Props) {
     isInit = true;
   }
 
-  return { effect: handleVisibility, cleanup: () => tracePositionComment.remove() };
+  return {
+    effect: handleVisibility,
+    cleanup: () => {
+      tracePositionComment.remove();
+    }
+  };
 }
