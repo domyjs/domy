@@ -1,7 +1,5 @@
 # TODO
 
-- Fixe unmount-childs-before bug (try simpe watchEffect / Try no unmount in d-if)
-
 - To hooks
 - Make i18n hook, make i18n dict reactive in case we add translations from the back
 - Fixe typing (App, createApp, createComponent, params in watcher)

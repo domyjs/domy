@@ -186,10 +186,12 @@ export class DomyHelper {
   }
 
   callCleanup() {
-    // not queued to ensure it start before childs update
+    const unmountQueueId = getUniqueQueueId();
     this.unmount = true;
-    this.clearEffects();
-    if (typeof this.cleanupFn === 'function') this.cleanupFn();
-    this.cleanupFn = null;
+    queueJob(() => {
+      this.clearEffects();
+      if (typeof this.cleanupFn === 'function') this.cleanupFn();
+      this.cleanupFn = null;
+    }, unmountQueueId);
   }
 }
