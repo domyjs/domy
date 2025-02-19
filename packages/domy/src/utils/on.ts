@@ -46,7 +46,7 @@ export default function on(props: {
     });
   if (modifiers.includes('self'))
     listener = wrapListener(listener, (next, event) => {
-      event.target === listenerTarget && next(event);
+      if (event.target === listenerTarget) next(event);
     });
 
   if (modifiers.includes('passive')) options.passive = true;

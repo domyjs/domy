@@ -235,7 +235,7 @@ export class ReactiveVariable {
       );
 
       return prox;
-    } catch (err) {
+    } catch {
       return target;
     }
   }
