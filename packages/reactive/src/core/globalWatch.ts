@@ -21,11 +21,10 @@ function removeGlobalWatch(listener: Listener) {
  */
 export function globalWatch(listener: Listener, tracking = true) {
   globalListenersList.push(listener);
-  const unwatch = () => removeGlobalWatch(listener);
+  const clean = () => removeGlobalWatch(listener);
 
   // Tracking global watch
-  if (trackCallback && tracking)
-    trackCallback({ type: 'global_watcher', removeGlobalWatcher: unwatch });
+  if (trackCallback && tracking) trackCallback({ type: 'global_watcher', clean });
 
-  return unwatch;
+  return clean;
 }

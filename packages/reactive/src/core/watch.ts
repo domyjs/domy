@@ -85,10 +85,10 @@ export function watch(listener: Listener, effect: () => any) {
     reactiveInstance?.attachListener(watcherListener);
   }
 
-  const unwatchFn = () => unwatch(watcherListener, reactiveInstances);
+  const clean = () => unwatch(watcherListener, reactiveInstances);
 
   // Tracking watcher creation
-  if (trackCallback) trackCallback({ type: 'watcher', unwatch: unwatchFn });
+  if (trackCallback) trackCallback({ type: 'watcher', clean });
 
-  return unwatchFn;
+  return clean;
 }

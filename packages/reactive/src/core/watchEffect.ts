@@ -72,7 +72,7 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
         for (const objToWatch of objsToWatch) {
           const matcher = matchPath(objToWatch.path, path);
           if (matcher.isMatching && obj === objToWatch.obj) {
-            if (opts.onDepChange) opts.onDepChange(uneffectFn);
+            if (opts.onDepChange) opts.onDepChange(clean);
             if (!opts.noSelfUpdate) watchDeps();
             break;
           }
@@ -84,13 +84,13 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
 
   watchDeps();
 
-  function uneffectFn() {
+  function clean() {
     const index = watchDepsQueue.indexOf(watchDeps);
     if (index !== -1) watchDepsQueue.splice(index, 1);
     uneffect();
   }
 
-  if (trackCallback) trackCallback({ type: 'effect', uneffect: uneffectFn });
+  if (trackCallback) trackCallback({ type: 'effect', clean });
 
-  return uneffectFn;
+  return clean;
 }

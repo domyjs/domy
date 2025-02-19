@@ -108,9 +108,7 @@ describe('Reactive System Tests', () => {
     mockWatch.mockReset();
 
     for (const dep of deps) {
-      if (dep.type === 'effect') dep.uneffect();
-      if (dep.type === 'global_watcher') dep.removeGlobalWatcher();
-      if (dep.type === 'watcher') dep.unwatch();
+      dep.clean();
     }
 
     if (todo) (todo as { name: string }).name = 'Will';

@@ -4,18 +4,11 @@ type Dep =
   | {
       type: 'reactive_variable_creation';
       reactiveVariable: ReactiveVariable;
+      clean: () => void;
     }
   | {
-      type: 'watcher';
-      unwatch: () => void;
-    }
-  | {
-      type: 'effect';
-      uneffect: () => void;
-    }
-  | {
-      type: 'global_watcher';
-      removeGlobalWatcher: () => void;
+      type: 'watcher' | 'effect' | 'global_watcher';
+      clean: () => void;
     };
 
 export let trackCallback: ((dep: Dep) => void) | null = null;
