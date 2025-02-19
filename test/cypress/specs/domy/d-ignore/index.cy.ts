@@ -5,7 +5,7 @@ beforeEach(() => {
 });
 
 describe('Attribute d-ignore test', () => {
-  it('Check the element is not rendered by domy', async () => {
+  it('Check the element is not rendered by domy', () => {
     cy.wait(1000);
 
     cy.get('div').should('not.have.attr', 'd-ignore');
