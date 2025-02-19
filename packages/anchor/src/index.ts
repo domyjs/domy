@@ -27,7 +27,7 @@ enum POSITION {
  *
  * @author yoannchb-pro
  */
-export function anchorPlugin(domy: DomyDirectiveHelper) {
+function anchorPlugin(domy: DomyDirectiveHelper) {
   const anchorEl = domy.evaluate(domy.attr.value);
 
   console.warn(POSITION);
