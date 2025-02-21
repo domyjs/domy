@@ -1,6 +1,6 @@
 # TODO
 
-- To hooks (remove dispatch events)
+- To hooks / Fixe d-for index
 - Make i18n hook, make i18n dict reactive in case we add translations from the back
 - Fixe typing (App, createApp, createComponent, params in watcher)
 

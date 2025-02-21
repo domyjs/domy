@@ -5,10 +5,11 @@ import { createDeepRenderFn } from './deepRender';
 import { trackDeps, isReactive, registerName } from '@domyjs/reactive';
 import { getRender } from './getRender';
 import { ComponentInfos, Components } from '../types/Component';
-import { App, AppState } from '../types/App';
+import { App } from '../types/App';
 import { PluginHelper } from './plugin';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { onMountedTracker, onUnmountTracker, onSetupedTracker } from './hooks';
+import { AppStateObserver } from './AppState';
 
 type Params = {
   appId: number;
@@ -30,11 +31,7 @@ type Params = {
  */
 export async function initApp(params: Params) {
   let unmountRender: (() => void) | null = null;
-  const appState: AppState = {
-    isSetuped: false,
-    isMounted: false,
-    isUnmounted: false
-  };
+  const appState = new AppStateObserver();
   const { components, config, target, app, componentInfos, appId } = params;
 
   // Getting app data, methods and deps

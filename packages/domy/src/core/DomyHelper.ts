@@ -11,10 +11,9 @@ import { createDeepRenderFn } from './deepRender';
 import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
 import type { Block } from './Block';
 import { DOMY_EVENTS } from './DomyEvents';
-import { DomyMountedEventDetails } from '../types/Events';
 import { error } from '../utils/logs';
 import { PluginHelper } from './plugin';
-import { AppState } from '../types/App';
+import { AppStateObserver } from './AppState';
 
 let domyHelperId = 0;
 
@@ -45,7 +44,7 @@ export class DomyHelper {
     public scopedNodeData: Record<string, any>[] = [],
     public config: Config,
     public renderWithoutListeningToChange: boolean,
-    public appState: AppState,
+    public appState: AppStateObserver,
     public pluginHelper: PluginHelper
   ) {}
 
@@ -114,14 +113,17 @@ export class DomyHelper {
   }
 
   onAppMounted(cb: () => void) {
-    const listener: EventListenerOrEventListenerObject = event => {
-      const e = event as CustomEvent<DomyMountedEventDetails>;
-      if (e.detail.appId === this.appId) {
-        document.removeEventListener(DOMY_EVENTS.App.Mounted, listener);
+    if (this.appState.isMounted) return cb();
+
+    const removeObserver = this.appState.addObserver({
+      type: 'isMounted',
+      callback: () => {
+        if (!this.appState.isMounted) return;
+
+        removeObserver();
         cb();
       }
-    };
-    document.addEventListener(DOMY_EVENTS.App.Mounted, listener);
+    });
   }
 
   clearEffects() {

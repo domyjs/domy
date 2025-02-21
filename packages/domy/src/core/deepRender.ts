@@ -1,10 +1,10 @@
-import { AppState } from '../types/App';
 import { Components } from '../types/Component';
 import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
 import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
 import { isBindAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { AppStateObserver } from './AppState';
 import { Block } from './Block';
 import { DOMY_EVENTS } from './DomyEvents';
 import { DomyHelper } from './DomyHelper';
@@ -35,7 +35,7 @@ type Props = {
  */
 export function createDeepRenderFn(
   appId: number,
-  appState: AppState,
+  appState: AppStateObserver,
   state: State,
   config: Config,
   components: Components,

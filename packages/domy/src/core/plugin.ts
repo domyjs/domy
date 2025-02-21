@@ -25,10 +25,6 @@ import { $childrens } from '../helpers/$childrens';
 import { $props } from '../helpers/$props';
 import { dTeleportImplementation } from '../directives/d-teleport';
 import { $config } from '../helpers/$config';
-import { $data } from '../helpers/$data';
-import { $scopedData } from '../helpers/$scopedData';
-import { $allData } from '../helpers/$allData';
-import { $methods } from '../helpers/$methods';
 import { dMountedImplementation } from '../directives/d-mounted';
 import { dUnMountImplementation } from '../directives/d-unmount';
 import { dAttrsImplementation } from '../directives/d-attrs';
@@ -109,10 +105,6 @@ function getDefaultsPlugin() {
       childrens: $childrens,
       props: $props,
       config: $config,
-      data: $data,
-      scopedData: $scopedData,
-      allData: $allData,
-      methods: $methods,
       watch: $watch,
       attrs: $attrs,
       names: $names,
