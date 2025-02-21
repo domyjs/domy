@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-for</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <ul d-for="item, index of list">
+      <li d-key="item.id" @click="removeElement(index)">
+        <p>{{ item.name }}</p>
+        <span>{{ index }}</span>
+      </li>
+    </ul>
+
+    <button @click="updateNames()">Update names</button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data() {
+        return {
+          list: [
+            {
+              id: 0,
+              name: 'Yoann'
+            },
+            {
+              id: 1,
+              name: 'Will'
+            }
+          ]
+        };
+      },
+      methods: {
+        removeElement(index) {
+          this.list.splice(index, 1);
+        },
+        updateNames() {
+          for (const item of this.list) {
+            item.name = item.name + '_changed';
+          }
+        }
+      }
+    }).mount();
+  </script>
+</html>
