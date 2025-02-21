@@ -24,6 +24,8 @@
     <button id="uk" @click="$i18n.setLangage('uk')">Change to UK</button>
   </body>
   <script>
+    const { signal } = DOMY;
+
     const i18nPlugin = i18n({
       messages: {
         en: {
@@ -45,12 +47,10 @@
       defaultCallbackLangage: 'en'
     });
 
-    DOMY.createApp({
-      data() {
-        return {
-          name: 'Yoann'
-        };
-      }
+    DOMY.createApp(() => {
+      const name = signal('Yoann');
+
+      return { name };
     })
       .plugins([i18nPlugin])
       .mount();

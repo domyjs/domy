@@ -12,12 +12,14 @@
     <button id="inc" @click="$throttle(() => ++count, 500)">+</button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          count: 0
-        };
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+
+      return {
+        count
+      };
     })
       .plugins([throttle])
       .mount();

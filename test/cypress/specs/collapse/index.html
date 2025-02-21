@@ -40,12 +40,13 @@
     </div>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          isCollapse: false
-        };
-      }
+    const { signal } = DOMY;
+    DOMY.createApp(() => {
+      const isCollapse = signal(false);
+
+      return {
+        isCollapse
+      };
     })
       .plugins([collapse])
       .mount();
