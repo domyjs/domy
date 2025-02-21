@@ -272,12 +272,16 @@ describe('Reactive System Tests', () => {
     globalWatch({ type: 'onSet', fn: mockGlobalWatch });
 
     todo.name = 'New Name';
-    expect(mockGlobalWatch).toHaveBeenCalledWith({
-      newValue: 'New Name',
-      prevValue: 'Yoann',
-      obj: todo,
-      path: 'name'
-    });
+
+    expect(mockGlobalWatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        newValue: 'New Name',
+        prevValue: 'Yoann',
+        obj: todo,
+        path: 'name',
+        reactiveVariable: expect.any(Object)
+      })
+    );
   });
 
   it('should watch specific reactive property and trigger callback', () => {
@@ -286,12 +290,17 @@ describe('Reactive System Tests', () => {
     const unwatch = watch({ type: 'onSet', fn: mockWatch }, () => [todo.name]);
 
     todo.name = 'New Name';
-    expect(mockWatch).toHaveBeenCalledWith({
-      prevValue: 'Yoann',
-      newValue: 'New Name',
-      obj: todo,
-      path: 'name'
-    });
+
+    expect(mockWatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prevValue: 'Yoann',
+        newValue: 'New Name',
+        obj: todo,
+        path: 'name',
+        reactiveVariable: expect.any(Object)
+      })
+    );
+
     unwatch();
   });
 
@@ -339,12 +348,15 @@ describe('Reactive System Tests', () => {
 
     todo.name = 'Pierre';
 
-    expect(mockWatch).toHaveBeenCalledWith({
-      prevValue: 'Yoann',
-      newValue: 'Pierre',
-      obj: todo,
-      path: 'todo.name'
-    });
+    expect(mockWatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prevValue: 'Yoann',
+        newValue: 'Pierre',
+        obj: todo,
+        path: 'todo.name',
+        reactiveVariable: expect.any(Object)
+      })
+    );
 
     unwatch();
   });
@@ -357,12 +369,15 @@ describe('Reactive System Tests', () => {
 
     count.value++;
 
-    expect(mockWatch).toHaveBeenCalledWith({
-      prevValue: 0,
-      newValue: 1,
-      obj: count,
-      path: 'value'
-    });
+    expect(mockWatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prevValue: 0,
+        newValue: 1,
+        obj: count,
+        path: 'value',
+        reactiveVariable: expect.any(Object)
+      })
+    );
 
     unwatch();
   });
@@ -387,31 +402,40 @@ describe('Reactive System Tests', () => {
 
     todo.list.push('New Task');
 
-    expect(mockWatch).toHaveBeenCalledWith({
-      prevValue: undefined,
-      newValue: 'New Task',
-      obj: todo,
-      path: 'list.0'
-    });
+    expect(mockWatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prevValue: undefined,
+        newValue: 'New Task',
+        obj: todo,
+        path: 'list.0',
+        reactiveVariable: expect.any(Object)
+      })
+    );
 
     todo.list.push('Another Task');
 
-    expect(mockWatch).toHaveBeenCalledWith({
-      prevValue: undefined,
-      newValue: 'Another Task',
-      obj: todo,
-      path: 'list.1'
-    });
+    expect(mockWatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prevValue: undefined,
+        newValue: 'Another Task',
+        obj: todo,
+        path: 'list.1',
+        reactiveVariable: expect.any(Object)
+      })
+    );
 
     const newTaskObj = { title: 'Task 1', completed: false };
     todo.list.push(newTaskObj);
 
-    expect(mockWatch).toHaveBeenCalledWith({
-      prevValue: undefined,
-      newValue: newTaskObj,
-      obj: todo,
-      path: 'list.2'
-    });
+    expect(mockWatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prevValue: undefined,
+        newValue: newTaskObj,
+        obj: todo,
+        path: 'list.2',
+        reactiveVariable: expect.any(Object)
+      })
+    );
 
     expect(isReactive(todo.list[2])).toBe(true);
 

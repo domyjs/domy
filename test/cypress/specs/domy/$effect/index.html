@@ -17,6 +17,8 @@
     <button id="show" @click="show = !show">Show/Hide</button>
   </body>
   <script>
+    const { onUnmounted, signal } = DOMY;
+
     const Count = DOMY.createComponent({
       props: ['count'],
       html: `
@@ -24,27 +26,25 @@
           <p>{{ $props.count }}</p>
         </div>
       `,
-      app: {
-        mounted() {
-          this.$effect(() => {
-            console.log('Effect called', this.$props.count);
-            const el = document.querySelector('#effectCall');
-            el.textContent = Number(el.textContent) + 1;
-          });
-        },
-        unmounted() {
+      app: ({ props }) => {
+        console.log('Effect called', props.count);
+        const el = document.querySelector('#effectCall');
+        el.textContent = Number(el.textContent) + 1;
+
+        onUnmounted(() => {
           console.log('unmount');
-        }
+        });
       }
     });
 
-    DOMY.createApp({
-      data() {
-        return {
-          show: false,
-          count: 0
-        };
-      }
+    DOMY.createApp(() => {
+      const show = signal(false);
+      const count = signal(0);
+
+      return {
+        show,
+        count
+      };
     })
       .components({
         Count

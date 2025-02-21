@@ -18,26 +18,25 @@
     <input type="text" d-model="this.search" placeholder="Search something..." />
   </body>
   <script>
-    DOMY.createApp({
-      watch: {
-        count({ prevValue, newValue }) {
-          if (newValue < 0) this.count = prevValue;
-        }
-      },
-      data() {
-        return {
-          count: 0,
-          search: ''
-        };
-      },
-      methods: {
-        increment() {
-          this.count++;
+    const { signal, watch } = DOMY;
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+      const search = signal('');
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
         },
-        decrement() {
-          this.count--;
-        }
-      }
+        () => count.value
+      );
+
+      return {
+        count,
+        search,
+        increment: () => count.value++,
+        decrement: () => count.value--
+      };
     })
       .configure({
         avoidDeprecatedWith: true

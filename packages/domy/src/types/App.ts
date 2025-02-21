@@ -4,4 +4,8 @@ export type AppState = {
   isUnmounted: boolean;
 };
 
-export type App = () => Record<string, unknown>;
+export type AppProps = {
+  props?: Record<string, unknown>;
+};
+
+export type App = (props: AppProps) => Record<string, unknown>;

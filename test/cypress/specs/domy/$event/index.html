@@ -11,12 +11,14 @@
     <button id="eventButton" @click="type = $event.type">Check Event Type</button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          type: ''
-        };
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const type = signal('');
+
+      return {
+        type
+      };
     }).mount();
   </script>
 </html>

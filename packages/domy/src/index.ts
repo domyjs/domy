@@ -1,24 +1,17 @@
 import { createApp } from './core/createApp';
 import { createComponent } from './core/createComponent';
-import {
-  globalWatch,
-  matchPath,
-  reactive,
-  signal,
-  skipReactive,
-  watch,
-  watchEffect
-} from '@domyjs/reactive';
-import { onMounted, onSetuped, onUnmount } from './core/hooks';
+import { matchPath, reactive, signal, skipReactive, watchEffect } from '@domyjs/reactive';
+import { globalWatchHook, onMounted, onSetuped, onUnmount, watchHook } from './core/hooks';
 
 const DOMY = {
   matchPath,
   reactive,
   signal,
-  globalWatch,
-  watch,
   watchEffect,
   skipReactive,
+
+  watch: watchHook,
+  globalWatch: globalWatchHook,
 
   onSetuped,
   onMounted,

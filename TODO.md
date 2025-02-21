@@ -1,6 +1,7 @@
 # TODO
 
 - To hooks / Fixe d-for index
+- Auto props based on props in create component
 - Make i18n hook, make i18n dict reactive in case we add translations from the back
 - Fixe typing (App, createApp, createComponent, params in watcher)
 
