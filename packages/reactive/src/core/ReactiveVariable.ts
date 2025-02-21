@@ -195,6 +195,43 @@ export class ReactiveVariable {
         }
 
         return result;
+      },
+      deleteProperty(target, p) {
+        if (typeof p === 'symbol') {
+          return Reflect.deleteProperty(target, p);
+        }
+
+        const prevValue = target[p];
+        const fullPath = [...path, p as string];
+
+        const result = Reflect.deleteProperty(target, p);
+        if (result) {
+          ctx.callOnSetListeners(fullPath, prevValue, undefined);
+        }
+
+        return result;
+      },
+      has(target, p) {
+        const exists = Reflect.has(target, p);
+
+        const fullPath = [...path, p as string];
+        ctx.callOnGetListeners(fullPath);
+
+        return exists;
+      },
+      ownKeys(target) {
+        const keys = Reflect.ownKeys(target);
+
+        ctx.callOnGetListeners([...path]);
+
+        return keys;
+      },
+      defineProperty(target, p, descriptor) {
+        const result = Reflect.defineProperty(target, p, descriptor);
+
+        ctx.callOnSetListeners([...path, p as string], undefined, descriptor);
+
+        return result;
       }
     };
     return handler;
