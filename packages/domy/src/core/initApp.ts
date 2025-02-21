@@ -37,7 +37,7 @@ export async function initApp(params: Params) {
   // Getting app data, methods and deps
   let data: ReturnType<App> = {};
   let deps: ReturnType<typeof trackDeps> = [];
-  if (app) deps = trackDeps(app);
+  if (app) deps = trackDeps(() => (data = app()));
 
   // Register name for the reactive data
   for (const key in data) {

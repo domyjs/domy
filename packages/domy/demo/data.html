@@ -15,14 +15,14 @@
       <div id="modal" d-if="showModal">Hello World</div>
       <button @click="showModal = !showModal">Show modal</button>
     </main>
-    <!-- <p id="err">{{ showModal }}</p> -->
-    <!-- <p id="initialMsg">{{ msg }}</p> -->
+    <p id="err">{{ showModal }}</p>
+    <p id="initialMsg">{{ msg }}</p>
   </body>
   <script>
-    DOMY.createApp({
-      data: {
-        msg: 'Hello World!'
-      }
-    });
+    DOMY.createApp(() => {
+      const msg = 'Hello World';
+
+      return { msg };
+    }).mount();
   </script>
 </html>

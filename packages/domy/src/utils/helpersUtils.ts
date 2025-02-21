@@ -4,7 +4,7 @@ import { executeActionAfterAnimation } from './executeActionAfterAnimation';
 import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
-import { getSignalHandler } from './getReactiveHandler';
+import { getReactiveHandler } from './getReactiveHandler';
 import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from './isSpecialAttribute';
 import { kebabToCamelCase } from './kebabToCamelCase';
 import { error, warn } from './logs';
@@ -23,7 +23,7 @@ export const helpersUtils = {
   getPreviousConditionsElements,
   moveElement,
   executeActionAfterAnimation,
-  getSignalHandler,
+  getReactiveHandler,
   mergeToNegativeCondition,
   fixeAttrName,
   getDomyAttributeInformations,

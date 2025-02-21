@@ -1,9 +1,8 @@
 import { Config } from '../types/Config';
 import { State } from '../types/State';
 import { getHelpers } from './getHelpers';
+import { getReactiveHandler } from './getReactiveHandler';
 import { PluginHelper } from '../core/plugin';
-import { isSignal } from '@domyjs/reactive';
-import { getSignalHandler } from './getReactiveHandler';
 
 type Props = {
   domyHelperId?: number;
@@ -27,19 +26,17 @@ type Props = {
 export function getContext(props: Props) {
   const helpers = getHelpers(props);
 
-  const context: Record<string, unknown> = {
+  const context = {
     ...helpers
   };
 
-  for (const obj in props.state.data) {
-    if (isSignal(obj)) Object.defineProperty(context, obj, getSignalHandler(props.state.data, obj));
-    else context[obj] = props.state.data[obj];
+  for (const key in props.state.data) {
+    Object.defineProperty(context, key, getReactiveHandler(props.state.data, key));
   }
 
   for (const obj of props.scopedNodeData) {
     for (const key in obj) {
-      if (isSignal(obj[key])) Object.defineProperty(context, key, getSignalHandler(obj, key));
-      else context[key] = obj[key];
+      Object.defineProperty(context, key, getReactiveHandler(obj, key));
     }
   }
 
