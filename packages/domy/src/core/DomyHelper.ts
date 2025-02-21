@@ -14,6 +14,7 @@ import { DOMY_EVENTS } from './DomyEvents';
 import { DomyMountedEventDetails } from '../types/Events';
 import { error } from '../utils/logs';
 import { PluginHelper } from './plugin';
+import { AppState } from '../types/App';
 
 let domyHelperId = 0;
 
@@ -44,7 +45,7 @@ export class DomyHelper {
     public scopedNodeData: Record<string, any>[] = [],
     public config: Config,
     public renderWithoutListeningToChange: boolean,
-    public appState: { isAppMounted: boolean },
+    public appState: AppState,
     public pluginHelper: PluginHelper
   ) {}
 
@@ -108,7 +109,7 @@ export class DomyHelper {
   }
 
   onElementMounted(cb: () => void) {
-    if (this.appState.isAppMounted) cb();
+    if (this.appState.isMounted) cb();
     else this.block.attachListener(DOMY_EVENTS.Element.Mounted, cb, { once: true });
   }
 
@@ -138,7 +139,7 @@ export class DomyHelper {
 
     if (!this.renderWithoutListeningToChange) {
       const uneffect = directivesUtils.queuedWatchEffect(fixedFn, {
-        dontQueueOnFirstExecution: !this.appState.isAppMounted
+        dontQueueOnFirstExecution: !this.appState.isMounted
       });
       this.clearEffectList.push(uneffect);
     } else {

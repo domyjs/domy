@@ -1,4 +1,3 @@
-import { Data } from '../types/App';
 import { ComponentDefinition, ComponentInfos, Components } from '../types/Component';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { createAdvancedApp } from './createApp';
@@ -48,12 +47,9 @@ function parseHTMl(html: string) {
  *
  * @author yoannchb-pro
  */
-export function createComponent<
-  P extends ComponentInfos['componentData']['$props'],
-  D extends Data,
-  M extends string,
-  A extends any[]
->(componentDefinition: ComponentDefinition<D, M, A, P>): Components[keyof Components] {
+export function createComponent(
+  componentDefinition: ComponentDefinition
+): Components[keyof Components] {
   const props = componentDefinition.props ?? [];
   const propsName = new Set(props.map(prop => prop.replace(/^!/, '')));
 
@@ -171,7 +167,7 @@ export function createComponent<
               });
           };
 
-          if (domy.appState.isAppMounted) domy.queueJob(makeComponent, queueId);
+          if (domy.appState.isMounted) domy.queueJob(makeComponent, queueId);
           else makeComponent();
         };
 
@@ -198,18 +194,3 @@ export function createComponent<
     );
   };
 }
-
-// createComponent({
-//   html: '',
-//   app: {
-//     data: {
-//       g: 4
-//     },
-//     methods: {
-//       gg() {
-//         this.r(5);
-//       },
-//       r(t: string) {}
-//     }
-//   }
-// });

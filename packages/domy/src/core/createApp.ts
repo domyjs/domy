@@ -1,4 +1,4 @@
-import { App, Data } from '../types/App';
+import { App } from '../types/App';
 import { Components, ComponentInfos } from '../types/Component';
 import { Config } from '../types/Config';
 import { DomyPlugin } from '../types/Domy';
@@ -16,12 +16,11 @@ let appId = 0;
  *
  * @author yoannchb-pro
  */
-export function createAdvancedApp<
-  D extends Data,
-  M extends string,
-  A extends any[],
-  P extends ComponentInfos['componentData']['$props'] = Record<string, never>
->(appDefinition?: App<D, M, A, P>, componentInfos?: ComponentInfos, byPassAttributes?: string[]) {
+export function createAdvancedApp(
+  appDefinition?: App,
+  componentInfos?: ComponentInfos,
+  byPassAttributes?: string[]
+) {
   ++appId;
 
   const pluginHelper = componentInfos?.parentPluginHelper ?? createPluginRegistrer();
@@ -100,23 +99,6 @@ export function createAdvancedApp<
  *
  * @author yoannchb-pro
  */
-export function createApp<D extends Data, M extends string, A extends any[]>(
-  appDefinition?: App<D, M, A>
-) {
-  return createAdvancedApp<D, M, A, Record<string, never>>(appDefinition);
+export function createApp(appDefinition?: App) {
+  return createAdvancedApp(appDefinition);
 }
-
-// createApp({
-//   data: {
-//     f: 5
-//   },
-//   methods: {
-//     r(t: string) {
-//       this.r;
-//     },
-//     g() {
-//       this.r();
-//       this.r(5);
-//     }
-//   }
-// });

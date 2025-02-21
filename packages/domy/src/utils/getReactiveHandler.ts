@@ -1,25 +1,20 @@
-import { isSignal } from '@domyjs/reactive';
-
 /**
- * Return the get and set method for a reactive variable
- * It allow us to keep the proxy and to handle signals
+ * Allow to handle signal without using "signal.value" in the dom
  * @param obj
  * @param key
  * @returns
  *
  * @author yoannchb-pro
  */
-export function getReactiveHandler(obj: Record<string, any>, key: string): PropertyDescriptor {
-  const isObjSignal = isSignal(obj[key]);
+export function getSignalHandler(obj: Record<string, any>, key: string): PropertyDescriptor {
   return {
     enumerable: true,
     configurable: true,
     get() {
-      return isObjSignal ? obj[key].value : obj[key];
+      return obj[key].value;
     },
     set(newValue: any) {
-      if (isObjSignal) return (obj[key].value = newValue);
-      return (obj[key] = newValue);
+      return (obj[key].value = newValue);
     }
   };
 }

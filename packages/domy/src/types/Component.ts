@@ -1,5 +1,5 @@
 import { PluginHelper } from '../core/plugin';
-import { App, Data } from './App';
+import { App } from './App';
 import { DomyDirectiveHelper } from './Domy';
 
 export type ComponentInfos = {
@@ -23,14 +23,9 @@ export type Components = {
   [name: string]: Component;
 };
 
-export type ComponentDefinition<
-  D extends Data,
-  M extends string,
-  A extends any[],
-  P extends ComponentInfos['componentData']['$props'] = Record<string, never>
-> = {
+export type ComponentDefinition = {
   html: string;
   props?: string[];
-  app?: App<D, M, A, P>;
+  app?: App;
   components?: Components;
 };

@@ -8,6 +8,7 @@ import { directivesUtils } from '../utils/directivesUtils';
 import { createDeepRenderFn } from '../core/deepRender';
 import type { Block } from '../core/Block';
 import type { PluginHelper } from '../core/plugin';
+import { AppState } from './App';
 
 export type DomyDirectiveFn = (domy: DomyDirectiveHelper) => DomyDirectiveReturn;
 export type DomySpecialFn = (domy: DomySpecialHelper) => any;
@@ -30,7 +31,7 @@ export type DomySpecialHelper = {
 export type DomyDirectiveHelper = {
   domyHelperId: number;
   pluginHelper: PluginHelper;
-  appState: { isAppMounted: boolean };
+  appState: AppState;
   block: Block;
   config: Config;
   state: State;

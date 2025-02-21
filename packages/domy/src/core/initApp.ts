@@ -1,23 +1,14 @@
 import { Config } from '../types/Config';
-import {
-  DomyMountedEventDetails,
-  DomyReadyEventDetails,
-  DomyUnMountEventDetails
-} from '../types/Events';
 import { State } from '../types/State';
-import { getContext } from '../utils/getContext';
 import { error } from '../utils/logs';
-import { toRegularFn } from '../utils/toRegularFn';
-import { DOMY_EVENTS } from './DomyEvents';
 import { createDeepRenderFn } from './deepRender';
-import { reactive, watch, matchPath, unReactive } from '@domyjs/reactive';
+import { trackDeps, isReactive, registerName } from '@domyjs/reactive';
 import { getRender } from './getRender';
 import { ComponentInfos, Components } from '../types/Component';
-import type { OnSetListener } from '@domyjs/reactive/src/core/ReactiveVariable';
-import { App } from '../types/App';
-import { getUniqueQueueId, queueJob } from './scheduler';
-import { queuedWatchEffect } from '../utils/queuedWatchEffect';
+import { App, AppState } from '../types/App';
 import { PluginHelper } from './plugin';
+import { callWithErrorHandling } from '../utils/callWithErrorHandling';
+import { onMountedTracker, onUnmountTracker, onSetupedTracker } from './hooks';
 
 type Params = {
   appId: number;
@@ -39,101 +30,48 @@ type Params = {
  */
 export async function initApp(params: Params) {
   let unmountRender: (() => void) | null = null;
-  const { components, config, target, app = {}, componentInfos } = params;
+  const appState: AppState = {
+    isSetuped: false,
+    isMounted: false,
+    isUnmounted: false
+  };
+  const { components, config, target, app, componentInfos, appId } = params;
 
-  // Initialisation event dispatch
-  document.dispatchEvent(
-    new CustomEvent(DOMY_EVENTS.App.Initialisation, {
-      bubbles: true,
-      detail: { app, target } as DomyReadyEventDetails
-    })
-  );
+  // Getting app data, methods and deps
+  let data: ReturnType<App> = {};
+  let deps: ReturnType<typeof trackDeps> = [];
+  if (app) deps = trackDeps(app);
+
+  // Register name for the reactive data
+  for (const key in data) {
+    if (isReactive(data[key])) registerName(key, data[key]);
+  }
+
+  // Calling onSetuped hooks
+  appState.isSetuped = true;
+  const setupedCallbacks = onSetupedTracker.getCallbacks();
+  onSetupedTracker.clear();
+  for (const setupedCallback of setupedCallbacks) {
+    callWithErrorHandling(setupedCallback);
+  }
 
   // State of the app
   const state: State = {
-    data: reactive(app.data?.() ?? {}),
+    data,
     componentInfos,
-    methods: {},
     refs: {}
   };
 
-  const contextProps: Parameters<typeof getContext>[0] = {
-    state,
-    scopedNodeData: [],
-    config,
-    pluginHelper: params.pluginHelper
-  };
-
-  // Methods
-  for (const key in app.methods) {
-    const method = toRegularFn(app.methods[key]);
-    state.methods[key] = function (...args: any[]) {
-      return method.call(getContext(contextProps), ...args);
-    };
-  }
-
-  // Watchers
-  const watchers: Record<string, { fn: OnSetListener['fn']; id: number }> = {};
-  // We convert all watcher function to regular function so we can change the context
-  for (const watcherName in app.watch) {
-    watchers[watcherName] = {
-      id: getUniqueQueueId(),
-      fn: toRegularFn(app.watch[watcherName])
-    };
-  }
-  // We attach a watcher to data (so a global watcher) to call the correct watcher based on the path
-  watch(
-    {
-      type: 'onSet',
-      fn: async props => {
-        for (const watcherName in app.watch) {
-          const match = matchPath(watcherName, props.path);
-
-          if (match.isMatching) {
-            const watcher = watchers[watcherName];
-
-            queueJob(async () => {
-              try {
-                await watcher.fn.call(getContext(contextProps), props);
-              } catch (err: any) {
-                error(err);
-              }
-            }, watcher.id);
-          }
-        }
-      }
-    },
-    () => [state.data, state.componentInfos?.componentData]
-  );
-
-  // Setup
-  if (app.setup) {
-    try {
-      const setupFn = toRegularFn(app.setup);
-      await setupFn.call(getContext(contextProps));
-    } catch (err: any) {
-      error(err);
-      return;
-    }
-  }
-
-  // Setuped event dispatch
-  document.dispatchEvent(
-    new CustomEvent(DOMY_EVENTS.App.Setuped, {
-      bubbles: true,
-      detail: { app, target } as DomyReadyEventDetails
-    })
-  );
-
+  // Render the dom with DOMY
   const deepRender = createDeepRenderFn(
     params.appId,
+    appState,
     state,
     config,
     components,
     params.pluginHelper
   );
   try {
-    // Render the dom with DOMY
     const block = deepRender({
       element: target,
       scopedNodeData: [],
@@ -144,54 +82,34 @@ export async function initApp(params: Params) {
     error(err);
   }
 
-  // Mounted
-  if (app.mounted) {
-    try {
-      const mountedFn = toRegularFn(app.mounted);
-      await mountedFn.call(getContext(contextProps));
-    } catch (err: any) {
-      error(err);
-    }
+  // Calling onMounted hooks
+  appState.isMounted = true;
+  const mountedCallbacks = onMountedTracker.getCallbacks();
+  onMountedTracker.clear();
+  for (const mountedCallback of mountedCallbacks) {
+    callWithErrorHandling(mountedCallback);
   }
 
-  // Effects
-  for (const effect of app.effect ?? []) {
-    const fn = toRegularFn(effect);
-    queuedWatchEffect(fn.bind(getContext(contextProps)));
-  }
-
-  // Mounted event dispatch
-  document.dispatchEvent(
-    new CustomEvent(DOMY_EVENTS.App.Mounted, {
-      bubbles: true,
-      detail: { appId: params.appId, app, state, target } as DomyMountedEventDetails
-    })
-  );
+  // Get the unmountCallbaks
+  const unmountCallbacks = onUnmountTracker.getCallbacks();
+  onUnmountTracker.clear();
 
   return {
     render: getRender(deepRender),
     async unmount() {
-      if (unmountRender) unmountRender();
-
-      // Unmount
-      if (app.unmount) {
-        try {
-          const unmountedFn = toRegularFn(app.unmount);
-          await unmountedFn.call(getContext(contextProps));
-        } catch (err: any) {
-          error(err);
-        }
+      // We clean the dependencies of the current app/component
+      for (const dep of deps) {
+        dep.clean();
       }
 
-      unReactive(state.data);
+      // unmount every deep component, ...
+      if (unmountRender) unmountRender();
 
-      // Unmount event
-      document.dispatchEvent(
-        new CustomEvent(DOMY_EVENTS.App.UnMount, {
-          bubbles: true,
-          detail: { app, state, target } as DomyUnMountEventDetails
-        })
-      );
+      // Calling onUnmount hooks
+      appState.isUnmounted = true;
+      for (const unmountCallback of unmountCallbacks) {
+        callWithErrorHandling(unmountCallback);
+      }
     }
   };
 }
