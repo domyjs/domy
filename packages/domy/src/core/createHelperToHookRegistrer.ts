@@ -14,7 +14,7 @@ export function createHelperToHookRegistrer() {
   let domy: DomySpecialHelper | null = null;
 
   return {
-    getHook<T extends Fn>(helper: T) {
+    getHook<T extends Fn>(helper: T): () => ReturnType<T> {
       helpersHooksList.add(helper);
 
       return () => {
