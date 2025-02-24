@@ -25,7 +25,7 @@ let domyHelperId = 0;
 export class DomyHelper {
   private domyHelperId = ++domyHelperId;
 
-  private unmount = false;
+  private isUnmountCalled = false;
 
   private cleanupFn: (() => void) | null = null;
   private clearEffectList: (() => void)[] = [];
@@ -136,7 +136,7 @@ export class DomyHelper {
   effect(fn: () => void) {
     // Unsure to not make the effect if the app is unmounted
     const fixedFn = () => {
-      if (!this.unmount) directivesUtils.callWithErrorHandling(fn, err => error(err));
+      if (!this.isUnmountCalled) directivesUtils.callWithErrorHandling(fn, err => error(err));
     };
 
     if (!this.renderWithoutListeningToChange) {
@@ -190,7 +190,10 @@ export class DomyHelper {
 
   callCleanup() {
     const unmountQueueId = getUniqueQueueId();
-    this.unmount = true;
+
+    // Ensure the jobs already in queue that affect this element don't start
+    this.isUnmountCalled = true;
+
     queueJob(() => {
       this.clearEffects();
       if (typeof this.cleanupFn === 'function') this.cleanupFn();

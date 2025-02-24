@@ -12,7 +12,8 @@ import {
   onMountedTracker,
   onUnmountTracker,
   onSetupedTracker,
-  helperToHookRegistrer
+  helperToHookRegistrer,
+  onBeforeUnmountTracker
 } from './hooks';
 import { AppStateObserver } from './AppState';
 import * as ReactiveUtils from '@domyjs/reactive';
@@ -98,13 +99,22 @@ export function initApp(params: Params) {
     callWithErrorHandling(mountedCallback);
   }
 
-  // Get the unmountCallbaks
+  // Get the beforeUnmount callbacks
+  const beforeUnmountCallbacks = onBeforeUnmountTracker.getCallbacks();
+  onBeforeUnmountTracker.clear();
+
+  // Get the unmount callbaks
   const unmountCallbacks = onUnmountTracker.getCallbacks();
   onUnmountTracker.clear();
 
   return {
     render: getRender(deepRender),
     async unmount() {
+      // Calling onBeforeUnmount hooks
+      for (const beforeUnmountCallback of beforeUnmountCallbacks) {
+        callWithErrorHandling(beforeUnmountCallback);
+      }
+
       // We clean the dependencies of the current app/component
       for (const dep of deps) {
         dep.clean();

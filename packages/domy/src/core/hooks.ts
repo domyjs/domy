@@ -14,14 +14,17 @@ import { $globalWatch } from '../helpers/$globalWatch';
 import { $nextTick } from '../helpers/$nextTick';
 
 export const helperToHookRegistrer = createHelperToHookRegistrer();
+
 export const onSetupedTracker = createCallbackRegistrer();
 export const onMountedTracker = createCallbackRegistrer();
+export const onBeforeUnmountTracker = createCallbackRegistrer();
 export const onUnmountTracker = createCallbackRegistrer();
 
 export const allHooks = {
   // Lifecycle
   onSetuped: onSetupedTracker.fn,
   onMounted: onMountedTracker.fn,
+  onBeforeUnmount: onBeforeUnmountTracker.fn,
   onUnmount: onUnmountTracker.fn,
 
   // Helpers hooks
