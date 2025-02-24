@@ -10,7 +10,7 @@ import { PluginHelper } from './plugin';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import {
   onMountedTracker,
-  onUnmountTracker,
+  onUnmountedTracker,
   onSetupedTracker,
   helperToHookRegistrer,
   onBeforeUnmountTracker
@@ -18,6 +18,7 @@ import {
 import { AppStateObserver } from './AppState';
 import * as ReactiveUtils from '@domyjs/reactive';
 import { helpersUtils } from '../utils/helpersUtils';
+import { getUniqueQueueId, queueJob } from './scheduler';
 
 type Params = {
   appId: number;
@@ -98,20 +99,21 @@ export function initApp(params: Params) {
     callWithErrorHandling(mountedCallback);
   }
 
+  const unmountQueueId = getUniqueQueueId();
   // Get the beforeUnmount callbacks
   const beforeUnmountCallbacks = onBeforeUnmountTracker.getCallbacks();
   onBeforeUnmountTracker.clear();
 
-  // Get the unmount callbaks
-  const unmountCallbacks = onUnmountTracker.getCallbacks();
-  onUnmountTracker.clear();
+  // Get the unmounted callbaks
+  const unmountedCallbacks = onUnmountedTracker.getCallbacks();
+  onUnmountedTracker.clear();
 
   return {
     render: getRender(deepRender),
-    async unmount() {
+    unmount() {
       // Calling onBeforeUnmount hooks
       for (const beforeUnmountCallback of beforeUnmountCallbacks) {
-        callWithErrorHandling(beforeUnmountCallback);
+        queueJob(beforeUnmountCallback, unmountQueueId);
       }
 
       // We clean the dependencies of the current app/component
@@ -124,8 +126,8 @@ export function initApp(params: Params) {
 
       // Calling onUnmount hooks
       appState.isUnmounted = true;
-      for (const unmountCallback of unmountCallbacks) {
-        callWithErrorHandling(unmountCallback);
+      for (const unmountedCallback of unmountedCallbacks) {
+        queueJob(unmountedCallback, unmountQueueId);
       }
     }
   };

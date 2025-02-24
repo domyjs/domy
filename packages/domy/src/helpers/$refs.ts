@@ -13,9 +13,10 @@ type Refs = Record<string, Element>;
  * @author yoannchb-pro
  */
 export function $refs(domy: DomySpecialHelper): Refs {
-  const refs: Refs = {};
-  for (const [name, block] of Object.entries(domy.state.refs)) {
-    refs[name] = block.el;
-  }
-  return refs;
+  return new Proxy({} as Refs, {
+    get(target, p, receiver) {
+      if (typeof p === 'symbol') return Reflect.get(target, p, receiver);
+      return domy.state.refs[p].el;
+    }
+  });
 }

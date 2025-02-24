@@ -20,7 +20,7 @@
     <button id="show-hide" @click="show = !show">Show/hide</button>
   </body>
   <script>
-    const { signal, useProps, onUnmount } = DOMY;
+    const { signal, useProps, onUnmounted } = DOMY;
     const unMountEventsCount = document.querySelector('#unmount-events-count');
 
     const ImbriquedComponent = DOMY.createComponent({
@@ -33,7 +33,7 @@
       app() {
         const props = useProps();
 
-        onUnmount(() => {
+        onUnmounted(() => {
           props.unmountUpdate();
         });
       }
@@ -57,7 +57,7 @@
         const count = signal(0);
         const props = useProps();
 
-        onUnmount(() => {
+        onUnmounted(() => {
           props.unmountUpdate();
         });
 

@@ -7,36 +7,58 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <p id="res" d-text="'Hello World!'"></p>
+    <Component d-if="show"></Component>
 
-    <p id="initialisation"></p>
     <p id="setuped"></p>
     <p id="mounted"></p>
+    <p id="beforeUnmount"></p>
+    <p id="unmounted"></p>
+
+    <button d-ref="button" @click="show = !show">Show component</button>
   </body>
   <script>
-    const domyEl = document.querySelector('#res');
-    const initialisationEl = document.querySelector('#initialisation');
+    const { signal, onSetuped, onMounted, onBeforeUnmount, onUnmounted, useRefs } = DOMY;
+
     const setupedEl = document.querySelector('#setuped');
     const mountedEl = document.querySelector('#mounted');
+    const beforeUnmountEl = document.querySelector('#beforeUnmount');
+    const unmountedEl = document.querySelector('#unmounted');
 
-    document.addEventListener('domy:app:initialisation', function () {
-      console.log('initialisation', domyEl.getAttribute('d-text'));
-      initialisationEl.textContent = domyEl.getAttribute('d-text');
-    });
+    const Component = DOMY.createComponent({
+      html: `
+          <p id="res" d-ref="res" d-text="'Hello World!'"></p>
+      `,
+      app() {
+        const refs = useRefs();
+        const domyEl = document.querySelector('#res');
 
-    document.addEventListener('domy:app:setuped', function () {
-      console.log('setuped', domyEl.getAttribute('d-text'));
-      setupedEl.textContent = domyEl.getAttribute('d-text');
-    });
+        onSetuped(() => {
+          setupedEl.textContent = domyEl.getAttribute('d-text');
+          domyEl.setAttribute('d-text', "'Bye World!'");
+        });
 
-    document.addEventListener('domy:app:mounted', function () {
-      mountedEl.textContent = domyEl.getAttribute('d-text') ?? '';
-    });
+        onMounted(() => {
+          console.log(refs);
+          mountedEl.textContent = domyEl.getAttribute('d-text') ?? '';
+        });
 
-    DOMY.createApp({
-      setup() {
-        res.setAttribute('d-text', "'Bye World!'");
+        onBeforeUnmount(() => {
+          beforeUnmountEl.textContent = refs.res.tagName;
+        });
+
+        onUnmounted(() => {
+          unmountedEl.textContent = refs.res.tagName;
+        });
       }
-    }).mount();
+    });
+
+    DOMY.createApp(() => {
+      const show = signal(true);
+      return { show };
+    })
+      .components({
+        Component
+      })
+      .mount();
   </script>
 </html>

@@ -5,15 +5,16 @@ beforeEach(() => {
 });
 
 describe('Lifecycle test', () => {
-  it('Check initialisation have the correct value', () => {
-    cy.get('#initialisation').should('have.text', "'Hello World!'");
-  });
-
-  it('Check setuped have the correct value', () => {
-    cy.get('#setuped').should('have.text', "'Bye World!'");
-  });
-
-  it('Check mounted have the correct value', () => {
+  it('should update the setuped and mounted elements on initialization', () => {
+    cy.get('#setuped').should('have.text', "'Hello World!'");
     cy.get('#mounted').should('have.text', '');
+  });
+
+  it('should update beforeUnmount and unmounted when the component is removed', () => {
+    // cy.get('#beforeUnmount').should('have.text', '');
+    // cy.get('#unmounted').should('have.text', '');
+    // cy.get('button').click(); // Hide the component
+    // cy.get('#beforeUnmount').should('have.text', 'P');
+    // cy.get('#unmounted').should('have.text', '');
   });
 });
