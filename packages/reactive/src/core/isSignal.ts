@@ -1,4 +1,4 @@
-import { isSignalSymbol } from './ReactiveVariable';
+import { ReactiveVariable } from './ReactiveVariable';
 
 /**
  * Will return true if the obj is a signal
@@ -8,5 +8,5 @@ import { isSignalSymbol } from './ReactiveVariable';
  * @author yoannchb-pro
  */
 export function isSignal(obj: any) {
-  return !!obj?.[isSignalSymbol];
+  return ReactiveVariable.isReactive(obj);
 }

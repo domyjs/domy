@@ -1,5 +1,4 @@
 /* eslint @typescript-eslint/no-this-alias: "off" */
-
 export type Listener = OnGetListener | OnSetListener;
 export type OnGetListener = {
   type: 'onGet';
@@ -50,6 +49,15 @@ export class ReactiveVariable {
    */
   public static isReactive(target: any) {
     return !!target?.[isProxySymbol];
+  }
+
+  /**
+   * Check if the current target is a signal instead of a reactive
+   * @param target
+   * @returns
+   */
+  public static isSignal(target: any) {
+    return !!target?.[isSignalSymbol] && 'value' in target;
   }
 
   public getInitialObj() {
@@ -225,13 +233,6 @@ export class ReactiveVariable {
         ctx.callOnGetListeners([...path]);
 
         return keys;
-      },
-      defineProperty(target, p, descriptor) {
-        const result = Reflect.defineProperty(target, p, descriptor);
-
-        ctx.callOnSetListeners([...path, p as string], undefined, descriptor);
-
-        return result;
       }
     };
     return handler;
@@ -300,11 +301,12 @@ export class ReactiveVariable {
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
     if (!ReactiveVariable.IS_GLOBAL_LOCK) {
+      const obj = this.getProxy();
       const params = {
         path: this.name + path.join('.'),
         prevValue,
         newValue,
-        obj: this.getProxy(),
+        obj,
         reactiveVariable: this
       };
 
