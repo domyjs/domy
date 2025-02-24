@@ -9,7 +9,6 @@
   <body>
     <p id="is-show">{{ show }}</p>
 
-    <p id="unmount-events-count">0</p>
     <p id="unmount-count">{{ unmountCount }}</p>
 
     <hr />
@@ -21,11 +20,8 @@
     <button id="show-hide" @click="show = !show">Show/hide</button>
   </body>
   <script>
+    const { signal, useProps, onUnmount } = DOMY;
     const unMountEventsCount = document.querySelector('#unmount-events-count');
-
-    document.addEventListener('domy:app:unmount', () => {
-      unMountEventsCount.textContent = Number(unMountEventsCount.textContent) + 1;
-    });
 
     const ImbriquedComponent = DOMY.createComponent({
       props: ['!unmountUpdate'],
@@ -34,11 +30,12 @@
               <p>Imbriqued Component</p>
             </div>
         `,
-      app: {
-        unmount() {
-          console.log('Unmount imbriqued');
-          this.$props.unmountUpdate();
-        }
+      app() {
+        const props = useProps();
+
+        onUnmount(() => {
+          props.unmountUpdate();
+        });
       }
     });
 
@@ -56,35 +53,33 @@
       components: {
         ImbriquedComponent
       },
-      app: {
-        data() {
-          return {
-            count: 0
-          };
-        },
-        unmount() {
-          console.log('Unmount count');
-          this.$props.unmountUpdate();
-        },
-        methods: {
-          increment: () => ++this.count,
-          decrement: () => --this.count
-        }
+      app() {
+        const count = signal(0);
+        const props = useProps();
+
+        onUnmount(() => {
+          props.unmountUpdate();
+        });
+
+        return {
+          count,
+          increment: () => ++count.value,
+          decrement: () => --count.value
+        };
       }
     });
 
-    DOMY.createApp({
-      data() {
-        return {
-          unmountCount: 0,
-          show: true
-        };
-      },
-      methods: {
+    DOMY.createApp(() => {
+      const unmountCount = signal(0);
+      const show = signal(true);
+
+      return {
+        unmountCount,
+        show,
         unmountUpdate() {
-          this.unmountCount++;
+          unmountCount.value++;
         }
-      }
+      };
     })
       .components({ Count })
       .mount();

@@ -43,15 +43,4 @@ describe('Unmount tests', () => {
     cy.get('#show-hide').click();
     cy.get('#unmount-count').should('contain', '4');
   });
-
-  it('Should update unmount events count when the Count component is unmounted', () => {
-    cy.get('#unmount-events-count').should('contain', '0');
-
-    cy.get('#show-hide').click();
-    cy.get('#unmount-events-count').should('contain', '2');
-
-    cy.get('#show-hide').click();
-    cy.get('#show-hide').click();
-    cy.get('#unmount-events-count').should('contain', '4');
-  });
 });
