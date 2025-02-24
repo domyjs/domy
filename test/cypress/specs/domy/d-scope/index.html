@@ -21,17 +21,25 @@
     <p id="watcherCalled" d-ref="watcherCalled">false</p>
   </body>
   <script>
-    DOMY.createApp({
-      watch: {
-        showModal() {
-          this.$refs.watcherCalled.textContent = 'true';
-        }
-      },
-      data() {
-        return {
-          msg: 'Hello World!'
-        };
-      }
+    const { useRefs, signal, watch } = DOMY;
+
+    DOMY.createApp(() => {
+      const refs = useRefs();
+      const showModal = signal(false);
+
+      watch(
+        ({ newValue }) => {
+          if (watcherCalled) {
+            refs.watcherCalled.textContent = newValue ? 'true' : 'false';
+          }
+        },
+        () => showModal
+      );
+
+      return {
+        msg: 'Hello World!',
+        showModal
+      };
     }).mount();
   </script>
 </html>

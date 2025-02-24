@@ -11,12 +11,12 @@
     <button @click="html = '<p>Bye World!</p>'">Change to Bye World!</button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          html: '<p>Hello World!</p>'
-        };
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const html = signal('<p>Hello World!</p>');
+
+      return { html };
     }).mount();
   </script>
 </html>

@@ -10,18 +10,19 @@
     <h1>Rendering took: {{ typeof perf === "number" ? Math.round(perf) : perf }}ms</h1>
   </body>
   <script>
-    DOMY.createApp({
-      async setup() {
-        this.perf = performance.now();
-      },
-      async mounted() {
-        this.perf = performance.now() - this.perf;
-      },
-      data() {
-        return {
-          perf: null
-        };
-      }
+    const { signal, onMounted } = DOMY;
+
+    DOMY.createApp(() => {
+      const start = performance.now();
+      const perf = signal(null);
+
+      onMounted(() => {
+        perf.value = performance.now() - start;
+      });
+
+      return {
+        perf
+      };
     }).mount();
   </script>
 </html>

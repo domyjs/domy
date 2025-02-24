@@ -23,6 +23,8 @@
     </main>
   </body>
   <script>
+    const { signal, watch, useProps } = DOMY;
+
     const ErrorMessage = DOMY.createComponent({
       props: ['close'],
       html: `
@@ -54,51 +56,53 @@
       components: {
         ErrorMessage
       },
-      app: {
-        setup() {},
-        mounted() {},
-        watch: {
-          '$props.showError'() {
+      app() {
+        const props = useProps();
+        const count = signal(0);
+        const message = 'The count as to be greater than 0!';
+
+        watch(
+          () => {
             const p = document.querySelector('#propChanges');
             p.textContent = Number(p.textContent) + 1;
           },
+          () => props.showError
+        );
 
-          count({ prevValue, newValue }) {
+        watch(
+          ({ newValue }) => {
             if (newValue < 0) {
-              this.$props.open();
+              props.open();
             } else {
-              this.$props.close();
+              props.close();
             }
-          }
-        },
-        data() {
-          return {
-            message: 'The count as to be greater than 0!',
-            count: 0
-          };
-        },
-        methods: {
-          increment: () => ++this.count,
-          decrement: () => --this.count
-        }
+          },
+          () => count.value
+        );
+
+        return {
+          count,
+          message,
+          increment: () => ++count.value,
+          decrement: () => --count.value
+        };
       }
     });
 
-    DOMY.createApp({
-      data() {
-        return {
-          showError: false,
-          componentClick: 0
-        };
-      },
-      methods: {
+    DOMY.createApp(() => {
+      const showError = signal(false);
+      const componentClick = signal(0);
+
+      return {
+        showError,
+        componentClick,
         close() {
-          this.showError = false;
+          showError.value = false;
         },
         open() {
-          this.showError = true;
+          showError.value = true;
         }
-      }
+      };
     })
       .components({
         Count

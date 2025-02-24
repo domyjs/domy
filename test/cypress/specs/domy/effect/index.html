@@ -14,23 +14,24 @@
     <button id="dec" @click="count--">-</button>
   </body>
   <script>
-    DOMY.createApp({
-      effect: [
-        function () {
-          console.log('effect called');
-          if (this.count < 0) this.count = 0;
-        },
-        function () {
-          console.log('effect 2 called');
-          this.countby2++;
-        }
-      ],
-      data() {
-        return {
-          count: 0,
-          countby2: 0
-        };
-      }
+    const { signal, effect } = DOMY;
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+      const countby2 = signal(0);
+
+      effect(() => {
+        if (count.value < 0) count.value = 0;
+      });
+
+      effect(() => {
+        countby2.value++;
+      });
+
+      return {
+        count,
+        countby2
+      };
     }).mount();
   </script>
 </html>

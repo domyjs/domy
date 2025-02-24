@@ -29,12 +29,14 @@
     </div>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          renderElement: false
-        };
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const renderElement = signal(false);
+
+      return {
+        renderElement
+      };
     }).mount();
   </script>
 </html>

@@ -84,21 +84,23 @@
     <button @click="show = !show">Show modal</button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          show: false
-        };
-      },
-      methods: {
-        createElement(text) {
-          const p = document.createElement('p');
-          p.textContent = text;
-          p.id = text.toLowerCase().replace(/\s+/, '-');
-          p.setAttribute('d-if', '5 === 5');
-          return p;
-        }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const show = signal(false);
+
+      function createElement(text) {
+        const p = document.createElement('p');
+        p.textContent = text;
+        p.id = text.toLowerCase().replace(/\s+/g, '-');
+        p.setAttribute('d-if', '5 === 5'); // condition pour afficher l'élément
+        return p;
       }
+
+      return {
+        show,
+        createElement
+      };
     }).mount();
   </script>
 </html>

@@ -7,6 +7,7 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
+    <h1>{{ list.length }}</h1>
     <ul d-for="user, index of list">
       Some text that shouldn't be rendered
       <li
@@ -32,33 +33,30 @@
     <button id="rm" @click="removeElement()">Remove</button>
   </body>
   <script>
-    DOMY.createApp({
-      setup() {
-        this.list.push(this.generateElement());
-      },
-      data() {
+    const { reactive, signal } = DOMY;
+
+    DOMY.createApp(() => {
+      let id = 0;
+      const list = reactive([]);
+
+      function generateElement() {
         return {
-          id: 0,
-          list: []
+          id: ++id,
+          name: (Math.random() * 10000).toString(36),
+          cars: ['BMW', 'PEUGEOT', 'MERCEDES'],
+          isClient: true
         };
-      },
-      methods: {
-        generateElement() {
-          const newEl = {
-            id: ++this.id,
-            name: (Math.random() * 10000).toString(36),
-            cars: ['BMW', 'PEUGEOT', 'MERCEDES'],
-            isClient: true
-          };
-          return newEl;
-        },
-        addElement() {
-          this.list.push(this.generateElement());
-        },
-        removeElement() {
-          this.list.pop();
-        }
       }
+
+      list.push(generateElement());
+
+      return {
+        id,
+        list,
+        generateElement,
+        addElement: () => list.push(generateElement()),
+        removeElement: () => list.pop()
+      };
     }).mount();
   </script>
 </html>

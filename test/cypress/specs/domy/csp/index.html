@@ -23,32 +23,30 @@
     <input type="text" d-model="search" placeholder="Search something..." />
   </body>
   <script nonce="a23gbfz9e">
-    DOMY.createApp({
-      watch: {
-        count({ prevValue, newValue }) {
-          if (newValue < 0) this.count = prevValue;
-        }
-      },
-      data() {
-        return {
-          greeting: {
-            msg: ['Hello World!']
-          },
-          count: 0,
-          search: ''
-        };
-      },
-      methods: {
-        isOdd() {
-          return this.count % 2 === 1;
+    const { signal, reactive, watch } = DOMY;
+
+    DOMY.createApp(() => {
+      const greeting = reactive({
+        msg: ['Hello World!']
+      });
+      const search = signal('');
+      const count = signal(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
         },
-        increment() {
-          this.count++;
-        },
-        decrement() {
-          this.count--;
-        }
-      }
+        () => count
+      );
+
+      return {
+        count,
+        search,
+        greeting,
+        isOdd: () => count.value % 2 === 1,
+        increment: () => count.value++,
+        decrement: () => count.value--
+      };
     })
       .configure({
         CSP: true

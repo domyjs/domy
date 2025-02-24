@@ -21,36 +21,55 @@
     <p id="index">{{ index }}</p>
   </body>
   <script>
-    DOMY.createApp({
-      watch: {
-        countby2({ prevValue, newValue }) {
+    const { signal, watch, matchPath, reactive } = DOMY;
+
+    DOMY.createApp(() => {
+      const todos = reactive([
+        { name: 'cleanning', isComplete: false },
+        { name: 'homework', isComplete: false }
+      ]);
+
+      const countby2 = signal(0);
+      const count = signal(0);
+      const path = signal('');
+      const index = signal('');
+
+      watch(
+        ({ prevValue, newValue }) => {
           if (newValue < prevValue) {
-            this.countby2--;
+            countby2.value--;
           } else {
-            this.countby2++;
+            countby2.value++;
           }
         },
-        count({ prevValue, newValue }) {
-          if (newValue < 0) this.count = prevValue;
+        () => countby2
+      );
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) {
+            count.value = prevValue;
+          }
         },
-        'todos.{index}'({ prevValue, newValue, path }) {
-          const matcher = DOMY.matchPath('todos.{index}', path);
-          this.path = path;
-          this.index = matcher.params.index;
-        }
-      },
-      data() {
-        return {
-          todos: [
-            { name: 'cleanning', isComplete: false },
-            { name: 'homework', isComplete: false }
-          ],
-          countby2: 0,
-          count: 0,
-          path: '',
-          index: ''
-        };
-      }
+        () => count
+      );
+
+      watch(
+        ({ path: watcherPath }) => {
+          const matcher = matchPath('todos.{index}', watcherPath);
+          path.value = watcherPath;
+          index.value = matcher.params.index;
+        },
+        () => todos
+      );
+
+      return {
+        todos,
+        countby2,
+        count,
+        path,
+        index
+      };
     }).mount();
   </script>
 </html>

@@ -11,19 +11,22 @@
     <p d-setup="refName = 'p'" d-ref.dynamic="refName"></p>
   </body>
   <script>
+    const { onMounted, useRefs } = DOMY;
+
     const Component = DOMY.createComponent({
       html: `<input type="text" value="Hello World!" />`
     });
 
-    DOMY.createApp({
-      data() {
-        return {
-          refName: null
-        };
-      },
-      mounted() {
-        this.$refs.p.textContent = this.$refs.input.value;
-      }
+    DOMY.createApp(() => {
+      const refName = DOMY.signal(null);
+      const refs = useRefs();
+
+      onMounted(() => {
+        console.log(refs);
+        refs.p.textContent = refs.input.value;
+      });
+
+      return { refName };
     })
       .components({
         Component

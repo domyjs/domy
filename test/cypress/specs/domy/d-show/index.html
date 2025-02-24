@@ -13,16 +13,18 @@
     <button @click="show = !show">Hide/Show modal</button>
   </body>
   <script>
+    const { signal } = DOMY;
+
     const Component = DOMY.createComponent({
       html: `<modal id="inside-modal" style="display: flex"> Hello from a modal </modal>`
     });
 
-    DOMY.createApp({
-      data() {
-        return {
-          show: false
-        };
-      }
+    DOMY.createApp(() => {
+      const show = signal(false);
+
+      return {
+        show
+      };
     })
       .components({
         Component

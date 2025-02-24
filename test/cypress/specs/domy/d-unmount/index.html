@@ -16,19 +16,22 @@
     <button @click="changeVisibility">Show/Hide modal</button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          text: '',
-          showModal: true
-        };
-      },
-      methods: {
-        changeVisibility() {
-          this.text = '';
-          this.showModal = !this.showModal;
-        }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const text = signal('');
+      const showModal = signal(true);
+
+      function changeVisibility() {
+        text.value = '';
+        showModal.value = !showModal.value;
       }
+
+      return {
+        text,
+        showModal,
+        changeVisibility
+      };
     }).mount();
   </script>
 </html>

@@ -27,26 +27,40 @@
     <button id="class2-btn" @click="classTest2['bg-blue'] = false">
       Remove class test2 bg blue
     </button>
-    <button id="style-btn" @click="styleTest = {}">Remove style test bg blue</button>
+    <button
+      id="style-btn"
+      @click="() => {
+      for(const key in styleTest) {
+        delete styleTest[key];
+      }
+    }"
+    >
+      Remove style test bg blue
+    </button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          id: 0,
-          style: { backgroundColor: 'red' },
+    const { reactive, signal } = DOMY;
 
-          classTest: ['bg-blue'],
-          classTest2: { 'bg-blue': true },
-          styleTest: { backgroundColor: 'blue' }
-        };
-      },
-      methods: {
+    DOMY.createApp(() => {
+      const id = signal(0);
+
+      const style = reactive({ backgroundColor: 'red' });
+      const styleTest = reactive({ backgroundColor: 'blue' });
+
+      const classTest = reactive(['bg-blue']);
+      const classTest2 = reactive({ 'bg-blue': true });
+
+      return {
+        id,
+        style,
+        classTest,
+        classTest2,
+        styleTest,
         update() {
-          this.id++;
-          this.style.backgroundColor = 'green';
+          id.value++;
+          style.backgroundColor = 'green';
         }
-      }
+      };
     }).mount();
   </script>
 </html>

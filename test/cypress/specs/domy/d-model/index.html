@@ -75,24 +75,33 @@
     </div>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          search: 'Hello World!',
-          searchLazy: 'Hello World!',
-          search2: 'Hello World!',
+    DOMY.createApp(() => {
+      const search = DOMY.signal('Hello World!');
+      const searchLazy = DOMY.signal('Hello World!');
+      const search2 = DOMY.signal('Hello World!');
 
-          age: 0,
-          age2: 0,
+      const age = DOMY.signal(0);
+      const age2 = DOMY.signal(0);
 
-          selectedColor: 'red',
-          selectedColor2: ['red', 'blue'],
-          selectedColor3: 'red',
+      const selectedColor = DOMY.signal('red');
+      const selectedColor2 = DOMY.reactive(['red', 'blue']);
+      const selectedColor3 = DOMY.signal('red');
 
-          checked: true,
-          checkedColors: ['red']
-        };
-      }
+      const checked = DOMY.signal(true);
+      const checkedColors = DOMY.reactive(['red']);
+
+      return {
+        search,
+        searchLazy,
+        search2,
+        age,
+        age2,
+        selectedColor,
+        selectedColor2,
+        selectedColor3,
+        checked,
+        checkedColors
+      };
     }).mount();
   </script>
 </html>

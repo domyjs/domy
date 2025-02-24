@@ -14,17 +14,15 @@
 
     <div id="dFor" d-mounted="this.$el.querySelector('li').textContent = '{{ text }}'">
       <ul d-for="color of ['red']">
-        <li>{{ color }}</li>
+        <li d-key="color">{{ color }}</li>
       </ul>
     </div>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          text: ''
-        };
-      }
+    DOMY.createApp(() => {
+      const text = DOMY.signal('');
+
+      return { text };
     }).mount();
   </script>
 </html>

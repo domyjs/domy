@@ -42,25 +42,25 @@
       <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
     </ul>
 
-    <div d-if="currPage.title==='Home'" d-transition="transition">
+    <div d-if="currPage.title === 'Home'" d-transition="transition">
       <p>{{ currPage.title }}</p>
     </div>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          msg: 'Page: ',
-          currPage: null,
-          pages: [
-            { title: 'Home', component: 'Home' },
-            { title: 'About', component: 'About' }
-          ]
-        };
-      },
-      setup() {
-        this.currPage = this.pages[0];
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const pages = [
+        { title: 'Home', component: 'Home' },
+        { title: 'About', component: 'About' }
+      ];
+
+      const currPage = signal(pages[0]);
+
+      return {
+        currPage,
+        pages
+      };
     }).mount();
   </script>
 </html>

@@ -12,36 +12,40 @@
 
     <button
       id="attrsBtn"
-      @click="() => {
-      delete attrs.title;
-      attrs = { name: 'test2', onclick: null  }
-    }"
+      @click="
+      () => {
+        attrs = { name: 'test2', onclick: null  }
+      }
+      "
     >
       Change attrs
     </button>
     <button
       id="attrsRenderBtn"
-      @click="() => {
-      delete attrsRender[':style'];
-      attrsRender = { 'd-show': '6 === 5', onclick: null, 'd-on:click': null }
-    }"
+      @click="
+      () => {
+        attrsRender = { 'd-show': '6 === 5', onclick: null, 'd-on:click': null }
+      }
+      "
     >
       Change render attrs
     </button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          style: { color: 'red' },
-          attrs: {
-            title: 'Hello'
-          },
-          attrsRender: {
-            ':style': 'style'
-          }
-        };
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const style = signal({ color: 'red' });
+      const attrs = signal({ title: 'Hello' });
+      const attrsRender = signal({
+        ':style': style.value
+      });
+
+      return {
+        style,
+        attrs,
+        attrsRender
+      };
     }).mount();
   </script>
 </html>

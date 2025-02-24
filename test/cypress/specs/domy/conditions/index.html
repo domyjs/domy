@@ -15,20 +15,20 @@
     <button id="dec" @click="decrement()">-</button>
   </body>
   <script>
-    window.DOMY.createApp({
-      data() {
-        return {
-          count: 0
-        };
-      },
-      methods: {
+    const { signal } = DOMY;
+
+    window.DOMY.createApp(() => {
+      const count = signal(0);
+
+      return {
+        count,
         increment() {
-          this.count++;
+          count.value++;
         },
         decrement() {
-          this.count--;
+          count.value--;
         }
-      }
+      };
     }).mount();
   </script>
 </html>

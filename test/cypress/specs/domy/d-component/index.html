@@ -47,6 +47,8 @@
     </template>
   </body>
   <script>
+    const { signal, reactive } = DOMY;
+
     const Home = DOMY.createComponent({
       props: ['title'],
       html: `<p id="home"><template d-insert.render="$childrens[0]"></template>{{ $props.title }}</p>`
@@ -57,21 +59,23 @@
       html: `<p id="about"><template d-insert.render="$childrens[0]"></template>{{ $props.title }}</p>`
     });
 
-    DOMY.createApp({
-      data() {
-        return {
-          msg: 'Page: ',
-          currPage: null,
-          pages: [
-            { title: 'Home', component: 'Home' },
-            { title: 'About', component: 'About' },
-            { title: 'Not Exist', component: null }
-          ]
-        };
-      },
-      setup() {
-        this.currPage = this.pages[0];
-      }
+    DOMY.createApp(() => {
+      const pages = [
+        { title: 'Home', component: 'Home' },
+        { title: 'About', component: 'About' },
+        { title: 'Not Exist', component: null }
+      ];
+
+      const currPage = signal(pages[0]);
+
+      return {
+        msg: 'Page: ',
+        pages,
+        currPage,
+        changePage: page => {
+          currPage.value = page;
+        }
+      };
     })
       .components({
         Home,

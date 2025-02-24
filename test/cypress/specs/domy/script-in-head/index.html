@@ -6,12 +6,14 @@
     <title>Script in head</title>
     <script src="/packages/domy/dist/index.js"></script>
     <script>
-      DOMY.createApp({
-        data() {
-          return {
-            msg: 'Hello World!'
-          };
-        }
+      const { signal } = DOMY;
+
+      DOMY.createApp(() => {
+        const msg = signal('Hello World!');
+
+        return {
+          msg
+        };
       }).mount();
     </script>
   </head>

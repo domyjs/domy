@@ -14,22 +14,24 @@
     <button id="dec" @click="count--">-</button>
   </body>
   <script>
-    DOMY.createApp({
-      watch: {
-        count({ prevValue, newValue }) {
-          if (newValue < 0) this.count = prevValue;
-        }
-      },
-      data() {
-        return {
-          count: 0
-        };
-      },
-      methods: {
+    const { watch, signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
+        },
+        () => count
+      );
+
+      return {
+        count,
         isCountOdd() {
-          return this.count % 2 === 1;
+          return count.value % 2 === 1;
         }
-      }
+      };
     }).mount();
   </script>
 </html>

@@ -23,35 +23,38 @@
     </div>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          count: 0
-        };
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+
+      return {
+        count
+      };
     }).mount(document.querySelector('#once'));
 
-    DOMY.createApp({
-      data() {
-        return {
-          name: '',
-          submitedName: ''
-        };
-      },
-      methods: {
-        submit() {
-          this.submitedName = this.name;
-          this.name = '';
-        }
-      }
+    DOMY.createApp(() => {
+      const name = signal('');
+      const submitedName = signal('');
+
+      const submit = () => {
+        submitedName.value = name.value;
+        name.value = '';
+      };
+
+      return {
+        name,
+        submitedName,
+        submit
+      };
     }).mount(document.querySelector('#enter'));
 
-    DOMY.createApp({
-      data() {
-        return {
-          show: false
-        };
-      }
+    DOMY.createApp(() => {
+      const show = signal(false);
+
+      return {
+        show
+      };
     }).mount(document.querySelector('#away'));
   </script>
 </html>

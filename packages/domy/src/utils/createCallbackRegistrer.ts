@@ -18,7 +18,7 @@ export function createCallbackRegistrer<T = Callback>() {
       callbackList.length = 0;
     },
     getCallbacks() {
-      return callbackList;
+      return [...callbackList];
     }
   };
 }
