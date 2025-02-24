@@ -60,7 +60,10 @@ function changeValue(domy: DomyDirectiveHelper) {
 
   if (isCsp) {
     const objPath = avoidDeprecatedWith ? domy.attr.value.replace(/^this\./g, '') : domy.attr.value;
-    domy.utils.set(domy.state.data, objPath, value);
+    const obj = domy.utils.get(domy.state.data, objPath);
+    if (domy.isSignal(obj)) {
+      obj.value = value;
+    } else domy.utils.set(domy.state.data, objPath, value);
   } else {
     const setter = domy.evaluate(`(__val) => (${domy.attr.value}) = __val`);
     setter(value);
