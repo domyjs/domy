@@ -30,30 +30,26 @@ export function createAdvancedApp(
 
   function mount(
     target?: HTMLElement
-  ): Promise<{ render: ReturnType<typeof getRender>; unmount: () => void } | undefined> {
-    return new Promise(resolve => {
-      const build = async () => {
-        const domTarget = target ?? document.body;
+  ): { render: ReturnType<typeof getRender>; unmount: () => void } | undefined {
+    const build = () => {
+      const domTarget = target ?? document.body;
 
-        const render = await initApp({
-          appId,
-          app: appDefinition,
-          components: componentsList,
-          config,
-          target: domTarget,
-          componentInfos,
-          byPassAttributes,
-          pluginHelper
-        });
+      return initApp({
+        appId,
+        app: appDefinition,
+        components: componentsList,
+        config,
+        target: domTarget,
+        componentInfos,
+        byPassAttributes,
+        pluginHelper
+      });
+    };
 
-        resolve(render);
-      };
-
-      // We ensure the DOM is accessible before mounting the app
-      if (document.readyState === 'interactive' || document.readyState === 'complete') {
-        build();
-      } else document.addEventListener('DOMContentLoaded', build);
-    });
+    // We ensure the DOM is accessible before mounting the app
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+      return build();
+    } else document.addEventListener('DOMContentLoaded', build);
   }
 
   function configure(c: Config) {

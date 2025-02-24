@@ -229,8 +229,6 @@ class Router {
   }
 
   public createRouterView() {
-    const ctx = this;
-
     const components: Record<string, Component> = this.routes.reduce(
       (acc, route) => ({
         [route.name]: route.component,
@@ -244,20 +242,17 @@ class Router {
       props: ['d-transition'],
       html: `<template d-insert.render="getComponent()"></template>`,
       components,
-      app: {
-        data() {
-          return ctx.currentRoute;
-        },
-        methods: {
-          getComponent() {
-            // In case we don't match any routes
-            if (!this.route) {
-              return null;
-            }
-
-            return document.createElement(this.route.name);
+      app: () => {
+        const getComponent = () => {
+          // In case we don't match any routes
+          if (!this.currentRoute.route) {
+            return null;
           }
-        } as any
+
+          return document.createElement(this.currentRoute.route.name);
+        };
+
+        return { getComponent };
       }
     });
   }

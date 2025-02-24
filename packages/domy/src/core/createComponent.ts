@@ -149,7 +149,7 @@ export function createComponent(
         const mountComponent = (target: HTMLElement) => {
           const makeComponent = () => {
             if (unmountComponent) unmountComponent();
-            createAdvancedApp(
+            const render = createAdvancedApp(
               componentDefinition.app,
               {
                 componentData: data,
@@ -161,10 +161,9 @@ export function createComponent(
             )
               .configure(domy.config)
               .components(componentDefinition.components ?? {})
-              .mount(target)
-              .then(render => {
-                unmountComponent = render?.unmount;
-              });
+              .mount(target);
+
+            unmountComponent = render?.unmount;
           };
 
           if (domy.appState.isMounted) domy.queueJob(makeComponent, queueId);

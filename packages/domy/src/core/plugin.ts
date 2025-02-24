@@ -37,6 +37,7 @@ import { dNameImplementation } from '../directives/d-name';
 import { $names } from '../helpers/$names';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { $effect } from '../helpers/$effect';
+import { $globalWatch } from '../helpers/$globalWatch';
 
 export type PluginHelper = ReturnType<typeof createPluginRegistrer>;
 export type Plugins = {
@@ -108,7 +109,8 @@ function getDefaultsPlugin() {
       watch: $watch,
       attrs: $attrs,
       names: $names,
-      effect: $effect
+      effect: $effect,
+      globalWatch: $globalWatch
     }
   };
   return DEFAULT_PLUGINS;

@@ -1,4 +1,4 @@
-type Callback = () => void;
+type Callback = () => void | Promise<void>;
 
 /**
  * Allow to create a registrer for callbacks

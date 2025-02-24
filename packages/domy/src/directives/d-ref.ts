@@ -23,11 +23,8 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
   // If the ref is dynamic
   if (domy.modifiers.includes('dynamic')) {
-    domy.effect(() => {
-      cleanRef();
-      refName = domy.evaluate(domy.attr.value);
-      setRef();
-    });
+    refName = domy.evaluate(domy.attr.value);
+    setRef();
   } else {
     setRef();
   }

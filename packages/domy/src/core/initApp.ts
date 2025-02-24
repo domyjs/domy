@@ -2,14 +2,21 @@ import { Config } from '../types/Config';
 import { State } from '../types/State';
 import { error } from '../utils/logs';
 import { createDeepRenderFn } from './deepRender';
-import { trackDeps, isReactive, registerName } from '@domyjs/reactive';
+import { trackDeps } from '@domyjs/reactive';
 import { getRender } from './getRender';
 import { ComponentInfos, Components } from '../types/Component';
 import { App } from '../types/App';
 import { PluginHelper } from './plugin';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
-import { onMountedTracker, onUnmountTracker, onSetupedTracker } from './hooks';
+import {
+  onMountedTracker,
+  onUnmountTracker,
+  onSetupedTracker,
+  helperToHookRegistrer
+} from './hooks';
 import { AppStateObserver } from './AppState';
+import * as ReactiveUtils from '@domyjs/reactive';
+import { helpersUtils } from '../utils/helpersUtils';
 
 type Params = {
   appId: number;
@@ -29,15 +36,31 @@ type Params = {
  *
  * @author yoannchb-pro
  */
-export async function initApp(params: Params) {
+export function initApp(params: Params) {
   let unmountRender: (() => void) | null = null;
   const appState = new AppStateObserver();
-  const { components, config, target, app, componentInfos, appId } = params;
+  const { components, config, target, app, componentInfos } = params;
+
+  // State of the app
+  const state: State = {
+    data: {},
+    componentInfos,
+    refs: {}
+  };
+
+  // Initialising hooks
+  helperToHookRegistrer.provideHookMandatories({
+    config,
+    scopedNodeData: [] as Record<string, any>[],
+    state,
+    ...ReactiveUtils,
+    utils: helpersUtils
+  });
 
   // Getting app data, methods and deps
-  let data: ReturnType<App> = {};
   let deps: ReturnType<typeof trackDeps> = [];
-  if (app) deps = trackDeps(() => (data = app({ props: componentInfos?.componentData.$props })));
+  if (app)
+    deps = trackDeps(() => (state.data = app({ props: componentInfos?.componentData.$props })));
 
   // Calling onSetuped hooks
   appState.isSetuped = true;
@@ -46,13 +69,6 @@ export async function initApp(params: Params) {
   for (const setupedCallback of setupedCallbacks) {
     callWithErrorHandling(setupedCallback);
   }
-
-  // State of the app
-  const state: State = {
-    data,
-    componentInfos,
-    refs: {}
-  };
 
   // Render the dom with DOMY
   const deepRender = createDeepRenderFn(
