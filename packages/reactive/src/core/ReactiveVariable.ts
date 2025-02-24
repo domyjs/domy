@@ -47,7 +47,7 @@ export class ReactiveVariable {
    * @param target
    * @returns
    */
-  public static isReactive(target: any) {
+  public static isReactive(target: any): boolean {
     return !!target?.[isProxySymbol];
   }
 
@@ -56,8 +56,8 @@ export class ReactiveVariable {
    * @param target
    * @returns
    */
-  public static isSignal(target: any) {
-    return !!target?.[isSignalSymbol] && 'value' in target;
+  public static isSignal(target: any): boolean {
+    return target?.[isSignalSymbol] && 'value' in target;
   }
 
   public getInitialObj() {

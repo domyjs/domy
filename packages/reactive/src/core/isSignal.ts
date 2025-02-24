@@ -8,5 +8,5 @@ import { ReactiveVariable } from './ReactiveVariable';
  * @author yoannchb-pro
  */
 export function isSignal(obj: any) {
-  return ReactiveVariable.isReactive(obj);
+  return ReactiveVariable.isSignal(obj);
 }
