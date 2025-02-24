@@ -30,7 +30,9 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
     }
 
     for (const attrName in attrs) {
-      el.setAttribute(attrName, attrs[attrName]);
+      const value = attrs[attrName];
+      const isObject = value !== 'string';
+      el.setAttribute(attrName, isObject ? JSON.stringify(value) : value);
     }
 
     // In case we need to render DOMY attributes
