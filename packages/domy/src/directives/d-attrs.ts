@@ -31,7 +31,7 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
 
     for (const attrName in attrs) {
       const value = attrs[attrName];
-      const isObject = value !== 'string';
+      const isObject = typeof value !== 'string';
       el.setAttribute(attrName, isObject ? JSON.stringify(value) : value);
     }
 
