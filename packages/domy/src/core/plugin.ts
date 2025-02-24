@@ -1,4 +1,3 @@
-import { dCloakImplementation } from '../directives/d-cloak';
 import { dElseIfImplementation } from '../directives/d-else-if';
 import { dForImplementation } from '../directives/d-for';
 import { dHtmlImplementation } from '../directives/d-html';
@@ -94,7 +93,6 @@ function getDefaultsPlugin() {
       ignore: dIgnoreImplementation,
       once: dOnceImplementation,
       show: dShowImplementation,
-      cloak: dCloakImplementation,
       component: dComponentImplementation,
       name: dNameImplementation
     },

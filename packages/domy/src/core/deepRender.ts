@@ -135,7 +135,7 @@ export function createDeepRenderFn(
 
         // We render the attribute
         // It's the main logic of DOMY
-        if (attr.name !== 'd-cloak') element.removeAttribute(attr.name);
+        element.removeAttribute(attr.name);
         const options: DomyDirectiveReturn = renderAttribute(domyHelper.getPluginHelper());
         block.addCleanup(domyHelper.getCleanupFn());
 
