@@ -10,15 +10,14 @@ import { isSignal } from '@domyjs/reactive';
  * @author yoannchb-pro
  */
 export function getReactiveHandler(obj: Record<string, any>, key: string): PropertyDescriptor {
-  const isObjSignal = isSignal(obj[key]);
   return {
     enumerable: true,
     configurable: true,
     get() {
-      return isObjSignal ? obj[key].value : obj[key];
+      return isSignal(obj[key]) ? obj[key].value : obj[key];
     },
     set(newValue: any) {
-      if (isObjSignal) return (obj[key].value = newValue);
+      if (isSignal(obj[key])) return (obj[key].value = newValue);
       return (obj[key] = newValue);
     }
   };
