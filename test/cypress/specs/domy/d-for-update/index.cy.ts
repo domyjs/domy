@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Attribute d-for test', () => {
+describe('Attribute d-for index test', () => {
   it('Check attribute removed', () => {
     cy.get('ul').should('not.have.attr', 'd-for');
     cy.get('body > ul > li').should('have.length', 2);
