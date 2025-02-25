@@ -52,12 +52,16 @@ export function watch(listener: Listener, effect: () => any) {
   removeEffect();
 
   // In case we want to watch directly the signal or reactive without passing by the properties
-  if (Array.isArray(deps)) {
+  if (Array.isArray(deps) && !isReactive(deps)) {
     for (const dep of deps) {
-      if (isReactive(dep)) registerListener(reactivesVariablesList.get(dep)!, dep);
+      if (isReactive(dep)) {
+        const reactiveVariable = reactivesVariablesList.get(dep);
+        if (reactiveVariable) registerListener(reactiveVariable, dep);
+      }
     }
-  } else {
-    if (isReactive(deps)) registerListener(reactivesVariablesList.get(deps)!, deps);
+  } else if (isReactive(deps)) {
+    const reactiveVariable = reactivesVariablesList.get(deps);
+    if (reactiveVariable) registerListener(reactiveVariable, deps);
   }
 
   const clean = () => {
