@@ -63,4 +63,8 @@ describe('i18n Functionality Test', () => {
   it('Check we can get all suported langages', () => {
     cy.get('#supportedLangages').should('have.text', 'en,fr');
   });
+
+  it('Check the hook is working', () => {
+    cy.get('h2').contains('Hello World!');
+  });
 });

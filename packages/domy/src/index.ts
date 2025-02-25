@@ -1,7 +1,7 @@
 import { createApp } from './core/createApp';
 import { createComponent } from './core/createComponent';
 import { matchPath, reactive, signal, skipReactive } from '@domyjs/reactive';
-import { allHooks } from './core/hooks';
+import { allHooks, helperToHookRegistrer } from './core/hooks';
 
 const DOMY = {
   matchPath,
@@ -9,6 +9,7 @@ const DOMY = {
   signal,
   skipReactive,
 
+  helperToHookRegistrer,
   ...allHooks,
 
   createApp,

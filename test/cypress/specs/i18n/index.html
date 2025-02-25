@@ -9,6 +9,7 @@
   </head>
   <body>
     <h1>{{ $t('title') }}</h1>
+    <h2>{{ msg }}</h2>
 
     <p id="validName">Message: {{ $t('greeting.hello', { name }) }}</p>
     <p id="invalideName">Message: {{ $t('greeting.bye') }}</p>
@@ -26,7 +27,7 @@
   <script>
     const { signal } = DOMY;
 
-    const i18nPlugin = i18n({
+    const { i18nPlugin, useI18n } = i18n({
       messages: {
         en: {
           title: 'Hello World!',
@@ -48,9 +49,10 @@
     });
 
     DOMY.createApp(() => {
+      const { t } = useI18n();
       const name = signal('Yoann');
 
-      return { name };
+      return { msg: t('title'), name };
     })
       .plugins([i18nPlugin])
       .mount();

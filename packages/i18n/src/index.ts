@@ -1,4 +1,11 @@
 import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/core/src/types/Domy';
+import DOMY from '@domyjs/core';
+
+declare global {
+  interface Window {
+    DOMY: typeof DOMY;
+  }
+}
 
 type Dict = {
   [key: string]: string | Dict;
@@ -13,19 +20,11 @@ type Settings = {
 class I18NHelper {
   public langage: { lang: string } | undefined;
 
-  constructor(public settings: Settings) {}
+  constructor(public settings: Settings) {
+    this.langage = window.DOMY.reactive({ lang: this.settings.currentLangage });
+  }
 
-  /**
-   * Give the i18n helper
-   * It allow us to get/set the langage
-   * @param domy
-   * @returns
-   *
-   * @author yoannchb-pro
-   */
-  getI18nHelper(domy: DomySpecialHelper) {
-    if (!this.langage) this.langage = domy.reactive({ lang: this.settings.currentLangage });
-
+  getHook() {
     return {
       getSupportedLangages: () => {
         return Object.keys(this.settings.messages);
@@ -37,7 +36,7 @@ class I18NHelper {
         let destinationLangage = newLangage;
         if (!(newLangage in this.settings.messages)) {
           destinationLangage = this.settings.defaultCallbackLangage;
-          domy.utils.warn(
+          console.warn(
             `I18N: The langage "${newLangage}" doesn't exist. Switched to "${destinationLangage}".`
           );
         }
@@ -55,7 +54,7 @@ class I18NHelper {
    * @author yoannchb-pro
    */
   messageHandler(domy: DomySpecialHelper) {
-    const langage = this.getI18nHelper(domy);
+    const langage = this.getHook();
 
     return (
       obj: string | { key: string; defaultMessage: string },
@@ -71,7 +70,7 @@ class I18NHelper {
       let message = domy.utils.get<string>(messages, key);
 
       if (!message) {
-        domy.utils.warn(`I18N: Invalide key "${key}".`);
+        console.warn(`I18N: Invalide key "${key}".`);
         return defaultMessage;
       }
 
@@ -108,9 +107,21 @@ function i18n(options: Settings) {
 
   const i18nInstance = new I18NHelper(options);
 
-  return (domyPluginSetter: DomyPluginDefinition) => {
-    domyPluginSetter.helper('i18n', i18nInstance.getI18nHelper.bind(i18nInstance));
-    domyPluginSetter.helper('t', i18nInstance.messageHandler.bind(i18nInstance));
+  return {
+    useI18n: () => {
+      const helperToHook = window.DOMY.helperToHookRegistrer.getHook;
+      const hook = {
+        t: helperToHook(i18nInstance.messageHandler.bind(i18nInstance) as any)() as ReturnType<
+          I18NHelper['messageHandler']
+        >,
+        ...i18nInstance.getHook()
+      };
+      return hook;
+    },
+    i18nPlugin: (domyPluginSetter: DomyPluginDefinition) => {
+      domyPluginSetter.helper('i18n', i18nInstance.getHook.bind(i18nInstance));
+      domyPluginSetter.helper('t', i18nInstance.messageHandler.bind(i18nInstance));
+    }
   };
 }
 
