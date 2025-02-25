@@ -134,7 +134,7 @@ export class DomyHelper {
   }
 
   effect(fn: () => void) {
-    // Unsure to not make the effect if the app is unmounted
+    // Ensure to not make the effect if the app is unmounted
     const fixedFn = () => {
       if (!this.isUnmountCalled) directivesUtils.callWithErrorHandling(fn, err => error(err));
     };

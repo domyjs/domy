@@ -35,7 +35,7 @@ import { dInsertImplementation } from '../directives/d-insert';
 import { dNameImplementation } from '../directives/d-name';
 import { $names } from '../helpers/$names';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
-import { $effect } from '../helpers/$effect';
+import { $watchEffect } from '../helpers/$watchEffect';
 import { $globalWatch } from '../helpers/$globalWatch';
 
 export type PluginHelper = ReturnType<typeof createPluginRegistrer>;
@@ -107,7 +107,7 @@ function getDefaultsPlugin() {
       watch: $watch,
       attrs: $attrs,
       names: $names,
-      effect: $effect,
+      watchEffect: $watchEffect,
       globalWatch: $globalWatch
     }
   };

@@ -9,7 +9,7 @@ import { $names } from '../helpers/$names';
 import { $root } from '../helpers/$root';
 import { $refs } from '../helpers/$refs';
 import { $watch } from '../helpers/$watch';
-import { $effect } from '../helpers/$effect';
+import { $watchEffect } from '../helpers/$watchEffect';
 import { $globalWatch } from '../helpers/$globalWatch';
 import { $nextTick } from '../helpers/$nextTick';
 
@@ -39,7 +39,7 @@ export const allHooks = {
 
   // Utilities
   watch: $watch(),
-  effect: $effect(),
+  watchEffect: $watchEffect(),
   globalWatch: $globalWatch(),
   nextTick: $nextTick()
 };
