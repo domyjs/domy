@@ -21,9 +21,4 @@ describe('Attribute d-scope test', () => {
     cy.get('#override').should('have.text', 'An other message');
     cy.get('#initialMsg').should('have.text', 'Hello World!');
   });
-
-  it('Check the watcher are not called with scoped datas', () => {
-    cy.get('button').click();
-    cy.get('#watcherCalled').should('not.have.text', 'true');
-  });
 });

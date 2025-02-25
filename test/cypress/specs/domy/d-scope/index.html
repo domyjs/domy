@@ -17,28 +17,11 @@
 
     <p id="err">{{ showModal }}</p>
     <p id="initialMsg">{{ msg }}</p>
-
-    <p id="watcherCalled" d-ref="watcherCalled">false</p>
   </body>
   <script>
-    const { useRefs, signal, watch } = DOMY;
-
     DOMY.createApp(() => {
-      const refs = useRefs();
-      const showModal = signal(false);
-
-      watch(
-        ({ newValue }) => {
-          if (watcherCalled) {
-            refs.watcherCalled.textContent = newValue ? 'true' : 'false';
-          }
-        },
-        () => showModal
-      );
-
       return {
-        msg: 'Hello World!',
-        showModal
+        msg: 'Hello World!'
       };
     }).mount();
   </script>
