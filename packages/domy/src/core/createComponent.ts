@@ -36,10 +36,9 @@ function parseHTMl(html: string) {
  *    <button @click="--count">-</button>
  *  </div>
  * `,
- *  app: {
- *    data() {
- *      return { count: 0 }
- *    }
+ *  app(){
+ *     const count = signal(0);
+ *     return { count };
  *  }
  * })
  * @param componentDefinition
