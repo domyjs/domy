@@ -28,15 +28,12 @@ import { dMountedImplementation } from '../directives/d-mounted';
 import { dUnMountImplementation } from '../directives/d-unmount';
 import { dAttrsImplementation } from '../directives/d-attrs';
 import { dKeyImplementation } from '../directives/d-key';
-import { $watch } from '../helpers/$watch';
 import { dComponentImplementation } from '../directives/d-component';
 import { $attrs } from '../helpers/$attrs';
 import { dInsertImplementation } from '../directives/d-insert';
 import { dNameImplementation } from '../directives/d-name';
 import { $names } from '../helpers/$names';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
-import { $watchEffect } from '../helpers/$watchEffect';
-import { $globalWatch } from '../helpers/$globalWatch';
 
 export type PluginHelper = ReturnType<typeof createPluginRegistrer>;
 export type Plugins = {
@@ -104,11 +101,8 @@ function getDefaultsPlugin() {
       childrens: $childrens,
       props: $props,
       config: $config,
-      watch: $watch,
       attrs: $attrs,
-      names: $names,
-      watchEffect: $watchEffect,
-      globalWatch: $globalWatch
+      names: $names
     }
   };
   return DEFAULT_PLUGINS;

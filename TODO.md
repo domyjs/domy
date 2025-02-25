@@ -1,7 +1,6 @@
 # TODO
 
-- To hooks / Fixe d-for index / $globalWatch test / $attrs should be reactive ?
-- Make watchEffect auto clear like watch to make $watchEffect auto clean (but problem with $globalWatch then)
+- To hooks / Fixe d-for index / $attrs should be reactive ?
 
 - Make i18n hook, make i18n dict reactive in case we add translations from the back
 

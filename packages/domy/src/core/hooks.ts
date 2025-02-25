@@ -8,10 +8,11 @@ import { $config } from '../helpers/$config';
 import { $names } from '../helpers/$names';
 import { $root } from '../helpers/$root';
 import { $refs } from '../helpers/$refs';
-import { $watch } from '../helpers/$watch';
-import { $watchEffect } from '../helpers/$watchEffect';
-import { $globalWatch } from '../helpers/$globalWatch';
 import { $nextTick } from '../helpers/$nextTick';
+import { globalWatch, watch } from '@domyjs/reactive';
+import { OnSetListener } from 'packages/reactive/src/core/ReactiveVariable';
+import { getUniqueQueueId, queueJob } from './scheduler';
+import { queuedWatchEffect } from '../utils/queuedWatchEffect';
 
 export const helperToHookRegistrer = createHelperToHookRegistrer();
 
@@ -38,8 +39,26 @@ export const allHooks = {
   useRefs: helperToHookRegistrer.getHook($refs),
 
   // Utilities
-  watch: $watch(),
-  watchEffect: $watchEffect(),
-  globalWatch: $globalWatch(),
-  nextTick: $nextTick()
+  nextTick: $nextTick(),
+  watch: (listener: OnSetListener['fn'], effect: () => any) => {
+    const queueId = getUniqueQueueId();
+    return watch(
+      {
+        type: 'onSet',
+        fn: props => queueJob(() => listener(props), queueId)
+      },
+      effect
+    );
+  },
+  watchEffect: (effect: () => any) => {
+    const uneffect = queuedWatchEffect(effect);
+    return uneffect;
+  },
+  globalWatch: (listener: OnSetListener['fn']) => {
+    const queueId = getUniqueQueueId();
+    return globalWatch({
+      type: 'onSet',
+      fn: props => queueJob(() => listener(props), queueId)
+    });
+  }
 };
