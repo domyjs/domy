@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>effect</title>
+    <title>watchEffect</title>
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
@@ -14,17 +14,17 @@
     <button id="dec" @click="count--">-</button>
   </body>
   <script>
-    const { signal, effect } = DOMY;
+    const { signal, watchEffect } = DOMY;
 
     DOMY.createApp(() => {
       const count = signal(0);
       const countby2 = signal(0);
 
-      effect(() => {
+      watchEffect(() => {
         if (count.value < 0) count.value = 0;
       });
 
-      effect(() => {
+      watchEffect(() => {
         countby2.value++;
       });
 

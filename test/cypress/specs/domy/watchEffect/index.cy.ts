@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('effect test', () => {
+describe('watchEffect test', () => {
   it('Check effect is called', () => {
     cy.get('h1').should('have.text', 'Count: 0');
 
