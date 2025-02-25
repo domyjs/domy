@@ -28,9 +28,10 @@ export function createAdvancedApp(
   let config: Config = {};
   let componentsList: Components = {};
 
-  function mount(
-    target?: HTMLElement
-  ): { render: ReturnType<typeof getRender>; unmount: () => void } | undefined {
+  function mount(target?: HTMLElement): {
+    render: ReturnType<typeof getRender>;
+    unmount: () => void;
+  } {
     const build = () => {
       const domTarget = target ?? document.body;
 
@@ -47,9 +48,7 @@ export function createAdvancedApp(
     };
 
     // We ensure the DOM is accessible before mounting the app
-    if (document.readyState === 'interactive' || document.readyState === 'complete') {
-      return build();
-    } else document.addEventListener('DOMContentLoaded', build);
+    return build();
   }
 
   function configure(c: Config) {

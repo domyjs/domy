@@ -162,7 +162,7 @@ export function createComponent(
               .components(componentDefinition.components ?? {})
               .mount(target);
 
-            unmountComponent = render?.unmount;
+            unmountComponent = render.unmount;
           };
 
           if (domy.appState.isMounted) domy.queueJob(makeComponent, queueId);
