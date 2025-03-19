@@ -55,11 +55,6 @@ function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
 
 const collapsePluginDefinition: DomyPlugin = domyPluginSetter => {
   domyPluginSetter.directive('collapse', collapsePlugin);
-  domyPluginSetter.directive('collapse-settings', () => {
-    throw new Error(`The directive "collapse-settings" as to be use with "collapse" directive.`);
-  });
-
-  domyPluginSetter.prioritise(['collapse', 'collapse-settings']);
 };
 
 export default collapsePluginDefinition;

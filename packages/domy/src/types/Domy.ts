@@ -61,7 +61,6 @@ export type DomyPluginDefinition = {
   prefix(name: string, fn: DomyDirectiveFn): void;
   directive(name: string, fn: DomyDirectiveFn): void;
   helper(name: string, fn: DomySpecialFn): void;
-  prioritise(directives: string[]): void;
 };
 
 export type DomyPlugin = (domy: DomyPluginDefinition) => void;

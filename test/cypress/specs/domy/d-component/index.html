@@ -42,7 +42,7 @@
       <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
     </ul>
 
-    <template :title="currPage.title" d-component="currPage.component" d-transition="transition">
+    <template d-transition="transition" d-component="currPage.component" :title="currPage.title">
       <span>{{ msg }}</span>
     </template>
   </body>

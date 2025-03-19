@@ -42,7 +42,7 @@
       <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
     </ul>
 
-    <div d-if="currPage.title === 'Home'" d-transition="transition">
+    <div d-transition="transition" d-if="currPage.title === 'Home'">
       <p>{{ currPage.title }}</p>
     </div>
   </body>

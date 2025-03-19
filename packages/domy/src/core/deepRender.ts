@@ -2,7 +2,6 @@ import { Components } from '../types/Component';
 import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
-import { sortAttributesBasedOnSortedDirectives } from '../utils/domyAttrUtils';
 import { isBindAttr, isNormalAttr } from '../utils/isSpecialAttribute';
 import { AppStateObserver } from './AppState';
 import { Block } from './Block';
@@ -111,13 +110,10 @@ export function createDeepRenderFn(
       }
 
       // Rendering attributes if it's an element
-      const sortedAttributes = sortAttributesBasedOnSortedDirectives(
-        pluginHelper.PLUGINS,
-        element.attributes
-      );
       const isComponent = element.localName in components;
+      const attrs = Array.from(element.attributes ?? []);
 
-      for (const attr of sortedAttributes) {
+      for (const attr of attrs) {
         if (!block.el.hasAttribute(attr.name)) continue;
 
         const shouldByPassAttribute =

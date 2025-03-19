@@ -13,7 +13,7 @@ import { $el } from '../helpers/$el';
 import { $nextTick } from '../helpers/$nextTick';
 import { $refs } from '../helpers/$refs';
 import { $root } from '../helpers/$root';
-import { error, warn } from '../utils/logs';
+import { error } from '../utils/logs';
 import { dElseImplementation } from '../directives/d-else';
 import { binding } from './binding';
 import { events } from './events';
@@ -37,7 +37,6 @@ import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 
 export type PluginHelper = ReturnType<typeof createPluginRegistrer>;
 export type Plugins = {
-  sortedDirectives: string[];
   prefixes: Record<string, DomyDirectiveFn>;
   directives: Record<string, DomyDirectiveFn>;
   helpers: Record<string, DomySpecialFn>;
@@ -51,20 +50,6 @@ export type Plugins = {
  */
 function getDefaultsPlugin() {
   const DEFAULT_PLUGINS: Plugins = {
-    sortedDirectives: [
-      'ignore',
-      'once',
-
-      'scope',
-      'key',
-      'transition',
-
-      'if',
-      'else-if',
-      'else',
-
-      'component'
-    ],
     prefixes: {
       bind: binding,
       on: events
@@ -135,29 +120,6 @@ export function createPluginRegistrer() {
         throw new Error(`A special with the name "${name}" already exist.`);
       }
       PLUGINS.helpers[name] = fn;
-    },
-    prioritise(directives) {
-      for (const directive of directives) {
-        // Check the directive exist
-        if (!(directive in PLUGINS.directives)) {
-          error(
-            new Error(
-              `The directive "${directive}" can't be prioritise because it doesn't exist. Ensure to register it with domy.directive() first.`
-            )
-          );
-          continue;
-        }
-
-        // Check the directive is not already prioritised
-        if (PLUGINS.sortedDirectives.includes(directive)) {
-          warn(
-            `The directive "${directive}" is already prioritised. The prioritisation has been skipped.`
-          );
-          continue;
-        }
-
-        PLUGINS.sortedDirectives.push(directive);
-      }
     }
   };
 

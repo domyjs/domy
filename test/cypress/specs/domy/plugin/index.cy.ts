@@ -24,9 +24,3 @@ describe('Plugin prefix test', () => {
     cy.get('#prefix').should('have.class', 'red');
   });
 });
-
-describe('Plugin prioritise test', () => {
-  it('Check d-before is executed before d-after', () => {
-    cy.get('#prioritise').should('have.text', 'Hello World!');
-  });
-});

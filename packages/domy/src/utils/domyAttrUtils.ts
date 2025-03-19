@@ -1,4 +1,3 @@
-import { Plugins } from '../core/plugin';
 /**
  * Fixe an attribute name to avoid setAttribute throwing error
  * @param attrName
@@ -45,28 +44,4 @@ export function getDomyAttributeInformations(attr: Attr) {
     modifiers,
     attrName: attrName.replace(/^@/, '')
   };
-}
-
-/**
- * Sort a list of attributes based on the sorted directives order in plugin
- * It ensure some attributes are rendered first like d-ignore, d-once, ...
- * @param attrs
- * @returns
- *
- * @author yoannchb-pro
- */
-export function sortAttributesBasedOnSortedDirectives(PLUGINS: Plugins, attrs: NamedNodeMap) {
-  const copy = Array.from(attrs ?? []);
-  copy.sort((a, b) => {
-    const iA = PLUGINS.sortedDirectives.indexOf(getDomyAttributeInformations(a).directive);
-    const iB = PLUGINS.sortedDirectives.indexOf(getDomyAttributeInformations(b).directive);
-    if (iA === -1) {
-      return 1;
-    } else if (iB === -1) {
-      return -1;
-    } else {
-      return iA - iB;
-    }
-  });
-  return copy;
 }

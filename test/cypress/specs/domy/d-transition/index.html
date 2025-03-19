@@ -64,8 +64,8 @@
     }
   </style>
   <body>
-    <div id="if" d-if="show" d-transition="transition">Modal Content... (by d-if)</div>
-    <div id="show" style="display: flex" d-show="show" d-transition="transition">
+    <div id="if" d-transition="transition" d-if="show">Modal Content... (by d-if)</div>
+    <div id="show" d-transition="transition" style="display: flex" d-show="show">
       Modal Content... (by d-show)
     </div>
     <template
@@ -74,10 +74,10 @@
     ></template>
 
     <!-- INIT TEST -->
-    <div id="init" d-if="!show" d-transition.init="transition">Modal content... (init)</div>
+    <div id="init" d-transition.init="transition" d-if="!show">Modal content... (init)</div>
 
     <!-- DYNAMIC TEST -->
-    <div id="dynamic" d-if="show" d-transition.dynamic="show ? 'transition' : 'op-transition'">
+    <div id="dynamic" d-transition.dynamic="show ? 'transition' : 'op-transition'" d-if="show">
       Modal content... (dynamic)
     </div>
 
