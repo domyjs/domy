@@ -23,10 +23,10 @@
     <input type="text" d-model="search" placeholder="Search something..." />
   </body>
   <script nonce="a23gbfz9e">
-    const { signal, reactive, watch } = DOMY;
+    const { signal, watch } = DOMY;
 
     DOMY.createApp(() => {
-      const greeting = reactive({
+      const greeting = signal({
         msg: ['Hello World!']
       });
       const search = signal('');

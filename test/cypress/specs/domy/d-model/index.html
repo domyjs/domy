@@ -75,6 +75,8 @@
     </div>
   </body>
   <script>
+    const { signal } = DOMY;
+
     DOMY.createApp(() => {
       const search = DOMY.signal('Hello World!');
       const searchLazy = DOMY.signal('Hello World!');
@@ -84,11 +86,11 @@
       const age2 = DOMY.signal(0);
 
       const selectedColor = DOMY.signal('red');
-      const selectedColor2 = DOMY.reactive(['red', 'blue']);
+      const selectedColor2 = DOMY.signal(['red', 'blue']);
       const selectedColor3 = DOMY.signal('red');
 
       const checked = DOMY.signal(true);
-      const checkedColors = DOMY.reactive(['red']);
+      const checkedColors = DOMY.signal(['red']);
 
       return {
         search,

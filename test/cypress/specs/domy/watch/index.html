@@ -21,10 +21,10 @@
     <p id="index">{{ index }}</p>
   </body>
   <script>
-    const { signal, watch, matchPath, reactive } = DOMY;
+    const { signal, watch, matchPath } = DOMY;
 
     DOMY.createApp(() => {
-      const todos = reactive([
+      const todos = signal([
         { name: 'cleanning', isComplete: false },
         { name: 'homework', isComplete: false }
       ]);
@@ -56,7 +56,7 @@
 
       watch(
         ({ path: watcherPath }) => {
-          const matcher = matchPath('{index}.*', watcherPath);
+          const matcher = matchPath('value.{index}.*', watcherPath);
           path.value = watcherPath;
           index.value = matcher.params.index;
         },

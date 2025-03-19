@@ -17,31 +17,31 @@
     <button @click="updateNames()">Update names</button>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          list: [
-            {
-              id: 0,
-              name: 'Yoann'
-            },
-            {
-              id: 1,
-              name: 'Will'
-            }
-          ]
-        };
-      },
-      methods: {
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const list = signal([
+        {
+          id: 0,
+          name: 'Yoann'
+        },
+        {
+          id: 1,
+          name: 'Will'
+        }
+      ]);
+
+      return {
+        list,
         removeElement(index) {
-          this.list.splice(index, 1);
+          list.value.splice(index, 1);
         },
         updateNames() {
-          for (const item of this.list) {
+          for (const item of list.value) {
             item.name = item.name + '_changed';
           }
         }
-      }
+      };
     }).mount();
   </script>
 </html>

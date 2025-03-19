@@ -33,11 +33,11 @@
     <button id="rm" @click="removeElement()">Remove</button>
   </body>
   <script>
-    const { reactive, signal } = DOMY;
+    const { signal } = DOMY;
 
     DOMY.createApp(() => {
       let id = 0;
-      const list = reactive([]);
+      const list = signal([]);
 
       function generateElement() {
         return {
@@ -48,14 +48,14 @@
         };
       }
 
-      list.push(generateElement());
+      list.value.push(generateElement());
 
       return {
         id,
         list,
         generateElement,
-        addElement: () => list.push(generateElement()),
-        removeElement: () => list.pop()
+        addElement: () => list.value.push(generateElement()),
+        removeElement: () => list.value.pop()
       };
     }).mount();
   </script>

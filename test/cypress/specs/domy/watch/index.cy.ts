@@ -31,7 +31,7 @@ describe('watch test', () => {
 
     cy.get('#todo1').click();
 
-    cy.get('#path').should('have.text', '1.isComplete');
+    cy.get('#path').should('have.text', 'value.1.isComplete');
     cy.get('#index').should('have.text', '1');
   });
 });

@@ -18,10 +18,10 @@ type Settings = {
 };
 
 class I18NHelper {
-  public langage: { lang: string } | undefined;
+  public langage: { value: { lang: string } };
 
   constructor(public settings: Settings) {
-    this.langage = window.DOMY.reactive({ lang: this.settings.currentLangage });
+    this.langage = window.DOMY.signal({ lang: this.settings.currentLangage });
   }
 
   getHook() {
@@ -30,7 +30,7 @@ class I18NHelper {
         return Object.keys(this.settings.messages);
       },
       getLangage: () => {
-        return this.langage!.lang;
+        return this.langage.value.lang;
       },
       setLangage: (newLangage: string) => {
         let destinationLangage = newLangage;
@@ -40,7 +40,7 @@ class I18NHelper {
             `I18N: The langage "${newLangage}" doesn't exist. Switched to "${destinationLangage}".`
           );
         }
-        this.langage!.lang = destinationLangage;
+        this.langage.value.lang = destinationLangage;
       }
     };
   }

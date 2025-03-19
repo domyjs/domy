@@ -13,7 +13,7 @@
     <button @click="list.push({ id: list[list.length - 1].id + 1 })">Add element</button>
   </body>
   <script>
-    const { reactive } = DOMY;
+    const { signal } = DOMY;
 
     const Component = DOMY.createComponent({
       props: ['title'],
@@ -21,7 +21,7 @@
     });
 
     DOMY.createApp(() => {
-      const list = reactive([
+      const list = signal([
         { id: 1, title: 'Premier' },
         { id: 2, title: 'Deuxième' }
       ]);
