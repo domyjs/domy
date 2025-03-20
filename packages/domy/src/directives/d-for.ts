@@ -31,7 +31,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     let sibling = traceStartPositionComment.nextSibling;
     let index = 0;
 
-    while (sibling !== traceEndPositionComment && index !== lookingIndex) {
+    while (sibling !== traceEndPositionComment && index < lookingIndex) {
       ++index;
       sibling = sibling!.nextSibling;
     }
