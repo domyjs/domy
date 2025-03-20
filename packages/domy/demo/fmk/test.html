@@ -10,41 +10,26 @@
     <div id="app">
       <p>Domy Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
       <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
-      <button @click="increment">+</button>
-      <button @click="decrement">-</button>
-      <button @click="supert">++</button>
+      <button @click="count++">+</button>
+      <button @click="count--">-</button>
     </div>
   </body>
   <script>
-    window.DOMY.createApp({
-      setup() {
-        this.perf = performance.now();
-      },
-      mounted() {
-        this.perf = performance.now() - this.perf;
-      },
-      watch: {
-        count({ prevValue, newValue }) {
-          if (newValue < 0) this.count = prevValue;
-        }
-      },
-      data() {
-        return {
-          perf: null,
-          count: 0
-        };
-      },
-      methods: {
-        supert() {
-          this.increment();
+    const { watch, onMounted, signal, watchEffect } = DOMY;
+    window.DOMY.createApp(() => {
+      const count = signal(0);
+      const perf = signal(performance.now());
+
+      watch(
+        () => {
+          if (count.value < 0) count.value = 0;
         },
-        increment() {
-          this.count++;
-        },
-        decrement() {
-          this.count--;
-        }
-      }
+        () => count.value
+      );
+
+      onMounted(() => (perf.value = performance.now() - perf.value));
+
+      return { perf, count };
     }).mount(document.querySelector('#app'));
   </script>
 </html>
