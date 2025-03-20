@@ -21,6 +21,6 @@ describe('Attribute d-for index test', () => {
     cy.get('ul').children().eq(1).get('span').contains('1');
 
     cy.get('ul').children().eq(0).click();
-    cy.get('ul').children().eq(1).get('span').contains('0');
+    cy.get('ul').children().eq(0).get('span').contains('0');
   });
 });

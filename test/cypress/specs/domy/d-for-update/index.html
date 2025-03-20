@@ -7,8 +7,8 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <ul d-for="item, index of list">
-      <li d-key="item.id" @click="removeElement(index)">
+    <ul>
+      <li d-for="item, index of list" d-key="item.id" @click="removeElement(index)">
         <p>{{ item.name }}</p>
         <span>{{ index }}</span>
       </li>

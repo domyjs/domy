@@ -11,7 +11,9 @@ import { ReactiveVariable } from './ReactiveVariable';
 export function unReactive<T = any>(obj: T): T {
   if (!ReactiveVariable.isReactive(obj)) return obj;
 
-  const reactiveInstance = reactivesVariablesList.get(obj) as ReactiveVariable;
+  const reactiveInstance = reactivesVariablesList.get(obj);
+
+  if (!reactiveInstance) return obj;
 
   reactiveInstance.clearListeners();
   reactivesVariablesList.delete(obj);

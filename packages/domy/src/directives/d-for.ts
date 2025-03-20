@@ -1,84 +1,6 @@
 import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
-type RendererProps = {
-  value: any;
-  valueIndex: number;
-
-  forPattern: RegExpExecArray;
-  initialChilds: Element[];
-  lastRenders: Block[];
-  domy: DomyDirectiveHelper;
-};
-
-/**
- * Render the childs in d-for element for a specific value and index
- * @param props
- * @returns
- *
- * @author yoannchb-pro
- */
-function renderer(props: RendererProps) {
-  const domy = props.domy;
-  const el = domy.block.el;
-  const currentChildrens = Array.from(el.children);
-  const currentRenders: (Block | Element)[] = [];
-
-  // Add the value to the scope
-  let scope = {
-    [props.forPattern!.groups!.dest]: props.value
-  };
-  // Add the index to the scope if needed
-  if (props.forPattern!.groups?.index) {
-    scope = {
-      ...scope,
-      [props.forPattern!.groups.index]: props.valueIndex
-    };
-  }
-
-  for (let childIndex = 0; childIndex < props.initialChilds.length; ++childIndex) {
-    const initialChild = props.initialChilds[childIndex] as Element;
-    const currentIndex = props.valueIndex * props.initialChilds.length + childIndex;
-
-    const keyAttr = initialChild.getAttribute('d-key');
-
-    if (keyAttr) {
-      // Check if the key already exist so we can skip render
-      domy.addScopeToNode(scope);
-      const currentKeyValue = domy.evaluate(keyAttr);
-      domy.removeScopeToNode(scope);
-
-      const oldRenderBlock = props.lastRenders.find(block => block.key === currentKeyValue);
-
-      if (oldRenderBlock) {
-        const oldRender = oldRenderBlock.el;
-        const oldRenderIndex = currentChildrens.findIndex(
-          currentChild => currentChild === oldRender
-        );
-
-        // If the index of the element changed we move it to the new position
-        if (oldRenderIndex !== currentIndex) {
-          domy.utils.moveElement(el, oldRender, currentIndex);
-        }
-
-        currentRenders.push(oldRender);
-        continue;
-      }
-    }
-
-    // Create and render the new element
-    const newChild = initialChild.cloneNode(true) as Element;
-    el.appendChild(newChild);
-    const render = domy.deepRender({
-      element: newChild,
-      scopedNodeData: [...domy.scopedNodeData, scope]
-    });
-    currentRenders.push(render);
-  }
-
-  return currentRenders;
-}
-
 /**
  * d-for implementation
  * Allow to render a list of element
@@ -88,18 +10,19 @@ function renderer(props: RendererProps) {
  * @author yoannchb-pro
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.block.el;
-  const initialChilds = Array.from(el.children);
-  const lastRenders: Block[] = [];
+  const originalEl = domy.block.el;
+  const parent = originalEl.parentElement!;
+  const originalBlock = domy.block;
+
+  const tracePositionComment = new Comment('d-for position tracking, do not remove');
+  originalEl.before(tracePositionComment);
+  originalEl.remove();
 
   // Display a warning message if the childrens don't have a d-key attribute
-  for (const child of initialChilds) {
-    if (!child.getAttribute('d-key')) {
-      domy.utils.warn(
-        `Elements inside the "${domy.directive}" directive should be rendered with "key" directive.`
-      );
-      break;
-    }
+  if (!originalEl.getAttribute('d-key')) {
+    domy.utils.warn(
+      `Elements inside the "${domy.directive}" directive should be rendered with "key" directive.`
+    );
   }
 
   // Checking "for" pattern
@@ -111,71 +34,92 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
   const isForIn = forPattern.groups!.type === 'in';
 
-  // Remove the original content
-  el.innerHTML = '';
+  const lastRenders: { render: Block; reactiveIndex: { value: number } }[] = [];
 
-  const handleChilds = () => {
-    const el = domy.block.el;
+  domy.effect(() => {
+    const treatedRenders: { render: Block; reactiveIndex: { value: number } }[] = [];
 
-    const executedValue = domy.evaluate(forPattern.groups!.org);
+    const renderEl = (value: unknown, index: number) => {
+      // Add the value to the scope
+      let scope = {
+        [forPattern!.groups!.dest]: value
+      };
+      // Add the index to the scope if needed
+      const reactiveIndex = domy.signal(index);
+      if (forPattern!.groups?.index) {
+        scope = {
+          ...scope,
+          [forPattern!.groups.index]: reactiveIndex
+        };
+      }
 
-    let valueIndex = 0;
+      const keyAttr = originalEl.getAttribute('d-key');
+      if (keyAttr) {
+        // Check if the key already exist so we can skip render
+        domy.addScopeToNode(scope);
+        const currentKeyValue = domy.evaluate(keyAttr);
+        domy.removeScopeToNode(scope);
 
-    const renderedChildrensForCurrentRender = new Set<Element | ChildNode | Node>();
-    const renderChilds = (value: any) => {
-      const renderedChildForCurrentValue = renderer({
-        domy,
-        forPattern,
-        initialChilds,
-        lastRenders,
-        value,
-        valueIndex
-      });
+        const oldRender = lastRenders.find(({ render }) => render.key === currentKeyValue);
 
-      for (const render of renderedChildForCurrentValue) {
-        if (render instanceof Block) {
-          lastRenders.push(render);
-          renderedChildrensForCurrentRender.add(render.el);
-        } else {
-          renderedChildrensForCurrentRender.add(render);
+        if (oldRender) {
+          const oldRenderEl = oldRender.render.el;
+          const oldRenderIndex = oldRender.reactiveIndex.value;
+
+          // If the index of the element changed we move it to the new position
+          if (oldRenderIndex !== index) {
+            domy.utils.moveElement(parent, oldRenderEl, index);
+            oldRender.reactiveIndex.value = index;
+          }
+
+          return treatedRenders.push(oldRender);
         }
       }
 
-      ++valueIndex;
+      // Create and render the new element
+      const newEl = originalEl.cloneNode(true) as Element;
+      tracePositionComment.before(newEl);
+      const render = domy.deepRender({
+        element: newEl,
+        scopedNodeData: [...domy.scopedNodeData, scope]
+      });
+      const newRender = { render, reactiveIndex };
+      lastRenders.push(newRender);
+      treatedRenders.push(newRender);
     };
 
+    let index = 0;
+    const executedValue = domy.evaluate(forPattern.groups!.org);
+
+    // Create or swap the elements
     if (isForIn) {
-      // Handle "for in"
-      for (const value in executedValue) renderChilds(value);
+      for (const value in executedValue) renderEl(value, index++);
     } else {
-      // Handle "for of"
-      for (const value of executedValue) renderChilds(value);
+      for (const value of executedValue) renderEl(value, index++);
     }
 
-    // Remove remaining childs that shouldn't be there
-    const currChildrens = Array.from(el.children);
-    for (const child of currChildrens) {
-      if (!renderedChildrensForCurrentRender.has(child)) {
-        child.remove();
-
-        const renderIndex = lastRenders.findIndex(block => block.el === child);
-
-        if (renderIndex !== -1) {
-          const render = lastRenders[renderIndex];
-          render.unmount();
-          lastRenders.splice(renderIndex, 1);
-        }
+    // Remove unecessary elements
+    for (const render of lastRenders) {
+      if (treatedRenders.indexOf(render) === -1) {
+        domy.unReactive(render.reactiveIndex);
+        render.render.remove();
+        render.render.unmount();
       }
-    }
-  };
-
-  domy.effect(handleChilds);
-
-  domy.cleanup(() => {
-    for (const block of lastRenders) {
-      block.unmount();
     }
   });
 
-  return { skipChildsRendering: true };
+  domy.cleanup(() => {
+    tracePositionComment.remove();
+    for (const render of lastRenders) {
+      domy.unReactive(render.reactiveIndex);
+      render.render.remove();
+      render.render.unmount();
+    }
+  });
+
+  return {
+    skipChildsRendering: true,
+    skipComponentRendering: true,
+    skipOtherAttributesRendering: true
+  };
 }
