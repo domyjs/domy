@@ -12,7 +12,6 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const originalEl = domy.block.el;
   const parent = originalEl.parentElement!;
-  const originalBlock = domy.block;
 
   const tracePositionComment = new Comment('d-for position tracking, do not remove');
   originalEl.before(tracePositionComment);
