@@ -44,7 +44,7 @@ export function getElementVisibilityHandler(props: Props) {
       const clone = originalEl.cloneNode(true) as Element;
 
       // Restore the element to his original position
-      tracePositionComment.before(clone);
+      tracePositionComment.after(clone);
 
       // Render the clone and create a new block
       lastRender = domy.deepRender({

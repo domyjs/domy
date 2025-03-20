@@ -55,7 +55,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     }
 
     // We restore the element to his original position
-    tracePositionComment.before(elementToRender);
+    tracePositionComment.after(elementToRender);
 
     // Render the element
     if (shouldBeRender) {
