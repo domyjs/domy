@@ -7,9 +7,12 @@
     <script src="/packages/domy/dist/index.js"></script>
   </head>
   <body>
-    <div d-for="element of list">
-      <Component d-key="element.id" :title="'Hello World' + element.id"></Component>
-    </div>
+    <Component
+      d-for="element of list"
+      d-key="element.id"
+      :title="'Hello World' + element.id"
+    ></Component>
+
     <button @click="list.push({ id: list[list.length - 1].id + 1 })">Add element</button>
   </body>
   <script>

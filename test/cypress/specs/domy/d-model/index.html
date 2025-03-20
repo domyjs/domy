@@ -36,25 +36,28 @@
 
     <div id="select">
       <p>{{ selectedColor }}</p>
-      <select d-for="color of ['red', 'blue', 'green']" d-model="selectedColor">
-        <option d-key="color" :value="color">{{ color }}</option>
+      <select d-model="selectedColor">
+        <option d-for="color of ['red', 'blue', 'green']" d-key="color" :value="color">
+          {{ color }}
+        </option>
       </select>
     </div>
 
     <div id="select-multiple">
       <p>{{ selectedColor2.join(',') }}</p>
-      <select d-for="color of ['red', 'blue', 'green']" d-model="selectedColor2" multiple>
-        <option d-key="color" :value="color">{{ color }}</option>
+      <select d-model="selectedColor2" multiple>
+        <option d-for="color of ['red', 'blue', 'green']" d-key="color" :value="color">
+          {{ color }}
+        </option>
       </select>
     </div>
 
     <div id="radio">
       <p>{{ selectedColor3 }}</p>
-      <div d-for="color of ['red', 'blue', 'green']">
-        <div d-key="color">
-          <input type="radio" name="color" :value="color" d-model="selectedColor3" />
-          <span>{{ color }}</span>
-        </div>
+
+      <div d-for="color of ['red', 'blue', 'green']" d-key="color">
+        <input type="radio" name="color" :value="color" d-model="selectedColor3" />
+        <span>{{ color }}</span>
       </div>
     </div>
 
@@ -66,11 +69,10 @@
 
     <div id="multiple-checkbox">
       <p>{{ checkedColors.join(',') }}</p>
-      <div d-for="color of ['red', 'blue', 'green']">
-        <div d-key="color">
-          <input type="checkbox" name="color" :value="color" d-model="checkedColors" />
-          <span>{{ color }}</span>
-        </div>
+
+      <div d-for="color of ['red', 'blue', 'green']" d-key="color">
+        <input type="checkbox" name="color" :value="color" d-model="checkedColors" />
+        <span>{{ color }}</span>
       </div>
     </div>
   </body>
