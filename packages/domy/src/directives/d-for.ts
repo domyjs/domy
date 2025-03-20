@@ -1,6 +1,8 @@
 import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
+type LastRender = { render: Block; reactiveIndex: { value: number } };
+
 /**
  * d-for implementation
  * Allow to render a list of element
@@ -11,10 +13,11 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const originalEl = domy.block.el;
-  const parent = originalEl.parentElement!;
 
-  const tracePositionComment = new Comment('d-for position tracking, do not remove');
-  originalEl.before(tracePositionComment);
+  const traceStartPositionComment = new Comment('d-for start position tracking, do not remove');
+  const traceEndPositionComment = new Comment('d-for end position tracking, do not remove');
+  originalEl.before(traceStartPositionComment);
+  traceStartPositionComment.after(traceEndPositionComment);
   originalEl.remove();
 
   // Display a warning message if the childrens don't have a d-key attribute
@@ -22,6 +25,24 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     domy.utils.warn(
       `Elements inside the "${domy.directive}" directive should be rendered with "key" directive.`
     );
+  }
+
+  function insertToIndex(element: Element, lookingIndex: number) {
+    let sibling = traceStartPositionComment.nextSibling;
+    let index = 0;
+
+    while (sibling !== traceEndPositionComment && index !== lookingIndex) {
+      ++index;
+      sibling = sibling!.nextSibling;
+    }
+
+    if (sibling) sibling.before(element);
+  }
+
+  function cleanupLastRender(lastRender: LastRender) {
+    domy.unReactive(lastRender.reactiveIndex);
+    lastRender.render.remove();
+    lastRender.render.unmount();
   }
 
   // Checking "for" pattern
@@ -33,10 +54,10 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
   const isForIn = forPattern.groups!.type === 'in';
 
-  const lastRenders: { render: Block; reactiveIndex: { value: number } }[] = [];
+  const lastRenders: LastRender[] = [];
 
   domy.effect(() => {
-    const treatedRenders: { render: Block; reactiveIndex: { value: number } }[] = [];
+    const treatedRenders: LastRender[] = [];
 
     const renderEl = (value: unknown, index: number) => {
       // Add the value to the scope
@@ -67,7 +88,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
           // If the index of the element changed we move it to the new position
           if (oldRenderIndex !== index) {
-            domy.utils.moveElement(parent, oldRenderEl, index);
+            insertToIndex(oldRenderEl, index);
             oldRender.reactiveIndex.value = index;
           }
 
@@ -77,7 +98,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
       // Create and render the new element
       const newEl = originalEl.cloneNode(true) as Element;
-      tracePositionComment.before(newEl);
+      insertToIndex(newEl, index);
       const render = domy.deepRender({
         element: newEl,
         scopedNodeData: [...domy.scopedNodeData, scope]
@@ -99,21 +120,14 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
     // Remove unecessary elements
     for (const render of lastRenders) {
-      if (treatedRenders.indexOf(render) === -1) {
-        domy.unReactive(render.reactiveIndex);
-        render.render.remove();
-        render.render.unmount();
-      }
+      if (treatedRenders.indexOf(render) === -1) cleanupLastRender(render);
     }
   });
 
   domy.cleanup(() => {
-    tracePositionComment.remove();
-    for (const render of lastRenders) {
-      domy.unReactive(render.reactiveIndex);
-      render.render.remove();
-      render.render.unmount();
-    }
+    traceStartPositionComment.remove();
+    traceEndPositionComment.remove();
+    for (const render of lastRenders) cleanupLastRender(render);
   });
 
   return {

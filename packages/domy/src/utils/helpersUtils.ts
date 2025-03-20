@@ -9,7 +9,6 @@ import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from './isSpecialAt
 import { kebabToCamelCase } from './kebabToCamelCase';
 import { error, warn } from './logs';
 import { mergeToNegativeCondition } from './mergeToNegativeCondition';
-import { moveElement } from './moveElement';
 import { toKebabCase } from './toKebabCase';
 
 // A list of utils we can access in helpers
@@ -21,7 +20,6 @@ export const helpersUtils = {
   get,
   set,
   getPreviousConditionsElements,
-  moveElement,
   executeActionAfterAnimation,
   getReactiveHandler,
   mergeToNegativeCondition,
