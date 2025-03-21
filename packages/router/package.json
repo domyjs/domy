@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/store",
+  "unpkg": "./dist/index.js",
   "buildName": "createRouter",
   "version": "1.0.0",
   "description": "Domyjs store plugin",

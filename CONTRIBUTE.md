@@ -7,7 +7,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 ## Code of Conduct
 
-See the code of conduct [here](./CODE_OF_CONDUCT.md)
+See the [code of conduct](./CODE_OF_CONDUCT.md)
 
 ## Pull Request Process
 
@@ -18,11 +18,6 @@ See the code of conduct [here](./CODE_OF_CONDUCT.md)
    do not have permission to do that, you may request the second reviewer to merge it for you.
 
 ## Setup the project
-
-```
-node: 18.13.0
-npm: 8.19.2
-```
 
 ### 1. Install dependencies
 

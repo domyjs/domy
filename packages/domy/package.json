@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/core",
+  "unpkg": "./dist/index.js",
   "buildName": "DOMY",
   "version": "1.0.0",
   "description": "A lightweight and minimal javascript framework for your frontend",

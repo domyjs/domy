@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/reactive",
+  "unpkg": "./dist/index.js",
   "version": "1.0.0",
   "description": "Domyjs reactive variable",
   "types": "./dist/index.d.ts",

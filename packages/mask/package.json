@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/mask",
+  "unpkg": "./dist/index.js",
   "version": "1.0.0",
   "description": "Domyjs mask plugin",
   "main": "./dist/index.js",

@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/i18n",
+  "unpkg": "./dist/index.js",
   "buildName": "i18n",
   "version": "1.0.0",
   "description": "Domyjs i18n plugin",
