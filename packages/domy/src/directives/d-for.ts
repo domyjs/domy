@@ -13,6 +13,7 @@ type LastRender = { render: Block; reactiveIndex: { value: number } };
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const originalEl = domy.block.el;
+  const rawKey = originalEl.getAttribute('d-key');
 
   const traceStartPositionComment = new Comment('d-for start position tracking, do not remove');
   const traceEndPositionComment = new Comment('d-for end position tracking, do not remove');
@@ -73,11 +74,10 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         };
       }
 
-      const keyAttr = originalEl.getAttribute('d-key');
-      if (keyAttr) {
+      if (rawKey) {
         // Check if the key already exist so we can skip render
         domy.addScopeToNode(scope);
-        const currentKeyValue = domy.evaluate(keyAttr);
+        const currentKeyValue = domy.evaluate(rawKey);
         domy.removeScopeToNode(scope);
 
         const oldRender = lastRenders.find(({ render }) => render.key === currentKeyValue);

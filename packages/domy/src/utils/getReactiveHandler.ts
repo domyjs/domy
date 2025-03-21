@@ -1,4 +1,4 @@
-import { isSignal } from '@domyjs/reactive';
+import { isComputed, isSignal } from '@domyjs/reactive';
 
 /**
  * Return the get and set method for a reactive variable
@@ -14,10 +14,10 @@ export function getReactiveHandler(obj: Record<string, any>, key: string): Prope
     enumerable: true,
     configurable: true,
     get() {
-      return isSignal(obj[key]) ? obj[key].value : obj[key];
+      return isSignal(obj[key]) || isComputed(obj[key]) ? obj[key].value : obj[key];
     },
     set(newValue: any) {
-      if (isSignal(obj[key])) return (obj[key].value = newValue);
+      if (isSignal(obj[key]) || isComputed(obj[key])) return (obj[key].value = newValue);
       return (obj[key] = newValue);
     }
   };

@@ -12,6 +12,7 @@ import { unReactive } from './core/unReactive';
 import { skipReactive } from './core/skipReactivity';
 import { watchEffect } from './core/watchEffect';
 import { trackDeps } from './core/trackDeps';
+import { computed, isComputed } from './core/computed';
 
 export {
   skipReactive,
@@ -27,5 +28,7 @@ export {
   registerName,
   isSignal,
   isReactive,
-  trackDeps
+  trackDeps,
+  computed,
+  isComputed
 };

@@ -6,6 +6,7 @@ import { allHooks, helperToHookRegistrer } from './core/hooks';
 const DOMY = {
   matchPath: ReactiveUtils.matchPath,
   signal: ReactiveUtils.signal,
+  computed: ReactiveUtils.computed,
   skipReactive: ReactiveUtils.skipReactive,
 
   helperToHookRegistrer,

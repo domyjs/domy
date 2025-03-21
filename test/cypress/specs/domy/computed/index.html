@@ -8,16 +8,17 @@
   </head>
   <body>
     <h1>Count: {{ count }}</h1>
-    <p>Is odd: {{ isCountOdd() }}</p>
+    <p>Is odd: {{ isCountOdd }}</p>
 
     <button id="inc" @click="count++">+</button>
     <button id="dec" @click="count--">-</button>
   </body>
   <script>
-    const { watch, signal } = DOMY;
+    const { watch, signal, computed } = DOMY;
 
     DOMY.createApp(() => {
       const count = signal(0);
+      const isCountOdd = computed(() => count.value % 2 === 1);
 
       watch(
         ({ prevValue, newValue }) => {
@@ -28,9 +29,7 @@
 
       return {
         count,
-        isCountOdd() {
-          return count.value % 2 === 1;
-        }
+        isCountOdd
       };
     }).mount();
   </script>

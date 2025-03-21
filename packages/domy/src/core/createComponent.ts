@@ -60,14 +60,20 @@ export function createComponent(
         const tree = parseHTMl(componentDefinition.html.trim());
 
         if (tree.length !== 1) {
-          throw new Error(`The component "${name}" need to have one element as root.`);
+          throw new Error(`The component can only have one element as root.`);
+        }
+
+        const root = tree[0] as HTMLElement;
+
+        if (root.getAttribute('d-for')) {
+          throw new Error(
+            `The component can't have a "d-for" directive/attribute on the root element.`
+          );
         }
 
         const requiredProps = new Set(
           props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
         );
-
-        const root = tree[0] as HTMLElement;
 
         // Replace the component by the root
         domy.block.replaceWith(root);
