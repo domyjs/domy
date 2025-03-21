@@ -1,9 +1,7 @@
 # TODO
 
-- Handle template
+- Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests
+- store (data/methods), anchor, intersect, mask
 
-- Refactor reactive to handle option API
-- Separate reactive, utils and types in other packages
-- script auto build, release ...
-
-- Collapse, anchor, intersect, mutation, persist (localStorage), i18n, router plugins
+- Documentation
+- Auto release ...

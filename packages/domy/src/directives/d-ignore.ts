@@ -8,5 +8,9 @@ import { DomyDirectiveReturn } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function dIgnoreImplementation(): DomyDirectiveReturn {
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

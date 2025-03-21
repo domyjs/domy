@@ -1,6 +1,7 @@
 {
   "name": "@domyjs/anchor",
   "version": "1.0.0",
+  "buildName": "anchor",
   "description": "Domyjs anchor plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,8 +25,5 @@
   "bugs": {
     "url": "https://github.com/yoannchb-pro/domy/issues"
   },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme",
-  "devDependencies": {
-    "@domyjs/types": "file:../types"
-  }
+  "homepage": "https://github.com/yoannchb-pro/domy#readme"
 }

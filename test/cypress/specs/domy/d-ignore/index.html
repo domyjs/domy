@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-ignore</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <div d-ignore d-if="count > 0">
+      <p>{{ msg }}</p>
+    </div>
+    <Component d-ignore></Component>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    const Component = DOMY.createComponent({
+      html: '<p id="component">Component</p>'
+    });
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+      const msg = signal('Hello World!');
+
+      return {
+        count,
+        msg
+      };
+    })
+      .components({
+        Component
+      })
+      .mount();
+  </script>
+</html>

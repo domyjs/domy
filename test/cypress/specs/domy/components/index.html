@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>components</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <p id="propChanges">0</p>
+    <p id="componentClick">{{ componentClick }}</p>
+
+    <main d-for="i of [1, 2, 3]">
+      <Count
+        d-if="i % 2 === 1"
+        d-key="i"
+        @click="++componentClick"
+        :id="'count-' + i"
+        :show-error="showError"
+        :close="close"
+        :open="open"
+      ></Count>
+    </main>
+  </body>
+  <script>
+    const { signal, watch, useProps } = DOMY;
+
+    const ErrorMessage = DOMY.createComponent({
+      props: ['close'],
+      html: `
+            <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white', position: 'relative' }">
+              <p>Error Message:</p>
+
+              <div d-for="children, index of $childrens">
+                  <template d-key="index" d-insert.render="children"></template>
+              </div>
+
+              <button @click="$props.close()" :style="{ position: 'absolute', right: '0.5rem', top: '0.5rem' }">X</button>
+            </div>
+        `
+    });
+
+    const Count = DOMY.createComponent({
+      props: ['showError', 'open', 'close'],
+      html: `
+            <div d-attrs="$attrs">
+              <h1>Props: {{ Object.keys($props).join(',') }}</h1>
+              <p>Count: {{ count }}</p>
+              <button @click="increment">+</button>
+              <button @click="decrement">-</button>
+              <error-message d-if="$props.showError" :close="$props.close">
+                <p :style="{ fontWeight: 'bold' }">{{ message ?? 'Unknown' }}</p>
+              </error-message>
+            </div>
+        `,
+      components: {
+        ErrorMessage
+      },
+      app() {
+        const props = useProps();
+        const count = signal(0);
+        const message = 'The count as to be greater than 0!';
+
+        watch(
+          () => {
+            const p = document.querySelector('#propChanges');
+            p.textContent = Number(p.textContent) + 1;
+          },
+          () => props.showError
+        );
+
+        watch(
+          ({ newValue }) => {
+            if (newValue < 0) {
+              props.open();
+            } else {
+              props.close();
+            }
+          },
+          () => count.value
+        );
+
+        return {
+          count,
+          message,
+          increment: () => ++count.value,
+          decrement: () => --count.value
+        };
+      }
+    });
+
+    DOMY.createApp(() => {
+      const showError = signal(false);
+      const componentClick = signal(0);
+
+      return {
+        showError,
+        componentClick,
+        close() {
+          showError.value = false;
+        },
+        open() {
+          showError.value = true;
+        }
+      };
+    })
+      .components({
+        Count
+      })
+      .mount();
+  </script>
+</html>

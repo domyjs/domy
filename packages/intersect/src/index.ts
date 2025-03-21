@@ -1,7 +1,5 @@
 // TODO
-import { Plugin } from '@domyjs/types';
-
-const intersectPlugin: Plugin = [
+const intersectPlugin = [
   {
     type: 'attribute',
     name: 'd-intersect',

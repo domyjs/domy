@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$el</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1 id="hello" :name="$el.id">{{ $el.id }}</h1>
+  </body>
+  <script>
+    DOMY.createApp().mount();
+  </script>
+</html>

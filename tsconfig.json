@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "CommonJS",
+    "module": "ESNext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2018",
@@ -10,10 +10,14 @@
     "sourceMap": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "typeRoots": ["node_modules/@types"],
     "strictBindCallApply": true,
-    "declaration": true
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "@domyjs/*": ["packages/*/src"]
+    }
   },
-  "include": ["packages/**/*"]
+  "include": ["packages/**/*", "test/jest/**/*"]
 }

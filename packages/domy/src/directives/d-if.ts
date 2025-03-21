@@ -1,5 +1,4 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
-import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandler';
 
 /**
  * d-if implementation
@@ -11,12 +10,17 @@ import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandle
  * @author yoannchb-pro
  */
 export function dIfImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const visibilityHandler = getElementVisibilityHandler({
+  const visibilityHandler = domy.utils.getElementVisibilityHandler({
     shouldBeDisplay: () => domy.evaluate(domy.attr.value),
     domy
   });
 
-  domy.effect(visibilityHandler);
+  domy.effect(visibilityHandler.effect);
+  domy.cleanup(visibilityHandler.cleanup);
 
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

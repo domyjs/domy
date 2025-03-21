@@ -1,135 +1,174 @@
+import { Components } from '../types/Component';
+import { Config } from '../types/Config';
 import { DomyDirectiveReturn } from '../types/Domy';
 import { State } from '../types/State';
-import { isNormalAttr } from '../utils/isSpecialAttribute';
+import { isBindAttr, isNormalAttr } from '../utils/isSpecialAttribute';
+import { AppStateObserver } from './AppState';
+import { Block } from './Block';
+import { DOMY_EVENTS } from './DomyEvents';
 import { DomyHelper } from './DomyHelper';
-import { PLUGINS } from './plugin';
+import { PluginHelper } from './plugin';
 import { renderAttribute } from './renderAttribute';
 import { renderText } from './renderText';
 
 type Elem = {
+  parentBlock?: Block;
   element: Element;
-  byPassAttributes?: string[];
   scopedNodeData?: Record<string, any>[];
 };
 
 type Props = {
-  state: State;
-  element: Element;
+  element: Element | Block;
+  scopedNodeData: Record<string, any>[];
   byPassAttributes?: string[];
-  scopedNodeData?: Record<string, any>[];
+  skipChildRendering?: boolean;
   renderWithoutListeningToChange?: boolean;
 };
 
 /**
- * Remove the domy "d-" prefix of a string
- * Otherwise it retun an empty string
- * @param attrName
- * @returns
- *
- * @author yoannchb-pro
- */
-function removeDPrefix(str: string) {
-  return str.startsWith('d-') ? str.slice(2) : '';
-}
-
-/**
  * Deep render an element (with the childs and textContent)
- * @param props
+ * It will keep the config for all the specified target only
+ * @param config
  *
  * @author yoannchb-pro
  */
-export function deepRender(props: Props) {
-  const toRenderList: Elem[] = [
-    {
-      element: props.element,
-      byPassAttributes: props.byPassAttributes,
-      scopedNodeData: props.scopedNodeData ?? []
-    }
-  ];
+export function createDeepRenderFn(
+  appId: number,
+  appState: AppStateObserver,
+  state: State,
+  config: Config,
+  components: Components,
+  pluginHelper: PluginHelper
+) {
+  // Deep render function for a specific block/element
+  return function deepRender(props: Props) {
+    const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
+    const rootElement = rootBlock.el;
 
-  while (toRenderList.length > 0) {
-    const toRender = toRenderList.shift() as Elem;
-    // const isTemplate = toRender.element instanceof HTMLTemplateElement;
-    const element = toRender.element;
-
-    let domyHelper = new DomyHelper(deepRender, element, props.state, toRender.scopedNodeData);
-
-    // Rendering textContent
-    if (element.nodeType === Node.TEXT_NODE) {
-      renderText(domyHelper.getPluginHelper());
-      domyHelper.callEffect();
-      continue;
-    }
-
-    const attributes = Array.from(element.attributes ?? []);
-    // We ensure some attributes are rendered first like d-ignore, d-once, ...
-    attributes.sort((a, b) => {
-      const iA = PLUGINS.sortedDirectives.indexOf(removeDPrefix(a.name));
-      const iB = PLUGINS.sortedDirectives.indexOf(removeDPrefix(b.name));
-      if (iA === -1) {
-        return 1;
-      } else if (iB === -1) {
-        return -1;
-      } else {
-        return iA - iB;
+    const toRenderList: Elem[] = [
+      {
+        element: rootElement,
+        scopedNodeData: props.scopedNodeData ?? []
       }
-    });
+    ];
 
-    // Rendering attributes if it's an element
-    let skipChildRendering = false;
-    for (const attr of attributes) {
-      const shouldByPassAttribute =
-        toRender.byPassAttributes && toRender.byPassAttributes.includes(attr.name);
+    while (toRenderList.length > 0) {
+      let skipOtherAttributesRendering = false;
+      let skipChildRendering = props.skipChildRendering ?? false;
+      let skipComponentRendering = false;
 
-      if (shouldByPassAttribute || isNormalAttr(attr.name)) continue;
+      // We use pop for performance issue and because we render the tree from the bottom to top
+      // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
+      const toRender = toRenderList.pop() as Elem;
+      const element = toRender.element;
+      const isRootRendering = element === rootElement;
 
-      // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData
-      domyHelper = new DomyHelper(deepRender, element, props.state, [...domyHelper.scopedNodeData]);
-
-      // We get the prefix, modifiers and attribute name
-      const [attrNameWithPrefix, ...modifiers] = attr.name.split('.');
-      let prefix = '';
-      let attrName = attrNameWithPrefix;
-      if (attrName.includes(':')) {
-        [prefix, attrName] = attrName.split(':');
+      // If we are to the previous element then the next element is rendered because we go from bottom to top
+      const lastRenderedElement = toRender.element.nextElementSibling;
+      if (lastRenderedElement) {
+        lastRenderedElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
       }
 
-      domyHelper.prefix = removeDPrefix(prefix);
-      domyHelper.directive = removeDPrefix(attrName);
-      domyHelper.modifiers = modifiers;
+      const block = isRootRendering ? rootBlock : new Block(element);
+      if (toRender.parentBlock) block.parentBlock = toRender.parentBlock;
 
-      domyHelper.attrName = attrName; // The attribute name without the modifiers and prefix (examples: d-for, style ...)
-      domyHelper.attr.name = attr.name;
-      domyHelper.attr.value = attr.value;
+      const safeDeepRender = (args: Props) => {
+        const render = deepRender(args);
 
-      // We render the attribute
-      // It's the main logic of DOMY
-      const options: DomyDirectiveReturn = renderAttribute(
-        domyHelper.getPluginHelper(props.renderWithoutListeningToChange)
+        const argElement = args.element instanceof Block ? args.element.el : args.element;
+        const isCurrentElement = argElement === block.el;
+        if (isCurrentElement) {
+          // If deep render is called on the current element we skip the current rendering to avoid errors
+          skipChildRendering = true;
+          skipComponentRendering = true;
+          skipOtherAttributesRendering = true;
+        }
+
+        return render;
+      };
+
+      let domyHelper = new DomyHelper(
+        appId,
+        safeDeepRender,
+        block,
+        state,
+        toRender.scopedNodeData,
+        config,
+        props.renderWithoutListeningToChange ?? false,
+        appState,
+        pluginHelper
       );
 
-      domyHelper.callEffect();
+      // Rendering textContent
+      if (element.nodeType === Node.TEXT_NODE) {
+        if (/\{\{\s*(?<org>.+?)\s*\}\}/g.test(element.textContent ?? '')) {
+          renderText(domyHelper.getPluginHelper());
+          block.addCleanup(domyHelper.getCleanupFn());
+        }
 
-      element.removeAttribute(attr.name);
-
-      // Handling options returned by the attribute
-      if (options) {
-        if (options.skipChildsRendering) skipChildRendering = true;
-        if (options.skipOtherAttributesRendering) break;
+        continue;
       }
-    }
 
-    // We add the child of the element to the list to render them next
-    // We reverse the child because in the case of d-if, d-else-if, d-else
-    // the element need to know if is previousSibling is displayed or not and to access to the d-if or d-else-if content
-    if (!skipChildRendering) {
-      const reversedChild = Array.from(element.childNodes).reverse();
-      for (const child of reversedChild) {
+      // Rendering attributes if it's an element
+      const isComponent = element.localName in components;
+      const attrs = Array.from(element.attributes ?? []);
+
+      for (const attr of attrs) {
+        if (!block.el.hasAttribute(attr.name)) continue;
+
+        const shouldByPassAttribute =
+          props.byPassAttributes && props.byPassAttributes.includes(attr.name);
+
+        if (shouldByPassAttribute || isNormalAttr(pluginHelper.PLUGINS, attr.name)) continue;
+        if (isComponent && (isBindAttr(attr.name) || isNormalAttr(pluginHelper.PLUGINS, attr.name)))
+          continue; //  We only render the directives/events for a component
+
+        // We create a copy of the scopedNodeData because after the attribute is rendered it will remove the scopedNodeData (but we still need it for later)
+        // We also need a new domy helper because every attribute need his own call effect
+        domyHelper = domyHelper.copy();
+
+        domyHelper.setAttrInfos(attr);
+
+        // We render the attribute
+        // It's the main logic of DOMY
+        element.removeAttribute(attr.name);
+        const options: DomyDirectiveReturn = renderAttribute(domyHelper.getPluginHelper());
+        block.addCleanup(domyHelper.getCleanupFn());
+
+        // Handling options returned by the attribute
+        if (options) {
+          if (options.skipChildsRendering) skipChildRendering = true;
+          if (options.skipComponentRendering) skipComponentRendering = true;
+          if (options.skipOtherAttributesRendering) break;
+        }
+        if (skipOtherAttributesRendering) break;
+      }
+
+      // Rendering component
+      if (!skipComponentRendering && isComponent) {
+        const componentSetup = components[element.localName];
+        componentSetup({
+          name: element.localName,
+          componentElement: element as HTMLElement,
+          domy: domyHelper.getPluginHelper()
+        });
+        block.addCleanup(domyHelper.getCleanupFn()); // TODO: make a bug
+        continue;
+      }
+
+      // Rendering childs
+      if (skipChildRendering) continue;
+      for (const child of element.childNodes) {
+        if ((child as HTMLElement).tagName === 'SCRIPT') continue; // We ensure we never render script
+
         toRenderList.push({
+          parentBlock: block,
           element: child as Element,
           scopedNodeData: domyHelper.scopedNodeData
         });
       }
     }
-  }
+
+    return rootBlock;
+  };
 }

@@ -1,4 +1,4 @@
-import { DomyDirectiveHelper } from '../types/Domy';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
  * d-ref implementation
@@ -7,9 +7,29 @@ import { DomyDirectiveHelper } from '../types/Domy';
  *
  * @author yoannchb-pro
  */
-export function dRefImplementation(domy: DomyDirectiveHelper) {
-  if (domy.state.refs[domy.attr.value])
-    throw new Error(`A ref with the name "${domy.attr.value}" already exist.`);
+export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  const isDynamic = domy.modifiers.includes('dynamic');
+  let refName = isDynamic ? domy.evaluate(domy.attr.value) : domy.attr.value;
 
-  domy.state.refs[domy.attr.value] = domy.el;
+  const cleanRef = () => {
+    delete domy.state.refs[refName];
+  };
+  const setRef = () => {
+    if (domy.state.refs[refName])
+      throw new Error(`A ref with the name "${refName}" already exist.`);
+
+    domy.state.refs[refName] = domy.block;
+  };
+
+  // If the ref is dynamic
+  if (domy.modifiers.includes('dynamic')) {
+    refName = domy.evaluate(domy.attr.value);
+    setRef();
+  } else {
+    setRef();
+  }
+
+  domy.cleanup(() => {
+    cleanRef();
+  });
 }

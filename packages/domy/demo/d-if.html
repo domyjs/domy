@@ -5,21 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="../dist/index.js"></script>
-    <script>
-      window.DOMY.createApp({
-        data: {
-          count: 0
-        },
-        methods: {
-          increment() {
-            this.count++;
-          },
-          decrement() {
-            this.count--;
-          }
-        }
-      });
-    </script>
   </head>
   <body>
     <p>Count: {{ count }}</p>
@@ -29,4 +14,19 @@
     <button @click="increment()">+</button>
     <button d-on:click="decrement">-</button>
   </body>
+  <script>
+    window.DOMY.createApp({
+      data: {
+        count: 0
+      },
+      methods: {
+        increment() {
+          this.count++;
+        },
+        decrement() {
+          this.count--;
+        }
+      }
+    });
+  </script>
 </html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>render</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <div id="container"></div>
+    <button id="inc" @click="++count">+</button>
+    <button id="dec" @click="--count">-</button>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    const app = DOMY.createApp(() => {
+      const count = signal(0);
+
+      return {
+        count
+      };
+    }).mount();
+
+    const p = document.createElement('p');
+    p.textContent = 'Count: {{ count }}';
+
+    app.render(p);
+
+    document.querySelector('#container').appendChild(p);
+  </script>
+</html>

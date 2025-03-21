@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lifecycle</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <Component d-if="show"></Component>
+
+    <p id="setuped"></p>
+    <p id="mounted"></p>
+    <p id="beforeUnmount"></p>
+    <p id="unmounted"></p>
+
+    <button d-ref="button" @click="show = !show">Show component</button>
+  </body>
+  <script>
+    const { signal, onSetuped, onMounted, onBeforeUnmount, onUnmounted, useRefs } = DOMY;
+
+    const setupedEl = document.querySelector('#setuped');
+    const mountedEl = document.querySelector('#mounted');
+    const beforeUnmountEl = document.querySelector('#beforeUnmount');
+    const unmountedEl = document.querySelector('#unmounted');
+
+    const Component = DOMY.createComponent({
+      html: `
+          <p id="res" d-ref="res" d-text="'Hello World!'"></p>
+      `,
+      app() {
+        const refs = useRefs();
+        const domyEl = document.querySelector('#res');
+
+        onSetuped(() => {
+          setupedEl.textContent = domyEl.getAttribute('d-text');
+          domyEl.setAttribute('d-text', "'Bye World!'");
+        });
+
+        onMounted(() => {
+          console.log(refs);
+          mountedEl.textContent = domyEl.getAttribute('d-text') ?? '';
+        });
+
+        onBeforeUnmount(() => {
+          beforeUnmountEl.textContent = refs.res.tagName;
+        });
+
+        onUnmounted(() => {
+          unmountedEl.textContent = refs.res.tagName;
+        });
+      }
+    });
+
+    DOMY.createApp(() => {
+      const show = signal(true);
+      return { show };
+    })
+      .components({
+        Component
+      })
+      .mount();
+  </script>
+</html>

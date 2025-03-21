@@ -1,11 +1,9 @@
 import { DomyDirectiveHelper } from '../types/Domy';
 
-const reg = /\{\{\s*(?<org>.+?)\s*\}\}/gi;
-
 /**
  * Render a textContent
  * Example with count = 5:
- * Count: {{ this.count.value }}
+ * Count: {{ count }}
  * Will give
  * Count: 5
  * @param domy
@@ -13,13 +11,14 @@ const reg = /\{\{\s*(?<org>.+?)\s*\}\}/gi;
  * @author yoannchb-pro
  */
 export function renderText(domy: DomyDirectiveHelper) {
-  const originalTextContent = domy.el.textContent ?? '';
+  const originalTextContent = domy.block.el.textContent ?? '';
 
   domy.effect(() => {
-    if (reg.test(originalTextContent)) {
-      domy.el.textContent = originalTextContent.replace(reg, function (_, code) {
+    domy.block.el.textContent = originalTextContent.replace(
+      /\{\{\s*(?<org>.+?)\s*\}\}/g,
+      function (_, code) {
         return domy.evaluate(code);
-      });
-    }
+      }
+    );
   });
 }

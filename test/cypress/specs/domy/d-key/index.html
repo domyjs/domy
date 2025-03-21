@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-key</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <Component
+      d-for="element of list"
+      d-key="element.id"
+      :title="'Hello World' + element.id"
+    ></Component>
+
+    <button @click="list.push({ id: list[list.length - 1].id + 1 })">Add element</button>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    const Component = DOMY.createComponent({
+      props: ['title'],
+      html: `<p>{{ $props.title }}</p>`
+    });
+
+    DOMY.createApp(() => {
+      const list = signal([
+        { id: 1, title: 'Premier' },
+        { id: 2, title: 'Deuxième' }
+      ]);
+
+      return {
+        list
+      };
+    })
+      .components({
+        Component
+      })
+      .mount();
+  </script>
+</html>

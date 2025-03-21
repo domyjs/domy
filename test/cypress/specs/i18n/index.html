@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>i18n</title>
+    <script src="/packages/i18n/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ $t('title') }}</h1>
+    <h2>{{ msg }}</h2>
+
+    <p id="validName">Message: {{ $t('greeting.hello', { name }) }}</p>
+    <p id="invalideName">Message: {{ $t('greeting.bye') }}</p>
+    <p id="invalideKey">Message: {{ $t('key.who.doesnt.exist') }}</p>
+    <p id="defaultMessage">
+      Message: {{ $t({ key: 'key.who.doesnt.exist', defaultMessage: 'default message' }) }}
+    </p>
+
+    <p id="supportedLangages">{{ $i18n.getSupportedLangages().join(',') }}</p>
+
+    <button id="name" @click="name = 'Pierre'">Change name to pierre</button>
+    <button id="fr" @click="$i18n.setLangage('fr')">Change to FR</button>
+    <button id="uk" @click="$i18n.setLangage('uk')">Change to UK</button>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    const { i18nPlugin, useI18n } = i18n({
+      messages: {
+        en: {
+          title: 'Hello World!',
+          greeting: {
+            hello: 'Hello, {{ name }}',
+            bye: 'Bye, {{ name }}'
+          }
+        },
+        fr: {
+          title: 'Bonjour le monde!',
+          greeting: {
+            hello: 'Bonjour, {{ name }}',
+            bye: 'Aurevoir, {{ name }}'
+          }
+        }
+      },
+      currentLangage: 'en',
+      defaultCallbackLangage: 'en'
+    });
+
+    DOMY.createApp(() => {
+      const { t } = useI18n();
+      const name = signal('Yoann');
+
+      return { msg: t('title'), name };
+    })
+      .plugins([i18nPlugin])
+      .mount();
+  </script>
+</html>

@@ -18,22 +18,24 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.14.0'
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run Build
-        run: npm run fastBuild
-
-      - name: Run Tests
-        run: npm run test
+      - name: Clear cache and Install dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Run Prettier
         run: npm run prettier
 
       - name: Run Linter
         run: npm run lint
+
+      - name: Run Build
+        run: npm run fastBuild
+
+      - name: Run Tests
+        run: npm run test
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-ref</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ Object.keys($refs) }}</h1>
+
+    <Component d-ref="input"></Component>
+    <p d-setup="refName = 'p'" d-ref.dynamic="refName"></p>
+  </body>
+  <script>
+    const { onMounted, useRefs } = DOMY;
+
+    const Component = DOMY.createComponent({
+      html: `<input type="text" value="Hello World!" />`
+    });
+
+    DOMY.createApp(() => {
+      const refName = DOMY.signal(null);
+      const refs = useRefs();
+
+      onMounted(() => {
+        console.log(refs);
+        refs.p.textContent = refs.input.value;
+      });
+
+      return { refName };
+    })
+      .components({
+        Component
+      })
+      .mount();
+  </script>
+</html>

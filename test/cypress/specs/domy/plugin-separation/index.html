@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plugin Separation</title>
+    <script src="/packages/domy/dist/index.js"></script>
+    <style>
+      .red {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app1">
+      <p>{{ $hello }}</p>
+      <span>{{ $bye }}</span>
+    </div>
+
+    <div id="app2">
+      <p>{{ $hello }}</p>
+      <span>{{ $bye }}</span>
+    </div>
+  </body>
+  <script>
+    DOMY.createApp()
+      .plugins([
+        function (domyPluginSetter) {
+          domyPluginSetter.helper('hello', () => 'Hello World!');
+        }
+      ])
+      .mount(document.querySelector('#app1'));
+
+    DOMY.createApp()
+      .plugins([
+        function (domyPluginSetter) {
+          domyPluginSetter.helper('bye', () => 'Bye World!');
+        }
+      ])
+      .mount(document.querySelector('#app2'));
+  </script>
+</html>

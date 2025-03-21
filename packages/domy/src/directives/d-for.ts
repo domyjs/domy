@@ -1,98 +1,7 @@
+import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
-import { warn } from '../utils/logs';
-import { moveElement } from '../utils/moveElement';
 
-type RendererProps = {
-  value: any;
-  valueIndex: number;
-  initialChilds: Element[];
-  domy: DomyDirectiveHelper;
-  forPattern: RegExpExecArray;
-};
-
-/**
- * Render the childs in d-for element for a specific value and index
- * @param props
- * @returns
- *
- * @author yoannchb-pro
- */
-function renderer(props: RendererProps) {
-  const domy = props.domy;
-  const el = domy.el;
-  const currentChildrens = Array.from(el.children);
-  const renderedChildrens: (Element | ChildNode | Node)[] = [];
-
-  // Add the current value to the scope
-  let scope = {
-    [props.forPattern!.groups!.dest]: props.value
-  };
-  // Add the current value index to the scope if needed
-  if (props.forPattern!.groups?.index) {
-    scope = {
-      ...scope,
-      [props.forPattern!.groups.index]: props.valueIndex
-    };
-  }
-  domy.addScopeToNode(scope);
-
-  for (let childIndex = 0; childIndex < props.initialChilds.length; ++childIndex) {
-    const initialChild = props.initialChilds[childIndex] as Element;
-    const currentIndex = props.valueIndex * props.initialChilds.length + childIndex;
-
-    const keyAttr = initialChild.getAttribute(':key');
-    if (keyAttr) {
-      // Check if the key already exist so we can skip render
-      const keyValue = domy.evaluateWithoutListening(keyAttr);
-      const elementWithKeyIndex = currentChildrens.findIndex(
-        el => el.getAttribute('key') === keyValue.toString()
-      );
-
-      if (elementWithKeyIndex !== -1) {
-        const elementWithKey = currentChildrens[elementWithKeyIndex];
-        if (elementWithKeyIndex !== currentIndex) {
-          // If the index of the element changed we move it to the new position
-          moveElement(el, elementWithKey, currentIndex);
-        }
-
-        renderedChildrens.push(elementWithKey);
-        continue;
-      }
-    }
-
-    // Create and render the new element
-    const newChild = initialChild.cloneNode(true);
-    domy.deepRender({
-      element: newChild as Element,
-      state: domy.state,
-      scopedNodeData: domy.scopedNodeData
-    });
-
-    const oldRender: ChildNode | undefined = el.childNodes[currentIndex];
-
-    // If an element doesn't exist at this index it mean we append a new child
-    if (!oldRender) {
-      el.appendChild(newChild);
-      renderedChildrens.push(newChild);
-      continue;
-    }
-
-    // If an element exist at this index we compare them
-    // If there are different we append the new child just before the old one
-    // Otherwise we don't do anything
-    const isEqual = oldRender.isEqualNode(newChild);
-    if (!isEqual) {
-      el.insertBefore(newChild, oldRender);
-      renderedChildrens.push(newChild);
-    } else {
-      renderedChildrens.push(oldRender);
-    }
-  }
-
-  domy.removeScopeToNode(scope);
-
-  return renderedChildrens;
-}
+type LastRender = { render: Block; reactiveIndex: { value: number } };
 
 /**
  * d-for implementation
@@ -103,65 +12,127 @@ function renderer(props: RendererProps) {
  * @author yoannchb-pro
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el;
-  const initialChilds = Array.from(el.children);
+  const originalEl = domy.block.el;
+  const rawKey = originalEl.getAttribute('d-key');
 
-  // Display a warning message if the childrens don't have a :key attribute
-  for (const child of initialChilds) {
-    if (!child.getAttribute(':key')) {
-      warn('Elements inside a d-for parent should be rendered with :key attribute.');
-      break;
-    }
+  const traceStartPositionComment = new Comment('d-for start position tracking, do not remove');
+  const traceEndPositionComment = new Comment('d-for end position tracking, do not remove');
+  originalEl.before(traceStartPositionComment);
+  traceStartPositionComment.after(traceEndPositionComment);
+  originalEl.remove();
+
+  // Display a warning message if the childrens don't have a d-key attribute
+  if (!originalEl.getAttribute('d-key')) {
+    domy.utils.warn(
+      `Elements inside the "${domy.directive}" directive should be rendered with "key" directive.`
+    );
   }
 
-  // Remove the original content
-  el.innerHTML = '';
+  function insertToIndex(element: Element, lookingIndex: number) {
+    let sibling = traceStartPositionComment.nextSibling;
+    let index = 0;
 
-  domy.effect(() => {
-    const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)/gi;
-    const forPattern = forRegex.exec(domy.attr.value);
-
-    if (!forPattern)
-      throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
-
-    const isForIn = forPattern.groups!.type === 'in';
-    const executedValue = domy.evaluate(forPattern.groups!.org);
-
-    const renderedChildrens: (Element | ChildNode | Node)[] = [];
-
-    let valueIndex = 0;
-    const renderChilds = (value: any) => {
-      const renderedChildForCurrentValue = renderer({
-        domy,
-        forPattern,
-        initialChilds,
-        value,
-        valueIndex
-      });
-      renderedChildrens.push(...renderedChildForCurrentValue);
-      ++valueIndex;
-    };
-
-    if (isForIn) {
-      // Handle "for in"
-      for (const value in executedValue) {
-        renderChilds(value);
-      }
-    } else {
-      // Handle "for of"
-      for (const value of executedValue) {
-        renderChilds(value);
-      }
+    while (sibling !== traceEndPositionComment && index < lookingIndex) {
+      ++index;
+      sibling = sibling!.nextSibling;
     }
 
-    // Remove remaining childs that shouldn't be there
-    const childrendsToRemove = Array.from(el.childNodes ?? []).filter(
-      child => !renderedChildrens.includes(child)
-    );
-    for (const child of childrendsToRemove) {
-      child.remove();
+    if (sibling) sibling.before(element);
+  }
+
+  function cleanupLastRender(lastRender: LastRender) {
+    domy.unReactive(lastRender.reactiveIndex);
+    lastRender.render.remove();
+    lastRender.render.unmount();
+  }
+
+  // Checking "for" pattern
+  const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)/gi;
+  const forPattern = forRegex.exec(domy.attr.value);
+
+  if (!forPattern)
+    throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
+
+  const isForIn = forPattern.groups!.type === 'in';
+
+  const lastRenders: LastRender[] = [];
+
+  domy.effect(() => {
+    const treatedRenders: LastRender[] = [];
+
+    const renderEl = (value: unknown, index: number) => {
+      // Add the value to the scope
+      let scope = {
+        [forPattern!.groups!.dest]: value
+      };
+      // Add the index to the scope if needed
+      const reactiveIndex = domy.signal(index);
+      if (forPattern!.groups?.index) {
+        scope = {
+          ...scope,
+          [forPattern!.groups.index]: reactiveIndex
+        };
+      }
+
+      if (rawKey) {
+        // Check if the key already exist so we can skip render
+        domy.addScopeToNode(scope);
+        const currentKeyValue = domy.evaluate(rawKey);
+        domy.removeScopeToNode(scope);
+
+        const oldRender = lastRenders.find(({ render }) => render.key === currentKeyValue);
+
+        if (oldRender) {
+          const oldRenderEl = oldRender.render.el;
+          const oldRenderIndex = oldRender.reactiveIndex.value;
+
+          // If the index of the element changed we move it to the new position
+          if (oldRenderIndex !== index) {
+            insertToIndex(oldRenderEl, index);
+            oldRender.reactiveIndex.value = index;
+          }
+
+          return treatedRenders.push(oldRender);
+        }
+      }
+
+      // Create and render the new element
+      const newEl = originalEl.cloneNode(true) as Element;
+      insertToIndex(newEl, index);
+      const render = domy.deepRender({
+        element: newEl,
+        scopedNodeData: [...domy.scopedNodeData, scope]
+      });
+      const newRender = { render, reactiveIndex };
+      lastRenders.push(newRender);
+      treatedRenders.push(newRender);
+    };
+
+    let index = 0;
+    const executedValue = domy.evaluate(forPattern.groups!.org);
+
+    // Create or swap the elements
+    if (isForIn) {
+      for (const value in executedValue) renderEl(value, index++);
+    } else {
+      for (const value of executedValue) renderEl(value, index++);
+    }
+
+    // Remove unecessary elements
+    for (const render of lastRenders) {
+      if (treatedRenders.indexOf(render) === -1) cleanupLastRender(render);
     }
   });
 
-  return { skipChildsRendering: true };
+  domy.cleanup(() => {
+    traceStartPositionComment.remove();
+    traceEndPositionComment.remove();
+    for (const render of lastRenders) cleanupLastRender(render);
+  });
+
+  return {
+    skipChildsRendering: true,
+    skipComponentRendering: true,
+    skipOtherAttributesRendering: true
+  };
 }

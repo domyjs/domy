@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-model</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <div id="simple-input">
+      <p>{{ search }}</p>
+      <button @click="search = 'Bye World!'">Set to Bye World!</button>
+      <input type="text" d-model="search" />
+    </div>
+
+    <div id="lazy-modifier">
+      <p>Lazy: {{ searchLazy }}</p>
+      <button @click="searchLazy = 'Bye World!'">Set to Bye World!</button>
+      <input type="text" d-model.lazy="searchLazy" />
+    </div>
+
+    <div id="textarea">
+      <p>{{ search2 }}</p>
+      <textarea d-model="search2"></textarea>
+    </div>
+
+    <div id="number-input">
+      <p>{{ "res: " + age + " " + (typeof age) }}</p>
+      <input type="number" placeholder="age" d-model="age" />
+    </div>
+
+    <div id="number-modifier">
+      <p>{{ "res: " + age2 + " " + (typeof age2) }}</p>
+      <input placeholder="age" d-model.number="age2" />
+    </div>
+
+    <div id="select">
+      <p>{{ selectedColor }}</p>
+      <select d-model="selectedColor">
+        <option d-for="color of ['red', 'blue', 'green']" d-key="color" :value="color">
+          {{ color }}
+        </option>
+      </select>
+    </div>
+
+    <div id="select-multiple">
+      <p>{{ selectedColor2.join(',') }}</p>
+      <select d-model="selectedColor2" multiple>
+        <option d-for="color of ['red', 'blue', 'green']" d-key="color" :value="color">
+          {{ color }}
+        </option>
+      </select>
+    </div>
+
+    <div id="radio">
+      <p>{{ selectedColor3 }}</p>
+
+      <div d-for="color of ['red', 'blue', 'green']" d-key="color">
+        <input type="radio" name="color" :value="color" d-model="selectedColor3" />
+        <span>{{ color }}</span>
+      </div>
+    </div>
+
+    <div id="checkbox">
+      <br />
+      <input type="checkbox" id="checkbox" d-model="checked" />
+      <label for="checkbox">{{ checked }}</label>
+    </div>
+
+    <div id="multiple-checkbox">
+      <p>{{ checkedColors.join(',') }}</p>
+
+      <div d-for="color of ['red', 'blue', 'green']" d-key="color">
+        <input type="checkbox" name="color" :value="color" d-model="checkedColors" />
+        <span>{{ color }}</span>
+      </div>
+    </div>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const search = DOMY.signal('Hello World!');
+      const searchLazy = DOMY.signal('Hello World!');
+      const search2 = DOMY.signal('Hello World!');
+
+      const age = DOMY.signal(0);
+      const age2 = DOMY.signal(0);
+
+      const selectedColor = DOMY.signal('red');
+      const selectedColor2 = DOMY.signal(['red', 'blue']);
+      const selectedColor3 = DOMY.signal('red');
+
+      const checked = DOMY.signal(true);
+      const checkedColors = DOMY.signal(['red']);
+
+      return {
+        search,
+        searchLazy,
+        search2,
+        age,
+        age2,
+        selectedColor,
+        selectedColor2,
+        selectedColor3,
+        checked,
+        checkedColors
+      };
+    }).mount();
+  </script>
+</html>

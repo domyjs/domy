@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>$nextTick</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <p>Actual msg: <span id="messageText">{{ msg }}</span></p>
+
+    <p id="before"></p>
+    <p id="after"></p>
+
+    <button
+      id="updateMessage"
+      @click="() => {
+        const p = document.querySelector('#messageText');
+        const checkNextTick = document.querySelector('#checkNextTick');
+
+        msg = 'After';
+
+        console.log('Before next tick:', p.textContent);
+        document.querySelector('#before').textContent = p.textContent;
+
+        $nextTick(() => {
+          console.log('Next tick called:', p.textContent);
+          document.querySelector('#after').textContent = p.textContent;
+        });
+    }"
+    >
+      Update message
+    </button>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const msg = signal('Before');
+
+      return { msg };
+    }).mount();
+  </script>
+</html>

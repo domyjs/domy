@@ -4,6 +4,7 @@
   "description": "Domyjs debounce plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "buildName": "debounce",
   "files": [
     "/dist",
     "package.json",
@@ -24,8 +25,5 @@
   "bugs": {
     "url": "https://github.com/yoannchb-pro/domy/issues"
   },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme",
-  "devDependencies": {
-    "@domyjs/types": "file:../types"
-  }
+  "homepage": "https://github.com/yoannchb-pro/domy#readme"
 }

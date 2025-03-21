@@ -5,7 +5,7 @@
  * @returns
  */
 export function executeActionAfterAnimation(el: Element, action: () => void) {
-  const actionAfterAnimation: EventListenerOrEventListenerObject = () => {
+  const actionAfterAnimation = () => {
     action();
   };
 
@@ -15,5 +15,6 @@ export function executeActionAfterAnimation(el: Element, action: () => void) {
   return () => {
     el.removeEventListener('animationend', actionAfterAnimation);
     el.removeEventListener('transition', actionAfterAnimation);
+    actionAfterAnimation();
   };
 }

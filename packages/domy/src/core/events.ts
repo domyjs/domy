@@ -11,38 +11,53 @@ import on from '../utils/on';
  * @author yoannchb-pro
  */
 export function events(domy: DomyDirectiveHelper) {
-  const domyAttrName = domy.attrName;
-  const eventName = domyAttrName.startsWith('@') ? domyAttrName.slice(1) : domyAttrName;
+  const queueId = domy.getUniqueQueueId();
+  const eventName = domy.attrName;
+  let el = domy.block.el;
 
-  if (!domy.state.events[eventName]) domy.state.events[eventName] = [];
-  domy.state.events[eventName].push(domy.el);
+  let removeEventListener: (() => void) | null = null;
 
-  const eventListener: EventListenerOrEventListenerObject = event => {
-    // If the element is not present in the dom we don't execute the event
-    if (!domy.el.isConnected) {
-      return;
-    }
+  function setUpEvent() {
+    const eventListener: EventListenerOrEventListenerObject = async event => {
+      const scope = {
+        $event: event
+      };
 
-    const scope = {
-      $event: event
+      domy.addScopeToNode(scope);
+
+      domy.queueJob(() => {
+        const executedValue = domy.evaluate(domy.attr.value);
+        if (typeof executedValue === 'function') executedValue(event);
+      }, queueId);
+
+      domy.queueJob(() => domy.removeScopeToNode(scope), queueId);
     };
 
-    domy.addScopeToNode(scope);
+    // We add wrappers to the listener to ensure we can add modifiers
+    const wrap = on({
+      el: el,
+      eventName,
+      listener: eventListener,
+      modifiers: domy.modifiers
+    });
 
-    const executedValue = domy.evaluateWithoutListening(domy.attr.value);
+    wrap.listenerTarget.addEventListener(wrap.eventName, wrap.listener, wrap.options);
 
-    // Ensure nextTick is called after changing variable state
-    if (typeof executedValue === 'function') {
-      domy.queueJob(() => executedValue(event));
-    }
+    removeEventListener = () =>
+      wrap.listenerTarget.removeEventListener(wrap.eventName, wrap.listener, wrap.options);
+  }
 
-    domy.removeScopeToNode(scope);
+  setUpEvent();
+
+  const cleanup = () => {
+    if (removeEventListener) removeEventListener();
   };
 
-  on({
-    el: domy.el,
-    eventName,
-    listener: eventListener,
-    modifiers: domy.modifiers
+  domy.block.onElementChange(newEl => {
+    cleanup();
+    el = newEl;
+    setUpEvent();
   });
+
+  domy.cleanup(cleanup);
 }

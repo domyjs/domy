@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>watch</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>Count: {{ count }}</h1>
+    <h2>Count by 2: {{ countby2 }}</h2>
+
+    <button id="inc" @click="count++">+</button>
+    <button id="dec" @click="count--">-</button>
+
+    <button id="inc2" @click="countby2++">+2</button>
+    <button id="dec2" @click="countby2--">-2</button>
+
+    <button id="todo1" @click="todos[1].isComplete = true">Change todo1</button>
+    <p id="path">{{ path }}</p>
+    <p id="index">{{ index }}</p>
+  </body>
+  <script>
+    const { signal, watch, matchPath } = DOMY;
+
+    DOMY.createApp(() => {
+      const todos = signal([
+        { name: 'cleanning', isComplete: false },
+        { name: 'homework', isComplete: false }
+      ]);
+
+      const countby2 = signal(0);
+      const count = signal(0);
+      const path = signal('');
+      const index = signal('');
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < prevValue) {
+            countby2.value--;
+          } else {
+            countby2.value++;
+          }
+        },
+        () => countby2
+      );
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) {
+            count.value = prevValue;
+          }
+        },
+        () => count
+      );
+
+      watch(
+        ({ path: watcherPath }) => {
+          const matcher = matchPath('value.{index}.*', watcherPath);
+          path.value = watcherPath;
+          index.value = matcher.params.index;
+        },
+        () => todos
+      );
+
+      return {
+        todos,
+        countby2,
+        count,
+        path,
+        index
+      };
+    }).mount();
+  </script>
+</html>

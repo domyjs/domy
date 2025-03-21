@@ -1,14 +1,7 @@
-export type App = {
-  target?: HTMLElement;
-  setup?: () => void | Promise<void>;
-  mounted?: () => void | Promise<void>;
-  watch?: {
-    [depName: string]: (
-      prevValue: any,
-      newValue: any,
-      utils: { path: string; params: Record<string, string> }
-    ) => void | Promise<void>;
-  };
-  data?: { [depName: string]: any };
-  methods?: { [fnName: string]: (...args: any[]) => any | Promise<any> };
+export type AppState = {
+  isSetuped: boolean;
+  isMounted: boolean;
+  isUnmounted: boolean;
 };
+
+export type App = () => Record<string, unknown>;

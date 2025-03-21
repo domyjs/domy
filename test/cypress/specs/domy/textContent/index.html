@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>textContent</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ msg }}</h1>
+    <button @click="msg = 'Bye World!'">Change to Bye World!</button>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const msg = signal('Hello World!');
+
+      return {
+        msg
+      };
+    }).mount();
+  </script>
+</html>

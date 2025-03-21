@@ -1,11 +1,21 @@
-import { configuration } from '../config';
-import { DomyDirectiveHelper } from '../types/Domy';
-import { State } from '../types/State';
+import { cspEvaluate } from '../utils/cspEvaluate';
 import { evaluate } from '../utils/evaluate';
 import { getContext } from '../utils/getContext';
-import { deepRender } from './deepRender';
-import { Listener, OnSetListener, reactive } from './reactive';
-import { queueJob } from './scheduler';
+import * as ReactiveUtils from '@domyjs/reactive';
+import { getUniqueQueueId, queueJob } from './scheduler';
+import { State } from '../types/State';
+import { Config } from '../types/Config';
+import { directivesUtils } from '../utils/directivesUtils';
+import { DomyDirectiveHelper } from '../types/Domy';
+import { createDeepRenderFn } from './deepRender';
+import { getDomyAttributeInformations } from '../utils/domyAttrUtils';
+import type { Block } from './Block';
+import { DOMY_EVENTS } from './DomyEvents';
+import { error } from '../utils/logs';
+import { PluginHelper } from './plugin';
+import { AppStateObserver } from './AppState';
+
+let domyHelperId = 0;
 
 /**
  * Domy helper class that handle dependencie change and give everything we need
@@ -13,10 +23,12 @@ import { queueJob } from './scheduler';
  * @author yoannchb-pro
  */
 export class DomyHelper {
-  private onSetListener: OnSetListener | null = null;
+  private domyHelperId = ++domyHelperId;
 
-  private cleanupFn: (() => Promise<void> | void) | null = null;
-  private effectFn: (() => Promise<void> | void) | null = null;
+  private isUnmountCalled = false;
+
+  private cleanupFn: (() => void) | null = null;
+  private clearEffectList: (() => void)[] = [];
 
   public prefix: string = '';
   public directive: string = '';
@@ -24,24 +36,27 @@ export class DomyHelper {
   public attr: { name: string; value: string } = { name: '', value: '' };
   public modifiers: string[] = [];
 
-  private paths = new Set<string>();
-
-  private static evaluator = evaluate;
-
   constructor(
-    private deepRenderFn: typeof deepRender, // It allow us to avoid circular dependencie (deepRender -> DomyHelper -> deepRender)
-    public el: Element,
+    private appId: number,
+    private deepRenderFn: ReturnType<typeof createDeepRenderFn>,
+    public block: Block,
     public state: State,
-    public scopedNodeData: Record<string, any>[] = []
+    public scopedNodeData: Record<string, any>[] = [],
+    public config: Config,
+    public renderWithoutListeningToChange: boolean,
+    public appState: AppStateObserver,
+    public pluginHelper: PluginHelper
   ) {}
 
-  getPluginHelper(renderWithoutListeningToChange = false): DomyDirectiveHelper {
-    const evaluateWithoutListening = this.evaluateWithoutListening.bind(this);
-
+  getPluginHelper(): DomyDirectiveHelper {
     return {
-      el: this.el,
+      domyHelperId: this.domyHelperId,
+      pluginHelper: this.pluginHelper,
+      appState: this.appState,
+      block: this.block,
       state: this.state,
       scopedNodeData: this.scopedNodeData,
+      config: this.config,
 
       prefix: this.prefix,
       directive: this.directive,
@@ -50,15 +65,16 @@ export class DomyHelper {
       attrName: this.attrName,
       attr: this.attr,
 
-      getConfig: configuration.getConfig,
+      ...ReactiveUtils,
+      utils: directivesUtils,
+
       queueJob,
+      getUniqueQueueId,
+      onElementMounted: this.onElementMounted.bind(this),
+      onAppMounted: this.onAppMounted.bind(this),
       effect: this.effect.bind(this),
       cleanup: this.cleanup.bind(this),
-      reactive,
-      evaluate: renderWithoutListeningToChange
-        ? evaluateWithoutListening
-        : this.evaluate.bind(this),
-      evaluateWithoutListening,
+      evaluate: this.evaluate.bind(this),
       deepRender: this.deepRenderFn,
       addScopeToNode: this.addScopeToNode.bind(this),
       removeScopeToNode: this.removeScopeToNode.bind(this),
@@ -66,70 +82,101 @@ export class DomyHelper {
     };
   }
 
-  attachOnSetListener() {
-    if (this.onSetListener) return;
-    this.onSetListener = {
-      type: 'onSet',
-      fn: ({ path }) => {
-        for (const listenedPath of this.paths) {
-          if (this.state.data.matchPath(listenedPath, path).isMatching) {
-            this.callCleanup();
-            this.callEffect();
-          }
-        }
+  copy() {
+    const copy = new DomyHelper(
+      this.appId,
+      this.deepRenderFn,
+      this.block,
+      this.state,
+      [...this.scopedNodeData], // Ensure the scoped node data of the current node are not affected by the next operations (like removing the scoped data in d-for)
+      this.config,
+      this.renderWithoutListeningToChange,
+      this.appState,
+      this.pluginHelper
+    );
+    return copy;
+  }
+
+  setAttrInfos(attr: Attr) {
+    const attrInfos = getDomyAttributeInformations(attr);
+    this.prefix = attrInfos.prefix;
+    this.directive = attrInfos.directive;
+    this.modifiers = attrInfos.modifiers;
+    this.attrName = attrInfos.attrName; // The attribute name without the modifiers and prefix (examples: d-on:click.{enter} -> click)
+    this.attr.name = attr.name; // the full attribute name
+    this.attr.value = attr.value;
+  }
+
+  onElementMounted(cb: () => void) {
+    if (this.appState.isMounted) cb();
+    else this.block.attachListener(DOMY_EVENTS.Element.Mounted, cb, { once: true });
+  }
+
+  onAppMounted(cb: () => void) {
+    if (this.appState.isMounted) return cb();
+
+    const removeObserver = this.appState.addObserver({
+      type: 'isMounted',
+      callback: () => {
+        if (!this.appState.isMounted) return;
+
+        removeObserver();
+        cb();
       }
+    });
+  }
+
+  clearEffects() {
+    for (const clearEffect of this.clearEffectList) {
+      clearEffect();
+    }
+    this.clearEffectList.length = 0;
+  }
+
+  effect(fn: () => void) {
+    // Ensure to not make the effect if the app is unmounted
+    const fixedFn = () => {
+      if (!this.isUnmountCalled) directivesUtils.callWithErrorHandling(fn, err => error(err));
     };
-    this.state.data.attachListener(this.onSetListener);
+
+    if (!this.renderWithoutListeningToChange) {
+      const uneffect = directivesUtils.queuedWatchEffect(fixedFn, {
+        dontQueueOnFirstExecution: !this.appState.isMounted
+      });
+      this.clearEffectList.push(uneffect);
+    } else {
+      fixedFn();
+    }
   }
 
-  effect(cb: () => void | Promise<void>) {
-    this.effectFn = cb;
-  }
-
-  cleanup(cb: () => void | Promise<void>) {
+  cleanup(cb: () => void) {
     this.cleanupFn = cb;
   }
 
-  eval(code: string) {
-    const executedValued = DomyHelper.evaluator({
+  evaluate(code: string) {
+    const evaluator = this.config.CSP ? cspEvaluate : evaluate;
+
+    const context = getContext({
+      domyHelperId: this.domyHelperId,
+      el: this.block.el,
+      state: this.state,
+      scopedNodeData: this.scopedNodeData,
+      config: this.config,
+      pluginHelper: this.pluginHelper
+    });
+
+    const executedValued = evaluator({
       code: code,
-      contextAsGlobal: !configuration.getConfig().avoidDeprecatedWith,
-      context: getContext(this.el, this.state, this.scopedNodeData),
+      contextAsGlobal: !this.config.avoidDeprecatedWith,
+      context,
       returnResult: true
     });
-    return executedValued;
-  }
-
-  evaluate(code: string) {
-    this.paths = new Set<string>();
-
-    const listener: Listener = {
-      type: 'onGet',
-      fn: ({ path }) => {
-        this.attachOnSetListener();
-        this.paths.add(path);
-      }
-    };
-
-    this.state.data.attachListener(listener);
-
-    const executedValued = this.eval(code);
-
-    this.state.data.removeListener(listener);
 
     return executedValued;
-  }
-
-  evaluateWithoutListening(code: string) {
-    return this.eval(code);
-  }
-
-  static setEvaluator(evaluator: typeof DomyHelper.evaluator) {
-    DomyHelper.evaluator = evaluator;
   }
 
   addScopeToNode(obj: Record<string, any>) {
-    this.scopedNodeData.unshift(obj);
+    this.scopedNodeData.push(obj);
   }
 
   removeScopeToNode(obj: Record<string, any>) {
@@ -137,11 +184,20 @@ export class DomyHelper {
     if (index !== -1) this.scopedNodeData.splice(index, 1);
   }
 
-  callCleanup() {
-    if (typeof this.cleanupFn === 'function') queueJob(this.cleanupFn.bind(this));
+  getCleanupFn() {
+    return this.callCleanup.bind(this);
   }
 
-  callEffect() {
-    if (typeof this.effectFn === 'function') queueJob(this.effectFn.bind(this));
+  callCleanup() {
+    const unmountQueueId = getUniqueQueueId();
+
+    // Ensure the jobs already in queue that affect this element don't start
+    this.isUnmountCalled = true;
+
+    queueJob(() => {
+      this.clearEffects();
+      if (typeof this.cleanupFn === 'function') this.cleanupFn();
+      this.cleanupFn = null;
+    }, unmountQueueId);
   }
 }

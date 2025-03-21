@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/i18n",
+  "buildName": "i18n",
   "version": "1.0.0",
   "description": "Domyjs i18n plugin",
   "main": "./dist/index.js",
@@ -26,6 +27,6 @@
   },
   "homepage": "https://github.com/yoannchb-pro/domy#readme",
   "devDependencies": {
-    "@domyjs/types": "file:../types"
+    "@domyjs/core": "file:../domy"
   }
 }

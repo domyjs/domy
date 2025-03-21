@@ -1,17 +1,17 @@
-import { PLUGINS } from '../core/plugin';
-import { DomySpecialHelper } from '../types/Domy';
+import { Config } from '../types/Config';
 import { State } from '../types/State';
+import { getHelpers } from './getHelpers';
+import { getReactiveHandler } from './getReactiveHandler';
+import { PluginHelper } from '../core/plugin';
 
-/**
- * Create fake data to provide an object with the same keys but a null value
- * @param obj
- * @returns
- *
- * @author yoannchb-pro
- */
-function createFakeData(obj: Record<string, any>) {
-  return Object.keys(obj).reduce((a, b) => ({ ...a, [b]: null }), {});
-}
+type Props = {
+  domyHelperId?: number;
+  el?: Element | Text;
+  state: State;
+  scopedNodeData: Record<string, any>[];
+  config: Config;
+  pluginHelper: PluginHelper;
+};
 
 /**
  * Return a context with all what domy need to render
@@ -23,73 +23,22 @@ function createFakeData(obj: Record<string, any>) {
  *
  * @author yoannchb-pro
  */
-export function getContext(
-  el: Element | Text | undefined,
-  state: State,
-  scopedNodeData: Record<string, any>[] = []
-) {
-  const stateDatas = state.data.reactiveObj;
+export function getContext(props: Props) {
+  const helpers = getHelpers(props);
 
-  const contextProxyHandler: ProxyHandler<any> = {
-    get(target, property, receiver) {
-      if (typeof property === 'symbol') return Reflect.get(target, property, receiver);
-
-      // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
-      if (property in stateDatas) {
-        return stateDatas[property];
-      } else {
-        for (const injectableData of scopedNodeData) {
-          if (property in injectableData) {
-            return injectableData[property];
-          }
-        }
-      }
-
-      return Reflect.get(target, property, receiver);
-    },
-    set(target, property, newValue, receiver) {
-      if (typeof property === 'symbol') return Reflect.set(target, property, newValue, receiver);
-
-      // We handle the case we want to get back some reactive data (because proxy destructuration doesn't work)
-      if (property in stateDatas) {
-        return (stateDatas[property] = newValue);
-      } else {
-        for (const injectableData of scopedNodeData) {
-          if (property in injectableData) {
-            return (injectableData[property] = newValue);
-          }
-        }
-      }
-
-      return Reflect.set(target, property, newValue, receiver);
-    }
+  const context = {
+    ...helpers
   };
 
-  // We create fake key with a null value because otherwise we have a reference error in the with(){ }
-  const fakeDatas = createFakeData(stateDatas);
-  const fakeScopedDatas = scopedNodeData.reduce((a, b) => ({ ...a, ...createFakeData(b) }), {});
-
-  // we init the helpers
-  const helpers: Record<string, (domy: DomySpecialHelper) => any> = {};
-  for (const [name, fn] of Object.entries(PLUGINS.helpers)) {
-    helpers['$' + name] = fn({
-      el,
-      state,
-      scopedNodeData
-    });
+  for (const key in props.state.data) {
+    Object.defineProperty(context, key, getReactiveHandler(props.state.data, key));
   }
 
-  const context = new Proxy(
-    {
-      ...fakeDatas,
-      ...fakeScopedDatas,
-
-      ...state.methods,
-
-      ...helpers
-    },
-    contextProxyHandler
-  );
+  for (const obj of props.scopedNodeData) {
+    for (const key in obj) {
+      Object.defineProperty(context, key, getReactiveHandler(obj, key));
+    }
+  }
 
   return context;
 }

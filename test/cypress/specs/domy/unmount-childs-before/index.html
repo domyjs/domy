@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-component</title>
+    <script src="/packages/domy/dist/index.js"></script>
+    <style>
+      @keyframes enter {
+        0% {
+          opacity: 0;
+          transform: translateX(3rem);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(0rem);
+        }
+      }
+
+      @keyframes out {
+        0% {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-3rem);
+        }
+      }
+
+      .transition-enter {
+        animation: enter 0.3s ease-out;
+      }
+
+      .transition-out {
+        animation: out 0.3s ease-in;
+      }
+    </style>
+  </head>
+  <body>
+    <ul d-for="page of pages">
+      <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
+    </ul>
+
+    <div d-transition="transition" d-if="currPage.title === 'Home'">
+      <p>{{ currPage.title }}</p>
+    </div>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const pages = [
+        { title: 'Home', component: 'Home' },
+        { title: 'About', component: 'About' }
+      ];
+
+      const currPage = signal(pages[0]);
+
+      return {
+        currPage,
+        pages
+      };
+    }).mount();
+  </script>
+</html>

@@ -1,6 +1,5 @@
+import { Block } from '../core/Block';
 import { DomyDirectiveHelper } from '../types/Domy';
-import { executeActionAfterAnimation } from './executeActionAfterAnimation';
-import { restoreElement } from './restoreElement';
 
 type Props = {
   shouldBeDisplay: () => boolean;
@@ -8,22 +7,7 @@ type Props = {
 };
 
 /**
- * Find where to insert the element
- * @returns
- */
-function findElementIndex(parentChilds: ChildNode[], el: Element): number {
-  let index = 0;
-  for (const child of parentChilds) {
-    if (child === el) break;
-    if (child.isConnected) ++index;
-  }
-  return index;
-}
-
-/**
- * LHandle the visibility of an element with the transition
- * removeAction: By default it will remove the element
- * displayAction: By default it will append the element to his last position into the dom
+ * Handle the visibility of an element with the transition
  * @param props
  * @returns
  *
@@ -31,14 +15,14 @@ function findElementIndex(parentChilds: ChildNode[], el: Element): number {
  */
 export function getElementVisibilityHandler(props: Props) {
   const domy = props.domy;
-  const el = domy.el;
-  const parent = domy.el.parentNode as Element;
-  const parentChilds = Array.from(parent.childNodes);
-  const transition = domy.state.transitions.get(domy.el);
+  const originalEl = domy.block.el;
 
-  let isInitialised = false;
-  let hasBeenRender = false;
-  let cleanupTransition: null | (() => void) = null;
+  const tracePositionComment = new Comment('d-if position tracking, do not remove');
+  originalEl.before(tracePositionComment);
+  originalEl.remove();
+
+  let lastRender: Block = domy.block;
+  let isInit = false;
 
   /**
    * Check if an element should be display
@@ -48,48 +32,41 @@ export function getElementVisibilityHandler(props: Props) {
    * @author yoannchb-pro
    */
   function handleVisibility() {
-    const isConnected = el.isConnected;
+    const isConnected = lastRender.el.isConnected;
     const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {
-      const removeAction = () => el.remove();
-
-      // Handle out transition
-      if (transition && isInitialised) {
-        if (cleanupTransition) cleanupTransition();
-        el.classList.remove(`${transition}-enter`);
-        el.classList.add(`${transition}-out`);
-        cleanupTransition = executeActionAfterAnimation(el, removeAction);
-      } else {
-        removeAction();
-      }
+      // Remove the element and unmount it
+      lastRender.transition = domy.block.transition;
+      lastRender.remove();
+      lastRender.unmount();
     } else if (!isConnected && shouldBeDisplay) {
+      const clone = originalEl.cloneNode(true) as Element;
+
+      // Restore the element to his original position
+      tracePositionComment.after(clone);
+
+      // Render the clone and create a new block
+      lastRender = domy.deepRender({
+        element: clone,
+        scopedNodeData: domy.scopedNodeData
+      });
+
+      // Replace the current block with the new rendered block
+      domy.block.setEl(lastRender);
+
       // Handle enter transition
-      if (transition && isInitialised) {
-        if (cleanupTransition) cleanupTransition();
-        el.classList.remove(`${transition}-out`);
-        el.classList.add(`${transition}-enter`);
-        cleanupTransition = executeActionAfterAnimation(el, () =>
-          el.classList.remove(`${transition}-enter`)
-        );
-      }
-
-      if (!hasBeenRender) {
-        // If it's the first time we display the element then we have to render it
-        domy.deepRender({
-          element: el,
-          state: domy.state,
-          byPassAttributes: [domy.attr.name]
-        });
-        hasBeenRender = true;
-      }
-
-      const indexToInsert = findElementIndex(parentChilds, el);
-      restoreElement(parent, el, indexToInsert);
+      // Need to be apply after the block know the new element
+      if (domy.block.transition?.init || isInit) domy.block.applyTransition('enterTransition');
     }
 
-    isInitialised = true;
+    isInit = true;
   }
 
-  return handleVisibility;
+  return {
+    effect: handleVisibility,
+    cleanup: () => {
+      tracePositionComment.remove();
+    }
+  };
 }

@@ -1,9 +1,8 @@
-import { reactive } from '../core/reactive';
+import type { Block } from '../core/Block';
+import { ComponentInfos } from './Component';
 
 export type State = {
-  data: ReturnType<typeof reactive>;
-  methods: { [fnName: string]: (...args: any[]) => any | Promise<any> };
-  events: { [eventName: string]: Element[] };
-  transitions: Map<Element, string>;
-  refs: Record<string, Element>;
+  data: Record<string, unknown>;
+  componentInfos?: ComponentInfos;
+  refs: Record<string, Block>;
 };

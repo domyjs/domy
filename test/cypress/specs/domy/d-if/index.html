@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-if</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <main d-if="count > 0">
+      <p d-if="count > 2" id="p2">{{ count }}</p>
+      <p d-if="count > 0" id="p0">{{ count }}</p>
+      <p d-if="count > 1" id="p1">{{ count }}</p>
+    </main>
+    <button id="inc" @click="count++">Increment count</button>
+    <button id="dec" @click="count--">Decrement count</button>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+
+      return { count };
+    }).mount();
+  </script>
+</html>

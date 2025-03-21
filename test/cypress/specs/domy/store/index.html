@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>store</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>{{ counterStore.count.value }}</h1>
+    <Count></Count>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    function useCount() {
+      const count = signal(0);
+
+      return {
+        count
+      };
+    }
+
+    const counterStore = useCount();
+
+    const Count = DOMY.createComponent({
+      html: `
+        <div>
+          <p>{{ counterStore.count.value }}</p>
+          <button id="increment" @click="counterStore.count.value++">+</button>
+          <button id="decrement" @click="counterStore.count.value--">-</button>
+        </div>
+      `,
+      app: () => {
+        return { counterStore };
+      }
+    });
+    const app = DOMY.createApp(() => {
+      return { counterStore };
+    })
+      .components({ Count })
+      .mount();
+  </script>
+</html>

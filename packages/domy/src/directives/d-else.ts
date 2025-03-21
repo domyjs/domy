@@ -1,7 +1,4 @@
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
-import { getElementVisibilityHandler } from '../utils/getElementVisibilityHandler';
-import { getPreviousConditionsElements } from '../utils/getPreviousConditionsElements';
-import { IsConnectedWatcher } from '../utils/IsConnectedWatcher';
 
 /**
  * d-else implementation
@@ -13,27 +10,32 @@ import { IsConnectedWatcher } from '../utils/IsConnectedWatcher';
  * @author yoannchb-pro
  */
 export function dElseImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.el as HTMLElement;
+  const el = domy.block.el as HTMLElement;
 
-  const allPreviousConditions = getPreviousConditionsElements(el, ['d-if', 'd-else-if']);
+  const allPreviousConditions = domy.utils.getPreviousConditionsElements(el, ['d-if', 'd-else-if']);
 
   if (allPreviousConditions.length === 0) {
     throw new Error(`"${domy.attrName}" should be preceded by "d-if" or "d-else-if" element.`);
   }
 
-  const visiblityHandler = getElementVisibilityHandler({
-    shouldBeDisplay: () => {
-      const allPreviousConditionsAreDisconnected = !allPreviousConditions.find(
-        el => el.isConnected
-      );
-      return allPreviousConditionsAreDisconnected;
-    },
+  const mergedNegativeCondition = domy.utils.mergeToNegativeCondition(
+    allPreviousConditions.map(
+      previousCondition =>
+        previousCondition.getAttribute('d-if') || previousCondition.getAttribute('d-else-if') || ''
+    )
+  );
+
+  const visibilityHandler = domy.utils.getElementVisibilityHandler({
+    shouldBeDisplay: () => domy.evaluate(mergedNegativeCondition),
     domy
   });
 
-  IsConnectedWatcher.getInstance().watch(allPreviousConditions, visiblityHandler);
+  domy.effect(visibilityHandler.effect);
+  domy.cleanup(visibilityHandler.cleanup);
 
-  visiblityHandler();
-
-  return { skipChildsRendering: true, skipOtherAttributesRendering: true };
+  return {
+    skipChildsRendering: true,
+    skipOtherAttributesRendering: true,
+    skipComponentRendering: true
+  };
 }

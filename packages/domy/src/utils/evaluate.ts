@@ -1,4 +1,4 @@
-type Props = {
+export type EvaluateProps = {
   code: string;
   context: any;
 
@@ -13,7 +13,7 @@ type Props = {
  *
  * @author yoannchb-pro
  */
-export function evaluate(props: Props) {
+export function evaluate(props: EvaluateProps) {
   let code = props.returnResult ? `return (${props.code});` : props.code;
   code = props.contextAsGlobal ? `with(this){ ${code} }` : code;
 

@@ -1,11 +1,19 @@
-import { configure } from './core/configure';
 import { createApp } from './core/createApp';
-import { plugin } from './core/plugin';
+import { createComponent } from './core/createComponent';
+import * as ReactiveUtils from '@domyjs/reactive';
+import { allHooks, helperToHookRegistrer } from './core/hooks';
 
 const DOMY = {
-  configure,
+  matchPath: ReactiveUtils.matchPath,
+  signal: ReactiveUtils.signal,
+  computed: ReactiveUtils.computed,
+  skipReactive: ReactiveUtils.skipReactive,
+
+  helperToHookRegistrer,
+  ...allHooks,
+
   createApp,
-  plugin
-} as const;
+  createComponent
+};
 
 export default DOMY;

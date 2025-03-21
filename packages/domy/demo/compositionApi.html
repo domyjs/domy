@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <div id="count1">
+      <h1>{{ count }}</h1>
+      <button id="inc" @click="increment" @increment="increment">+</button>
+      <button id="dec" @click="decrement">-</button>
+    </div>
+    <div id="count2">
+      <h1>{{ count }}</h1>
+      <button id="inc" @click="increment" @increment="increment">+</button>
+      <button id="dec" @click="decrement">-</button>
+    </div>
+  </body>
+  <script>
+    const { ref, reactive, watch } = DOMY;
+
+    function useCount() {
+      const count = ref(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
+        },
+        [count]
+      );
+
+      const increment = () => {
+        count.value++;
+      };
+
+      const decrement = () => {
+        count.value--;
+      };
+
+      return { count, increment, decrement };
+    }
+
+    DOMY.createApp(({ onMounted }) => {
+      const { count, increment, decrement } = useCount();
+
+      onMounted(({ helpers }) => {
+        helpers.$dispatch('increment');
+      });
+
+      return {
+        count,
+        increment,
+        decrement
+      };
+    }).mount(document.querySelector('#count1'));
+
+    DOMY.createApp(({ onMounted }) => {
+      const { count, increment, decrement } = useCount();
+
+      onMounted(({ helpers }) => {
+        helpers.$dispatch('increment');
+      });
+
+      return {
+        count,
+        increment,
+        decrement
+      };
+    }).mount(document.querySelector('#count2'));
+  </script>
+</html>

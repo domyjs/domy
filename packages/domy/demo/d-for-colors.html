@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-for</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <ul d-for="color of list">
+      <li>{{ color }}</li>
+    </ul>
+    <button id="add" @click="addElement()">Add</button>
+    <button id="rm" @click="removeElement()">Remove</button>
+  </body>
+  <script>
+    const colors = ['red', 'blue', 'purple', 'yellow', 'white', 'black'];
+
+    DOMY.createApp({
+      setup() {
+        this.addElement();
+      },
+      data() {
+        return {
+          index: 0,
+          list: []
+        };
+      },
+      methods: {
+        addElement() {
+          this.list.push(colors[this.index++ % colors.length]);
+        },
+        removeElement() {
+          this.list.pop();
+        }
+      }
+    }).mount();
+  </script>
+</html>

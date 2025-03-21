@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <body>
+    <div id="app" d-scope="{ title: 'Test' }">
+      <p>{{ test.g }}</p>
+      <error-message>
+        <p>{{ message }}</p>
+      </error-message>
+      <Count :title="title" @sayHello="sayHello"></Count>
+      <button @click="message = 'Nop'">Change error message</button>
+      <button @click="title = 'Test2'">changeTitle</button>
+    </div>
+  </body>
+  <script>
+    const ErrorMessage = DOMY.createComponent({
+      html: `<div>
+            <p>Error Message:</p>
+            <div :style="{ padding: '1rem', backgroundColor: 'red', color: 'white' }">
+                <template d-insert.render="$childrens?.[0]"></template>    
+            </div>
+            <p>contact admin for more infos</p>
+        </div>`
+    });
+
+    const Count = DOMY.createComponent({
+      props: ['title'],
+      html: `<div>
+            <h1>{{ $props.title ?? "Counter default title" }}</h1>
+            <p>Count: {{ count }}</p>
+            <button @click="increment">+</button>
+            <button @click="decrement">-</button>
+      </div>`,
+      app: {
+        data() {
+          return { count: 0 };
+        },
+        methods: {
+          increment: () => ++this.count,
+          decrement: () => --this.count
+        }
+      }
+    });
+
+    DOMY.createApp({
+      data() {
+        return {
+          message: 'An error occured',
+          name: 'yoann',
+          test: {}
+        };
+      },
+      methods: {
+        sayHello() {
+          console.log('hello', this.name);
+        }
+      },
+      mounted() {
+        setTimeout(() => (this.test.g = 'hello'), 2000);
+      }
+    })
+      .components({
+        ErrorMessage,
+        Count
+      })
+      .mount(document.querySelector('#app'));
+  </script>
+</html>

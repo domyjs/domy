@@ -1,132 +1,99 @@
 import { App } from '../types/App';
-import { DomyMountedEventDetails, DomyReadyEventDetails } from '../types/Events';
-import { State } from '../types/State';
-import { getContext } from '../utils/getContext';
-import { error } from '../utils/logs';
-import { toRegularFn } from '../utils/toRegularFn';
-import { deepRender } from './deepRender';
-import { reactive } from './reactive';
+import { Components, ComponentInfos } from '../types/Component';
+import { Config } from '../types/Config';
+import { DomyPlugin } from '../types/Domy';
+import { toKebabCase } from '../utils/toKebabCase';
+import { getRender } from './getRender';
+import { initApp } from './initApp';
+import { createPluginRegistrer } from './plugin';
 
-const DOMY_EVENTS = {
-  App: {
-    Initialisation: 'domy:app:initialisation',
-    Setuped: 'domy:app:setuped',
-    Mounted: 'domy:app:mounted'
-  }
-};
+let appId = 0;
 
 /**
- * Initialise domy state on a target (by default the body)
- * @param app
+ * Initialise domy on a target (by default the body)
+ * @param appDefinition
  * @param target
  *
  * @author yoannchb-pro
  */
-export async function createApp(app: App = {}) {
-  const domTarget = app.target ?? document.body;
+export function createAdvancedApp(
+  appDefinition?: App,
+  componentInfos?: ComponentInfos,
+  byPassAttributes?: string[]
+) {
+  ++appId;
 
-  // Initialisation event dispatch
-  document.dispatchEvent(
-    new CustomEvent(DOMY_EVENTS.App.Initialisation, {
-      bubbles: true,
-      detail: { app, target: domTarget } as DomyReadyEventDetails
-    })
-  );
+  const pluginHelper = componentInfos?.parentPluginHelper ?? createPluginRegistrer();
 
-  // State of the app
-  const state: State = {
-    data: reactive(app.data ?? {}),
-    methods: {},
-    events: {},
-    refs: {},
-    transitions: new Map()
-  };
+  let config: Config = {};
+  let componentsList: Components = {};
 
-  // Methods
-  for (const key in app.methods) {
-    const method = toRegularFn(app.methods[key]);
-    state.methods[key] = function (...args: any[]) {
-      return method.call(getContext(undefined, state), ...args);
-    };
-  }
+  function mount(target?: HTMLElement): {
+    render: ReturnType<typeof getRender>;
+    unmount: () => void;
+  } {
+    const build = () => {
+      const domTarget = target ?? document.body;
 
-  // Watchers
-  for (const watcherName in app.watch) {
-    let isWatcherLocked = false; // We ensure the watcher can't call it self (act like a lock)
-    const watcherfn = toRegularFn(app.watch[watcherName]);
-
-    state.data.attachListener({
-      type: 'onSet',
-      fn: async ({ path, prevValue, newValue }) => {
-        const match = state.data.matchPath(watcherName, path);
-        if (match.isMatching) {
-          if (!isWatcherLocked) {
-            isWatcherLocked = true;
-            try {
-              await watcherfn.call(getContext(undefined, state), prevValue, newValue, {
-                path,
-                params: match.params
-              });
-            } catch (err: any) {
-              error(err);
-            }
-          }
-          isWatcherLocked = false;
-        }
-      }
-    });
-  }
-
-  // Setup
-  if (app.setup) {
-    try {
-      const setupFn = toRegularFn(app.setup);
-      await setupFn.call(getContext(undefined, state));
-    } catch (err: any) {
-      error(err);
-      return;
-    }
-  }
-
-  // Setuped event dispatch
-  document.dispatchEvent(
-    new CustomEvent(DOMY_EVENTS.App.Setuped, {
-      bubbles: true,
-      detail: { app, target: domTarget } as DomyReadyEventDetails
-    })
-  );
-
-  // Init domy
-  if (document.readyState === 'complete') {
-    await mountApp();
-  } else document.addEventListener('DOMContentLoaded', mountApp);
-
-  async function mountApp() {
-    try {
-      deepRender({
-        element: domTarget,
-        state
+      return initApp({
+        appId,
+        app: appDefinition,
+        components: componentsList,
+        config,
+        target: domTarget,
+        componentInfos,
+        byPassAttributes,
+        pluginHelper
       });
-    } catch (err: any) {
-      error(err);
-    }
+    };
 
-    // Mounted
-    if (app.mounted) {
-      try {
-        const mountedFn = toRegularFn(app.mounted);
-        await mountedFn.call(getContext(undefined, state));
-      } catch (err: any) {
-        error(err);
-      }
-    }
-
-    // Mounted event dispatch
-    document.dispatchEvent(
-      new CustomEvent(DOMY_EVENTS.App.Mounted, {
-        bubbles: true,
-        detail: { app, state, target: domTarget } as DomyMountedEventDetails
-      })
-    );
+    // We ensure the DOM is accessible before mounting the app
+    return build();
   }
+
+  function configure(c: Config) {
+    config = c;
+
+    return { plugins, components, mount };
+  }
+
+  function plugins(pluginsList: DomyPlugin[]) {
+    for (const plugin of pluginsList) {
+      pluginHelper.plugin(plugin);
+    }
+
+    return { components, mount };
+  }
+
+  function components(c: Components) {
+    const kebabCaseComponents: Components = {};
+
+    for (const key in c) {
+      const kebabKey = toKebabCase(key);
+      kebabCaseComponents[kebabKey] = c[key];
+    }
+
+    componentsList = kebabCaseComponents;
+
+    return { mount };
+  }
+
+  return {
+    appId,
+    mount,
+    configure,
+    components,
+    plugins
+  };
+}
+
+/**
+ * Same as createAdvancedApp but the user can't inject data or methods
+ * @param appDefinition
+ * @returns
+ *
+ * @author yoannchb-pro
+ */
+export function createApp(appDefinition?: App) {
+  return createAdvancedApp(appDefinition);
 }

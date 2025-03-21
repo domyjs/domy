@@ -1,5 +1,6 @@
 /**
  * Wrap a function
+ * It allow us to apply many effects to a listener
  * @param listener
  * @param wrapper
  * @returns
@@ -45,13 +46,15 @@ export default function on(props: {
     });
   if (modifiers.includes('self'))
     listener = wrapListener(listener, (next, event) => {
-      event.target === listenerTarget && next(event);
+      if (event.target === listenerTarget) next(event);
     });
 
   if (modifiers.includes('passive')) options.passive = true;
   if (modifiers.includes('capture')) options.capture = true;
   if (modifiers.includes('once')) options.once = true;
 
+  // We handle keys
+  // Example: keydown.{enter}
   const keyReg = /^\{(?<keys>.+?)\}$/gi;
   const keyModifier = modifiers.find(modifier => !!modifier.match(keyReg));
   if (keyModifier) {
@@ -62,6 +65,7 @@ export default function on(props: {
 
     listener = wrapListener(listener, (next, event) => {
       if ('key' in event && keys.find(key => key === (event.key as string).toLowerCase())) {
+        event.preventDefault(); // Ensure the pressed key is not happened to the input value
         next(event);
       }
     });
@@ -76,5 +80,10 @@ export default function on(props: {
     });
   }
 
-  listenerTarget.addEventListener(eventName, listener, options);
+  return {
+    listenerTarget,
+    eventName,
+    listener,
+    options
+  };
 }

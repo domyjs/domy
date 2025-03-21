@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>watchEffect</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <h1>Count: {{ count }}</h1>
+    <h2>Count by 2: {{ countby2 }}</h2>
+
+    <button id="inc" @click="count++">+</button>
+    <button id="dec" @click="count--">-</button>
+  </body>
+  <script>
+    const { signal, watchEffect } = DOMY;
+
+    DOMY.createApp(() => {
+      const count = signal(0);
+      const countby2 = signal(0);
+
+      watchEffect(() => {
+        if (count.value < 0) count.value = 0;
+      });
+
+      watchEffect(() => {
+        countby2.value++;
+      });
+
+      return {
+        count,
+        countby2
+      };
+    }).mount();
+  </script>
+</html>

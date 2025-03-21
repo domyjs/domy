@@ -14,6 +14,6 @@ export function warn(msg: string) {
  *
  * @author yoannchb-pro
  */
-export function error(err: Error) {
-  console.error('(Domy Error)', err);
+export function error(...errs: (Error | string)[]) {
+  console.error('(Domy Error)', ...errs);
 }

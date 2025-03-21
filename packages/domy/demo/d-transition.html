@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-transition</title>
+    <script src="../dist/index.js"></script>
+  </head>
+  <style>
+    @keyframes enter {
+      0% {
+        opacity: 0;
+        transform: translateX(3rem);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0rem);
+      }
+    }
+
+    @keyframes out {
+      0% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-3rem);
+      }
+    }
+
+    @keyframes op-enter {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes op-out {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .transition-enter {
+      animation: enter 0.3s ease-out;
+    }
+
+    .transition-out {
+      animation: out 0.3s ease-in;
+    }
+
+    .op-transition-enter {
+      animation: op-enter 0.3s ease-out;
+    }
+
+    .op-transition-out {
+      animation: op-out 0.3s ease-in;
+    }
+  </style>
+  <body>
+    <div id="if" d-if="show" d-transition="transition">Modal Content... (by d-if)</div>
+    <div id="show" style="display: flex" d-show="show" d-transition="transition">
+      Modal Content... (by d-show)
+    </div>
+    <template
+      d-transition="transition"
+      d-insert.render="show ? createElement('Hello World1') : createElement('Hello World2')"
+    ></template>
+
+    <!-- INIT TEST -->
+    <div id="init" d-if="!show" d-transition.init="transition">Modal content... (init)</div>
+
+    <!-- DYNAMIC TEST -->
+    <div id="dynamic" d-if="show" d-transition.dynamic="show ? 'transition' : 'op-transition'">
+      Modal content... (dynamic)
+    </div>
+
+    <button @click="show = !show">Show modal</button>
+  </body>
+  <script>
+    DOMY.createApp({
+      data() {
+        return {
+          show: false
+        };
+      },
+      methods: {
+        createElement(text) {
+          const p = document.createElement('p');
+          p.textContent = text;
+          p.id = text.toLowerCase().replace(/\s+/, '-');
+          p.setAttribute('d-if', '5 === 5');
+          return p;
+        }
+      }
+    }).mount();
+  </script>
+</html>

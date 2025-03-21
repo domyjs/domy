@@ -1,47 +1,47 @@
-import { DomyDirectiveHelper } from '../types/Domy';
-import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimation';
+import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 /**
  * d-show implementation
- * It's like a d-if but the element is fully rendered
- * We just hide it with a display none
+ * It's like a d-if but the element is fully rendered and we don't remove it from the dom
+ * We just hide it with a display none and show it back with the correct display
  * @param domy
  *
  * @author yoannchb-pro
  */
-export function dShowImplementation(domy: DomyDirectiveHelper) {
-  const el = domy.el as HTMLElement;
-  const originalDisplay = el.style.display ?? '';
-  const transition = domy.state.transitions.get(el);
+export function dShowImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  // We deep render the element first to ensure to get the correct initial style (in particular if the style is binded with :style)
+  domy.onElementMounted(() => {
+    // Ensure the code is started after the effects of the previous deepRender
+    let isInit = false;
+    const needInitTransition = domy.block.transition?.init;
+    const originalDisplay = (domy.block.el as HTMLElement).style.display ?? '';
 
-  let isInitialised = false;
-  let cleanupTransition: null | (() => void) = null;
+    function visibilityHandler() {
+      const el = domy.block.el as HTMLElement;
+      const shouldBeDisplay = domy.evaluate(domy.attr.value);
+      const isAlreadyShow = el.style.display !== 'none';
 
-  domy.effect(() => {
-    const shouldBeDisplay = domy.evaluate(domy.attr.value);
-    const isAlreadyShow = el.style.display !== 'none';
+      if (shouldBeDisplay && !isAlreadyShow) {
+        el.style.display = originalDisplay;
 
-    if (shouldBeDisplay && !isAlreadyShow) {
-      if (cleanupTransition) cleanupTransition();
-
-      el.style.display = originalDisplay;
-
-      if (transition && isInitialised) {
-        el.classList.remove(`${transition}-out`);
-        el.classList.add(`${transition}-enter`);
-      }
-    } else if (isAlreadyShow) {
-      if (transition && isInitialised) {
-        el.classList.remove(`${transition}-enter`);
-        el.classList.add(`${transition}-out`);
-        cleanupTransition = executeActionAfterAnimation(el, () => {
+        if (needInitTransition || isInit) domy.block.applyTransition('enterTransition');
+      } else if (isAlreadyShow && !shouldBeDisplay) {
+        if (needInitTransition || isInit) {
+          domy.block.applyTransition('outTransition', () => {
+            el.style.display = 'none';
+          });
+        } else {
           el.style.display = 'none';
-        });
-      } else {
-        el.style.display = 'none';
+        }
       }
+
+      isInit = true;
     }
 
-    isInitialised = true;
+    domy.block.onElementChange(() => {
+      visibilityHandler();
+    });
+
+    domy.effect(visibilityHandler);
   });
 }

@@ -1,7 +1,8 @@
 {
-  "name": "@domyjs/router",
+  "name": "@domyjs/store",
+  "buildName": "createRouter",
   "version": "1.0.0",
-  "description": "Domyjs router plugin",
+  "description": "Domyjs store plugin",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -24,8 +25,5 @@
   "bugs": {
     "url": "https://github.com/yoannchb-pro/domy/issues"
   },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme",
-  "devDependencies": {
-    "@domyjs/types": "file:../types"
-  }
+  "homepage": "https://github.com/yoannchb-pro/domy#readme"
 }
