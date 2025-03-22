@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-for</title>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <ul>
+      <li d-for="item, index of Array(10_000)" d-key="index">{{index}}</li>
+    </ul>
+  </body>
+  <script>
+    const { signal } = DOMY;
+
+    DOMY.createApp().mount();
+  </script>
+</html>
