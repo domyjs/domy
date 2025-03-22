@@ -7,20 +7,24 @@
     <script src="../dist/index.js"></script>
   </head>
   <body>
-    <div id="select">
-      <select d-for="color of ['red', 'blue', 'green']" d-model="selectedColor">
-        <option d-key="color" :value="color">{{ color }}</option>
-      </select>
+    <div id="multiple-checkbox">
+      <p>{{ checkedColors.join(',') }}</p>
+
+      <div d-for="color of ['red', 'blue', 'green']" d-key="color">
+        <input type="checkbox" name="color" :value="color" d-model="checkedColors" />
+        <span>{{ color }}</span>
+      </div>
     </div>
   </body>
   <script>
-    DOMY.createApp({
-      data() {
-        return {
-          selectedColor: 'blue',
-          selectedColor2: ['red', 'blue']
-        };
-      }
+    const { signal } = DOMY;
+
+    DOMY.createApp(() => {
+      const checkedColors = DOMY.signal(['red']);
+
+      return {
+        checkedColors
+      };
     }).mount();
   </script>
 </html>

@@ -23,6 +23,8 @@ export function matchPath(reg: string, path: string): MatchingResult {
   const rules = reg.split('.');
   const paths = path.split('.');
 
+  const isArrayLength = paths[paths.length - 1] === 'length';
+
   const params: Record<string, string> = {};
 
   for (let i = 0; i < rules.length; ++i) {
@@ -36,6 +38,10 @@ export function matchPath(reg: string, path: string): MatchingResult {
       }
       continue;
     }
+
+    // We handle the case it's an array
+    // For exemple we want value.0 to match value.length
+    if (i === paths.length - 1 && isArrayLength && !isNaN(Number(rules[i]))) continue;
 
     if (paths[i] !== rules[i]) return defaultRes;
   }

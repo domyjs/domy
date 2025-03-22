@@ -286,33 +286,33 @@ export class ReactiveVariable {
   }
 
   private callOnGetListeners(path: string[]) {
-    if (!ReactiveVariable.IS_GLOBAL_LOCK) {
-      const params = {
-        path: this.name + path.join('.'),
-        obj: this.getProxy(),
-        reactiveVariable: this
-      };
+    if (ReactiveVariable.IS_GLOBAL_LOCK) return;
 
-      for (const listener of this.onGetListeners) {
-        listener(params);
-      }
+    const params = {
+      path: this.name + path.join('.'),
+      obj: this.getProxy(),
+      reactiveVariable: this
+    };
+
+    for (const listener of [...this.onGetListeners]) {
+      listener(params);
     }
   }
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
-    if (!ReactiveVariable.IS_GLOBAL_LOCK) {
-      const obj = this.getProxy();
-      const params = {
-        path: this.name + path.join('.'),
-        prevValue,
-        newValue,
-        obj,
-        reactiveVariable: this
-      };
+    if (ReactiveVariable.IS_GLOBAL_LOCK) return;
 
-      for (const listener of this.onSetListeners) {
-        listener(params);
-      }
+    const obj = this.getProxy();
+    const params = {
+      path: this.name + path.join('.'),
+      prevValue,
+      newValue,
+      obj,
+      reactiveVariable: this
+    };
+
+    for (const listener of [...this.onSetListeners]) {
+      listener(params);
     }
   }
 }

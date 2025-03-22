@@ -58,7 +58,6 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
   const isForIn = forPattern.groups!.type === 'in';
   const lastRenders: LastRender[] = [];
-  const keysMap = new Map<string, LastRender>();
   const fragment = new DocumentFragment();
 
   domy.effect(() => {
@@ -89,7 +88,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
       if (rawKey && !canUseFragment) {
         // Check if the key already exist so we can skip render
         const currentKeyValue = domy.evaluate(rawKey, scope);
-        const oldRender = keysMap.get(currentKeyValue);
+        const oldRender = lastRenders.find(l => l.render.key === currentKeyValue);
 
         if (oldRender) {
           const oldRenderEl = oldRender.render.el;
@@ -120,7 +119,6 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         reactiveIndex,
         loopId: currentLoopId
       };
-      if (newRender.render.key) keysMap.set(newRender.render.key, newRender);
       lastRenders.push(newRender);
     }
 

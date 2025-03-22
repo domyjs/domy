@@ -8,8 +8,8 @@
     "jest-test": "jest",
     "cypress-test": "cypress run --quiet",
     "cypress": "cypress open",
-    "build": "npm run prettier && npm run lint && npm run fastBuild",
-    "fastBuild": "ts-node ./scripts/build.ts",
+    "build": "npm run prettier && npm run lint && npm run fast-build",
+    "fast-build": "ts-node ./scripts/build.ts",
     "lint": "eslint .",
     "prettier": "prettier --write ."
   },

@@ -67,10 +67,8 @@
             const p = document.querySelector('#propChanges');
             p.textContent = Number(p.textContent) + 1;
           },
-          () => props.showError.value
+          () => props.showError
         );
-
-        console.log(props.showError);
 
         watch(
           ({ newValue }) => {

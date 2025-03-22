@@ -63,7 +63,7 @@ function flushJobs() {
 export function queueJob(job: QueueElement, id: number) {
   const count = seen.get(id) ?? 1;
 
-  if (count > MAX_RECURSION) {
+  if (count >= MAX_RECURSION) {
     error(
       `A job as been skipped because it look like he is calling it self a bounch of times and exceed the max recursive amount (${MAX_RECURSION}).`
     );

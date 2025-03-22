@@ -1,5 +1,6 @@
 import { globalWatch } from './globalWatch';
 import { matchPath } from './matchPath';
+import { OnSetListener } from './ReactiveVariable';
 import { trackCallback } from './trackDeps';
 
 type Effect = () => any;
@@ -9,24 +10,7 @@ type WatchEffectOptions = {
   onDepChange?: (uneffect: UnEffect) => void;
 };
 
-const watchDepsQueue: (() => void)[] = [];
-let isFlushing = false;
-
-/**
- * Drain the effect queue by executing each effect in the order they were added.
- */
-function nextWatchDeps() {
-  if (isFlushing) return;
-
-  isFlushing = true;
-
-  while (watchDepsQueue.length > 0) {
-    const watchDeps = watchDepsQueue.pop();
-    if (watchDeps) watchDeps();
-  }
-
-  isFlushing = false;
-}
+let watchEffectDepth = 0;
 
 /**
  * Act like a watcher but get his dependencies it self by running one time the instance
@@ -34,61 +18,67 @@ function nextWatchDeps() {
  * const todo = reactive({ title: "Yoann", isCompleted: false });
  * const uneffect = watchEffect(() => console.log(todo.title)); // Will display: "Yoann" when initialising
  * todo.isCompleted = true; // Don't call the effect
- * todo.title = "Pierre"; // Will cal the effect and display "Pierre"
+ * todo.title = "Pierre"; // Will call the effect and display "Pierre"
  * @param effectFn
  *
  * @author yoannchb-pro
  */
 export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEffect {
-  const objsToWatch: { path: string; obj: unknown }[] = [];
+  ++watchEffectDepth;
+
+  const removeListenersList: (() => void)[] = [];
+
+  function clean() {
+    for (const removeListener of removeListenersList) {
+      removeListener();
+    }
+    removeListenersList.length = 0;
+  }
 
   function watchDeps() {
-    objsToWatch.length = 0; // We remove the last dependencies
+    clean(); // We remove the last dependencies to listen to the new ones
+    const currentWatchEffectDepth = watchEffectDepth;
 
+    let listenerAlreadyMatched = false;
     const removeGlobalWatch = globalWatch(
       {
         type: 'onGet',
-        fn: ({ path, obj }) => objsToWatch.push({ path, obj })
+        fn: ({ path, reactiveVariable }) => {
+          // If the currentwatch effect depth is not the same then it mean we have an effect in an effect
+          // In this case we don't want to listen to the effect child deps
+          if (currentWatchEffectDepth !== watchEffectDepth) return;
+
+          const listener: OnSetListener = {
+            type: 'onSet',
+            fn: toWatch => {
+              if (listenerAlreadyMatched) return;
+
+              const matcher = matchPath(toWatch.path, path);
+              if (matcher.isMatching) {
+                listenerAlreadyMatched = true;
+                if (opts.onDepChange) opts.onDepChange(clean);
+                if (!opts.noSelfUpdate) watchDeps();
+              }
+            }
+          };
+
+          const removeListener = () => reactiveVariable.removeListener(listener);
+          removeListenersList.push(removeListener);
+          reactiveVariable.attachListener(listener);
+        }
       },
       false
     );
 
     try {
       effect();
+      --watchEffectDepth;
     } finally {
       removeGlobalWatch();
-      nextWatchDeps();
     }
   }
 
-  const uneffect = globalWatch(
-    {
-      type: 'onSet',
-      fn: ({ path, obj }) => {
-        for (const objToWatch of objsToWatch) {
-          const matcher = matchPath(objToWatch.path, path);
-          if (matcher.isMatching && obj === objToWatch.obj) {
-            if (opts.onDepChange) opts.onDepChange(clean);
-            if (!opts.noSelfUpdate) watchDeps();
-            break;
-          }
-        }
-      }
-    },
-    false
-  );
-
-  if (isFlushing) {
-    if (!watchDepsQueue.includes(watchDeps)) watchDepsQueue.push(watchDeps);
-  } else {
-    watchDeps();
-  }
-
-  function clean() {
-    const index = watchDepsQueue.indexOf(watchDeps);
-    if (index !== -1) watchDepsQueue.splice(index, 1);
-    uneffect();
-  }
+  watchDeps();
 
   if (trackCallback) trackCallback({ type: 'effect', clean });
 
