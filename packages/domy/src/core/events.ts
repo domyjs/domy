@@ -23,14 +23,10 @@ export function events(domy: DomyDirectiveHelper) {
         $event: event
       };
 
-      domy.addScopeToNode(scope);
-
       domy.queueJob(() => {
-        const executedValue = domy.evaluate(domy.attr.value);
+        const executedValue = domy.evaluate(domy.attr.value, scope);
         if (typeof executedValue === 'function') executedValue(event);
       }, queueId);
-
-      domy.queueJob(() => domy.removeScopeToNode(scope), queueId);
     };
 
     // We add wrappers to the listener to ensure we can add modifiers
