@@ -1,7 +1,7 @@
 import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
-type LastRender = { render: Block; reactiveIndex: { value: number } };
+type LastRender = { render: Block; reactiveIndex: { value: number }; loopId: number };
 
 /**
  * d-for implementation
@@ -12,6 +12,9 @@ type LastRender = { render: Block; reactiveIndex: { value: number } };
  * @author yoannchb-pro
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  let currentLoopId = 0;
+  let oldArrayLength = 0;
+
   const originalEl = domy.block.el;
   const rawKey = originalEl.getAttribute('d-key');
 
@@ -22,7 +25,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   originalEl.remove();
 
   // Display a warning message if the childrens don't have a d-key attribute
-  if (!originalEl.getAttribute('d-key')) {
+  if (!rawKey) {
     domy.utils.warn(
       `Elements inside the "${domy.directive}" directive should be rendered with "key" directive.`
     );
@@ -47,40 +50,46 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   }
 
   // Checking "for" pattern
-  const forRegex = /(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)/gi;
+  const forRegex = /^(?<dest>\w+)(?:,\s*(?<index>\w+))?\s+(?<type>in|of)\s+(?<org>.+)$/i;
   const forPattern = forRegex.exec(domy.attr.value);
 
   if (!forPattern)
     throw new Error(`Invalide "${domy.attr.name}" attribute value: "${domy.attr.value}".`);
 
   const isForIn = forPattern.groups!.type === 'in';
-
   const lastRenders: LastRender[] = [];
+  const keysMap = new Map<string, LastRender>();
+  const fragment = new DocumentFragment();
 
   domy.effect(() => {
-    const treatedRenders: LastRender[] = [];
+    const canUseFragment = oldArrayLength === 0;
+    const executedValue = domy.evaluate(forPattern.groups!.org);
+    const executedValueObjs = isForIn ? Object.keys(executedValue) : executedValue;
 
-    const renderEl = (value: unknown, index: number) => {
+    oldArrayLength = executedValueObjs.length;
+
+    // Create or swap the elements
+    for (let index = 0; index < executedValueObjs.length; ++index) {
+      const value = executedValueObjs[index];
+
       // Add the value to the scope
       let scope = {
         [forPattern!.groups!.dest]: value
       };
       // Add the index to the scope if needed
-      const reactiveIndex = domy.signal(index);
-      if (forPattern!.groups?.index) {
+      const indexName = forPattern!.groups?.index;
+      const reactiveIndex = indexName ? domy.signal(index) : { value: index };
+      if (indexName) {
         scope = {
           ...scope,
-          [forPattern!.groups.index]: reactiveIndex
+          [indexName]: reactiveIndex
         };
       }
 
-      if (rawKey) {
+      if (rawKey && !canUseFragment) {
         // Check if the key already exist so we can skip render
-        domy.addScopeToNode(scope);
-        const currentKeyValue = domy.evaluate(rawKey);
-        domy.removeScopeToNode(scope);
-
-        const oldRender = lastRenders.find(({ render }) => render.key === currentKeyValue);
+        const currentKeyValue = domy.evaluate(rawKey, scope);
+        const oldRender = keysMap.get(currentKeyValue);
 
         if (oldRender) {
           const oldRenderEl = oldRender.render.el;
@@ -92,36 +101,42 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
             oldRender.reactiveIndex.value = index;
           }
 
-          return treatedRenders.push(oldRender);
+          oldRender.loopId = currentLoopId;
+
+          continue;
         }
       }
 
       // Create and render the new element
       const newEl = originalEl.cloneNode(true) as Element;
-      insertToIndex(newEl, index);
+      if (canUseFragment) fragment.appendChild(newEl);
+      else insertToIndex(newEl, index);
       const render = domy.deepRender({
         element: newEl,
         scopedNodeData: [...domy.scopedNodeData, scope]
       });
-      const newRender = { render, reactiveIndex };
+      const newRender: LastRender = {
+        render,
+        reactiveIndex,
+        loopId: currentLoopId
+      };
+      if (newRender.render.key) keysMap.set(newRender.render.key, newRender);
       lastRenders.push(newRender);
-      treatedRenders.push(newRender);
-    };
+    }
 
-    let index = 0;
-    const executedValue = domy.evaluate(forPattern.groups!.org);
-
-    // Create or swap the elements
-    if (isForIn) {
-      for (const value in executedValue) renderEl(value, index++);
-    } else {
-      for (const value of executedValue) renderEl(value, index++);
+    // We add all the new elements
+    if (canUseFragment) {
+      traceEndPositionComment.before(fragment);
     }
 
     // Remove unecessary elements
-    for (const render of lastRenders) {
-      if (treatedRenders.indexOf(render) === -1) cleanupLastRender(render);
+    if (!canUseFragment) {
+      for (const render of lastRenders) {
+        if (render.loopId !== currentLoopId) cleanupLastRender(render);
+      }
     }
+
+    currentLoopId += 1;
   });
 
   domy.cleanup(() => {

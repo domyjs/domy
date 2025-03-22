@@ -10,16 +10,22 @@ type WatchEffectOptions = {
 };
 
 const watchDepsQueue: (() => void)[] = [];
-let isRunning = false;
+let isFlushing = false;
 
 /**
  * Drain the effect queue by executing each effect in the order they were added.
  */
 function nextWatchDeps() {
-  if (watchDepsQueue.length > 0 && !isRunning) {
-    const watchDeps = watchDepsQueue.shift();
+  if (isFlushing) return;
+
+  isFlushing = true;
+
+  while (watchDepsQueue.length > 0) {
+    const watchDeps = watchDepsQueue.pop();
     if (watchDeps) watchDeps();
   }
+
+  isFlushing = false;
 }
 
 /**
@@ -39,15 +45,6 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
   function watchDeps() {
     objsToWatch.length = 0; // We remove the last dependencies
 
-    if (isRunning) {
-      if (!watchDepsQueue.includes(watchDeps)) {
-        watchDepsQueue.push(watchDeps);
-      }
-      return;
-    }
-
-    isRunning = true;
-
     const removeGlobalWatch = globalWatch(
       {
         type: 'onGet',
@@ -60,7 +57,6 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
       effect();
     } finally {
       removeGlobalWatch();
-      isRunning = false;
       nextWatchDeps();
     }
   }
@@ -82,7 +78,11 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
     false
   );
 
-  watchDeps();
+  if (isFlushing) {
+    if (!watchDepsQueue.includes(watchDeps)) watchDepsQueue.push(watchDeps);
+  } else {
+    watchDeps();
+  }
 
   function clean() {
     const index = watchDepsQueue.indexOf(watchDeps);
