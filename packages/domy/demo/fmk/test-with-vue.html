@@ -10,45 +10,37 @@
     <div id="app">
       <p>Vue Rendering took: {{ Math.round(perf * 100) / 100 }}ms</p>
       <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
-      <button @click="increment">+</button>
-      <button @click="decrement">-</button>
-      <button @click="supert">++</button>
+      <button @click="count++">+</button>
+      <button @click="count--">-</button>
+
+      <ul>
+        <li v-for="(item,index) of Array(10_000)" :key="index">{{index}}</li>
+      </ul>
     </div>
   </body>
   <script>
-    const app = Vue.createApp({
-      data() {
-        return {
-          perf: null,
-          count: 0
-        };
-      },
-      methods: {
-        supert() {
-          this.increment();
-        },
-        increment() {
-          this.count++;
-        },
-        decrement() {
-          this.count--;
-        }
-      },
-      watch: {
-        count(newValue, oldValue) {
-          if (newValue < 0) {
-            this.count = oldValue;
-          }
-        }
-      },
-      mounted() {
-        this.perf = performance.now() - this.perf;
-      },
-      created() {
-        this.perf = performance.now();
-      }
-    });
+    const { createApp, ref, watch, onMounted, onBeforeMount } = Vue;
 
-    app.mount('#app');
+    createApp({
+      setup() {
+        const perf = ref(performance.now());
+        const count = ref(0);
+
+        watch(count, (newValue, oldValue) => {
+          if (newValue < 0) {
+            count.value = oldValue;
+          }
+        });
+
+        onMounted(() => {
+          perf.value = performance.now() - perf.value;
+        });
+
+        return {
+          perf,
+          count
+        };
+      }
+    }).mount('#app');
   </script>
 </html>

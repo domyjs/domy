@@ -12,6 +12,10 @@
       <p :style="{ color: count % 2 === 0 ? 'blue' : 'red' }">Count: {{ count }}</p>
       <button @click="count++">+</button>
       <button @click="count--">-</button>
+
+      <ul>
+        <li d-for="item,index of Array(10_000)">{{index}}</li>
+      </ul>
     </div>
   </body>
   <script>
@@ -21,8 +25,8 @@
       const perf = signal(performance.now());
 
       watch(
-        () => {
-          if (count.value < 0) count.value = 0;
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
         },
         () => count.value
       );
