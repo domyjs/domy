@@ -27,8 +27,8 @@ export class ReactiveVariable {
   public name = '';
   private proxy: any = null;
 
-  private onSetListeners: OnSetListener['fn'][] = [];
-  private onGetListeners: OnGetListener['fn'][] = [];
+  private onSetListeners = new Set<OnSetListener['fn']>();
+  private onGetListeners = new Set<OnGetListener['fn']>();
 
   private proxyQueue: (() => void)[] = [];
   private queued = false;
@@ -65,20 +65,19 @@ export class ReactiveVariable {
   }
 
   public clearListeners() {
-    this.onGetListeners = [];
-    this.onSetListeners = [];
+    this.onGetListeners.clear();
+    this.onSetListeners.clear();
   }
 
   public attachListener(l: Listener) {
     const listeners = l.type === 'onGet' ? this.onGetListeners : this.onSetListeners;
-    listeners.push(l.fn);
+    listeners.add(l.fn);
     return () => this.removeListener(l);
   }
 
   public removeListener(l: Listener) {
     const listeners = l.type === 'onGet' ? this.onGetListeners : this.onSetListeners;
-    const index = listeners.indexOf(l.fn);
-    if (index !== -1) listeners.splice(index, 1);
+    listeners.delete(l.fn);
   }
 
   private canAttachProxy(target: any) {

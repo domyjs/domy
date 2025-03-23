@@ -26,18 +26,20 @@ let watchEffectDepth = 0;
 export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEffect {
   ++watchEffectDepth;
 
-  const removeListenersList: (() => void)[] = [];
+  const removeListenersSet = new Set<() => void>();
 
   function clean() {
-    for (const removeListener of removeListenersList) {
+    for (const removeListener of removeListenersSet) {
       removeListener();
     }
-    removeListenersList.length = 0;
+    removeListenersSet.clear();
   }
 
   function watchDeps() {
     clean(); // We remove the last dependencies to listen to the new ones
+
     const currentWatchEffectDepth = watchEffectDepth;
+    const dependencyMap = new Map<any, Set<string>>();
 
     let listenerAlreadyMatched = false;
     const removeGlobalWatch = globalWatch(
@@ -62,8 +64,15 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
             }
           };
 
+          // We check the dep is not already registered
+          const currentDeps = dependencyMap.get(reactiveVariable) || new Set<string>();
+          if (currentDeps.has(path)) return;
+          currentDeps.add(path);
+          dependencyMap.set(reactiveVariable, currentDeps);
+
+          // We attach the on set listener
           const removeListener = () => reactiveVariable.removeListener(listener);
-          removeListenersList.push(removeListener);
+          removeListenersSet.add(removeListener);
           reactiveVariable.attachListener(listener);
         }
       },

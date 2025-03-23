@@ -9,8 +9,7 @@ import { trackCallback } from './trackDeps';
  * @author yoannchb-pro
  */
 function removeGlobalWatch(listener: Listener) {
-  const index = globalListenersList.findIndex(l => l === listener);
-  globalListenersList.splice(index, 1);
+  if (globalListenersList.has(listener)) globalListenersList.delete(listener);
 }
 
 /**
@@ -20,7 +19,7 @@ function removeGlobalWatch(listener: Listener) {
  * @author yoannchb-pro
  */
 export function globalWatch(listener: Listener, tracking = true) {
-  globalListenersList.push(listener);
+  globalListenersList.add(listener);
   const clean = () => removeGlobalWatch(listener);
 
   // Tracking global watch

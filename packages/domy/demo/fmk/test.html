@@ -14,7 +14,7 @@
       <button @click="count--">-</button>
 
       <ul>
-        <li d-for="item,index of Array(10_000)">{{index}}</li>
+        <li d-for="item,index of Array(10_000)" d-key="index">{{index}}</li>
       </ul>
     </div>
   </body>
