@@ -10,6 +10,7 @@ A lightweight and minimal JavaScript framework for your frontend that mixes Alpi
 - Reactive data binding
 - Component-based architecture
 - Easy to integrate with existing projects
+- No virtual DOM
 
 # 📚 Documentation
 
@@ -52,7 +53,7 @@ Check out our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) for details.
 
 # 💎 Contact
 
-If you have any questions or feedback, feel free to open an issue or contact us at [charbonn.yoann@gmail.com].
+If you have any questions or feedback, feel free to open an issue.
 
 # 💜 License
 
