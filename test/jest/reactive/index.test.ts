@@ -55,8 +55,4 @@ describe('Global Reactive System Tests', () => {
 
     removeGlobalWatch();
   });
-
-  // Test pour matchPath
-
-  // Test pour registerName
 });

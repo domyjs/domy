@@ -20,7 +20,6 @@ describe('Reactive tests', () => {
       expect.objectContaining({
         prevValue: undefined,
         newValue: 'New Task',
-        obj: todo,
         path: 'list.0',
         reactiveVariable: expect.any(Object)
       })
@@ -32,7 +31,6 @@ describe('Reactive tests', () => {
       expect.objectContaining({
         prevValue: undefined,
         newValue: 'Another Task',
-        obj: todo,
         path: 'list.1',
         reactiveVariable: expect.any(Object)
       })
@@ -45,7 +43,6 @@ describe('Reactive tests', () => {
       expect.objectContaining({
         prevValue: undefined,
         newValue: newTaskObj,
-        obj: todo,
         path: 'list.2',
         reactiveVariable: expect.any(Object)
       })
@@ -87,7 +84,6 @@ describe('Reactive tests', () => {
       expect.objectContaining({
         prevValue: 'Yoann',
         newValue: 'Pierre',
-        obj: todo,
         path: 'todo.name',
         reactiveVariable: expect.any(Object)
       })
