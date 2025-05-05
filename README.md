@@ -47,7 +47,7 @@ Check the [Changelog](./CHANGELOG.md) to see what's new in each version.
 
 We welcome contributions of all kinds! Check out our [Contributing Guide](./CONTRIBUTE.md) for details on how to get started.
 
-# 🤝 Code of conduct
+# 👮‍♂️ Code of conduct
 
 Check out our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) for details.
 
