@@ -1,6 +1,11 @@
-/* eslint @typescript-eslint/no-this-alias: "off" */
 import type { DomyPluginDefinition } from '@domyjs/core/src/types/Domy';
-import type DOMY from '@domyjs/core/src/index';
+import DOMY from '@domyjs/core';
+
+declare global {
+  interface Window {
+    DOMY: typeof DOMY;
+  }
+}
 
 type BeforeAfterParams = {
   route: Route;
@@ -31,14 +36,11 @@ type Component = ReturnType<(typeof DOMY)['createComponent']>;
 const NOT_FOUND_ROUTE = ':not-found:';
 
 class Router {
-  private DOMY: typeof DOMY;
-
   private routes: Route[];
   private hashMode: boolean;
   private notFoundRoute?: Route;
 
   private currentRoute: { path: string; params?: Params; queryParams?: QueryParams; route?: Route };
-
   constructor(settings: Settings) {
     // The name as to be kebab case to ensure localName when mounting the component match the route name
     for (const route of settings.routes) {
@@ -48,9 +50,8 @@ class Router {
     this.notFoundRoute = settings.routes.find(({ route }) => route === NOT_FOUND_ROUTE);
     this.routes = settings.routes.filter(r => r.route !== NOT_FOUND_ROUTE);
     this.hashMode = settings.hashMode;
-    this.DOMY = settings.DOMY;
 
-    this.currentRoute = { path: '' }; // TODO: Make it reactive
+    this.currentRoute = window.DOMY.signal({ path: '' }).value;
 
     this.init();
   }
@@ -198,37 +199,31 @@ class Router {
     };
   }
 
-  public createRouterLink() {
-    const ctx = this;
-
-    return this.DOMY.createComponent({
-      props: ['!to', 'queryParams'],
+  public createRouterLink(): Component {
+    return window.DOMY.createComponent({
+      props: ['!to', 'activeClass', 'queryParams'],
       html: `
-        <a :href="getRoute()" @click.prevent="navigate">
-          <template d-insert.render="$childrens"></template>
+        <a :href="getRoute()" @click.prevent="navigate" d-attrs="$attrs" :class="$router.path === $props.to ? [$props.activeClass] : []">
+          <template d-for="children,index of $childrens" d-key="index" d-insert.render="children"></template>
         </a>
       `,
-      app: {
-        data() {
-          return {
-            hashMode: ctx.hashMode
-          };
-        },
-        methods: {
-          navigate() {
-            const x = this as any;
-            ctx.navigate({ path: x.$props.to, queryParams: x.$props.queryParams });
+      app: () => {
+        const props = window.DOMY.useProps()!;
+
+        return {
+          hashMode: this.hashMode,
+          navigate: () => {
+            this.navigate({ path: props.to, queryParams: props.queryParams });
           },
-          getRoute() {
-            const x = this as any;
-            return (ctx.hashMode ? '#' : '') + ctx.getFullRoute(x.$props.to, x.$props.queryParams);
+          getRoute: () => {
+            return (this.hashMode ? '#' : '') + this.getFullRoute(props.to, props.queryParams);
           }
-        }
-      } as any
+        };
+      }
     });
   }
 
-  public createRouterView() {
+  public createRouterView(): Component {
     const components: Record<string, Component> = this.routes.reduce(
       (acc, route) => ({
         [route.name]: route.component,
@@ -238,7 +233,7 @@ class Router {
     );
     if (this.notFoundRoute) components[this.notFoundRoute.name] = this.notFoundRoute.component;
 
-    return this.DOMY.createComponent({
+    return window.DOMY.createComponent({
       props: ['d-transition'],
       html: `<template d-insert.render="getComponent()"></template>`,
       components,
@@ -265,14 +260,18 @@ class Router {
  *
  * @author yoannchb-pro
  */
-function createRouter(options: Settings) {
+function createRouter(options: Settings): {
+  RouterView: Component;
+  RouterLink: Component;
+  router(domyPluginSetter: DomyPluginDefinition): void;
+} {
   const router = new Router(options);
 
   return {
     RouterView: router.createRouterView(),
     RouterLink: router.createRouterLink(),
 
-    router(domyPluginSetter: DomyPluginDefinition) {
+    router(domyPluginSetter: DomyPluginDefinition): void {
       domyPluginSetter.helper('router', () => router.getHelper());
     }
   };

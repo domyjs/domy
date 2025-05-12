@@ -6,19 +6,30 @@
     <title>Domy</title>
     <script src="../../router/dist/index.js"></script>
     <script src="../dist/index.js"></script>
+    <style>
+      .red {
+        color: red !important;
+      }
+    </style>
   </head>
   <body>
     <header>
       <nav>
-        <ul d-for="route of routes">
-          <li d-if="!route.hide" d-key="route.name">
-            <router-link :to="route.route">{{ route.name }}</router-link>
+        <ul>
+          <li d-for="route of routes" d-key="route.name" d-if="!route.hide">
+            <router-link
+              style="color: black"
+              active-class="red"
+              :to="route.route.replace(':id', '5')"
+            >
+              <p>{{ route.name }}</p>
+            </router-link>
           </li>
         </ul>
       </nav>
     </header>
     <router-view></router-view>
-    <footer>Footer of the {{ $router.path }}</footer>
+    <footer>Footer of the {{ $router.path }} {{ JSON.stringify($router.params) }}</footer>
   </body>
   <script>
     function r(route, name, hide = false) {
@@ -33,23 +44,24 @@
       };
     }
 
-    const routes = [r('/', 'Home'), r('/about', 'About'), r(':not-found:', 'Not Found', true)];
+    const registeredRoutes = [
+      r('/', 'Home'),
+      r('/about', 'About'),
+      r('/params/:id', 'Params'),
+      r(':not-found:', 'Not Found', true)
+    ];
 
     const { router, RouterView, RouterLink } = createRouter({
       hashMode: true,
-      DOMY,
-      routes
+      routes: registeredRoutes
     });
 
-    DOMY.plugin(router);
+    DOMY.createApp(() => {
+      const routes = [...registeredRoutes, r('/something-that-doesnt-exist-login', 'login')];
 
-    DOMY.createApp({
-      data() {
-        return {
-          routes: [...routes, r('/something-that-doesnt-exist-login', 'login')]
-        };
-      }
+      return { routes };
     })
+      .plugins([router])
       .components({
         RouterView,
         RouterLink
