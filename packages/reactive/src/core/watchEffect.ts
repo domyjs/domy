@@ -71,6 +71,7 @@ export function watchEffect(effect: Effect, opts: WatchEffectOptions = {}): UnEf
           dependencyMap.set(reactiveVariable, currentDeps);
 
           // We attach the on set listener
+          // We ensure we register the remove listener before adding it because attach listener car directly call the listener which can call clean
           const removeListener = () => reactiveVariable.removeListener(listener);
           removeListenersSet.add(removeListener);
           reactiveVariable.attachListener(listener);
