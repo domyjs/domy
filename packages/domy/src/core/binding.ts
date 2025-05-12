@@ -12,10 +12,10 @@ import { DomyDirectiveHelper } from '../types/Domy';
 function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle: string) {
   const el = domy.block.el as HTMLElement;
 
-  el.setAttribute('style', defaultStyle ?? '');
+  el.setAttribute('style', defaultStyle);
 
   for (const styleName in executedValue) {
-    el.style.setProperty(styleName, executedValue[styleName]);
+    el.style[styleName as any] = executedValue[styleName];
   }
 }
 
