@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-this-alias: "off" */
 import type { DomyPluginDefinition } from '@domyjs/core/src/types/Domy';
 import DOMY from '@domyjs/core';
 
