@@ -12,10 +12,10 @@ import { DomyDirectiveHelper } from '../types/Domy';
 function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle: string) {
   const el = domy.block.el as HTMLElement;
 
-  el.setAttribute('style', defaultStyle);
+  el.setAttribute('style', defaultStyle ?? '');
 
   for (const styleName in executedValue) {
-    el.style[styleName as any] = executedValue[styleName];
+    el.style.setProperty(styleName, executedValue[styleName]);
   }
 }
 
@@ -33,7 +33,7 @@ function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle
 function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass: string) {
   const el = domy.block.el as HTMLElement;
 
-  el.className = defaultClass;
+  el.className = defaultClass ?? '';
 
   if (Array.isArray(executedValue)) {
     for (const className of executedValue) {
