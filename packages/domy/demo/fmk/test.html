@@ -14,7 +14,7 @@
       <button @click="count--">-</button>
 
       <ul>
-        <li d-for="item,index of Array(10_000)" d-key="index">{{index}}</li>
+        <li d-for="item,index of list" d-key="index">{{index}}</li>
       </ul>
     </div>
   </body>
@@ -23,6 +23,7 @@
     window.DOMY.createApp(() => {
       const count = signal(0);
       const perf = signal(performance.now());
+      const list = signal(Array(10_000));
 
       watch(
         ({ prevValue, newValue }) => {
@@ -33,7 +34,7 @@
 
       onMounted(() => (perf.value = performance.now() - perf.value));
 
-      return { perf, count };
+      return { perf, count, list };
     }).mount(document.querySelector('#app'));
   </script>
 </html>
