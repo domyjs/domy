@@ -37,6 +37,9 @@ Here’s a quick example to get you started:
   <p>Count: {{ count }}</p>
   <button @click="count++">Increment</button>
 </div>
+```
+
+```html
 <script>
   DOMY.createApp().mount();
 </script>
