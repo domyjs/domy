@@ -19,7 +19,7 @@ type CollapseSettings = {
 function collapseSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   if (!domy.block.el.getAttribute('d-collapse'))
     throw new Error(
-      `The "d-collapse" directive as to be placed after "d-collapse-settings" directive (and not before).`
+      `(Collapse) The "d-collapse" directive as to be placed after "d-collapse-settings" directive (and not before).`
     );
 
   domy.block.setDataForPluginId('collapse-settings', domy.evaluate(domy.attr.value));

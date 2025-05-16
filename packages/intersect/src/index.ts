@@ -76,7 +76,7 @@ class IntersectPlugin {
   intersectSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
     if (!domy.block.el.getAttribute('d-intersect') && !domy.block.el.getAttribute('d-unintersect'))
       throw new Error(
-        `The "d-intersect" or "d-unintersect" directive as to be placed after "d-intersect-settings" directive (and not before).`
+        `(Intersect) The "d-intersect" or "d-unintersect" directive as to be placed after "d-intersect-settings" directive (and not before).`
       );
 
     domy.block.setDataForPluginId('intersect-settings', domy.evaluate(domy.attr.value));
