@@ -1,8 +1,7 @@
 import type {
   DomyDirectiveHelper,
   DomyDirectiveReturn,
-  DomyPluginDefinition,
-  DomySpecialHelper
+  DomyPluginDefinition
 } from '@domyjs/core/src/types/Domy';
 
 const WILDCARDS = {

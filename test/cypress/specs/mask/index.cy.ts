@@ -22,7 +22,8 @@ describe('Mask test', () => {
   });
 
   it('applies money mask correctly', () => {
-    cy.get('#money').type('1234567.8').blur();
+    cy.get('#money').type('1234567.8');
+    cy.get('#money').blur();
     cy.get('#money').should('have.value', '1,234,567.8');
   });
 
