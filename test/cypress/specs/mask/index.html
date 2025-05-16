@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mask directive</title>
+    <script src="/packages/mask/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
+  </head>
+  <body>
+    <input id="date" d-mask="99/99/9999" placeholder="DD/MM/YYYY" />
+
+    <input
+      id="dynamic"
+      d-mask.dynamic="input => input.startsWith('33') ? '99 9 99 99 99 99' : '9 999 999 9999'"
+      placeholder="French or Canadian phone number with region indication"
+    />
+
+    <input id="money" d-mask.dynamic="$money" placeholder="0.00" />
+
+    <input id="letters" d-mask="aa 9999" placeholder="AC 1234" />
+  </body>
+  <script>
+    DOMY.createApp().plugins([mask]).mount();
+  </script>
+</html>
