@@ -112,7 +112,7 @@ function setCursorPreserving(
 ) {
   const lengthDiff = newValue.length - oldValue.length;
   const nextCursor = oldCursor + lengthDiff;
-  requestAnimationFrame(() => el.setSelectionRange(nextCursor, nextCursor));
+  el.setSelectionRange(nextCursor, nextCursor);
 }
 
 /**
