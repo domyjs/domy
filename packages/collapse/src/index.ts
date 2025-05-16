@@ -10,7 +10,20 @@ type CollapseSettings = {
   transition?: string;
 };
 
-const SETTINGS_ATTRIBUTE = 'd-collapse-settings';
+/**
+ * Register collapse settings on the block
+ * @param domy
+ *
+ * @author yoannchb-pro
+ */
+function collapseSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+  if (!domy.block.el.getAttribute('d-collapse'))
+    throw new Error(
+      `The "d-collapse" directive as to be placed after "d-collapse-settings" directive (and not before).`
+    );
+
+  domy.block.setDataForPluginId('collapse-settings', domy.evaluate(domy.attr.value));
+}
 
 /**
  * Collapse directive
@@ -23,12 +36,7 @@ const SETTINGS_ATTRIBUTE = 'd-collapse-settings';
  */
 function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.block.el as HTMLElement;
-
-  // We get the settings first to ensure it will not throw an error in the following deep render
-  const settingsAttr = el.getAttribute(SETTINGS_ATTRIBUTE);
-  const settings: CollapseSettings = settingsAttr ? domy.evaluate(settingsAttr) : {};
-
-  el.removeAttribute(SETTINGS_ATTRIBUTE);
+  const settings: CollapseSettings = domy.block.getDataForPluginId('collapse-settings') ?? {};
 
   // We wait the element to be mounted first to get his initial height
   domy.onElementMounted(() => {
@@ -55,6 +63,7 @@ function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
 
 const collapsePluginDefinition: DomyPlugin = domyPluginSetter => {
   domyPluginSetter.directive('collapse', collapsePlugin);
+  domyPluginSetter.directive('collapse-settings', collapseSettingsPlugin);
 };
 
 export default collapsePluginDefinition;
