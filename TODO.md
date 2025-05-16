@@ -2,8 +2,8 @@
 
 - Improve d-for perf and watchEffect perf
 
-- Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests
-- store (data/methods), anchor, intersect, mask
+- Router beforeEach/afterEach/replace/redirect and tests
+- store (data/methods), anchor, mask
 
 - Documentation
 - Auto release ...

@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
-describe('Collapse directive', () => {
+describe('Collapse test', () => {
   it('Check the setting attribute is removed', () => {
     // Check settings attribute is removed
     cy.get('#c2').should('not.have.attr', 'd-collapse-settings');

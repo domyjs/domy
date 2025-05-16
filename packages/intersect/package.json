@@ -1,6 +1,7 @@
 {
   "name": "@domyjs/intersect",
   "unpkg": "./dist/index.js",
+  "buildName": "intersect",
   "version": "1.0.0",
   "description": "Domyjs intersect plugin",
   "main": "./dist/index.js",
