@@ -56,7 +56,7 @@ function applyMask(value: string, mask: string): string {
  *
  * @author yoannchb-pro
  */
-function moneyHelper(domy: DomySpecialHelper) {
+function moneyHelper() {
   return function (
     input: string,
     delimiter: string = '.',
@@ -93,14 +93,6 @@ function moneyHelper(domy: DomySpecialHelper) {
     let mask = minus + addThousands('9'.repeat(intPart.length), thousands);
     if (precision > 0 && input.includes(delimiter)) {
       mask += delimiter + '9'.repeat(precision);
-    }
-
-    const el = domy.el as HTMLInputElement;
-    const val = el.value;
-    if (val.endsWith(delimiter)) return '';
-    const pos = el.selectionStart;
-    if (val[pos! - 1] === delimiter) {
-      el.setSelectionRange(pos! - 1, pos! - 1);
     }
 
     return mask;
@@ -170,8 +162,6 @@ function staticMaskDirective(domy: DomyDirectiveHelper): DomyDirectiveReturn {
  */
 function dynamicMaskDirective(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const getMask = domy.evaluate(domy.attr.value);
-  if (!getMask) return;
-
   const el = domy.block.el as HTMLInputElement;
 
   const resolveMask = (input: string): string | null => {
