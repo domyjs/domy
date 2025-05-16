@@ -20,9 +20,8 @@ jobs:
         with:
           node-version: '22.14.0'
 
-      - name: Clear cache and Install dependencies
+      - name: Install dependencies
         run: |
-          rm -rf node_modules package-lock.json
           npm install
 
       - name: Run Prettier
