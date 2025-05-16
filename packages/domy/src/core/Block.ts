@@ -11,6 +11,7 @@ type TransitionType = 'enterTransition' | 'outTransition';
 export class Block {
   public name: string | null = null;
   public key: string | null = null;
+  private pluginsData = new Map<string, any>();
 
   public transition: Transition | null = null;
   private cleanupTransition: (() => void) | null = null;
@@ -21,6 +22,14 @@ export class Block {
   public parentBlock: Block | null = null;
 
   constructor(private element: Element | Block) {}
+
+  getDataForPluginId(pluginId: string) {
+    return this.pluginsData.get(pluginId);
+  }
+
+  setDataForPluginId(pluginId: string, data: any) {
+    this.pluginsData.set(pluginId, data);
+  }
 
   get el(): Element {
     return this.element instanceof Block ? this.element.el : this.element;
