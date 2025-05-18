@@ -12,24 +12,29 @@ Simply create a html file and fill it with this content:
 <html>
   <head>
     <title>Domy is awesome !</title>
-    <script src="https://cdn.jsdelivr.net/npm/@yoannchb-pro/domy@1.x.x/dist/index.js"></script>
+    <script src="https://unpkg.com/@domyjs/core"></script>
   </head>
   <body>
-    <p>Count: {{ this.count }}</p>
-    <button @click="this.count++">Increment</button>
-    <button @click="this.count--">Decrement</button>
+    <p>Count: {{ count }}</p>
+    <button @click="count++">Increment</button>
+    <button @click="count--">Decrement</button>
   </body>
   <script>
-    DOMY.createApp({
-      $watch: {
-        count() {
-          this.count = Math.max(0, this.count);
-        }
-      },
-      $state: {
-        count: 0
-      }
-    });
+    const { signal, watch } = DOMY;
+    DOMY.createApp(() => {
+      const count = signal(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
+        },
+        () => count
+      );
+
+      return {
+        count
+      };
+    }).mount();
   </script>
 </html>
 ```
@@ -38,32 +43,282 @@ Open your file in the browser and see the following result !
 
 <Demo
   code={`
-    <p>Count: {{ this.count }}</p>
-    <button @click="this.count++">Increment</button>
-    <button @click="this.count--">Decrement</button>
+    <p>Count: {{ count }}</p>
+    <button @click="count++">Increment</button>
+    <button @click="count--">Decrement</button>
   `}
-  domy={{
-    $watch: {
-      count() {
-        this.count = Math.max(0, this.count);
-      }
-    },
-    $state: {
-      count: 0
-    }
-  }}
+  domy={() => {
+      const { signal, watch } = DOMY;
+      const count = signal(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
+        },
+        () => count
+      );
+
+      return {
+        count
+      };
+    }}
+
 />
 
 ## Explanation
 
-### Declaring data
+Let's break down what's happening in the example above:
 
-Firstly, you need to declare what variables you want to use in you application. Because we create a simple counter the only thing we need here is `count`.
+### 1. The Template Syntax
 
-### Listening for events
+```html
+<p>Count: {{ count }}</p>
+<button @click="count++">Increment</button>
+<button @click="count--">Decrement</button>
+```
 
-### Watch data change
+- `{{ count }}`: This is a placeholder that DOMY automatically replaces with the current value of `count`. It updates automatically whenever `count` changes.
+- `@click="..."`: This is a DOMY directive that binds a click event to the button. When the button is clicked, the expression is evaluated.
 
-### setup
+### 2. The App Logic
 
-### mounted
+```js
+const { signal, watch } = DOMY;
+```
+
+- `signal(...)`: Creates a reactive value. Here, `count` is initialized to `0`. Changing `count.value` automatically updates all parts of the DOM that reference it.
+- `watch(...)`: Observes changes to one or more signals and lets you react when a value changes.
+
+### 3. Preventing Negative Values
+
+```js
+watch(
+  ({ prevValue, newValue }) => {
+    if (newValue < 0) count.value = prevValue;
+  },
+  () => count
+);
+```
+
+- This watcher monitors `count`. If the new value is less than `0`, it reverts to the previous value. This effectively prevents the counter from going negative.
+
+### 4. Mounting the App
+
+```js
+DOMY.createApp(() => {
+  ...
+}).mount();
+```
+
+- This defines and mounts your app. Everything returned from the `createApp` function becomes available in the template (HTML) via reactivity.
+
+## Advanced Features
+
+### Scope data on current element
+
+Use `d-scope` to define data that's only accessible within a specific element:
+
+```html
+<div d-scope="{ msg: 'Hello World!' }">
+  <p>{{ msg }}</p>
+</div>
+<p>{{ msg }}</p>
+```
+
+```js
+DOMY.createApp(() => ({ msg: 'Bye World!' })).mount();
+```
+
+<Demo
+  code={`
+  <div d-scope="{ msg: 'Hello World!' }">
+    <p>{{ msg }}</p>
+  </div>
+  <p>{{ msg }}</p>
+  `}
+  domy={() => ({msg: 'Bye World!'})}
+
+/>
+
+### Conditional Rendering
+
+Use `d-if`, `d-else-if`, and `d-else` for conditionals:
+
+```html
+<div d-scope="{ loggedIn: false }">
+  <button @click="loggedIn = !loggedIn">Toggle Login</button>
+
+  <p d-if="loggedIn">Welcome back!</p>
+  <p d-else>You are logged out.</p>
+</div>
+```
+
+Only one conditional block will show depending on the expression.
+
+<Demo
+  code={`
+  <div d-scope="{ loggedIn: false }">
+    <button @click="loggedIn = !loggedIn">Toggle Login</button>
+
+    <p d-if="loggedIn">Welcome back!</p>
+    <p d-else>You are logged out.</p>
+
+  </div>
+  `}
+
+/>
+
+### Loops with `d-for`
+
+Use `d-for` to loop through arrays. Use `d-key` to help DOMY efficiently update the DOM:
+
+```html
+<div d-scope="{ items: ['Apple', 'Banana', 'Cherry'] }">
+  <ul>
+    <li d-for="item of items" d-key="item">{{ item }}</li>
+  </ul>
+</div>
+```
+
+You can also access the index:
+
+```html
+<li d-for="item, index of items" d-key="item">{{ index }} - {{ item }}</li>
+```
+
+<Demo
+  code={`
+  <div d-scope="{ items: ['Apple', 'Banana', 'Cherry'] }">
+    <ul>
+      <li d-for="item, index of items" d-key="item">{{ index }} - {{ item }}</li>
+    </ul>
+  </div>
+  `}
+
+/>
+
+### Dynamic Attributes and Events
+
+Bind attributes dynamically using the `:` shorthand for `d-bind:` prefix. Create event with `@` shorthand for `d-on:` prefix:
+
+```html
+<div d-scope="{ active: true }">
+  <button @click="active = !active" :style="{ color: active ? 'green' : 'red' }">Toggle Me</button>
+  <!-- 
+   Same as: 
+   <button d-on:click="active = !active" d-bind:style="{ color: active ? 'green' : 'red' }">Toggle Me</button>
+  -->
+</div>
+```
+
+You can dynamically control any HTML attribute (styles, classes, ARIA attributes, etc.).
+
+<Demo
+  code={`
+  <div d-scope="{ active: true }">
+    <button @click="active = !active" :style="{ color: active ? 'green' : 'red' }">Toggle Me</button>
+  </div>
+  `}
+
+/>
+
+### Forms with `d-model`
+
+Use `d-model` to bind inputs easily:
+
+```html
+<div d-scope="{ filter: 'ba', items: ['bar', 'foo', 'baz'] }">
+  <p>Current filter: {{ filter }}</p>
+  <input type="text" d-model="filter" />
+  <ul>
+    <li d-for="item of items" d-key="item" d-show="item.startsWith(filter)">{{ item }}</li>
+  </ul>
+</div>
+```
+
+`d-show` hides or shows the element without removing it from the DOM (unlike `d-if`).
+
+<Demo
+  code={`
+  <div d-scope="{ filter: 'ba', items: ['bar', 'foo', 'baz'] }">
+    <p>Current filter: {{ filter }}</p>
+    <input type="text" d-model="filter" />
+    <ul>
+      <li d-for="item of items" d-key="item" d-show="item.startsWith(filter)">{{ item }}</li>
+    </ul>
+  </div>
+  `}
+
+/>
+
+### Components
+
+Create reusable components with `DOMY.createComponent`:
+
+```html
+<counter d-for="i of [1,2,3]" d-key="i" :id="i"></counter>
+```
+
+```js
+const { signal } = DOMY;
+
+const counter = DOMY.createComponent({
+  props: ['!id'],
+  html: `
+    <div>
+      <p>My component number: {{ $props.id }}</p>
+      <p>Count: {{ count }}</p>
+      <button @click="count++">Increment</button>
+    </div
+    >`,
+  app: () => {
+    const count = signal(0);
+    return {
+      count
+    };
+  }
+});
+
+DOMY.createApp().components({ counter }).mount();
+```
+
+- The `!id` mean the `id` prop is <b>required</b>
+- Access props using the `useProps` hook or the `$props` helper.
+
+<Demo
+  code={`
+    <counter d-for="i of [1,2,3]" d-key="i" :id="i"></counter>
+  `}
+  components={() => {
+    const { signal } = DOMY;
+    const counter = DOMY.createComponent({
+      props: ['!id'],
+      html: `
+    <div>
+      <p>My component number: {{ $props.id }}</p>
+      <p>Count: {{ count }}</p>
+      <button @click="count++">Increment</button>
+    </div
+    >`,
+      app: () => {
+        const count = signal(0);
+        return {
+          count
+        };
+      }
+    });
+
+    return {
+      counter
+    }
+
+}}
+/>
+
+## Going Further
+
+These were just a few examples to get you started. To level up with DOMY, check out how to use plugins, explore the different directives, helpers, and hooks.
+
+```
+$ Happy Codding!
+```
