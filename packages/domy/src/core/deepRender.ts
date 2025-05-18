@@ -45,8 +45,7 @@ export function createDeepRenderFn(
     const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
     const rootElement = rootBlock.el;
 
-    let elementToDispatchMounted: Element | null = null;
-    const toRenderList: Elem[] = [
+    const toRenderList: (Elem | (() => void))[] = [
       {
         element: rootElement,
         scopedNodeData: props.scopedNodeData ?? []
@@ -60,23 +59,31 @@ export function createDeepRenderFn(
 
       // We use pop for performance issue and because we render the tree from the bottom to top
       // It's usefull in the case of d-if, d-else-if, d-else to find the previous sibling element which are conditions
-      const toRender = toRenderList.pop() as Elem;
+      const toRender = toRenderList.pop()!;
+
+      if (typeof toRender === 'function') {
+        const action = toRender;
+        action();
+        continue;
+      }
+
       const element = toRender.element;
       const isRootRendering = element === rootElement;
 
-      // Ensure the last rendered element with no nextSibling is set to mounted
-      if (elementToDispatchMounted)
-        elementToDispatchMounted.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
+      // Creating the block
+      const block = isRootRendering ? rootBlock : new Block(element);
+      if (toRender.parentBlock) block.parentBlock = toRender.parentBlock;
+
       // If we are to the previous element then the next element is rendered because we go from bottom to top
       const lastRenderedElement = element.nextElementSibling;
       if (lastRenderedElement) {
         lastRenderedElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
       } else {
-        elementToDispatchMounted = element;
+        // If the element doesn't have a next sibling then on the next render we want to ensure the mounted event on this element is dispatched
+        toRenderList.push(() =>
+          block.el.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted))
+        );
       }
-
-      const block = isRootRendering ? rootBlock : new Block(element);
-      if (toRender.parentBlock) block.parentBlock = toRender.parentBlock;
 
       const safeDeepRender = (args: Props) => {
         const render = deepRender(args);
@@ -174,12 +181,6 @@ export function createDeepRenderFn(
         });
       }
     }
-
-    // Ensure the last rendered element with no nextSibling is set to mounted
-    if (elementToDispatchMounted)
-      elementToDispatchMounted.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
-    // Ensure the root element is set to mounted
-    rootElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
 
     return rootBlock;
   };
