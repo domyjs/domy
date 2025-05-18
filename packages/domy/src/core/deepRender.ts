@@ -45,6 +45,7 @@ export function createDeepRenderFn(
     const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
     const rootElement = rootBlock.el;
 
+    let elementToDispatchMounted: Element | null = null;
     const toRenderList: Elem[] = [
       {
         element: rootElement,
@@ -63,10 +64,15 @@ export function createDeepRenderFn(
       const element = toRender.element;
       const isRootRendering = element === rootElement;
 
+      // Ensure the last rendered element with no nextSibling is set to mounted
+      if (elementToDispatchMounted)
+        elementToDispatchMounted.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
       // If we are to the previous element then the next element is rendered because we go from bottom to top
-      const lastRenderedElement = toRender.element.nextElementSibling;
+      const lastRenderedElement = element.nextElementSibling;
       if (lastRenderedElement) {
         lastRenderedElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
+      } else {
+        elementToDispatchMounted = element;
       }
 
       const block = isRootRendering ? rootBlock : new Block(element);
@@ -152,7 +158,7 @@ export function createDeepRenderFn(
           componentElement: element as HTMLElement,
           domy: domyHelper.getPluginHelper()
         });
-        block.addCleanup(domyHelper.getCleanupFn()); // TODO: make a bug
+        block.addCleanup(domyHelper.getCleanupFn());
         continue;
       }
 
@@ -168,6 +174,12 @@ export function createDeepRenderFn(
         });
       }
     }
+
+    // Ensure the last rendered element with no nextSibling is set to mounted
+    if (elementToDispatchMounted)
+      elementToDispatchMounted.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
+    // Ensure the root element is set to mounted
+    rootElement.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted));
 
     return rootBlock;
   };
