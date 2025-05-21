@@ -1,9 +1,9 @@
 {
-  "label": "Domy Attributes",
+  "label": "Directives",
   "position": 3,
   "collapsed": false,
   "link": {
     "type": "generated-index",
-    "description": "Domy Attributes you need to know."
+    "description": "Domy directives you need to know."
   }
 }
