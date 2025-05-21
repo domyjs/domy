@@ -1,0 +1,43 @@
+import Demo from '@site/src/components/Demo';
+
+# d-ref
+
+The `d-ref` directive in DOMY allows you to **assign a reference name to an element** so you can easily access it later via the `$refs` object in your component or scope.
+
+This is useful for direct DOM access or manipulation when necessary.
+
+## Syntax
+
+```html
+<div d-ref="myElement"></div>
+```
+
+You can then access this element using:
+
+```js
+$refs.myElement;
+```
+
+## Modifiers
+
+- `dynamic`: Use this modifier if the name of the ref is dynamic (evaluated as an expression).
+
+```html
+<div d-ref.dynamic="someVar"></div>
+```
+
+If `someVar` evaluates to `'foo'`, then `$refs.foo` will contain the element.
+
+## Example
+
+```html
+<div d-ref="title">Hello World</div>
+<button @click="alert($refs.title.textContents)">Show Text</button>
+```
+
+This will show an alert with the text content of the `div` when the button is clicked.
+
+<Demo
+  code={`     <div d-ref="title">Hello World</div>     <button @click="alert($refs.title.textContent)">Show Text</button>
+  `}
+/>

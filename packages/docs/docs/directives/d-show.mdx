@@ -1,0 +1,35 @@
+import Demo from '@site/src/components/Demo';
+
+# d-show
+
+The `d-show` directive in DOMY allows you to **conditionally display an element** by toggling its `display` style rather than removing it from the DOM.
+
+This is useful when you want to preserve the element's state and layout, and potentially apply enter/leave transitions.
+
+## Syntax
+
+```html
+<div d-show="shouldBeVisible">This may be shown or hidden</div>
+```
+
+The value of `d-show` should be a boolean expression. If it evaluates to `true`, the element will be shown; otherwise, it will be hidden (`display: none`).
+
+Unlike `d-if`, `d-show` does not remove or re-render the element—it only toggles visibility.
+
+## Example
+
+```html
+<div d-scope="{ visible: false }">
+  <button @click="visible = !visible">Toggle</button>
+  <p d-show="visible">Now you see me!</p>
+</div>
+```
+
+<Demo
+  code={`
+    <div d-scope="{ visible: false }">
+        <button @click="visible = !visible">Toggle</button>
+        <p d-show="visible">Now you see me!</p>
+    </div>
+  `}
+/>

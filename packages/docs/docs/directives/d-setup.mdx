@@ -1,0 +1,29 @@
+import Demo from '@site/src/components/Demo';
+
+# d-setup
+
+The `d-setup` directive in DOMY allows you to **execute JavaScript code or a function** when an element is initialized by DOMY for the first time.
+
+This is useful for setting up logic that only needs to run once, such as initial DOM manipulations, logging, or variable initialization.
+
+## Syntax
+
+```html
+<div d-setup="console.log('My div is rendering')">...</div>
+```
+
+You can also run a function defined in your scope:
+
+```html
+<div d-setup="initializeDiv">...</div>
+```
+
+If `initializeDiv` is a function in your scope, it will be called when the element is initialized.
+
+## Example
+
+```html
+<div d-setup="$el.textContent = 'Hello'"></div>
+```
+
+<Demo code={`<div d-setup="$el.textContent = 'Hello'"></div>`} />

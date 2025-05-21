@@ -1,0 +1,30 @@
+import Demo from '@site/src/components/Demo';
+
+# d-mounted
+
+The `d-mounted` directive in DOMY allows you to **run JavaScript code or a function once the element and all its children are fully mounted in the DOM**. This is especially useful when you need to access references (`d-ref`) or ensure that the layout is complete before executing logic.
+
+## Syntax
+
+```html
+<div d-mounted="expression"></div>
+```
+
+- The `expression` can be any JavaScript code or a function call.
+- It is executed once, when the element and its children are mounted.
+
+## Example
+
+```html
+<div d-mounted="$refs.text.textContent = 'Hello DOMY!'">
+  <div d-ref="text"></div>
+</div>
+```
+
+<Demo
+  code={`
+  <div d-mounted="$refs.text.textContent = 'Hello DOMY!'">
+    <div d-ref="text"></div>
+  </div>
+  `}
+/>

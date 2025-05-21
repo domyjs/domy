@@ -1,0 +1,48 @@
+import Demo from '@site/src/components/Demo';
+
+# d-insert
+
+The `d-insert` directive in DOMY allows you to **replace a `<template>` element with a dynamically created DOM element**. It is reactive, so whenever the expression changes, the inserted element updates accordingly.
+
+This directive is used to insert or swap elements in the DOM while keeping track of their position for smooth updates and transitions.
+
+## Syntax
+
+```html
+<template d-insert="expression"></template>
+```
+
+- The expression must return a single DOM element.
+- The directive only works on `<template>` elements.
+
+## Modifiers
+
+- `render`: When this modifier is present, DOMY will perform a deep render of the inserted element, enabling reactive bindings inside it.
+
+```html
+<div
+  d-scope="{ count: 5, createP: () => {
+  const p = document.createElement('p');
+  p.textContent = 'Count: {{ count }}';
+  return p;
+}}"
+>
+  <template d-insert.render="createP()"></template>
+</div>
+```
+
+Will give:
+
+<Demo
+  code={`
+    <div
+    d-scope="{ count: 5, createP: () => {
+    const p = document.createElement('p');
+    p.textContent = 'Count: {{ count }}';
+    return p;
+    }}"
+    >
+    <template d-insert.render="createP()"></template>
+    </div>
+`}
+/>
