@@ -1,67 +1,78 @@
 import { DomyDirectiveHelper } from '../types/Domy';
+import { toKebabCase } from '../utils/toKebabCase';
 
 /**
  * Handle style attribute if it's an object
  * { backgroundColor: '#fff', color: 'red' .... }
- * @param domy
  * @param executedValue
  * @param defaultStyle
  *
  * @author yoannchb-pro
  */
-function handleStyle(domy: DomyDirectiveHelper, executedValue: any, defaultStyle: string) {
-  const el = domy.block.el as HTMLElement;
+export function handleStyle(executedValue: any, defaultStyle: string): string {
+  const styleEntries = [];
 
-  el.setAttribute('style', defaultStyle);
+  if (defaultStyle) {
+    styleEntries.push(defaultStyle);
+  }
 
   for (const styleName in executedValue) {
-    el.style[styleName as any] = executedValue[styleName];
+    const value = executedValue[styleName];
+    const kebabCaseName = toKebabCase(styleName);
+    styleEntries.push(`${kebabCaseName}:${value}`);
   }
-}
 
+  return styleEntries.join('; ');
+}
 /**
  * Handle class attribute if it's an object like
  * { show: true }
  * or
  * ["show"]
- * @param domy
  * @param executedValue
  * @param defaultClass
  *
  * @author yoannchb-pro
  */
-function handleClass(domy: DomyDirectiveHelper, executedValue: any, defaultClass: string) {
-  const el = domy.block.el as HTMLElement;
-
-  el.className = defaultClass ?? '';
+export function handleClass(executedValue: any, defaultClass: string): string {
+  const classNames = new Set((defaultClass ?? '').split(/\s+/).filter(Boolean));
 
   if (Array.isArray(executedValue)) {
     for (const className of executedValue) {
-      el.classList.add(className);
+      classNames.add(className);
     }
   } else {
     for (const [className, shouldBeSet] of Object.entries(executedValue)) {
-      if (shouldBeSet) el.classList.add(className);
+      if (shouldBeSet) classNames.add(className);
     }
   }
+
+  return [...classNames].join(' ');
 }
 
 /**
  * Remove styles from the style attribute if they are in executedValue
  * { backgroundColor: true, color: true .... }
- * @param domy
+ * @param currentStyle
  * @param executedValue
  *
  * @author yoannchb-pro
  */
-function handleRemoveStyle(domy: DomyDirectiveHelper, executedValue: any) {
-  const el = domy.block.el as HTMLElement;
+export function handleRemoveStyle(currentStyle: string, executedValue: any) {
+  const currentStyleDict: Record<string, string> = {};
+
+  for (const style of currentStyle.split(';').filter(Boolean)) {
+    const [key, value] = style.split(':');
+    currentStyleDict[key] = value;
+  }
 
   for (const styleName in executedValue) {
-    if (executedValue[styleName]) {
-      el.style.removeProperty(styleName);
-    }
+    if (executedValue[styleName] && currentStyleDict[styleName]) delete currentStyleDict[styleName];
   }
+
+  return Object.entries(currentStyleDict)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(';');
 }
 
 /**
@@ -69,23 +80,25 @@ function handleRemoveStyle(domy: DomyDirectiveHelper, executedValue: any) {
  * { show: true }
  * or
  * ["show"]
- * @param domy
+ * @param currentClass
  * @param executedValue
  *
  * @author yoannchb-pro
  */
-function handleRemoveClass(domy: DomyDirectiveHelper, executedValue: any) {
-  const el = domy.block.el as HTMLElement;
+export function handleRemoveClass(currentClass: string, executedValue: any) {
+  const classNames = new Set((currentClass ?? '').split(/\s+/).filter(Boolean));
 
   if (Array.isArray(executedValue)) {
     for (const className of executedValue) {
-      el.classList.remove(className);
+      classNames.delete(className);
     }
   } else {
     for (const [className, shouldBeRemoved] of Object.entries(executedValue)) {
-      if (shouldBeRemoved) el.classList.remove(className);
+      if (shouldBeRemoved) classNames.delete(className);
     }
   }
+
+  return [...classNames].join(' ');
 }
 
 /**
@@ -100,7 +113,7 @@ function handleRemoveClass(domy: DomyDirectiveHelper, executedValue: any) {
  * @author yoannchb-pro
  */
 export function binding(domy: DomyDirectiveHelper) {
-  const el = domy.block.el;
+  const el = domy.block.el as HTMLElement;
   const attrName = domy.attrName;
 
   // We register the default style and default class
@@ -121,9 +134,9 @@ export function binding(domy: DomyDirectiveHelper) {
     lastExecutedValue = executedValue;
 
     if (isExecutedValueObject && attrName === 'style') {
-      handleStyle(domy, executedValue, defaultStyle as string);
+      el.style = handleStyle(executedValue, defaultStyle as string);
     } else if (isExecutedValueObject && attrName === 'class') {
-      handleClass(domy, executedValue, defaultClass as string);
+      el.className = handleClass(executedValue, defaultClass as string);
     } else {
       el.setAttribute(attrName, executedValue);
     }
@@ -134,9 +147,9 @@ export function binding(domy: DomyDirectiveHelper) {
       typeof lastExecutedValue === 'object' && lastExecutedValue !== null;
 
     if (isExecutedValueObject && attrName === 'style') {
-      handleRemoveStyle(domy, lastExecutedValue);
+      el.style = handleRemoveStyle(el.style.all, lastExecutedValue);
     } else if (isExecutedValueObject && attrName === 'class') {
-      handleRemoveClass(domy, lastExecutedValue);
+      el.className = handleRemoveClass(el.className, lastExecutedValue);
     } else {
       el.removeAttribute(attrName);
     }

@@ -1,5 +1,6 @@
 import { ComponentDefinition, ComponentInfos, Components } from '../types/Component';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
+import { handleClass, handleRemoveClass, handleRemoveStyle, handleStyle } from './binding';
 import { createAdvancedApp } from './createApp';
 import { getUniqueQueueId } from './scheduler';
 
@@ -84,7 +85,6 @@ export function createComponent(
         });
 
         const propsAttributes: Attr[] = [];
-        const attrsAttributes: Attr[] = [];
         const componentAttributes: string[] = [];
 
         // We handle the attributes
@@ -100,7 +100,42 @@ export function createComponent(
           }
 
           // Handling attrs
-          attrsAttributes.push(attr);
+          const { attrName } = domy.utils.getDomyAttributeInformations(attr);
+          const isClass = attrName === 'class';
+          const isStyle = attrName === 'style';
+          if (domy.utils.isBindAttr(attr.name)) {
+            let lastExecutedValue: string | null = null;
+
+            domy.effect(() => {
+              lastExecutedValue = domy.evaluate(attr.value) as string;
+
+              domy.lockWatchers();
+              if (isClass)
+                data.$attrs[attrName] = handleClass(lastExecutedValue, data.$attrs[attrName] ?? '');
+              else if (isStyle)
+                data.$attrs[attrName] = handleStyle(lastExecutedValue, data.$attrs[attrName] ?? '');
+              else data.$attrs[attrName] = lastExecutedValue;
+              domy.unlockWatchers();
+            });
+
+            if (isClass) {
+              domy.cleanup(() => {
+                data.$attrs[attrName] = handleRemoveClass(data.$attrs['class'], lastExecutedValue);
+              });
+            }
+
+            if (isStyle) {
+              domy.cleanup(() => {
+                data.$attrs[attrName] = handleRemoveStyle(data.$attrs['style'], lastExecutedValue);
+              });
+            }
+          } else {
+            if (isClass)
+              data.$attrs[attrName] = [data.$attrs[attrName], attr.value].filter(Boolean).join(' ');
+            else if (isStyle)
+              data.$attrs[attrName] = [data.$attrs[attrName], attr.value].filter(Boolean).join(';');
+            else data.$attrs[attrName] = attr.value;
+          }
         }
 
         // Error handling for required props
@@ -119,19 +154,6 @@ export function createComponent(
             });
           } else {
             data.$props[propName] = attr.value === '' ? true : attr.value;
-          }
-        }
-
-        // reactive attributes
-        for (const attr of attrsAttributes) {
-          const { attrName } = domy.utils.getDomyAttributeInformations(attr);
-          if (domy.utils.isBindAttr(attr.name)) {
-            domy.effect(() => {
-              const executedValue = domy.evaluate(attr.value);
-              data.$attrs[attrName] = executedValue;
-            });
-          } else {
-            data.$attrs[attrName] = attr.value;
           }
         }
 
