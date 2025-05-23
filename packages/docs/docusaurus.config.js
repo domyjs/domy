@@ -71,6 +71,11 @@ const config = {
             href: 'https://github.com/yoannchb-pro/domy',
             label: 'GitHub',
             position: 'right'
+          },
+          {
+            href: 'https://buymeacoffee.com/yoannchbpro',
+            label: 'BuyMeACoffee',
+            position: 'right'
           }
         ]
       },
