@@ -1,6 +1,5 @@
 import { ComponentDefinition, ComponentInfos, Components } from '../types/Component';
 import { callWithErrorHandling } from '../utils/callWithErrorHandling';
-import { handleClass, handleRemoveClass, handleRemoveStyle, handleStyle } from './binding';
 import { createAdvancedApp } from './createApp';
 import { getUniqueQueueId } from './scheduler';
 
@@ -111,22 +110,34 @@ export function createComponent(
 
               domy.lockWatchers();
               if (isClass)
-                data.$attrs[attrName] = handleClass(lastExecutedValue, data.$attrs[attrName] ?? '');
+                data.$attrs[attrName] = domy.utils.handleClass(
+                  lastExecutedValue,
+                  data.$attrs[attrName] ?? ''
+                );
               else if (isStyle)
-                data.$attrs[attrName] = handleStyle(lastExecutedValue, data.$attrs[attrName] ?? '');
+                data.$attrs[attrName] = domy.utils.handleStyle(
+                  lastExecutedValue,
+                  data.$attrs[attrName] ?? ''
+                );
               else data.$attrs[attrName] = lastExecutedValue;
               domy.unlockWatchers();
             });
 
             if (isClass) {
               domy.cleanup(() => {
-                data.$attrs[attrName] = handleRemoveClass(data.$attrs['class'], lastExecutedValue);
+                data.$attrs[attrName] = domy.utils.handleRemoveClass(
+                  data.$attrs['class'],
+                  lastExecutedValue
+                );
               });
             }
 
             if (isStyle) {
               domy.cleanup(() => {
-                data.$attrs[attrName] = handleRemoveStyle(data.$attrs['style'], lastExecutedValue);
+                data.$attrs[attrName] = domy.utils.handleRemoveStyle(
+                  data.$attrs['style'],
+                  lastExecutedValue
+                );
               });
             }
           } else {
