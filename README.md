@@ -25,7 +25,7 @@ $ npm install @domyjs/core
 or with the cdn
 
 ```html
-<script src="https://unpkg.com/@domyjs/core"></script>
+<script src="https://unpkg.com/@domyjs/core@1.x.x"></script>
 ```
 
 # 📝 Usage
