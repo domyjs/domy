@@ -1,0 +1,112 @@
+import Demo from '@site/src/components/Demo';
+
+# Content Security Policy (CSP)
+
+Content Security Policy (CSP) is a security feature that helps prevent cross-site scripting (XSS) and other code injection attacks by controlling the sources from which scripts, styles, and other resources are loaded.
+
+## Configuration in DOMY
+
+DOMY provides a CSP mode that allows applications to work securely while enforcing strict script execution rules. To enable CSP in DOMY, you can configure it as follows:
+
+```js
+DOMY.createApp(() => {
+  return {
+    message: 'Secure Mode Enabled'
+  };
+})
+  .configure({
+    CSP: true
+  })
+  .mount();
+```
+
+## Example
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'nonce-abc123'"
+    />
+    <title>CSP with DOMY</title>
+    <script nonce="abc123" src="..."></script>
+  </head>
+  <body>
+    <h1>{{ greeting.msg }}</h1>
+
+    <p>Count: {{ count }}</p>
+    <p>Odd: {{ isOdd() }}</p>
+
+    <button @click="increment">+</button>
+    <button @click="decrement">-</button>
+  </body>
+  <script nonce="abc123">
+    const { signal, watch } = DOMY;
+
+    DOMY.createApp(() => {
+      const greeting = signal({ msg: 'Hello World!' });
+      const count = signal(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
+        },
+        () => count
+      );
+
+      return {
+        count,
+        greeting,
+        isOdd: () => count.value % 2 === 1,
+        increment: () => count.value++,
+        decrement: () => count.value--
+      };
+    })
+      .configure({
+        CSP: true
+      })
+      .mount();
+  </script>
+</html>
+```
+
+<Demo  
+  config={{CSP: true}}
+
+code={`
+
+<h1>{{ greeting.msg }}</h1>
+
+    <p>Cound: {{ count }}</p>
+    <p>Odd: {{ isOdd() }}</p>
+
+    <button @click="increment">+</button>
+    <button @click="decrement">-</button>
+
+`}
+
+domy={() => {
+const { signal, watch } = DOMY;
+const greeting = signal({ msg: 'Hello World!' });
+const count = signal(0);
+
+      watch(
+        ({ prevValue, newValue }) => {
+          if (newValue < 0) count.value = prevValue;
+        },
+        () => count
+      );
+
+      return {
+        count,
+        greeting,
+        isOdd: () => count.value % 2 === 1,
+        increment: () => count.value++,
+        decrement: () => count.value--
+      };
+
+}}/>
