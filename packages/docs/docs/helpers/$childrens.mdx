@@ -1,0 +1,48 @@
+import Demo from '@site/src/components/Demo';
+
+# $childrens
+
+The `$childrens` special helper allows a component to access the elements passed inside its tag.
+This is useful for handling slots or dynamically rendering child elements within a component.
+
+## Syntax
+
+```html
+<ErrorMessage>
+  <p>Hello</p>
+</ErrorMessage>
+```
+
+Inside `ErrorMessage`:
+
+```js
+console.log($childrens); // [<p>Hello</p>]
+```
+
+## Example
+
+```html
+<component>
+  <p>This element is injected in the component.</p>
+</component>
+```
+
+```js
+const Component = DOMY.createComponent({
+  html: `<template d-insert="$childrens[0]"></template>`
+});
+```
+
+<Demo
+  code={`
+  <component>
+    <p>This element is injected in the component.</p>
+  </component>
+  `}
+  components={() => {
+    const Component = DOMY.createComponent({
+      html: `<template d-insert="$childrens[0]"></template>`
+    });
+    return { Component };
+  }}
+/>

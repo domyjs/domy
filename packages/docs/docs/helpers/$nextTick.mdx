@@ -1,0 +1,62 @@
+import Demo from '@site/src/components/Demo';
+
+# $nextTick
+
+The `$nextTick` special helper ensures that a callback function is executed after the framework has finished updating dependencies. This is useful for scenarios where you need to wait for DOM updates before executing logic.
+
+## Syntax
+
+```js
+$nextTick(() => {
+  console.log('DOM updates completed');
+});
+```
+
+## Behavior
+
+- `$nextTick` ensures that the callback executes **after** DOM updates are finished.
+- It returns a promise, allowing for asynchronous execution.
+- Useful for reading updated DOM values or performing next-step computations.
+
+## Example
+
+```html
+<div
+  d-scope="{
+    updateMessage: () => {
+        message = 'Hello World!';
+        $nextTick(() => alert($refs.p.textContent)); 
+    }
+}"
+>
+  <p d-ref="p">{{ message }}</p>
+  <button @click="updateMessage">Update Message</button>
+</div>
+```
+
+```js
+const { signal } = DOMY;
+DOMY.createApp(() => {
+  const message = signal('');
+  return { message };
+}).mount();
+```
+
+<Demo
+  code={`
+<div d-scope="{
+    updateMessage: () => {
+        message = 'Hello World!';
+        $nextTick(() => alert($refs.p.textContent)); 
+    }
+}">
+  <p d-ref="p">{{ message }}</p>
+  <button @click="updateMessage">Update Message</button>
+</div>
+`}
+  domy={() => {
+    const { signal } = DOMY;
+    const message = signal('');
+    return { message };
+  }}
+/>

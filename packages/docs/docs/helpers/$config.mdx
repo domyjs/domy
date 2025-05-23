@@ -1,0 +1,21 @@
+import Demo from '@site/src/components/Demo';
+
+# $config
+
+Allow you to retrieve the current configuration.
+
+## Example
+
+NOTE: We are using `this.$config` instead of `$config` because `avoidDeprecatedWith` is set to `true`.
+
+```html
+<p>{{ JSON.stringify(this.$config) }}</p>
+```
+
+```js
+DOMY.createApp().configure({ avoidDeprecatedWith: true }).mount();
+```
+
+Will produce:
+
+<Demo code={`<p>{{ JSON.stringify(this.$config) }}</p>`} config={{ avoidDeprecatedWith: true }} />

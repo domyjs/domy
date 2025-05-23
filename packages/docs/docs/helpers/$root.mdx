@@ -1,0 +1,33 @@
+import Demo from '@site/src/components/Demo';
+
+# $root
+
+The `$root` special helper provides access to the parent element of the current component or directive. It is useful for performing DOM manipulations that require knowledge of the element's immediate container.
+
+## Syntax
+
+```js
+console.log($root);
+```
+
+## Behavior
+
+- `$root` returns the parent element of the current directive or component.
+- If the element is a text node, it returns the grandparent instead.
+- Helps in scenarios where direct manipulation of the container element is required.
+
+## Example
+
+```html
+<div>
+  <button @click="alert($root.tagName)">Log Parent Element</button>
+</div>
+```
+
+<Demo
+  code={`
+<div>
+  <button @click="alert($root.tagName)">Log Parent Element</button>
+</div>
+`}
+/>
