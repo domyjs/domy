@@ -1,12 +1,10 @@
 import { createCallbackRegistrer } from '../utils/createCallbackRegistrer';
 import { createHelperToHookRegistrer } from './createHelperToHookRegistrer';
-import { $el } from '../helpers/$el';
 import { $attrs } from '../helpers/$attrs';
 import { $props } from '../helpers/$props';
 import { $childrens } from '../helpers/$childrens';
 import { $config } from '../helpers/$config';
 import { $names } from '../helpers/$names';
-import { $root } from '../helpers/$root';
 import { $refs } from '../helpers/$refs';
 import { $nextTick } from '../helpers/$nextTick';
 import { globalWatch, watch } from '@domyjs/reactive';
@@ -29,8 +27,6 @@ export const allHooks = {
   onUnmounted: onUnmountedTracker.fn,
 
   // Helpers hooks
-  useEl: helperToHookRegistrer.getHook($el),
-  useRoot: helperToHookRegistrer.getHook($root),
   useAttrs: helperToHookRegistrer.getHook($attrs),
   useProps: helperToHookRegistrer.getHook($props),
   useChildrens: helperToHookRegistrer.getHook($childrens),
