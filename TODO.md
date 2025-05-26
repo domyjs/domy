@@ -6,3 +6,4 @@
 
 - Documentation
 - Auto release ...
+- Remove DEMO
