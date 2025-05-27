@@ -1,0 +1,61 @@
+import Demo from '@site/src/components/Demo';
+
+# Lifecycle
+
+DOMY provides lifecycle hooks that allow developers to execute logic at different stages of a component’s lifecycle. These hooks are useful for **initialization, mounting, cleanup, and unmounting processes**.
+
+## Available Lifecycle Hooks
+
+### **onSetuped**
+
+Triggered after the component has completed its setup phase. Mean it went through the whole setup function.
+
+```js
+const { onSetuped } = DOMY;
+
+onSetuped(() => {
+  console.log('Component setup complete!');
+});
+```
+
+### **onMounted**
+
+Executed once the component is fully mounted in the DOM. Really usefull to access `refs`.
+
+```js
+const { onMounted, useRefs } = DOMY;
+
+const refs = useRefs();
+
+onMounted(() => {
+  refs.input.focus();
+});
+```
+
+### **onBeforeUnmount**
+
+Runs just before the component is unmounted, allowing cleanup operations. For example cleaning `interval`.
+
+```js
+const { onBeforeUnmount } = DOMY;
+
+let intervalId = setInterval(() => {
+  console.log('Updating data...');
+}, 1000);
+
+onBeforeUnmount(() => {
+  clearInterval(intervalId);
+});
+```
+
+### **onUnmounted**
+
+Triggered after the component has been fully removed from the DOM.
+
+```js
+const { onUnmounted } = DOMY;
+
+onUnmounted(() => {
+  console.log('Component fully unmounted, resources freed.');
+});
+```

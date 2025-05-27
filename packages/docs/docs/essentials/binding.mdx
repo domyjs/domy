@@ -1,0 +1,97 @@
+import Demo from '@site/src/components/Demo';
+
+# Attribute Binding
+
+DOMY provides powerful **attribute binding** to dynamically update HTML attributes. You can use either the `d-bind:` prefix or the shorthand `:` syntax to bind attributes reactively.
+
+## Using `d-bind:` Prefix\*\*
+
+You can bind attributes using the `d-bind:` directive, making them reactive.
+
+### Example: Binding a class dynamically
+
+```html
+<p d-bind:class="dynamicClass">This text changes class dynamically.</p>
+```
+
+```js
+const dynamicClass = signal('highlight');
+```
+
+**How it works**:
+
+- The **class attribute** is bound to the reactive variable `dynamicClass`.
+- When `dynamicClass` changes, the attribute updates automatically.
+
+---
+
+## Using `:` Shorthand\*\*
+
+DOMY allows a shorthand syntax using `:` instead of `d-bind:`.
+
+### Example: Using `:` for class binding
+
+```html
+<p :class="dynamicClass">This text changes class dynamically.</p>
+```
+
+**Equivalent to** `d-bind:class="dynamicClass"`.
+
+---
+
+## Binding Other Attributes\*\*
+
+### Dynamic `id` binding
+
+```html
+<p d-bind:id="elementId">This paragraph has a dynamic ID.</p>
+```
+
+```html
+<p :id="elementId">This paragraph has a dynamic ID.</p>
+```
+
+### Inline `style` binding
+
+```html
+<p d-bind:style="{ color: 'red' }">This text is red.</p>
+```
+
+```html
+<p :style="{ color: 'red' }">This text is red.</p>
+```
+
+### Conditional attributes
+
+```html
+<button d-bind:disabled="isDisabled">Click me</button>
+```
+
+```html
+<button :disabled="isDisabled">Click me</button>
+```
+
+**Reacting to state changes**:
+
+```js
+const isDisabled = signal(true);
+setTimeout(() => {
+  isDisabled.value = false; // Enables the button after a delay
+}, 2000);
+```
+
+---
+
+## Example
+
+```html
+<p :style="{ color: 'red', background: 'yellow' }">Hello World!</p>
+```
+
+Will give:
+
+<Demo
+  code={`
+<p :style="{ color: 'red', background: 'yellow' }">Hello World!</p>
+`}
+/>

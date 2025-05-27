@@ -1,0 +1,76 @@
+import Demo from '@site/src/components/Demo';
+
+# nextTick
+
+The `nextTick` hook ensures that a callback function is executed after the framework has finished updating dependencies. This is useful for scenarios where you need to wait for DOM updates before executing logic.
+
+## Syntax
+
+```js
+const { nextTick } = DOMY;
+
+nextTick(() => {
+  console.log('DOM updates completed');
+});
+```
+
+## Behavior
+
+- `nextTick()` ensures that the callback executes **after** DOM updates are finished.
+- It returns a promise, allowing for asynchronous execution.
+- Useful for reading updated DOM values or performing next-step computations.
+
+## Example
+
+### Ensuring Correct DOM Interaction
+
+```html
+<div>
+  <p d-ref="p">{{ message }}</p>
+  <button @click="updateMessage">Update Message</button>
+</div>
+```
+
+```js
+const { signal, nextTick, useRefs } = DOMY;
+
+DOMY.createApp(() => {
+  const refs = useRefs();
+  const message = signal('');
+
+  const updateMessage = () => {
+    message.value = 'Hello World!';
+    nextTick(() => alert(refs.p.textContent));
+  };
+
+  return {
+    message,
+    updateMessage
+  };
+}).mount();
+```
+
+<Demo
+  code={`
+  <div>
+    <p d-ref="p">{{ message }}</p>
+    <button @click="updateMessage">Update Message</button>
+  </div>
+  `}
+  domy={() => {
+    const { signal, nextTick, useRefs } = DOMY;
+    const refs = useRefs();
+    const message = signal('');
+
+    const updateMessage = () => {
+      message.value = 'Hello World!';
+      nextTick(() => alert(refs.p.textContent));
+    };
+
+    return {
+      message,
+      updateMessage
+    };
+
+}}
+/>
