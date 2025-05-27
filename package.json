@@ -10,6 +10,7 @@
     "cypress": "cypress open",
     "build": "npm run prettier && npm run lint && npm run fast-build",
     "fast-build": "ts-node ./scripts/build.ts",
+    "inject-domy": "cd ./packages/docs && npm run inject-domy",
     "lint": "eslint .",
     "prettier": "prettier --write .",
     "dep-check": "npx npm-check -u"

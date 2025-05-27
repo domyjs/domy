@@ -33,6 +33,9 @@ jobs:
       - name: Run Build
         run: npm run fast-build
 
+      - name: Inject DOMY into doc
+        run: npm run inject-domy
+
       - name: Run Tests
         run: npm run test
 
