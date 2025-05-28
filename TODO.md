@@ -1,8 +1,9 @@
 # TODO
 
 - Improve d-for perf and watchEffect perf
+- Suspense / onError
 
-- Router beforeEach/afterEach/replace/redirect and tests
+- d-component, Router beforeEach/afterEach/replace/redirect and tests
 
 - Documentation
 - Auto release ...

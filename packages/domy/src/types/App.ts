@@ -4,4 +4,4 @@ export type AppState = {
   isUnmounted: boolean;
 };
 
-export type App = () => Record<string, unknown>;
+export type App = () => Record<string, unknown> | void;
