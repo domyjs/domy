@@ -1,0 +1,73 @@
+import Demo from '@site/src/components/Demo';
+import collapse from '@domyjs/collapse';
+
+# Collapse
+
+The `d-collapse` directive allows you to **toggle the visibility of an element** dynamically by adjusting its height. It smoothly transitions between collapsed and expanded states, making it perfect for **dropdowns, accordions, or expandable sections**.
+
+## Installation
+
+To use `d-collapse`, include the DOMY Collapse plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/collapse@1.x.x"></script>
+```
+
+---
+
+## Syntax and Usage
+
+### Basic Collapse Usage
+
+```html
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div d-collapse="toggleState">This section expands and collapses smoothly.</div>
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div d-collapse="toggleState">This section expands and collapses smoothly.</div>
+</div>
+`}
+  plugins={() => {
+    return [collapse];
+  }}
+/>
+
+### Settings
+
+Modify the collapse transition behavior using `d-collapse-settings` (have to be placed before `d-collapse`).
+
+- `height` to set the height when it's expanded
+- `defaultHeight` for the minimal height when it's collapsed.
+- `transition` for modifying the transition when expanding.
+
+```html
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div
+    d-collapse-settings="{ transition: 'height 300ms ease-in-out', height: 200, defaultHeight: 10 }"
+    d-collapse="toggleState"
+  >
+    Expandable content with custom transition.
+  </div>
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div d-collapse-settings="{ transition: 'height 300ms ease-in-out', height: 200, defaultHeight: 10 }" d-collapse="toggleState" >
+    Expandable content with custom transition.
+  </div>
+</div>
+`}
+  plugins={() => {
+    return [collapse];
+  }}
+/>

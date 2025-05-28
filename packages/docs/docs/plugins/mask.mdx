@@ -1,0 +1,92 @@
+import Demo from '@site/src/components/Demo';
+import mask from '@domyjs/mask';
+
+# Mask
+
+The `d-mask` directive allows you to **apply input masks**, ensuring consistent formatting for fields like phone numbers, credit cards, and currency inputs.
+
+## Installation
+
+To use `d-mask`, include the DOMY Mask plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/mask@1.x.x"></script>
+```
+
+---
+
+## Syntax and Usage
+
+### **Basic Mask Usage (Static)**
+
+Use a predefined mask structure.
+
+```html
+<input type="text" d-mask="99/99/9999" placeholder="DD/MM/YYYY" />
+```
+
+💡 **Mask Rules:**
+
+- `9` → Number (0-9)
+- `a` → Letter (A-Z or a-z)
+- `*` → Any character
+
+---
+
+### **Dynamic Mask Usage**
+
+Define a **mask dynamically** based on user input.
+
+```html
+<input type="text" d-mask.dynamic="maskType" placeholder="Dynamic mask applied" />
+```
+
+```js
+const maskType = input => {
+  return input.includes('@') ? 'a*@a*' : '999-999-9999';
+};
+```
+
+---
+
+### **Money Formatting Helper (`$money`)**
+
+Format currency inputs dynamically.
+
+```html
+<input type="text" d-mask.dynamic="$money" placeholder="$0.00" />
+```
+
+💡 **Usage Options**
+
+- `$money(input, decimalSeparator = '.', thousandsSeparator = ',', precision = 2)`
+- Ensures consistent money formatting with thousands and decimals.
+
+---
+
+## Example: Full Mask Implementation
+
+```html
+<div>
+  <p>Phone</p>
+  <input type="text" d-mask="999-999-9999" />
+
+  <p>Price</p>
+  <input type="text" d-mask.dynamic="$money" placeholder="$0.00" />
+</div>
+```
+
+<Demo
+  code={`
+<div>
+  <p>Phone</p>
+  <input type="text" d-mask="999-999-9999" />
+
+  <p>Price</p>
+  <input type="text" d-mask.dynamic="$money" placeholder="$0.00" />
+</div>
+`}
+  plugins={() => {
+    return [mask];
+  }}
+/>

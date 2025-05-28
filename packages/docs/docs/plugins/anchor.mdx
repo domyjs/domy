@@ -1,43 +1,69 @@
----
-sidebar_position: 1
----
+import Demo from '@site/src/components/Demo';
+import anchor from '@domyjs/anchor';
 
-# Create a Page
+# Anchor
 
-Add **Markdown or React** files to `src/pages` to create a **standalone page**:
+The `d-anchor` directive allows you to **attach an element to another**, ensuring proper **positioning and visibility**. This is particularly useful for **tooltips, dropdowns, or contextual menus**.
 
-- `src/pages/index.js` → `localhost:3000/`
-- `src/pages/foo.md` → `localhost:3000/foo`
-- `src/pages/foo/bar.js` → `localhost:3000/foo/bar`
+## Installation
 
-## Create your first React Page
+To use `d-anchor`, include the DOMY Anchor plugin via CDN:
 
-Create a file at `src/pages/my-react-page.js`:
-
-```jsx title="src/pages/my-react-page.js"
-import React from 'react';
-import Layout from '@theme/Layout';
-
-export default function MyReactPage() {
-  return (
-    <Layout>
-      <h1>My React page</h1>
-      <p>This is a React page</p>
-    </Layout>
-  );
-}
+```html
+<script src="https://unpkg.com/@domyjs/anchor@1.x.x"></script>
 ```
 
-A new page is now available at [http://localhost:3000/my-react-page](http://localhost:3000/my-react-page).
+---
 
-## Create your first Markdown Page
+## Syntax and Usage
 
-Create a file at `src/pages/my-markdown-page.md`:
+### Basic Anchor Usage
 
-```mdx title="src/pages/my-markdown-page.md"
-# My Markdown page
+Attach an element to another by specifying its reference.
 
-This is a Markdown page
+```html
+<button d-ref="trigger">Hover me</button>
+<div d-anchor="$refs.trigger">Tooltip content</div>
 ```
 
-A new page is now available at [http://localhost:3000/my-markdown-page](http://localhost:3000/my-markdown-page).
+### Using Position Modifiers
+
+Modify the element's placement relative to the anchor.
+
+### Supported Positions
+
+| Modifier | Description      |
+| -------- | ---------------- |
+| `b`      | Bottom (Default) |
+| `bs`     | Bottom Start     |
+| `be`     | Bottom End       |
+| `t`      | Top              |
+| `ts`     | Top Start        |
+| `te`     | Top End          |
+| `l`      | Left             |
+| `ls`     | Left Start       |
+| `le`     | Left End         |
+| `r`      | Right            |
+| `rs`     | Right Start      |
+| `re`     | Right End        |
+
+---
+
+## Example:
+
+This example positions a tooltip below a button and toggles its visibility.
+
+```html
+<button d-ref="trigger">Click me</button>
+<div d-anchor.b="$refs.trigger">Tooltip appears below</div>
+```
+
+<Demo
+  code={`
+<button d-ref="trigger">Click me</button>
+<div d-anchor.b="$refs.trigger">Tooltip appears below</div>
+`}
+  plugins={() => {
+    return [anchor];
+  }}
+/>

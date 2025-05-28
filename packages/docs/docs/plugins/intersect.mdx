@@ -1,0 +1,73 @@
+import Demo from '@site/src/components/Demo';
+import intersect from '@domyjs/intersect';
+
+# Intersect
+
+The `d-intersect` directive allows you to **trigger an action when an element appears in the viewport**, making it perfect for **lazy loading, animations, or analytics tracking**.
+
+## Installation
+
+To use `d-intersect`, include the DOMY Intersect plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/intersect@1.x.x"></script>
+```
+
+---
+
+## Syntax and Usage
+
+### **Basic Intersect Usage**
+
+Triggers an action when the element enters the viewport.
+
+```html
+<div d-intersect="loadContent">Content appears when visible</div>
+```
+
+```js
+const loadContent = () => console.log('Element is visible!');
+```
+
+### **Unintersect Usage**
+
+Triggers an action when the element leaves the viewport.
+
+```html
+<div d-unintersect="hideContent">Content disappears when scrolled away</div>
+```
+
+```js
+const hideContent = () => console.log('Element left viewport!');
+```
+
+---
+
+## **Using Custom Settings (`d-intersect-settings`)**
+
+Modify the intersection behavior using **threshold and root margins**. Ensure it's placed before `d-intersect`.
+
+```html
+<div
+  d-intersect-settings="{ threshold: 0.5, rootMargin: '0px 0px -100px 0px' }"
+  d-intersect="animateElement"
+>
+  Custom intersection settings applied
+</div>
+```
+
+---
+
+## Example: Lazy Loading Images
+
+Only loads an image when it **appears in the viewport**.
+
+```html
+<img d-intersect="loadImage($el)" data-src="image.jpg" alt="Lazy-loaded image" />
+```
+
+```js
+const loadImage = img => {
+  img.src = img.dataset.src;
+};
+```

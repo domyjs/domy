@@ -1,0 +1,48 @@
+import Demo from '@site/src/components/Demo';
+import debounce from '@domyjs/debounce';
+
+# Debounce
+
+The `$debounce` helper prevents a function from being **called multiple times in quick succession**, ensuring it's executed **only after a specified delay**. This is useful for optimizing **event listeners**, such as search inputs or resize events.
+
+## Installation
+
+To use `$debounce`, include the DOMY Debounce plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/debounce@1.x.x"></script>
+```
+
+---
+
+## Syntax and Usage
+
+### Basic Debounce Example
+
+```html
+<div d-scope="{ search: '' }">
+  <p>Search: {{ search }}</p>
+  <input
+    type="text"
+    @input="$debounce(() => search = $el.value, 300)"
+    placeholder="Type to search..."
+  />
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{ search: '' }">
+  <p>Search: {{ search }}</p>
+  <input
+    type="text"
+    @input="$debounce(() => search = $el.value, 300)"
+    placeholder="Type to search..."
+  />
+</div>
+`}
+
+plugins={() => {
+return [debounce];
+}}
+/>

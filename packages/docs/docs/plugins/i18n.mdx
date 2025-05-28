@@ -1,0 +1,130 @@
+import Demo from '@site/src/components/Demo';
+import i18n from '@domyjs/i18n';
+
+# Internationalization (i18n)
+
+The `i18n` plugin enables **dynamic text translation** based on the selected language. It supports **language switching, message formatting, and placeholders** for personalized content.
+
+## Installation
+
+To use `i18n`, include the DOMY I18N plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/i18n@1.x.x"></script>
+```
+
+---
+
+## Syntax and Usage
+
+### **Defining Language Messages**
+
+Define translations for multiple languages.
+
+```js
+const { i18nPlugin, useI18n } = i18n({
+  messages: {
+    en: {
+      title: 'Hello World!',
+      greeting: {
+        hello: 'Hello, {{ name }}',
+        bye: 'Bye, {{ name }}'
+      }
+    },
+    fr: {
+      title: 'Bonjour le monde!',
+      greeting: {
+        hello: 'Bonjour, {{ name }}',
+        bye: 'Aurevoir, {{ name }}'
+      }
+    }
+  },
+  currentLangage: 'en',
+  defaultCallbackLangage: 'en'
+});
+```
+
+---
+
+### **Using Translations in Components**
+
+Bind translation keys using `$t()`.
+
+```html
+<h1>{{ $t('title') }}</h1>
+<p>{{ $t('greeting.hello', { name: 'John' }) }}</p>
+<p>{{ $t('greeting.bye') }}</p>
+<p>{{ $t({ key: 'key.who.doesnt.exist', defaultMessage: 'default message' }) }}</p>
+```
+
+---
+
+### **Switching Languages Dynamically**
+
+Modify the active language using `$i18n.setLangage()`.
+
+```html
+<button @click="$i18n.setLangage('fr')">🇫🇷 French</button>
+<button @click="$i18n.setLangage('en')">🇬🇧 English</button>
+```
+
+---
+
+### **Getting Supported Languages**
+
+Retrieve the list of available languages dynamically.
+
+```html
+<p>{{ $i18n.getSupportedLangages().join(', ') }}</p>
+```
+
+---
+
+## **Example: Language Selector**
+
+```html
+<div d-scope="{ name: 'Yoann' }">
+  <h1>{{ $t('title') }}</h1>
+  <p>{{ $t('greeting.hello', { name }) }}</p>
+
+  <button @click="name = 'Pierre'">Change name to Pierre</button>
+  <button @click="$i18n.setLangage('fr')">Switch to French</button>
+  <button @click="$i18n.setLangage('en')">Switch to English</button>
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{ name: 'Yoann' }">
+  <h1>{{ $t('title') }}</h1>
+  <p>{{ $t('greeting.hello', { name }) }}</p>
+
+  <button @click="name = 'Pierre'">Change name to Pierre</button>
+  <button @click="$i18n.setLangage('fr')">Switch to French</button>
+  <button @click="$i18n.setLangage('en')">Switch to English</button>
+</div>
+`}
+plugins={() => {
+const { i18nPlugin } = i18n({
+messages: {
+en: {
+title: 'Hello World!',
+greeting: {
+hello: 'Hello, {{ name }}',
+bye: 'Bye, {{ name }}'
+}
+},
+fr: {
+title: 'Bonjour le monde!',
+greeting: {
+hello: 'Bonjour, {{ name }}',
+bye: 'Aurevoir, {{ name }}'
+}
+}
+},
+currentLangage: 'en',
+defaultCallbackLangage: 'en'
+});
+return [i18nPlugin];
+}}
+/>
