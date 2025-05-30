@@ -47,7 +47,7 @@ export function initApp(params: Params) {
   const state: State = {
     data: {},
     componentInfos,
-    refs: {}
+    refs: ReactiveUtils.reactive({})
   };
 
   // Initialising hooks

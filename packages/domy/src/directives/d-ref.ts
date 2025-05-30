@@ -9,7 +9,7 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
  */
 export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const isDynamic = domy.modifiers.includes('dynamic');
-  let refName = isDynamic ? domy.evaluate(domy.attr.value) : domy.attr.value;
+  const refName = isDynamic ? domy.evaluate(domy.attr.value) : domy.attr.value;
 
   const cleanRef = () => {
     delete domy.state.refs[refName];
@@ -17,17 +17,14 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   const setRef = () => {
     if (domy.state.refs[refName])
       throw new Error(`A ref with the name "${refName}" already exist.`);
-
-    domy.state.refs[refName] = domy.block;
+    updateRef();
+  };
+  const updateRef = () => {
+    domy.state.refs[refName] = domy.skipReactive(domy.block.el);
   };
 
-  // If the ref is dynamic
-  if (domy.modifiers.includes('dynamic')) {
-    refName = domy.evaluate(domy.attr.value);
-    setRef();
-  } else {
-    setRef();
-  }
+  setRef();
+  domy.block.onElementChange(updateRef);
 
   domy.cleanup(() => {
     cleanRef();
