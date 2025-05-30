@@ -28,7 +28,7 @@
 
       watch(
         () => {
-          if (refs.p) refs.p.textContent = refs.input.value;
+          if (refs.p) refs.p.textContent = refs.input.value; // Ensure refs are reactive
         },
         () => refs
       );
