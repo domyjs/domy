@@ -107,6 +107,10 @@ const config = {
               {
                 label: 'GitHub',
                 href: 'https://github.com/yoannchb-pro/domy'
+              },
+              {
+                label: 'BuyMeACoffee',
+                href: 'https://buymeacoffee.com/yoannchbpro'
               }
             ]
           }
