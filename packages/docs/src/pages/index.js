@@ -120,9 +120,7 @@ export default function Home() {
       count
     };
   }).mount();
-</script>
-
-`}
+</script>`}
               </CodeBlock>
             </div>
             <p>
@@ -140,9 +138,7 @@ export default function Home() {
 
 <script>
   DOMY.createApp().mount();
-</script>
-
-`}
+</script>`}
               </CodeBlock>
             </div>
             <p>
