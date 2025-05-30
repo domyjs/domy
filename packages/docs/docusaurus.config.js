@@ -9,11 +9,12 @@ import { themes as prismThemes } from 'prism-react-renderer';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Domy',
-  tagline: 'A lightweight and minimal javascript framework for your frontend',
+  tagline:
+    'A lightweight and minimal JavaScript framework for your frontend that mixes AlpineJS and VueJS perfectly.',
   favicon: 'img/domy.png',
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://domyjs.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -110,7 +111,7 @@ const config = {
             ]
           }
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Domy, Inc. Built with Docusaurus.`
+        copyright: `Copyright © ${new Date().getFullYear()} Domy`
       },
       prism: {
         theme: prismThemes.github,
