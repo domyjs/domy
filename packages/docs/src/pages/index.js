@@ -126,6 +126,26 @@ export default function Home() {
               </CodeBlock>
             </div>
             <p>
+              Or a basic implementation with <b>d-scope</b>:
+            </p>
+            <div className={styles.codeBlock}>
+              <CodeBlock language="html">
+                {`<script src="https://unpkg.com/@domyjs/core@1.x.x"></script>
+
+<div d-scope="{ count: 0 }">
+  <p>Count: {{ count }}</p>
+  <button @click="count++">Increment</button>
+  <button @click="count--">Decrement</button>
+</div>
+
+<script>
+  DOMY.createApp().mount();
+</script>
+
+`}
+              </CodeBlock>
+            </div>
+            <p>
               <Link to="/docs/get-started" className="button button--primary">
                 Learn more →
               </Link>
