@@ -38,8 +38,8 @@
     </style>
   </head>
   <body>
-    <ul d-for="page of pages">
-      <li d-key="page.title" @click="currPage = page">{{ page.title }}</li>
+    <ul>
+      <li d-for="page of pages" d-key="page.title" @click="currPage = page">{{ page.title }}</li>
     </ul>
 
     <template d-transition="transition" d-component="currPage.component" :title="currPage.title">
@@ -51,12 +51,12 @@
 
     const Home = DOMY.createComponent({
       props: ['title'],
-      html: `<p id="home"><template d-insert.render="$childrens[0]"></template>{{ $props.title }}</p>`
+      html: `<p id="home"><template d-insert="$childrens[0]"></template>{{ $props.title }}</p>`
     });
 
     const About = DOMY.createComponent({
       props: ['title'],
-      html: `<p id="about"><template d-insert.render="$childrens[0]"></template>{{ $props.title }}</p>`
+      html: `<p id="about"><template d-insert="$childrens[0]"></template>{{ $props.title }}</p>`
     });
 
     DOMY.createApp(() => {

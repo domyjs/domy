@@ -1,4 +1,3 @@
-import type { Block } from '../core/Block';
 import { ComponentInfos } from './Component';
 
 export type State = {

@@ -4,5 +4,6 @@
 - Suspense
 - onError
 
-- d-component, Router beforeEach/afterEach/replace and tests and doc
+- Fixe d-component
+- use d-component instead of d-insert, Router beforeEach/afterEach/replace and tests and doc
 - Auto release ...
