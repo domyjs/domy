@@ -75,9 +75,6 @@ export function createComponent(
           props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
         );
 
-        // Replace the component by the root
-        domy.block.replaceWith(root);
-
         const data = domy.reactive({
           $props: {} as ComponentInfos['componentData']['$props'],
           $attrs: {} as ComponentInfos['componentData']['$attrs']
@@ -169,17 +166,42 @@ export function createComponent(
         }
 
         //  We render the childs first to ensure they keep the current state and not the component state
-        const names: { [name: string]: Element } = {};
-        const childrens: Element[] = [];
-        for (const child of componentElement.children) {
+        const names: { [name: string]: Element | undefined } = domy.reactive({});
+        const childrens: Element[] = domy.reactive([]);
+        const childrensCache: (Element | undefined)[] = [];
+        const updateChildrens = () => {
+          childrens.length = 0;
+          childrens.push(...(childrensCache.filter(Boolean) as Element[]));
+        };
+        for (let i = 0; i < componentElement.children.length; ++i) {
+          const child = componentElement.children[i];
           const childBlock = domy.deepRender({
             element: child as Element,
             scopedNodeData: domy.scopedNodeData
           });
+
           unmountChilds.push(childBlock.unmount.bind(childBlock));
-          childrens.push(childBlock.el);
-          if (childBlock.name) names[childBlock.name] = childBlock.el;
+
+          domy.lockWatchers();
+          // Insert initial render
+          let childEl: Element | undefined = domy.skipReactive(childBlock.el);
+          childEl = childEl.isConnected ? childEl : undefined;
+          childrensCache.push(childEl);
+          if (childBlock.name) names[childBlock.name] = childEl;
+          updateChildrens();
+
+          // Handle the case the element change (for example with "d-if")
+          childBlock.onElementChange(newEl => {
+            const newChildEl: Element | undefined = domy.skipReactive(newEl);
+            childrensCache[i] = newChildEl;
+            if (childBlock.name) names[childBlock.name] = newChildEl;
+            updateChildrens();
+          });
+          domy.unlockWatchers();
         }
+
+        // Replace the component by the root
+        domy.block.replaceWith(root);
 
         let unmountComponent: (() => void) | undefined;
         const queueId = getUniqueQueueId();
@@ -219,6 +241,8 @@ export function createComponent(
           if (unmountComponent) unmountComponent();
           cleanup(unmountChilds);
           domy.unReactive(data);
+          domy.unReactive(childrens);
+          domy.unReactive(names);
         });
       },
       err => {

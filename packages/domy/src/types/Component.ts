@@ -9,7 +9,7 @@ export type ComponentInfos = {
   };
 
   childrens: Element[];
-  names: { [name: string]: Element };
+  names: { [name: string]: Element | undefined };
   parentPluginHelper: PluginHelper;
 };
 

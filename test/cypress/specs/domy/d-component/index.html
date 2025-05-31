@@ -38,12 +38,14 @@
     </style>
   </head>
   <body>
+    <button @click="toggle = !toggle">Toggle msg "{{ toggle }}"</button>
+
     <ul>
       <li d-for="page of pages" d-key="page.title" @click="currPage = page">{{ page.title }}</li>
     </ul>
 
     <template d-transition="transition" d-component="currPage.component" :title="currPage.title">
-      <span>{{ msg }}</span>
+      <span d-if="toggle">{{ msg }}</span>
     </template>
   </body>
   <script>
@@ -67,9 +69,11 @@
       ];
 
       const currPage = signal(pages[0]);
+      const toggle = signal(false); // check chidlrens are reactive
 
       return {
         msg: 'Page: ',
+        toggle,
         pages,
         currPage,
         changePage: page => {
