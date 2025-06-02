@@ -33,7 +33,6 @@ function moveToIndexBetweenComments(
  */
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   let currentLoopId = 0;
-  let oldArrayLength = 0;
 
   const originalEl = domy.block.el;
   const rawKey = originalEl.getAttribute('d-key');
@@ -72,8 +71,6 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
     const executedValue = domy.evaluate(forPattern.groups!.org);
     const executedValueObjs = isForIn ? Object.keys(executedValue) : executedValue;
-
-    oldArrayLength = executedValueObjs.length;
 
     // Create or swap the elements
     const currentElements: { element: Element; index: number }[] = [];
