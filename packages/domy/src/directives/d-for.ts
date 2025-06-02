@@ -36,7 +36,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     let index = 0;
 
     while (sibling !== traceEndPositionComment && index < lookingIndex) {
-      ++index;
+      if (sibling && sibling.nodeType !== Node.COMMENT_NODE) ++index;
       sibling = sibling!.nextSibling;
     }
 
@@ -58,10 +58,8 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
   const isForIn = forPattern.groups!.type === 'in';
   const lastRenders: LastRender[] = [];
-  const fragment = new DocumentFragment();
 
   domy.effect(() => {
-    const canUseFragment = oldArrayLength === 0;
     const executedValue = domy.evaluate(forPattern.groups!.org);
     const executedValueObjs = isForIn ? Object.keys(executedValue) : executedValue;
 
@@ -85,7 +83,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         };
       }
 
-      if (rawKey && !canUseFragment) {
+      if (rawKey) {
         // Check if the key already exist so we can skip render
         const currentKeyValue = domy.evaluate(rawKey, scope);
         const oldRender = lastRenders.find(l => l.render.key === currentKeyValue);
@@ -108,8 +106,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
       // Create and render the new element
       const newEl = originalEl.cloneNode(true) as Element;
-      if (canUseFragment) fragment.appendChild(newEl);
-      else insertToIndex(newEl, index);
+      insertToIndex(newEl, index);
       const render = domy.deepRender({
         element: newEl,
         scopedNodeData: [...domy.scopedNodeData, scope]
@@ -122,16 +119,9 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
       lastRenders.push(newRender);
     }
 
-    // We add all the new elements
-    if (canUseFragment) {
-      traceEndPositionComment.before(fragment);
-    }
-
     // Remove unecessary elements
-    if (!canUseFragment) {
-      for (const render of lastRenders) {
-        if (render.loopId !== currentLoopId) cleanupLastRender(render);
-      }
+    for (const render of lastRenders) {
+      if (render.loopId !== currentLoopId) cleanupLastRender(render);
     }
 
     currentLoopId += 1;
