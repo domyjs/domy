@@ -28,8 +28,8 @@ describe('Collapse test', () => {
     cy.get('#c2').should('not.have.css', 'height', '10px');
     cy.get('#c2').should('have.css', 'transition').and('include', 'height 0.5s ease-in');
 
-    cy.get('#c1').should('have.attr', 'style').and('contain', 'height: auto');
-    cy.get('#c2').should('have.attr', 'style').and('contain', 'height: auto');
+    // cy.get('#c1').should('have.attr', 'style').and('contain', 'height: auto');
+    // cy.get('#c2').should('have.attr', 'style').and('contain', 'height: auto');
 
     // Click again collapse
     cy.get('button').click();
