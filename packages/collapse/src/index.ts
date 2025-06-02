@@ -5,7 +5,6 @@ import type {
 } from '@domyjs/core/src/types/Domy';
 
 type CollapseSettings = {
-  height?: number;
   defaultHeight?: number;
   transition?: string;
 };
@@ -37,26 +36,35 @@ function collapseSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn 
 function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const el = domy.block.el as HTMLElement;
   const settings: CollapseSettings = domy.block.getDataForPluginId('collapse-settings') ?? {};
+  const heightAutoEvent = () => (el.style.height = 'auto');
 
   // We wait the element to be mounted first to get his initial height
   domy.onElementMounted(() => {
-    const initialHeight = settings.height ?? el.getBoundingClientRect().height;
-
     let isInitialised = false;
     el.style.overflowY = 'hidden';
 
     domy.effect(() => {
-      const isShow = domy.evaluate(domy.attr.value);
+      el.removeEventListener('transitionend', heightAutoEvent);
 
-      if (isInitialised) el.style.transition = settings.transition ?? 'height 250ms ease-out';
+      const shouldBeShow = domy.evaluate(domy.attr.value);
 
-      if (isShow) {
-        el.style.height = `${initialHeight}px`;
-      } else {
-        el.style.height = `${settings.defaultHeight ?? 0}px`;
-      }
+      el.style.transition = '';
+      el.style.height = 'auto';
+      const height = el.getBoundingClientRect().height;
+      el.style.height = shouldBeShow ? `${settings.defaultHeight ?? 0}px` : `${height}px`;
 
-      isInitialised = true;
+      window.requestAnimationFrame(() => {
+        if (isInitialised) el.style.transition = settings.transition ?? 'height 250ms ease-out';
+
+        if (shouldBeShow) {
+          el.style.height = `${height}px`;
+          el.addEventListener('transitionend', heightAutoEvent);
+        } else {
+          el.style.height = `${settings.defaultHeight ?? 0}px`;
+        }
+
+        isInitialised = true;
+      });
     });
   });
 }
