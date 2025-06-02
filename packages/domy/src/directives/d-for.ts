@@ -3,6 +3,26 @@ import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
 type LastRender = { render: Block; reactiveIndex: { value: number }; loopId: number };
 
+function moveToIndexBetweenComments(
+  element: Element,
+  index: number,
+  startComment: Comment,
+  endComment: Comment
+) {
+  const nodesBetween: Element[] = [];
+  let current = startComment.nextSibling;
+
+  while (current && current !== endComment) {
+    if (current.nodeType === Node.ELEMENT_NODE && current !== element) {
+      nodesBetween.push(current as Element);
+    }
+    current = current.nextSibling;
+  }
+
+  const refNode = nodesBetween[index] || endComment;
+  refNode.before(element);
+}
+
 /**
  * d-for implementation
  * Allow to render a list of element
@@ -31,18 +51,6 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     );
   }
 
-  function insertToIndex(element: Element, lookingIndex: number) {
-    let sibling = traceStartPositionComment.nextSibling;
-    let index = 0;
-
-    while (sibling !== traceEndPositionComment && index < lookingIndex) {
-      if (sibling && sibling.nodeType !== Node.COMMENT_NODE) ++index;
-      sibling = sibling!.nextSibling;
-    }
-
-    if (sibling) sibling.before(element);
-  }
-
   function cleanupLastRender(lastRender: LastRender) {
     domy.unReactive(lastRender.reactiveIndex);
     lastRender.render.remove();
@@ -60,12 +68,16 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   const lastRenders: LastRender[] = [];
 
   domy.effect(() => {
+    currentLoopId += 1;
+
     const executedValue = domy.evaluate(forPattern.groups!.org);
     const executedValueObjs = isForIn ? Object.keys(executedValue) : executedValue;
 
     oldArrayLength = executedValueObjs.length;
 
     // Create or swap the elements
+    const currentElements: { element: Element; index: number }[] = [];
+    const renderFns: (() => void)[] = [];
     for (let index = 0; index < executedValueObjs.length; ++index) {
       const value = executedValueObjs[index];
 
@@ -92,12 +104,10 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
           const oldRenderEl = oldRender.render.el;
           const oldRenderIndex = oldRender.reactiveIndex.value;
 
-          // If the index of the element changed we move it to the new position
-          if (oldRenderIndex !== index) {
-            insertToIndex(oldRenderEl, index);
-            oldRender.reactiveIndex.value = index;
-          }
+          // Update the index if needed
+          if (oldRenderIndex !== index) oldRender.reactiveIndex.value = index;
 
+          currentElements.push({ element: oldRenderEl, index });
           oldRender.loopId = currentLoopId;
 
           continue;
@@ -106,25 +116,44 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
       // Create and render the new element
       const newEl = originalEl.cloneNode(true) as Element;
-      insertToIndex(newEl, index);
-      const render = domy.deepRender({
-        element: newEl,
-        scopedNodeData: [...domy.scopedNodeData, scope]
+      currentElements.push({ element: newEl, index });
+      renderFns.push(() => {
+        const render = domy.deepRender({
+          element: newEl,
+          scopedNodeData: [...domy.scopedNodeData, scope]
+        });
+        const newRender: LastRender = {
+          render,
+          reactiveIndex,
+          loopId: currentLoopId
+        };
+        lastRenders.push(newRender);
       });
-      const newRender: LastRender = {
-        render,
-        reactiveIndex,
-        loopId: currentLoopId
-      };
-      lastRenders.push(newRender);
     }
 
     // Remove unecessary elements
-    for (const render of lastRenders) {
-      if (render.loopId !== currentLoopId) cleanupLastRender(render);
+    for (let i = lastRenders.length - 1; i >= 0; --i) {
+      const render = lastRenders[i];
+      if (render.loopId !== currentLoopId) {
+        lastRenders.splice(i, 1);
+        cleanupLastRender(render);
+      }
     }
 
-    currentLoopId += 1;
+    // Move elements to the correct index
+    for (const { element, index } of currentElements) {
+      moveToIndexBetweenComments(
+        element,
+        index,
+        traceStartPositionComment,
+        traceEndPositionComment
+      );
+    }
+
+    // Render new elements
+    for (const renderFn of renderFns) {
+      renderFn();
+    }
   });
 
   domy.cleanup(() => {
