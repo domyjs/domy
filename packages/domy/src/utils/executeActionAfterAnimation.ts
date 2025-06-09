@@ -5,16 +5,33 @@
  * @returns
  */
 export function executeActionAfterAnimation(el: Element, action: () => void) {
-  const actionAfterAnimation = () => {
+  let started = false;
+
+  const onStart = () => (started = true);
+  const onEnd = () => {
+    cleanup();
     action();
   };
 
-  el.addEventListener('animationend', actionAfterAnimation, { once: true });
-  el.addEventListener('transition', actionAfterAnimation, { once: true });
-
-  return () => {
-    el.removeEventListener('animationend', actionAfterAnimation);
-    el.removeEventListener('transition', actionAfterAnimation);
-    actionAfterAnimation();
+  const cleanup = () => {
+    el.removeEventListener('animationstart', onStart);
+    el.removeEventListener('transitionstart', onStart);
+    el.removeEventListener('animationend', onEnd);
+    el.removeEventListener('transitionend', onEnd);
   };
+
+  el.addEventListener('animationstart', onStart);
+  el.addEventListener('transitionstart', onStart);
+
+  el.addEventListener('animationend', onEnd, { once: true });
+  el.addEventListener('transitionend', onEnd, { once: true });
+
+  // If no animation as started
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (!started) onEnd();
+    });
+  });
+
+  return cleanup;
 }
