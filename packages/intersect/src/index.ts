@@ -90,23 +90,28 @@ class IntersectPlugin {
     const settings: IntersectionObserverInit =
       domy.block.getDataForPluginId('intersect-settings') ?? {};
 
-    const isIntersectAttr = domy.attrName === 'd-intersect' || domy.prefix === 'd-intersect';
-    const isPrefix = domy.prefix === 'd-intersect' || domy.prefix === 'd-unintersect';
+    const isIntersectAttr = domy.attrName === 'd-intersect' || domy.prefix === 'intersect';
+    const isPrefix = domy.prefix === 'intersect' || domy.prefix === 'unintersect';
 
+    let uneffect: (() => void) | null = null;
+    let cleanAttr: (() => void) | null = null;
     const action = (isIntersecting: boolean) => {
       const triggerIntersect = isIntersecting && isIntersectAttr;
       const triggerUnIntersect = !isIntersecting && !isIntersectAttr;
 
-      if (triggerIntersect || triggerUnIntersect) {
-        if (isPrefix) {
-          const isClass = domy.attrName === 'class';
-          const isStyle = domy.attrName === 'style';
-          if (isClass && domy.block.el.getAttribute(':class'))
-            throw new Error(`(Intersect) ":class" must be placed before "${domy.attr.name}".`);
-          if (isStyle && domy.block.el.getAttribute(':style'))
-            throw new Error(`(Intersect) ":style" must be placed before "${domy.attr.name}".`);
+      if (isPrefix) {
+        if ((isIntersectAttr && !isIntersecting) || (!isIntersectAttr && isIntersecting)) {
+          cleanAttr?.();
+          uneffect?.();
+          return;
+        }
 
-          let cleanAttr: (() => void) | null = null;
+        if (!triggerIntersect && !triggerUnIntersect) return;
+
+        const isClass = domy.attrName === 'class';
+        const isStyle = domy.attrName === 'style';
+
+        uneffect =
           domy.effect(() => {
             const el = domy.block.el as HTMLElement;
 
@@ -121,15 +126,13 @@ class IntersectPlugin {
               cleanAttr = () =>
                 el.setAttribute(domy.attrName, fixedStyle.cleanedStyle(el.style.cssText));
               el.setAttribute(domy.attrName, fixedStyle.style);
-            } else el.setAttribute(domy.attrName, executedValue);
-          });
-
-          if (isClass || isClass) {
-            domy.cleanup(() => cleanAttr && cleanAttr());
-          }
-        } else {
-          domy.evaluate(domy.attr.value);
-        }
+            } else {
+              cleanAttr = () => el.removeAttribute(domy.attrName);
+              el.setAttribute(domy.attrName, executedValue);
+            }
+          }) ?? null;
+      } else if (triggerIntersect || triggerUnIntersect) {
+        domy.evaluate(domy.attr.value);
       }
     };
 

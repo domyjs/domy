@@ -144,6 +144,7 @@ export class DomyHelper {
         dontQueueOnFirstExecution: !this.appState.isMounted
       });
       this.clearEffectList.push(uneffect);
+      return uneffect;
     } else {
       fixedFn();
     }

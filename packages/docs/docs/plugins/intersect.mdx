@@ -1,9 +1,8 @@
-import Demo from '@site/src/components/Demo';
 import intersect from '@domyjs/intersect';
 
 # Intersect
 
-The `d-intersect` directive allows you to **trigger an action when an element appears in the viewport**, making it perfect for **lazy loading, animations, or analytics tracking**.
+The `d-intersect` directive/prefix allows you to **trigger an action when an element appears in the viewport**, making it perfect for **lazy loading, animations, or analytics tracking**.
 
 ## Installation
 
@@ -16,7 +15,11 @@ To use `d-intersect`, include the DOMY Intersect plugin via CDN:
 And then:
 
 ```js
-DOMY.createApp().plugins([intersect]).mount();
+DOMY.createApp()
+  .plugins([
+    intersect({ rootMargin: '30px' }) // Set your own global settings for the IntersectionObserver
+  ])
+  .mount();
 ```
 
 ---
@@ -69,11 +72,5 @@ Modify the intersection behavior using **threshold and root margins**. Ensure it
 Only loads an image when it **appears in the viewport**.
 
 ```html
-<img d-intersect="loadImage($el)" data-src="image.jpg" alt="Lazy-loaded image" />
-```
-
-```js
-const loadImage = img => {
-  img.src = img.dataset.src;
-};
+<img d-intersect:src="image.jpg" alt="Lazy-loaded image" />
 ```

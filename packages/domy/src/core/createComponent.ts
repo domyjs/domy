@@ -129,8 +129,6 @@ export function createComponent(
               } else data.$attrs[attrName] = lastExecutedValue;
               domy.unlockWatchers();
             });
-
-            if (isClass || isStyle) domy.cleanup(() => cleanAttr && cleanAttr());
           } else {
             if (isClass)
               data.$attrs[attrName] = [data.$attrs[attrName], attr.value].filter(Boolean).join(' ');
