@@ -7,14 +7,33 @@
  * @author yoannchb-pro
  */
 export function executeActionAfterAnimation(el: Element, action: () => void) {
-  const cleanAndRunAction = () => {
-    el.removeEventListener('animationend', cleanAndRunAction);
-    el.removeEventListener('transitionend', cleanAndRunAction);
+  let started = false;
+  const onStart = () => (started = true);
+
+  const cleanAndStartAction = () => {
+    el.removeEventListener('animationiteration', onStart);
+    el.removeEventListener('animationstart', onStart);
+    el.removeEventListener('transitionstart', onStart);
+    el.removeEventListener('transitionrun', onStart);
+    el.removeEventListener('animationend', cleanAndStartAction);
+    el.removeEventListener('transitionend', cleanAndStartAction);
     action();
   };
 
-  el.addEventListener('animationend', cleanAndRunAction, { once: true });
-  el.addEventListener('transitionend', cleanAndRunAction, { once: true });
+  el.addEventListener('animationiteration', onStart, { once: true });
+  el.addEventListener('animationstart', onStart, { once: true });
+  el.addEventListener('transitionrun', onStart, { once: true });
+  el.addEventListener('transitionstart', onStart, { once: true });
 
-  return cleanAndRunAction;
+  el.addEventListener('animationend', cleanAndStartAction, { once: true });
+  el.addEventListener('transitionend', cleanAndStartAction, { once: true });
+
+  // If the animation/transition is not applying
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      if (!started) cleanAndStartAction();
+    })
+  );
+
+  return cleanAndStartAction;
 }
