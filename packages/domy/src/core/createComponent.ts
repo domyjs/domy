@@ -173,8 +173,12 @@ export function createComponent(
           childrens.length = 0;
           childrens.push(...(childrensCache.filter(Boolean) as Element[]));
         };
-        for (let i = 0; i < componentElement.children.length; ++i) {
-          const child = componentElement.children[i];
+        const filtredChilds = Array.from(componentElement.childNodes).filter(child => {
+          const isTextNode = child.nodeType === Node.TEXT_NODE;
+          return isTextNode ? child.textContent?.trim() !== '' : true;
+        });
+        for (let i = 0; i < filtredChilds.length; ++i) {
+          const child = filtredChilds[i];
           const childBlock = domy.deepRender({
             element: child as Element,
             scopedNodeData: domy.scopedNodeData
