@@ -8,7 +8,7 @@ describe('Attribute d-attrs test', () => {
   it('should have initial attributes for #attrs and #attrsRender', () => {
     cy.get('#attrs').should('have.attr', 'title', 'Hello');
     cy.get('#attrs').should('have.attr', 'name', 'test1');
-    cy.get('#attrsRender').should('have.attr', 'style', 'color: red;');
+    cy.get('#attrsRender').should('have.attr', 'style', 'color:red');
   });
 
   it('should update attrs when clicking on #attrsBtn', () => {

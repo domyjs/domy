@@ -71,7 +71,11 @@ class IntersectionHandler {
  * @author yoannchb-pro
  */
 class IntersectPlugin {
-  private globalIntersectionObserver = new IntersectionHandler();
+  private globalIntersectionObserver;
+
+  constructor(options?: IntersectionObserverInit) {
+    this.globalIntersectionObserver = new IntersectionHandler(options);
+  }
 
   intersectSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
     if (!domy.block.el.getAttribute('d-intersect') && !domy.block.el.getAttribute('d-unintersect'))
@@ -87,12 +91,45 @@ class IntersectPlugin {
       domy.block.getDataForPluginId('intersect-settings') ?? {};
 
     const isIntersectAttr = domy.attrName === 'd-intersect' || domy.prefix === 'd-intersect';
+    const isPrefix = domy.prefix === 'd-intersect' || domy.prefix === 'd-unintersect';
 
     const action = (isIntersecting: boolean) => {
       const triggerIntersect = isIntersecting && isIntersectAttr;
       const triggerUnIntersect = !isIntersecting && !isIntersectAttr;
+
       if (triggerIntersect || triggerUnIntersect) {
-        domy.evaluate(domy.attr.value);
+        if (isPrefix) {
+          const isClass = domy.attrName === 'class';
+          const isStyle = domy.attrName === 'style';
+          if (isClass && domy.block.el.getAttribute(':class'))
+            throw new Error(`(Intersect) ":class" must be placed before "${domy.attr.name}".`);
+          if (isStyle && domy.block.el.getAttribute(':style'))
+            throw new Error(`(Intersect) ":style" must be placed before "${domy.attr.name}".`);
+
+          let cleanAttr: (() => void) | null = null;
+          domy.effect(() => {
+            const el = domy.block.el as HTMLElement;
+
+            const executedValue = domy.evaluate(domy.attr.value);
+
+            if (isClass) {
+              const fixedClass = domy.utils.handleClass(executedValue, el.className);
+              cleanAttr = () => (el.className = fixedClass.cleanedClass(el.className));
+              el.className = fixedClass.class;
+            } else if (isStyle) {
+              const fixedStyle = domy.utils.handleStyle(executedValue, el.style.cssText);
+              cleanAttr = () =>
+                el.setAttribute(domy.attrName, fixedStyle.cleanedStyle(el.style.cssText));
+              el.setAttribute(domy.attrName, fixedStyle.style);
+            } else el.setAttribute(domy.attrName, executedValue);
+          });
+
+          if (isClass || isClass) {
+            domy.cleanup(() => cleanAttr && cleanAttr());
+          }
+        } else {
+          domy.evaluate(domy.attr.value);
+        }
       }
     };
 
@@ -107,12 +144,17 @@ class IntersectPlugin {
   }
 }
 
-const intersectPluginDefinition: DomyPlugin = domyPluginSetter => {
-  const plugin = new IntersectPlugin();
+const intersectPluginDefinition = (options?: IntersectionObserverInit) => {
+  const plugin = new IntersectPlugin(options);
   const intersectPlugin = plugin.intersectPlugin.bind(plugin);
-  domyPluginSetter.directive('intersect-settings', plugin.intersectSettingsPlugin.bind(plugin));
-  domyPluginSetter.directive('intersect', intersectPlugin);
-  domyPluginSetter.directive('unintersect', intersectPlugin);
+  const pluginSetter: DomyPlugin = domyPluginSetter => {
+    domyPluginSetter.directive('intersect-settings', plugin.intersectSettingsPlugin.bind(plugin));
+    domyPluginSetter.prefix('intersect', intersectPlugin);
+    domyPluginSetter.prefix('unintersect', intersectPlugin);
+    domyPluginSetter.directive('intersect', intersectPlugin);
+    domyPluginSetter.directive('unintersect', intersectPlugin);
+  };
+  return pluginSetter;
 };
 
 export default intersectPluginDefinition;

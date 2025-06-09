@@ -1,4 +1,3 @@
-import { handleClass, handleRemoveClass, handleRemoveStyle, handleStyle } from '../core/binding';
 import { callWithErrorHandling } from './callWithErrorHandling';
 import { fixeAttrName, getDomyAttributeInformations } from './domyAttrUtils';
 import { executeActionAfterAnimation } from './executeActionAfterAnimation';
@@ -6,6 +5,8 @@ import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
 import { getReactiveHandler } from './getReactiveHandler';
+import { handleClass } from './handleClass';
+import { handleStyle } from './handleStyle';
 import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from './isSpecialAttribute';
 import { kebabToCamelCase } from './kebabToCamelCase';
 import { error, warn } from './logs';
@@ -16,8 +17,6 @@ import { toKebabCase } from './toKebabCase';
 export const helpersUtils = {
   handleClass,
   handleStyle,
-  handleRemoveClass,
-  handleRemoveStyle,
   callWithErrorHandling,
   toKebabCase,
   kebabToCamelCase,

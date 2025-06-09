@@ -99,44 +99,38 @@ export function createComponent(
           const { attrName } = domy.utils.getDomyAttributeInformations(attr);
           const isClass = attrName === 'class';
           const isStyle = attrName === 'style';
+          let cleanAttr: (() => void) | null = null;
           if (domy.utils.isBindAttr(attr.name)) {
-            let lastExecutedValue: string | null = null;
+            let lastExecutedValue: any = null;
 
             domy.effect(() => {
-              lastExecutedValue = domy.evaluate(attr.value) as string;
+              // Clearing previous class and style
+              if (cleanAttr) cleanAttr();
+
+              lastExecutedValue = domy.evaluate(attr.value);
 
               domy.lockWatchers();
-              if (isClass)
-                data.$attrs[attrName] = domy.utils.handleClass(
+              if (isClass) {
+                const fixedClass = domy.utils.handleClass(
                   lastExecutedValue,
                   data.$attrs[attrName] ?? ''
                 );
-              else if (isStyle)
-                data.$attrs[attrName] = domy.utils.handleStyle(
+                cleanAttr = () =>
+                  (data.$attrs[attrName] = fixedClass.cleanedClass(data.$attrs[attrName]));
+                data.$attrs[attrName] = fixedClass.class;
+              } else if (isStyle) {
+                const fixedStyle = domy.utils.handleStyle(
                   lastExecutedValue,
                   data.$attrs[attrName] ?? ''
                 );
-              else data.$attrs[attrName] = lastExecutedValue;
+                cleanAttr = () =>
+                  (data.$attrs[attrName] = fixedStyle.cleanedStyle(data.$attrs[attrName]));
+                data.$attrs[attrName] = fixedStyle.style;
+              } else data.$attrs[attrName] = lastExecutedValue;
               domy.unlockWatchers();
             });
 
-            if (isClass) {
-              domy.cleanup(() => {
-                data.$attrs[attrName] = domy.utils.handleRemoveClass(
-                  data.$attrs['class'],
-                  lastExecutedValue
-                );
-              });
-            }
-
-            if (isStyle) {
-              domy.cleanup(() => {
-                data.$attrs[attrName] = domy.utils.handleRemoveStyle(
-                  data.$attrs['style'],
-                  lastExecutedValue
-                );
-              });
-            }
+            if (isClass || isStyle) domy.cleanup(() => cleanAttr && cleanAttr());
           } else {
             if (isClass)
               data.$attrs[attrName] = [data.$attrs[attrName], attr.value].filter(Boolean).join(' ');

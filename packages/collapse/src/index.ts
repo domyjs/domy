@@ -9,69 +9,83 @@ type CollapseSettings = {
   transition?: string;
 };
 
-/**
- * Register collapse settings on the block
- * @param domy
- *
- * @author yoannchb-pro
- */
-function collapseSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  if (!domy.block.el.getAttribute('d-collapse'))
-    throw new Error(
-      `(Collapse) The "d-collapse" directive as to be placed after "d-collapse-settings" directive (and not before).`
-    );
+class CollapsePlugin {
+  constructor(private defaultSettings: CollapseSettings = {}) {}
 
-  domy.block.setDataForPluginId('collapse-settings', domy.evaluate(domy.attr.value));
-}
+  /**
+   * Register collapse settings on the block
+   * @param domy
+   *
+   * @author yoannchb-pro
+   */
+  collapseSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+    if (!domy.block.el.getAttribute('d-collapse'))
+      throw new Error(
+        `(Collapse) The "d-collapse" directive as to be placed after "d-collapse-settings" directive (and not before).`
+      );
 
-/**
- * Collapse directive
- * It will hide the element by setting the height to 0px
- * When it have to be show the height will go back to normal height with a transition
- * @param domy
- * @returns
- *
- * @author yoannchb-pro
- */
-function collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-  const el = domy.block.el as HTMLElement;
-  const settings: CollapseSettings = domy.block.getDataForPluginId('collapse-settings') ?? {};
-  const heightAutoEvent = () => (el.style.height = 'auto');
+    domy.block.setDataForPluginId('collapse-settings', domy.evaluate(domy.attr.value));
+  }
 
-  // We wait the element to be mounted first to get his initial height
-  domy.onElementMounted(() => {
-    let isInitialised = false;
-    el.style.overflowY = 'hidden';
+  /**
+   * Collapse directive
+   * It will hide the element by setting the height to 0px
+   * When it have to be show the height will go back to normal height with a transition
+   * @param domy
+   * @returns
+   *
+   * @author yoannchb-pro
+   */
+  collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
+    const el = domy.block.el as HTMLElement;
+    const settings: CollapseSettings = domy.block.getDataForPluginId('collapse-settings') ?? {};
+    const heightAutoEvent = () => (el.style.height = 'auto');
 
-    domy.effect(() => {
-      el.removeEventListener('transitionend', heightAutoEvent);
+    // We wait the element to be mounted first to get his initial height
+    domy.onElementMounted(() => {
+      let isInitialised = false;
+      el.style.overflowY = 'hidden';
 
-      const shouldBeShow = domy.evaluate(domy.attr.value);
+      domy.effect(() => {
+        el.removeEventListener('transitionend', heightAutoEvent);
 
-      el.style.transition = '';
-      el.style.height = 'auto';
-      const height = el.getBoundingClientRect().height;
-      el.style.height = shouldBeShow ? `${settings.defaultHeight ?? 0}px` : `${height}px`;
+        const shouldBeShow = domy.evaluate(domy.attr.value);
 
-      window.requestAnimationFrame(() => {
-        if (isInitialised) el.style.transition = settings.transition ?? 'height 250ms ease-out';
+        el.style.transition = '';
+        el.style.height = 'auto';
+        const height = el.getBoundingClientRect().height;
+        const defaultHeight = settings.defaultHeight ?? this.defaultSettings.defaultHeight ?? 0;
+        el.style.height = shouldBeShow ? `${defaultHeight}px` : `${height}px`;
 
-        if (shouldBeShow) {
-          el.style.height = `${height}px`;
-          el.addEventListener('transitionend', heightAutoEvent);
-        } else {
-          el.style.height = `${settings.defaultHeight ?? 0}px`;
-        }
+        requestAnimationFrame(() => {
+          if (isInitialised)
+            el.style.transition =
+              settings.transition ?? this.defaultSettings.transition ?? 'height 250ms ease-out';
 
-        isInitialised = true;
+          if (shouldBeShow) {
+            el.style.height = `${height}px`;
+            el.addEventListener('transitionend', heightAutoEvent);
+          } else {
+            el.style.height = `${defaultHeight}px`;
+          }
+
+          isInitialised = true;
+        });
       });
     });
-  });
+  }
 }
 
-const collapsePluginDefinition: DomyPlugin = domyPluginSetter => {
-  domyPluginSetter.directive('collapse', collapsePlugin);
-  domyPluginSetter.directive('collapse-settings', collapseSettingsPlugin);
+const collapsePluginDefinition = (settings?: CollapseSettings) => {
+  const collapseInstance = new CollapsePlugin(settings);
+  const pluginSetter: DomyPlugin = domyPluginSetter => {
+    domyPluginSetter.directive('collapse', collapseInstance.collapsePlugin.bind(collapseInstance));
+    domyPluginSetter.directive(
+      'collapse-settings',
+      collapseInstance.collapseSettingsPlugin.bind(collapseInstance)
+    );
+  };
+  return pluginSetter;
 };
 
 export default collapsePluginDefinition;

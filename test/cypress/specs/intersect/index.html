@@ -72,11 +72,17 @@
       Controller
     </div>
 
+    <div id="attributeBinding" class="box" d-intersect:class="['highlight']"></div>
+
+    <div id="attributeBinding" class="box" d-intersect:title="'Hello World'"></div>
+
     <div id="target" class="box hidden">Controlled</div>
 
     <div class="spacer">Scroll up and down to test again</div>
   </body>
   <script>
-    DOMY.createApp().plugins([intersect]).mount();
+    DOMY.createApp()
+      .plugins([intersect({ rootMargin: '30px' })])
+      .mount();
   </script>
 </html>
