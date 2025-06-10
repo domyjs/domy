@@ -2,7 +2,13 @@ import { callWithErrorHandling } from '../utils/callWithErrorHandling';
 import { executeActionAfterAnimation } from '../utils/executeActionAfterAnimation';
 import { error } from '../utils/logs';
 
-type Transition = { enterTransition: string; outTransition: string; init: boolean };
+type Transition = {
+  enterTransition: string;
+  enterTransitionTo: string;
+  outTransition: string;
+  outTransitionTo: string;
+  init: boolean;
+};
 type TransitionType = 'enterTransition' | 'outTransition';
 
 /**
@@ -77,10 +83,16 @@ export class Block {
     const transitionName = this.transition[transitionType];
     this.el.classList.add(transitionName);
 
-    this.cleanupTransition = executeActionAfterAnimation(this.el, () => {
-      this.el.classList.remove(transitionName);
-      if (action) action();
-      this.cleanupTransition = null;
+    requestAnimationFrame(() => {
+      const transitionNameTo = this.transition![`${transitionType}To`];
+      this.el.classList.add(transitionNameTo);
+
+      this.cleanupTransition = executeActionAfterAnimation(this.el, () => {
+        this.el.classList.remove(transitionName);
+        this.el.classList.remove(transitionNameTo);
+        if (action) action();
+        this.cleanupTransition = null;
+      });
     });
   }
 

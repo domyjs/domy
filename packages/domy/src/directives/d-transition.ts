@@ -21,11 +21,15 @@ export function dTransitionImplementation(domy: DomyDirectiveHelper) {
     }
 
     const enterTransition = `${transitionName}-enter`;
+    const enterTransitionTo = `${enterTransition}-to`;
     const outTransition = `${transitionName}-out`;
+    const outTransitionTo = `${outTransition}-to`;
 
     domy.block.transition = {
       enterTransition,
+      enterTransitionTo,
       outTransition,
+      outTransitionTo,
       init: domy.modifiers.includes('init')
     };
   };

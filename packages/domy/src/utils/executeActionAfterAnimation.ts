@@ -12,11 +12,11 @@ export function executeActionAfterAnimation(el: Element, action: () => void) {
   };
 
   el.addEventListener('animationend', actionAfterAnimation, { once: true });
-  el.addEventListener('transition', actionAfterAnimation, { once: true });
+  el.addEventListener('transitionend', actionAfterAnimation, { once: true });
 
   return () => {
     el.removeEventListener('animationend', actionAfterAnimation);
-    el.removeEventListener('transition', actionAfterAnimation);
+    el.removeEventListener('transitionend', actionAfterAnimation);
     actionAfterAnimation();
   };
 }
