@@ -7,16 +7,20 @@
  * @author yoannchb-pro
  */
 export function executeActionAfterAnimation(el: Element, action: () => void) {
-  const actionAfterAnimation = () => {
-    action();
-  };
+  const computedStyle = window.getComputedStyle(el);
+  const hasAnimation = computedStyle.animationName !== 'none';
+  const hasTransition = computedStyle.transitionDuration !== '0s';
 
-  el.addEventListener('animationend', actionAfterAnimation, { once: true });
-  el.addEventListener('transitionend', actionAfterAnimation, { once: true });
+  if (hasAnimation || hasTransition) {
+    el.addEventListener('animationend', action, { once: true });
+    el.addEventListener('transitionend', action, { once: true });
+  } else {
+    action();
+  }
 
   return () => {
-    el.removeEventListener('animationend', actionAfterAnimation);
-    el.removeEventListener('transitionend', actionAfterAnimation);
-    actionAfterAnimation();
+    el.removeEventListener('animationend', action);
+    el.removeEventListener('transitionend', action);
+    action();
   };
 }

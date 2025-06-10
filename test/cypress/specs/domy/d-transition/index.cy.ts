@@ -60,4 +60,28 @@ describe('Attribute d-transition test', () => {
     cy.get('#dynamic').should('have.class', 'op-transition-out');
     cy.get('#dynamic').should('not.exist');
   });
+
+  it('Check transition element appears and applies transition', () => {
+    cy.get('button').click();
+
+    cy.get('#transition').should('exist');
+    cy.get('#transition').should('have.class', 'fade-enter');
+    cy.get('#transition').should('have.class', 'fade-enter-to');
+
+    cy.get('button').click();
+
+    cy.get('#transition').should('have.class', 'fade-out');
+    cy.get('#transition').should('have.class', 'fade-out-to');
+    cy.get('#transition').should('not.exist');
+  });
+
+  it('Check that element without valid transition appears immediately', () => {
+    cy.get('button').click();
+
+    cy.get('#doesnt-exist').should('exist');
+
+    cy.get('button').click();
+
+    cy.get('#doesnt-exist').should('not.exist');
+  });
 });
