@@ -74,7 +74,7 @@ export default function on(props: {
   if (modifiers.includes('away')) {
     listenerTarget = document.body;
     listener = wrapListener(listener, (next, event) => {
-      if (el.isConnected && event.target !== el && !el.contains(event.target as Node)) {
+      if (event.target !== el && !el.contains(event.target as Node)) {
         next(event);
       }
     });

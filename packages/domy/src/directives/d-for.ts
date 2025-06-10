@@ -1,7 +1,12 @@
 import { Block } from '../core/Block';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 
-type LastRender = { render: Block; reactiveIndex: { value: number }; loopId: number };
+type LastRender = {
+  render: Block;
+  reactiveIndex: { value: number };
+  loopId: number;
+  currentKey?: string;
+};
 
 function moveToIndexBetweenComments(
   element: Element,
@@ -70,6 +75,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
   const isForIn = forPattern.groups!.type === 'in';
   const lastRenders: LastRender[] = [];
+  const keyedLastRenders = new Map<string, LastRender>();
 
   domy.effect(() => {
     currentLoopId += 1;
@@ -79,7 +85,8 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
 
     // Create or swap the elements
     const currentElements: { element: Element; index: number }[] = [];
-    const renderFns: (() => void)[] = [];
+    const renderFns: (() => LastRender)[] = [];
+    let canUseTemplate = true;
     for (let index = 0; index < executedValueObjs.length; ++index) {
       const value = executedValueObjs[index];
 
@@ -97,12 +104,15 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         };
       }
 
+      let currentKeyValue: string | null = null;
       if (rawKey) {
         // Check if the key already exist so we can skip render
-        const currentKeyValue = domy.evaluate(rawKey, scope);
-        const oldRender = lastRenders.find(l => l.render.key === currentKeyValue);
+        currentKeyValue = domy.evaluate(rawKey, scope) as string;
+        const oldRender = keyedLastRenders.get(currentKeyValue);
 
         if (oldRender) {
+          canUseTemplate = false;
+
           const oldRenderEl = oldRender.render.el;
           const oldRenderIndex = oldRender.reactiveIndex.value;
 
@@ -130,6 +140,11 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
           loopId: currentLoopId
         };
         lastRenders.push(newRender);
+        if (currentKeyValue) {
+          newRender.currentKey = currentKeyValue;
+          keyedLastRenders.set(currentKeyValue, newRender);
+        }
+        return newRender;
       });
     }
 
@@ -137,13 +152,14 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     for (let i = lastRenders.length - 1; i >= 0; --i) {
       const render = lastRenders[i];
       if (render.loopId !== currentLoopId) {
+        if (render.currentKey) keyedLastRenders.delete(render.currentKey);
         lastRenders.splice(i, 1);
         cleanupLastRender(render);
       }
     }
 
     // Move elements to the correct index
-    if (currentLoopId === 1) {
+    if (canUseTemplate) {
       const fragment = document.createDocumentFragment();
       for (const { element } of currentElements) {
         fragment.appendChild(element);

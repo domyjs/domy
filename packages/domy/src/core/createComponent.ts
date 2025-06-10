@@ -181,7 +181,7 @@ export function createComponent(
           domy.lockWatchers();
           // Insert initial render
           let childEl: Element | undefined = domy.skipReactive(childBlock.el);
-          childEl = childEl.isConnected ? childEl : undefined;
+          childEl = childEl.parentNode ? childEl : undefined;
           childrensCache.push(childEl);
           if (childBlock.name) names[childBlock.name] = childEl;
           updateChildrens();
