@@ -76,12 +76,11 @@ export class Block {
 
     const transitionName = this.transition[transitionType];
     this.el.classList.add(transitionName);
-    requestAnimationFrame(() => {
-      this.cleanupTransition = executeActionAfterAnimation(this.el, () => {
-        this.el.classList.remove(transitionName);
-        if (action) action();
-        this.cleanupTransition = null;
-      });
+
+    this.cleanupTransition = executeActionAfterAnimation(this.el, () => {
+      this.el.classList.remove(transitionName);
+      if (action) action();
+      this.cleanupTransition = null;
     });
   }
 

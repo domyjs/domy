@@ -20,6 +20,11 @@ function moveToIndexBetweenComments(
   }
 
   const refNode = nodesBetween[index] || endComment;
+
+  if (element.nextSibling === refNode) {
+    return;
+  }
+
   refNode.before(element);
 }
 
@@ -138,13 +143,21 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
     }
 
     // Move elements to the correct index
-    for (const { element, index } of currentElements) {
-      moveToIndexBetweenComments(
-        element,
-        index,
-        traceStartPositionComment,
-        traceEndPositionComment
-      );
+    if (currentLoopId === 1) {
+      const fragment = document.createDocumentFragment();
+      for (const { element } of currentElements) {
+        fragment.appendChild(element);
+      }
+      traceStartPositionComment.after(fragment);
+    } else {
+      for (const { element, index } of currentElements) {
+        moveToIndexBetweenComments(
+          element,
+          index,
+          traceStartPositionComment,
+          traceEndPositionComment
+        );
+      }
     }
 
     // Render new elements
