@@ -8,3 +8,4 @@
 - Router beforeEach/afterEach/replace and tests and doc
 - Plublish doc / make repo public
 - Auto release ...
+- Remove NOTE in README
