@@ -27,16 +27,7 @@
     <button id="class2-btn" @click="classTest2['bg-blue'] = false">
       Remove class test2 bg blue
     </button>
-    <button
-      id="style-btn"
-      @click="() => {
-      for(const key in styleTest) {
-        delete styleTest[key];
-      }
-    }"
-    >
-      Remove style test bg blue
-    </button>
+    <button id="style-btn" @click="styleTest = {}">Remove style test bg blue</button>
   </body>
   <script>
     const { signal } = DOMY;

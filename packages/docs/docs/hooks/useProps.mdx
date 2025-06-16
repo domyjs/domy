@@ -1,0 +1,81 @@
+import Demo from '@site/src/components/Demo';
+
+# useProps
+
+The `useProps` hook allows a component to access the properties passed to it by its parent. This is useful for managing dynamic data within components.
+
+## Syntax
+
+```html
+<component :title="'Dynamic Title'" :visible="true">
+  <p>This element receives props.</p>
+</component>
+```
+
+Inside the component, `useProps()` will return:
+
+```js
+const props = useProps();
+console.log(props.title); // "Dynamic Title"
+console.log(props.visible); // true
+```
+
+## Example
+
+### Using Props in a Component
+
+```html
+<component :title="'Dynamic Title'" :visible="true">
+  <p>This element receives props.</p>
+</component>
+```
+
+```js
+const { useProps } = DOMY;
+
+const Component = DOMY.createComponent({
+  props: ['!title', 'visible'],
+  html: `
+    <div>
+        <h1 d-text="props.title"></h1>
+        <p d-if="props.visible">This is conditionally rendered based on props.</p>
+    </div>
+  `,
+  app: () => {
+    const props = useProps();
+    return {
+      props
+    };
+  }
+});
+```
+
+<Demo
+  code={`
+  <component :title="'Dynamic Title'" :visible="true">
+    <p>This element receives props.</p>
+  </component>
+  `}
+  components={() => {
+    const { useProps } = DOMY;
+
+    const Component = DOMY.createComponent({
+      props: ['!title', 'visible'],
+      html: `
+        <div>
+            <h1 d-text="props.title"></h1>
+            <p d-if="props.visible">This is conditionally rendered based on props.</p>
+        </div>
+      `,
+      app: () => {
+        const props = useProps();
+        return {
+          props
+        };
+      }
+    });
+
+    return { Component };
+
+}}
+/>

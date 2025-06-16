@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Intersect directive</title>
+    <script src="/packages/intersect/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+      .spacer {
+        height: 100vh;
+        background: #f0f0f0;
+      }
+      .box {
+        margin: 50px auto;
+        width: 200px;
+        height: 200px;
+        background: lightgray;
+        text-align: center;
+        line-height: 200px;
+        font-weight: bold;
+        transition:
+          background 0.3s,
+          color 0.3s;
+      }
+      .highlight {
+        background: green;
+        color: white;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="spacer">Scroll down to test intersect</div>
+
+    <!-- Test 1: Change text when intersecting -->
+    <div
+      id="text-change"
+      class="box"
+      d-intersect-settings="{ threshold: 0.5 }"
+      d-intersect="$el.textContent = 'Visible'"
+      d-unintersect="$el.textContent = 'Hidden'"
+    >
+      Hidden
+    </div>
+
+    <!-- Test 2: Add class when visible -->
+    <div
+      id="add-class"
+      class="box"
+      d-intersect-settings="{ threshold: 0.5 }"
+      d-intersect="$el.classList.add('highlight')"
+      d-unintersect="$el.classList.remove('highlight')"
+    >
+      Class Test
+    </div>
+
+    <!-- Test 3: Toggle another element -->
+    <div
+      id="controller"
+      class="box"
+      d-intersect-settings="{ threshold: 0.1 }"
+      d-intersect="document.getElementById('target').classList.remove('hidden')"
+      d-unintersect="document.getElementById('target').classList.add('hidden')"
+    >
+      Controller
+    </div>
+
+    <div id="attributeBinding" class="box" d-intersect:class="['highlight']"></div>
+
+    <div id="attributeBindingOnUnintersect" class="box" d-unintersect:title="'Hello World'"></div>
+
+    <div id="target" class="box hidden">Controlled</div>
+
+    <div class="spacer">Scroll up and down to test again</div>
+  </body>
+  <script>
+    DOMY.createApp()
+      .plugins([intersect({ rootMargin: '30px' })])
+      .mount();
+  </script>
+</html>

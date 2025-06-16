@@ -1,0 +1,55 @@
+import Demo from '@site/src/components/Demo';
+
+# useRefs
+
+The `useRefs` hook allows components to access registered reference elements within a component. This is useful for interacting directly with elements assigned a `d-ref` identifier.
+
+## Syntax
+
+```html
+<p d-ref="text">Hello!</p>
+```
+
+Inside the component, `useRefs()` will return:
+
+```js
+const refs = useRefs();
+console.log(refs.text.textContent); // "Hello!"
+```
+
+## Example
+
+### Accessing and Interacting with Reference Elements
+
+```html
+<div>
+  <input d-ref="inputBox" type="text" placeholder="Type here..." />
+  <button @click="refs.inputBox.focus()">Focus Input</button>
+</div>
+```
+
+```js
+const { useRefs } = DOMY;
+DOMY.createApp(() => {
+  const refs = useRefs();
+  return {
+    refs
+  };
+}).mount();
+```
+
+<Demo
+  code={`
+  <div>
+    <input d-ref="inputBox" type="text" placeholder="Type here..." />
+    <button @click="refs.inputBox.focus()">Focus Input</button>
+  </div>
+  `}
+  domy={() => {
+    const { useRefs } = DOMY;
+    const refs = useRefs();
+    return {
+      refs
+    };
+  }}
+/>

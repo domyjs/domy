@@ -1,0 +1,27 @@
+import Demo from '@site/src/components/Demo';
+
+# d-scope
+
+The `d-scope` directive in DOMY allows you to **create a reactive data object** that is scoped to the current DOM element and its children. This scoped reactivity means variables defined here will only be available within the specific subtree.
+
+This is useful for isolating state in a portion of the DOM without polluting the global state.
+
+## Syntax
+
+```html
+<div d-scope="{ count: 0 }">
+  <button @click="count++">+</button>
+  <span>{{ count }}</span>
+</div>
+```
+
+## Example
+
+<Demo
+  code={`
+    <div d-scope="{ count: 0 }">
+      <button @click="count++">+</button>
+      <span>{{ count }}</span>
+    </div>
+  `}
+/>

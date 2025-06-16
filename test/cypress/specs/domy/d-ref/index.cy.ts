@@ -10,6 +10,10 @@ describe('Attribute d-ref test', () => {
   });
 
   it('Check the ref is accessible', () => {
+    cy.get('button').click();
+    cy.get('button').click();
+    cy.get('button').click();
+
     cy.get('p').should('have.text', 'Hello World!');
   });
 });

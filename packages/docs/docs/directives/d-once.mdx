@@ -1,0 +1,32 @@
+import Demo from '@site/src/components/Demo';
+
+# d-once
+
+The `d-once` directive in DOMY allows you to **render an element only once**, even if its reactive dependencies change later. This is useful when you want to optimize rendering for static content that doesn’t need to update after the initial render.
+
+## Syntax
+
+```html
+<div d-once>Static content</div>
+```
+
+- The content inside the element will be rendered only once, when it is first mounted.
+- Any future updates to reactive variables used inside the element will be ignored.
+
+This is particularly useful in `d-for` or when using expensive rendering operations.
+
+## Example
+
+```html
+<div d-scope="{ name: 'Alice' }">
+  <p d-once>{{ name }}</p>
+  <button d-on:click="name = 'Bob'">Change Name</button>
+</div>
+```
+
+Even when clicking the button changes the value of `name`, the `<p>` element will **not** update its content because of the `d-once` directive.
+
+<Demo
+  code={`     <div d-scope="{ name: 'Alice' }">       <p d-once>{{ name }}</p>       <button d-on:click="name = 'Bob'">Change Name</button>     </div>
+  `}
+/>

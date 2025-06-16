@@ -1,0 +1,82 @@
+import Demo from '@site/src/components/Demo';
+
+# $attrs
+
+The `$attrs` special helper allows components to access attributes passed from their parent, excluding `props`.
+This is useful for forwarding extra attributes like classes, data attributes, ...
+
+## Syntax
+
+```html
+<MyComponent class="red" data-info="example">
+  <p>Hello</p>
+</MyComponent>
+```
+
+Inside `MyComponent`, `$attrs` will hold:
+
+```js
+console.log($attrs); // { class: "red", "data-info": "example" }
+```
+
+## Behavior
+
+- `$attrs` contains attributes that are passed to the component but are **not** defined as props.
+- Works well for forwarding attributes dynamically.
+- Helps ensure flexibility when wrapping or extending components.
+
+## Use Case
+
+### Example of attribute forwarding
+
+```html
+<component :style="{ color: 'red' }">
+  <p>This component inherits passed attributes</p>
+</component>
+```
+
+```js
+const Component = DOMY.createComponent({
+  html: `
+    <div d-attrs="$attrs">
+      <template d-insert="$childrens[0]"></template>
+    </div>
+  `
+});
+```
+
+The `$attrs` helper will have the value `{ style: 'color:red' }`.
+
+<Demo
+  code={`
+  <component :style="{ color: 'red' }">
+    <p>This component inherits passed attributes</p>
+  </component>
+  `}
+  components={() => {
+    const Component = DOMY.createComponent({
+      html: `
+    <div d-attrs="$attrs">
+      <template d-insert="$childrens[0]"></template>
+    </div>
+  `
+    });
+    return { Component };
+  }}
+/>
+
+### Example with props
+
+Let's imagine `count` is a prop of `ErrorMessage` component:
+
+```html
+<ErrorMessage class="warning" :count="5">
+  <p>Error occurred</p>
+</ErrorMessage>
+```
+
+Inside `ErrorMessage` we will have:
+
+```js
+console.log($attrs); // { class: "warning" }
+```

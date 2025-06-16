@@ -32,7 +32,7 @@ export function getElementVisibilityHandler(props: Props) {
    * @author yoannchb-pro
    */
   function handleVisibility() {
-    const isConnected = lastRender.el.isConnected;
+    const isConnected = !!lastRender.el.parentNode;
     const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {

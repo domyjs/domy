@@ -1,7 +1,10 @@
 # TODO
 
-- Router beforeEach/afterEach/isActiveClass/params/replace/redirect/no path and tests
-- store (data/methods), anchor, intersect, mask
+- Improve d-for perf and watchEffect perf (might need VDOM)
+- Suspense
+- onError
+- $anchor
 
-- Documentation
+- Plublish doc / make repo public
 - Auto release ...
+- Remove NOTE in README

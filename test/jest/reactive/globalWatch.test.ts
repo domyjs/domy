@@ -12,7 +12,6 @@ describe('GlobalWatch tests', () => {
       expect.objectContaining({
         newValue: 'New Name',
         prevValue: 'Yoann',
-        obj: todo,
         path: 'name',
         reactiveVariable: expect.any(Object)
       })

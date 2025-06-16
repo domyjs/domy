@@ -1,0 +1,52 @@
+# d-component
+
+The `d-component` directive in DOMY allows you to dynamically render a custom component based on a provided name and transfer all the attributes and children to it.
+
+It is especially useful when you want to dynamically decide which component to render at runtime.
+
+## Syntax
+
+```HTML
+<template d-component="'my-component'" title="Hello">
+  <p>Some content</p>
+</template>
+```
+
+This will produce:
+
+```HTML
+<my-component title="Hello">
+  <p>Some content</p>
+</my-component>
+```
+
+If the evaluated value of the expression passed to `d-component` changes, the rendered component will automatically update accordingly.
+
+## Requirements
+
+- The directive **must** be used on a `<template>` element.
+- The component name **must** be a valid string and must correspond to a registered custom element.
+
+## Example
+
+```HTML
+<template d-component="currentComponent" class="card">
+  <p>This will be passed as a child to the rendered component</p>
+</template>
+```
+
+Assuming `currentComponent = 'user-profile'`, this will render as:
+
+```HTML
+<user-profile class="card">
+  <p>This will be passed as a child to the rendered component</p>
+</user-profile>
+```
+
+If `currentComponent` later becomes `'admin-panel'`, the DOM will update to:
+
+```HTML
+<admin-panel class="card">
+  <p>This will be passed as a child to the rendered component</p>
+</admin-panel>
+```

@@ -10,10 +10,12 @@
     <h1>{{ Object.keys($refs) }}</h1>
 
     <Component d-ref="input"></Component>
-    <p d-setup="refName = 'p'" d-ref.dynamic="refName"></p>
+    <p d-setup="refName = 'p'" d-ref.dynamic="refName" d-if="toggle"></p>
+
+    <button @click="toggle = !toggle">Toggle</button>
   </body>
   <script>
-    const { onMounted, useRefs } = DOMY;
+    const { onMounted, useRefs, signal, watch } = DOMY;
 
     const Component = DOMY.createComponent({
       html: `<input type="text" value="Hello World!" />`
@@ -22,13 +24,16 @@
     DOMY.createApp(() => {
       const refName = DOMY.signal(null);
       const refs = useRefs();
+      const toggle = signal(false);
 
-      onMounted(() => {
-        console.log(refs);
-        refs.p.textContent = refs.input.value;
-      });
+      watch(
+        () => {
+          if (refs.p) refs.p.textContent = refs.input.value; // Ensure refs are reactive
+        },
+        () => refs
+      );
 
-      return { refName };
+      return { toggle, refName };
     })
       .components({
         Component

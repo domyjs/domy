@@ -1,0 +1,90 @@
+import Demo from '@site/src/components/Demo';
+import collapse from '@domyjs/collapse/dist';
+
+# Collapse
+
+The `d-collapse` directive allows you to **toggle the visibility of an element** dynamically by adjusting its height. It smoothly transitions between collapsed and expanded states, making it perfect for **dropdowns, accordions, or expandable sections**.
+
+## Installation
+
+To use `d-collapse`, include the DOMY Collapse plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/collapse@1.x.x"></script>
+```
+
+And then:
+
+```js
+DOMY.createApp()
+  .plugins([
+    collapse({
+      defaultHeight: 0 // Set your own global settings
+    })
+  ])
+  .mount();
+```
+
+---
+
+## Syntax and Usage
+
+### Basic Collapse Usage
+
+```html
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div d-collapse="toggleState">
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+    the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley
+    of type and scrambled it to make a type specimen book.
+  </div>
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div d-collapse="toggleState">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</div>
+</div>
+`}
+  plugins={() => {
+    return [collapse()];
+  }}
+/>
+
+### Settings
+
+Modify the collapse transition behavior using `d-collapse-settings` (have to be placed before `d-collapse`).
+
+- `defaultHeight` for the minimal height when it's collapsed.
+- `transition` for modifying the transition when expanding.
+
+```html
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div
+    d-collapse-settings="{ transition: 'height 300ms ease-in-out', defaultHeight: 15 }"
+    d-collapse="toggleState"
+  >
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+    the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley
+    of type and scrambled it to make a type specimen book.
+  </div>
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{ toggleState: false }">
+  <button @click="toggleState = !toggleState">Toggle Section</button>
+  <div d-collapse-settings="{ transition: 'height 300ms ease-in-out', defaultHeight: 15 }" d-collapse="toggleState" >
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+  </div>
+</div>
+`}
+  plugins={() => {
+    return [collapse()];
+  }}
+/>

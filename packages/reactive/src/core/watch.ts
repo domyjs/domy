@@ -15,14 +15,11 @@ import { trackCallback } from './trackDeps';
 export function watch(listener: Listener, effect: () => any) {
   const removeWatcherLists: (() => void)[] = [];
 
-  function registerListener(reactiveVariable: ReactiveVariable, obj: any, path?: string) {
+  function registerListener(reactiveVariable: ReactiveVariable, path?: string) {
     const overideListener: Listener = {
       type: listener.type,
       fn: (props: Parameters<Listener['fn']>[0]) => {
-        if (!path) {
-          if (obj === props.obj) listener.fn(props as any);
-          return;
-        }
+        if (!path) return listener.fn(props as any);
 
         const matcher = matchPath(path, props.path);
         if (matcher.isMatching) {
@@ -38,7 +35,7 @@ export function watch(listener: Listener, effect: () => any) {
   const removeEffect = globalWatch(
     {
       type: 'onGet',
-      fn: ({ path, obj, reactiveVariable }) => registerListener(reactiveVariable, obj, path)
+      fn: ({ path, reactiveVariable }) => registerListener(reactiveVariable, path)
     },
     false
   );
@@ -56,12 +53,12 @@ export function watch(listener: Listener, effect: () => any) {
     for (const dep of deps) {
       if (isReactive(dep)) {
         const reactiveVariable = reactivesVariablesList.get(dep);
-        if (reactiveVariable) registerListener(reactiveVariable, dep);
+        if (reactiveVariable) registerListener(reactiveVariable);
       }
     }
   } else if (isReactive(deps)) {
     const reactiveVariable = reactivesVariablesList.get(deps);
-    if (reactiveVariable) registerListener(reactiveVariable, deps);
+    if (reactiveVariable) registerListener(reactiveVariable);
   }
 
   const clean = () => {

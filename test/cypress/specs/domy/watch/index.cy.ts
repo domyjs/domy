@@ -22,7 +22,7 @@ describe('watch test', () => {
     cy.get('h2').should('have.text', 'Count by 2: 0');
 
     cy.get('#dec2').click();
-    cy.get('h2').should('have.text', 'Count by 2: -100');
+    cy.get('h2').should('have.text', 'Count by 2: -101');
   });
 
   it('Check path and params work', () => {

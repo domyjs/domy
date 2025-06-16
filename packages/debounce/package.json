@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/debounce",
+  "unpkg": "./dist/index.js",
   "version": "1.0.0",
   "description": "Domyjs debounce plugin",
   "main": "./dist/index.js",

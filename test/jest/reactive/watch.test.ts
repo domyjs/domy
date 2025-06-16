@@ -12,7 +12,6 @@ describe('Watch tests', () => {
       expect.objectContaining({
         prevValue: 'Yoann',
         newValue: 'New Name',
-        obj: todo,
         path: 'name',
         reactiveVariable: expect.any(Object)
       })
@@ -33,7 +32,6 @@ describe('Watch tests', () => {
       expect.objectContaining({
         prevValue: 0,
         newValue: 1,
-        obj: count,
         path: 'value',
         reactiveVariable: expect.any(Object)
       })

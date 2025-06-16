@@ -1,0 +1,75 @@
+import Demo from '@site/src/components/Demo';
+import anchor from '@domyjs/anchor';
+
+# Anchor
+
+The `d-anchor` directive allows you to **attach an element to another**, ensuring proper **positioning and visibility**. This is particularly useful for **tooltips, dropdowns, or contextual menus**.
+
+## Installation
+
+To use `d-anchor`, include the DOMY Anchor plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/anchor@1.x.x"></script>
+```
+
+And then:
+
+```js
+DOMY.createApp().plugins([anchor]).mount();
+```
+
+---
+
+## Syntax and Usage
+
+### Basic Anchor Usage
+
+Attach an element to another by specifying its reference.
+
+```html
+<button d-ref="trigger">Hover me</button>
+<div d-anchor="$refs.trigger">Tooltip content</div>
+```
+
+### Using Position Modifiers
+
+Modify the element's placement relative to the anchor.
+
+### Supported Positions
+
+| Modifier | Description      |
+| -------- | ---------------- |
+| `b`      | Bottom (Default) |
+| `bs`     | Bottom Start     |
+| `be`     | Bottom End       |
+| `t`      | Top              |
+| `ts`     | Top Start        |
+| `te`     | Top End          |
+| `l`      | Left             |
+| `ls`     | Left Start       |
+| `le`     | Left End         |
+| `r`      | Right            |
+| `rs`     | Right Start      |
+| `re`     | Right End        |
+
+---
+
+## Example:
+
+This example positions a tooltip below a button and toggles its visibility.
+
+```html
+<button d-ref="trigger">Click me</button>
+<div d-anchor.b="$refs.trigger">Tooltip appears below</div>
+```
+
+<Demo
+  code={`
+<button d-ref="trigger">Click me</button>
+<div d-anchor.b="$refs.trigger">Tooltip appears below</div>
+`}
+  plugins={() => {
+    return [anchor];
+  }}
+/>

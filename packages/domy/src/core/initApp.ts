@@ -47,7 +47,7 @@ export function initApp(params: Params) {
   const state: State = {
     data: {},
     componentInfos,
-    refs: {}
+    refs: ReactiveUtils.reactive({})
   };
 
   // Initialising hooks
@@ -61,7 +61,7 @@ export function initApp(params: Params) {
 
   // Getting app data, methods and deps
   let deps: ReturnType<typeof trackDeps> = [];
-  if (app) deps = trackDeps(() => (state.data = app()));
+  if (app) deps = trackDeps(() => (state.data = app() ?? {}));
 
   // Calling onSetuped hooks
   appState.isSetuped = true;

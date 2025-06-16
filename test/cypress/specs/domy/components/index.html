@@ -10,8 +10,9 @@
     <p id="propChanges">0</p>
     <p id="componentClick">{{ componentClick }}</p>
 
-    <main d-for="i of [1, 2, 3]">
+    <main>
       <Count
+        d-for="i of [1, 2, 3]"
         d-if="i % 2 === 1"
         d-key="i"
         @click="++componentClick"

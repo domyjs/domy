@@ -1,0 +1,66 @@
+import Demo from '@site/src/components/Demo';
+
+# d-if
+
+The `d-if` directive in DOMY allows you to conditionally render an element in the DOM based on a JavaScript expression. It functions similarly to an `if` statement in JavaScript.
+
+DOMY also supports chaining `d-else-if` and `d-else` directives, making conditional rendering straightforward and expressive.
+
+## Syntax
+
+```html
+<div d-if="shouldDisplay">This will be shown if shouldDisplay is true</div>
+```
+
+The element is only inserted into the DOM if the expression inside `d-if` evaluates to `true`.
+
+## Animation
+
+The directive also supports enter/leave animations, which are triggered when the element is added or removed from the DOM. These can be defined using CSS transitions or animations.
+
+## Chaining with d-else-if and d-else
+
+DOMY supports chaining multiple conditions using `d-else-if` and a final fallback with `d-else`. These directives must be siblings and appear consecutively.
+
+### Example
+
+```html
+<div d-scope="{user: {role: 'admin'}}">
+  <div d-if="user.role === 'admin'">Admin dashboard</div>
+  <div d-else-if="user.role === 'editor'">Editor tools</div>
+  <div d-else>User homepage</div>
+
+  <button @click="user.role = 'admin'">change to admin</button>
+  <button @click="user.role = 'editor'">change to editor</button>
+  <button @click="user.role = 'normal'">change to normal</button>
+</div>
+```
+
+<Demo code={`
+    <div d-scope="{user: {role: 'admin'}}">
+    <div d-if="user.role === 'admin'">Admin dashboard</div>
+    <div d-else-if="user.role === 'editor'">Editor tools</div>
+    <div d-else>User homepage</div>
+
+    <button @click="user.role = 'admin'">change to admin</button>
+    <button @click="user.role = 'editor'">change to editor</button>
+    <button @click="user.role = 'normal'">change to normal</button>
+    </div>
+
+`} />
+
+In the example above:
+
+- If `user.role === 'admin'`, the first `div` is rendered.
+- Else if `user.role === 'editor'`, the second `div` is rendered.
+- Otherwise, the third `div` is rendered.
+
+### Notes
+
+- `d-else-if` must follow a `d-if` or another `d-else-if`.
+- `d-else` must follow a `d-if` or `d-else-if`, and does not take any value.
+- Only one of the conditional elements will be rendered at a time.
+
+## Summary
+
+The `d-if`, `d-else-if`, and `d-else` directives together provide a clean and reactive way to control the visibility and rendering of elements based on conditions in your data model.

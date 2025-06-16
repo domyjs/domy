@@ -12,7 +12,7 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "inject-domy": "cp ../dist/index.js ./static/index.js"
+    "inject-domy": "cp ../domy/dist/index.js ./static/index.js"
   },
   "dependencies": {
     "@docusaurus/core": "3.1.1",

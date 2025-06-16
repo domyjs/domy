@@ -1,0 +1,82 @@
+import Demo from '@site/src/components/Demo';
+
+# useNames
+
+The `useNames` hook allows a component to access registered child elements that have been assigned a specific name using the `d-name` directive. This is useful for managing named slots or dynamically manipulating specific child elements within a component.
+
+## Syntax
+
+```html
+<ErrorMessage>
+  <p d-name="example">Hello</p>
+</ErrorMessage>
+```
+
+Inside `ErrorMessage`, `useNames()` will return:
+
+```js
+const names = useNames();
+console.log(names['example']); // [<p>Hello</p>]
+```
+
+## Example
+
+### Injecting Named Child Elements
+
+```html
+<component>
+  <p d-name="header">This header is injected into the component.</p>
+  <p d-name="footer">This footer is injected into the component.</p>
+</component>
+```
+
+```js
+const { useNames } = DOMY;
+
+const Component = DOMY.createComponent({
+  html: `
+    <div>
+        <template d-insert="names['header']"></template>
+        <div>Main content</div>
+        <template d-insert="names['footer']"></template>
+    </div>
+  `,
+  app: () => {
+    const names = useNames();
+    return {
+      names
+    };
+  }
+});
+```
+
+<Demo
+  code={`
+  <component>
+    <p d-name="header">This header is injected into the component.</p>
+    <p d-name="footer">This footer is injected into the component.</p>
+  </component>
+  `}
+  components={() => {
+    const { useNames } = DOMY;
+
+    const Component = DOMY.createComponent({
+      html: `
+      <div>
+            <template d-insert="names['header']"></template>
+            <div>Main content</div>
+            <template d-insert="names['footer']"></template>
+      </div>
+      `,
+      app: () => {
+        const names = useNames();
+        return {
+          names
+        };
+      }
+    });
+
+    return { Component };
+
+}}
+/>

@@ -1,0 +1,158 @@
+import Demo from '@site/src/components/Demo';
+
+# Event Handling
+
+DOMY allows components to **react to user interactions** using event bindings. Modifiers can be used to **customize event behavior**, such as preventing default actions, stopping propagation, or handling events conditionally.
+
+## Event Binding Syntax
+
+You can bind events using either **`@event` shorthand** or **`d-on:event` full directive**.
+
+### Example: Basic Click Event
+
+```html
+<button @click="handleClick">Click me</button>
+<!-- SAME AS: <button d-on:click="handleClick">Click me</button> -->
+```
+
+```js
+const handleClick = () => {
+  alert('Button clicked!');
+};
+```
+
+<Demo
+  code={`
+    <button @click="handleClick">Click me</button>
+`}
+  domy={() => {
+    const handleClick = () => {
+      alert('Button clicked!');
+    };
+    return { handleClick };
+  }}
+/>
+---
+
+## Modifiers
+
+Modifiers allow additional **control** over event execution. Note you can put many `modifier` as same time.
+
+### **Prevent Default (`.prevent`)**
+
+Stops the default action of an event.
+
+```html
+<form @submit.prevent="handleSubmit">
+  <button type="submit">Submit</button>
+</form>
+```
+
+```js
+const handleSubmit = event => {
+  console.log('Form submission prevented!');
+};
+```
+
+### **Stop Propagation (`.stop`)**
+
+Prevents the event from bubbling up the DOM tree.
+
+```html
+<div @click="parentClicked">
+  <button @click.stop="childClicked">Click Me</button>
+</div>
+```
+
+```js
+const parentClicked = () => console.log('Parent clicked!');
+const childClicked = () => console.log('Child clicked!');
+```
+
+**Without `.stop`**, clicking the button would trigger **both** handlers.
+
+---
+
+### **Self (`.self`)**
+
+Ensures the event **only** triggers if fired directly on the bound element.
+
+```html
+<div @click.self="handleClick">
+  <p>Click inside, only the `div` will register it.</p>
+</div>
+```
+
+---
+
+### **Once (`.once`)**
+
+Ensures the event only fires **once**, then removes the listener.
+
+```html
+<button @click.once="handleClick">Click me once</button>
+```
+
+---
+
+### **Passive (`.passive`)**
+
+Improves performance by **allowing scrolling** while listening to the event.
+
+```html
+<div @touchmove.passive="handleTouch">Touch and scroll smoothly</div>
+```
+
+---
+
+### **Capture (`.capture`)**
+
+Forces the event to **trigger first** in the capturing phase.
+
+```html
+<div @click.capture="handleClick">
+  <button>Click Me</button>
+</div>
+```
+
+**Without `.capture`**, clicking the button triggers the event on **inner elements first**.
+
+---
+
+### **Key Modifiers (`.{key}`)**
+
+Filters event execution based on **specific keys**.
+
+```html
+<input @keydown.{enter}="submitForm" />
+```
+
+```js
+const submitForm = () => {
+  console.log('Enter key pressed!');
+};
+```
+
+Supports multiple keys:
+
+```html
+<input @keydown.{enter,escape}="handleKeyPress" />
+```
+
+---
+
+### **Away (`.away`)**
+
+Triggers event **when clicking outside** the bound element.
+
+```html
+<div @click.away="handleOutsideClick">Click anywhere **outside** this div.</div>
+```
+
+```js
+const handleOutsideClick = () => {
+  console.log('Clicked outside the div!');
+};
+```
+
+---

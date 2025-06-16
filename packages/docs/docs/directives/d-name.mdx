@@ -1,0 +1,63 @@
+import Demo from '@site/src/components/Demo';
+
+# d-name
+
+The `d-name` directive in DOMY allows you to **assign a name to an element**, enabling components to easily reference it using `$names`.
+
+This directive is particularly useful inside components that need to access or interact with specific children.
+
+## Syntax
+
+```html
+<div d-name="MyName"></div>
+```
+
+You can then access the named element in the component via:
+
+```js
+$names['MyName'];
+```
+
+## Example
+
+```html
+<my-component>
+  <p d-name="second">Second</p>
+  <p d-name="first">First</p>
+</my-component>
+```
+
+And the component `my-component`:
+
+```js
+const MyComponent = DOMY.createComponent({
+  html: `
+    <div>
+        <template d-insert="$names['first']"></template>
+        <template d-insert="$names['second']"></template>
+    </div>
+    `
+});
+```
+
+Will produce:
+
+<Demo
+  code={`
+    <my-component>
+        <p d-name="second">Second</p>
+        <p d-name="first">First</p>
+    </my-component>
+  `}
+  components={() => {
+    const MyComponent = DOMY.createComponent({
+      html: `
+    <div>
+        <template d-insert="$names['first']"></template>
+        <template d-insert="$names['second']"></template>
+    </div>
+    `
+    });
+    return { MyComponent };
+  }}
+/>

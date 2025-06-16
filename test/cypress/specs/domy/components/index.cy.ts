@@ -12,18 +12,18 @@ describe('Components tests', () => {
   });
 
   it('Check we can watch $props', () => {
+    cy.get('#propChanges').contains('0');
+
+    cy.get('#count-1 button').contains('-').click();
     cy.get('#propChanges').contains('2');
 
-    cy.get('#count-1 button').contains('-').click();
+    cy.get('#count-1 button').contains('+').click();
+    cy.get('#count-1 button').contains('+').click();
     cy.get('#propChanges').contains('4');
 
-    cy.get('#count-1 button').contains('+').click();
-    cy.get('#count-1 button').contains('+').click();
+    cy.get('#count-1 button').contains('-').click();
+    cy.get('#count-1 button').contains('-').click();
     cy.get('#propChanges').contains('6');
-
-    cy.get('#count-1 button').contains('-').click();
-    cy.get('#count-1 button').contains('-').click();
-    cy.get('#propChanges').contains('8');
   });
 
   it('Check we can add listener to components', () => {

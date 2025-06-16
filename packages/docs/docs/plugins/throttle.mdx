@@ -1,0 +1,56 @@
+import Demo from '@site/src/components/Demo';
+import throttle from '@domyjs/throttle';
+
+# Throttle
+
+The `$throttle` helper ensures that a function **executes at most once within a given time interval**, even if triggered multiple times. This is useful for optimizing **event listeners**, such as scroll events or rapid user inputs.
+
+## Installation
+
+To use `$throttle`, include the DOMY Throttle plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/throttle@1.x.x"></script>
+```
+
+And then:
+
+```js
+DOMY.createApp().plugins([throttle]).mount();
+```
+
+---
+
+## Syntax and Usage
+
+### Basic Throttle Example
+
+```html
+<div d-scope="{ search: '' }">
+  <p>Search: {{ search }}</p>
+  <input
+    type="text"
+    @input="$throttle(() => search = $el.value, 500)"
+    placeholder="Type to search..."
+  />
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{ search: '' }">
+  <p>Search: {{ search }}</p>
+  <input
+    type="text"
+    @input="$throttle(() => search = $el.value, 500)"
+    placeholder="Type to search..."
+  />
+</div>
+`}
+
+plugins={() => {
+return [throttle];
+}}
+/>
+
+---

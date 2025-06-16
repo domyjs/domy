@@ -1,0 +1,13 @@
+# d-ignore
+
+If you don't want DOMY to render a specific HTML element.
+
+```html
+<div d-ignore d-if="false">{{ 'Hello World!' }}</div>
+```
+
+Will produce:
+
+```html
+<div d-if="false">{{ 'Hello World!' }}</div>
+```

@@ -1,0 +1,68 @@
+import Demo from '@site/src/components/Demo';
+
+# d-for
+
+The `d-for` directive in DOMY allows you to loop over arrays or objects to dynamically render elements based on the collection. It acts like a `for` loop in JavaScript.
+
+```html
+<div d-for="item in items">{{ item }}</div>
+```
+
+You can also track the index:
+
+```html
+<div d-for="item, index in items">{{ index }} - {{ item }}</div>
+```
+
+Or use `of` instead of `in`:
+
+```html
+<div d-for="item of items">{{ item }}</div>
+```
+
+> Note: `in` is used for iterating over object keys, while `of` is used for array values (similar to JavaScript).
+
+---
+
+## Syntax
+
+```ts
+item in items
+item, index in items
+item of items
+```
+
+- `item` is the current value in the iteration.
+- `index` (optional) is the current index.
+- `items` is the array or object being iterated over.
+
+---
+
+## Keyed Rendering (Recommended)
+
+For better performance and DOM stability during re-renders, use the `d-key` attribute inside the `d-for` element:
+
+```html
+<div d-for="user in users" d-key="user.id">{{ user.name }}</div>
+```
+
+If no `d-key` is provided, DOMY will still render the loop, but a warning will be logged to inform you that using keys is highly recommended.
+
+---
+
+## Example
+
+```html
+<ul>
+  <li d-for="item, i of ['fruits', 'food', 'chips']" d-key="item">{{ i }} - {{ item }}</li>
+</ul>
+```
+
+<Demo
+  code={`
+    <ul>
+        <li d-for="item, i of ['fruits', 'food', 'chips']" d-key="item">{{ i }} - {{ item }}</li>
+    </ul>
+ `}
+
+/>

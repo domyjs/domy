@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Router</title>
+    <script src="/packages/router/dist/index.js"></script>
+    <script src="/packages/domy/dist/index.js"></script>
+    <style>
+      .red {
+        color: red !important;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li d-for="route of routes" d-key="route.name" d-if="!route.hide">
+            <router-link
+              style="color: black"
+              active-class="red"
+              :to="route.route.replace(':id', '5')"
+              :id="route.name"
+            >
+              {{ route.name }} - {{ route.route }} - {{ route.route.replace(':id', '5') }}
+            </router-link>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <router-view transition="test"></router-view>
+
+    <footer>Footer of the {{ $router.path }} {{ JSON.stringify($router.params) }}</footer>
+  </body>
+  <script>
+    function r(route, name, hide = false) {
+      const component = DOMY.createComponent({
+        html: `<div :style="{ border: 'thin solid #000' }"><h1>${name}</h1></div>`
+      });
+      return {
+        route,
+        name,
+        component,
+        hide
+      };
+    }
+
+    const registeredRoutes = [
+      r('/', 'Home'),
+      r('/about', 'About'),
+      r('/params/:id', 'Params'),
+      r('/order/:id(\\d+)', 'Order', true),
+      r('/rest/:test+', 'Rest', true),
+      r('/optional/:name?', 'Optional', true),
+      r('/wildcard/:test*', 'Wildcard', true),
+      r('/:p*', 'NotFound', true) // catch-all
+    ];
+
+    const { router, RouterView, RouterLink, useRouter } = createRouter({
+      hashMode: true,
+      routes: registeredRoutes
+    });
+
+    window.DIR = { router: useRouter() };
+
+    DOMY.createApp(() => {
+      const routes = [...registeredRoutes, r('/something/that/doesnt/exist', 'Login')];
+      return { routes };
+    })
+      .plugins([router])
+      .components({
+        RouterView,
+        RouterLink
+      })
+      .mount();
+  </script>
+</html>

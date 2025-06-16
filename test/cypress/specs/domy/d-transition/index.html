@@ -62,6 +62,24 @@
     .op-transition-out {
       animation: op-out 0.3s ease-in;
     }
+
+    .fade-enter {
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .fade-enter-to {
+      opacity: 1;
+    }
+
+    .fade-out {
+      transition: all 0.3s ease;
+      opacity: 1;
+    }
+
+    .fade-out-to {
+      opacity: 0;
+    }
   </style>
   <body>
     <div id="if" d-transition="transition" d-if="show">Modal Content... (by d-if)</div>
@@ -79,6 +97,16 @@
     <!-- DYNAMIC TEST -->
     <div id="dynamic" d-transition.dynamic="show ? 'transition' : 'op-transition'" d-if="show">
       Modal content... (dynamic)
+    </div>
+
+    <!-- TEST WITH TRANSITION -->
+    <div id="transition" d-transition="fade" d-if="show">
+      Modal Content... (by d-if + transition)
+    </div>
+
+    <!-- TEST WITH A CLASS THAT DOESNT EXIST -->
+    <div id="doesnt-exist" d-transition="doesnt-exist" d-if="show">
+      Modal Content... (by d-if + class that doesnt exist)
     </div>
 
     <button @click="show = !show">Show modal</button>

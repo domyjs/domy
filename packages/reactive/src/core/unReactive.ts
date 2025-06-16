@@ -18,5 +18,5 @@ export function unReactive<T = any>(obj: T): T {
   reactiveInstance.clearListeners();
   reactivesVariablesList.delete(obj);
 
-  return reactiveInstance.getInitialObj();
+  return obj;
 }

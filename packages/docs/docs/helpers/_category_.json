@@ -1,0 +1,9 @@
+{
+  "label": "Helpers",
+  "position": 5,
+  "collapsed": true,
+  "link": {
+    "type": "generated-index",
+    "description": "Helpers you can access in Domy."
+  }
+}

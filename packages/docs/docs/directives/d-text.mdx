@@ -1,0 +1,35 @@
+import Demo from '@site/src/components/Demo';
+
+# d-text
+
+The `d-text` directive allows dynamic text content updates in an element. It is particularly useful when using a templating language like Mustache.js, which also utilizes `{{ expression }}` syntax.
+
+## Syntax
+
+```html
+<div d-text="message"></div>
+```
+
+When the value of `message` changes, the text content of the `div` updates accordingly.
+
+## Example
+
+```html
+<div d-scope="{user: {name: 'Alice'}}">
+  <p d-text="user.name"></p>
+  <button @click="user.name = 'Bob'">Change Name</button>
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{user: {name: 'Alice'}}">
+  <p d-text="user.name"></p>
+  <button @click="user.name = 'Bob'">Change Name</button>
+</div>
+`}
+/>
+
+## Summary
+
+The `d-text` directive is a powerful way to dynamically bind and update text content in your application. It ensures content stays reactive and eliminates manual DOM manipulation.

@@ -5,6 +5,8 @@ import { get, set } from './getAndSet';
 import { getElementVisibilityHandler } from './getElementVisibilityHandler';
 import { getPreviousConditionsElements } from './getPreviousConditionsElements';
 import { getReactiveHandler } from './getReactiveHandler';
+import { handleClass } from './handleClass';
+import { handleStyle } from './handleStyle';
 import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from './isSpecialAttribute';
 import { kebabToCamelCase } from './kebabToCamelCase';
 import { error, warn } from './logs';
@@ -13,6 +15,8 @@ import { toKebabCase } from './toKebabCase';
 
 // A list of utils we can access in helpers
 export const helpersUtils = {
+  handleClass,
+  handleStyle,
   callWithErrorHandling,
   toKebabCase,
   kebabToCamelCase,

@@ -75,16 +75,12 @@ export function createComponent(
           props.filter(e => e.startsWith('!')).map(prop => prop.slice(1))
         );
 
-        // Replace the component by the root
-        domy.block.replaceWith(root);
-
         const data = domy.reactive({
           $props: {} as ComponentInfos['componentData']['$props'],
           $attrs: {} as ComponentInfos['componentData']['$attrs']
         });
 
         const propsAttributes: Attr[] = [];
-        const attrsAttributes: Attr[] = [];
         const componentAttributes: string[] = [];
 
         // We handle the attributes
@@ -100,7 +96,46 @@ export function createComponent(
           }
 
           // Handling attrs
-          attrsAttributes.push(attr);
+          const { attrName } = domy.utils.getDomyAttributeInformations(attr);
+          const isClass = attrName === 'class';
+          const isStyle = attrName === 'style';
+          let cleanAttr: (() => void) | null = null;
+          if (domy.utils.isBindAttr(attr.name)) {
+            let lastExecutedValue: any = null;
+
+            domy.effect(() => {
+              // Clearing previous class and style
+              if (cleanAttr) cleanAttr();
+
+              lastExecutedValue = domy.evaluate(attr.value);
+
+              domy.lockWatchers();
+              if (isClass) {
+                const fixedClass = domy.utils.handleClass(
+                  lastExecutedValue,
+                  data.$attrs[attrName] ?? ''
+                );
+                cleanAttr = () =>
+                  (data.$attrs[attrName] = fixedClass.cleanedClass(data.$attrs[attrName]));
+                data.$attrs[attrName] = fixedClass.class;
+              } else if (isStyle) {
+                const fixedStyle = domy.utils.handleStyle(
+                  lastExecutedValue,
+                  data.$attrs[attrName] ?? ''
+                );
+                cleanAttr = () =>
+                  (data.$attrs[attrName] = fixedStyle.cleanedStyle(data.$attrs[attrName]));
+                data.$attrs[attrName] = fixedStyle.style;
+              } else data.$attrs[attrName] = lastExecutedValue;
+              domy.unlockWatchers();
+            });
+          } else {
+            if (isClass)
+              data.$attrs[attrName] = [data.$attrs[attrName], attr.value].filter(Boolean).join(' ');
+            else if (isStyle)
+              data.$attrs[attrName] = [data.$attrs[attrName], attr.value].filter(Boolean).join(';');
+            else data.$attrs[attrName] = attr.value;
+          }
         }
 
         // Error handling for required props
@@ -122,31 +157,47 @@ export function createComponent(
           }
         }
 
-        // reactive attributes
-        for (const attr of attrsAttributes) {
-          const { attrName } = domy.utils.getDomyAttributeInformations(attr);
-          if (domy.utils.isBindAttr(attr.name)) {
-            domy.effect(() => {
-              const executedValue = domy.evaluate(attr.value);
-              data.$attrs[attrName] = executedValue;
-            });
-          } else {
-            data.$attrs[attrName] = attr.value;
-          }
-        }
-
         //  We render the childs first to ensure they keep the current state and not the component state
-        const names: { [name: string]: Element } = {};
-        const childrens: Element[] = [];
-        for (const child of componentElement.children) {
+        const names: { [name: string]: Element | undefined } = domy.reactive({});
+        const childrens: Element[] = domy.reactive([]);
+        const childrensCache: (Element | undefined)[] = [];
+        const updateChildrens = () => {
+          childrens.length = 0;
+          childrens.push(...(childrensCache.filter(Boolean) as Element[]));
+        };
+        const filtredChilds = Array.from(componentElement.childNodes).filter(child => {
+          const isTextNode = child.nodeType === Node.TEXT_NODE;
+          return isTextNode ? child.textContent?.trim() !== '' : true;
+        });
+        for (let i = 0; i < filtredChilds.length; ++i) {
+          const child = filtredChilds[i];
           const childBlock = domy.deepRender({
             element: child as Element,
             scopedNodeData: domy.scopedNodeData
           });
+
           unmountChilds.push(childBlock.unmount.bind(childBlock));
-          childrens.push(childBlock.el);
-          if (childBlock.name) names[childBlock.name] = childBlock.el;
+
+          domy.lockWatchers();
+          // Insert initial render
+          let childEl: Element | undefined = domy.skipReactive(childBlock.el);
+          childEl = childEl.parentNode ? childEl : undefined;
+          childrensCache.push(childEl);
+          if (childBlock.name) names[childBlock.name] = childEl;
+          updateChildrens();
+
+          // Handle the case the element change (for example with "d-if")
+          childBlock.onElementChange(newEl => {
+            const newChildEl: Element | undefined = domy.skipReactive(newEl);
+            childrensCache[i] = newChildEl;
+            if (childBlock.name) names[childBlock.name] = newChildEl;
+            updateChildrens();
+          });
+          domy.unlockWatchers();
         }
+
+        // Replace the component by the root
+        domy.block.replaceWith(root);
 
         let unmountComponent: (() => void) | undefined;
         const queueId = getUniqueQueueId();
@@ -186,6 +237,8 @@ export function createComponent(
           if (unmountComponent) unmountComponent();
           cleanup(unmountChilds);
           domy.unReactive(data);
+          domy.unReactive(childrens);
+          domy.unReactive(names);
         });
       },
       err => {

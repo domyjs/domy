@@ -40,7 +40,7 @@ export function dAttrsImplementation(domy: DomyDirectiveHelper): DomyDirectiveRe
       render = domy.deepRender({
         element: el,
         scopedNodeData: domy.scopedNodeData,
-        skipChildRendering: true
+        skipChildRendering: domy.appState.isMounted
       });
     }
 

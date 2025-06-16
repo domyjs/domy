@@ -1,0 +1,153 @@
+import Demo from '@site/src/components/Demo';
+
+# Components
+
+Components in DOMY allow you to create **reusable** UI elements with encapsulated logic. They support **props, slots, events**, and even **functions** passed as props to update a parent component's state dynamically.
+
+---
+
+## Creating a Basic Component
+
+A **component** is defined using `DOMY.createComponent()` and includes:
+
+- `html` → Template structure.
+- `props` → Properties passed by the parent.
+- `app` → Reactive state and logic.
+- `components` → Components you need to use inside that component.
+
+### Example: A Simple Counter Component
+
+NOTE: The `!` mean the prop is required. Also, ensure to use `kebab case` for props attributes on the component.
+
+```html
+<Count :count="myCount" :update-count="updateCount"></Count>
+```
+
+```js
+const { signal } = DOMY;
+
+const Count = DOMY.createComponent({
+  props: ['!count', 'updateCount'],
+  html: `
+    <div>
+      <p>Counter: {{ $props.count }}</p>
+      <button d-if="$props.updateCount" @click="$props.updateCount">+</button>
+    </div>
+  `
+});
+
+DOMY.createApp(() => {
+  const myCount = signal(0);
+  const updateCount = () => myCount.value++;
+  return { myCount, updateCount };
+})
+  .components({ Count })
+  .mount();
+```
+
+<Demo
+  code={`
+<Count :count="myCount" :update-count="updateCount"></Count>
+`}
+  domy={() => {
+    const { signal } = DOMY;
+    const myCount = signal(0);
+    const updateCount = () => myCount.value++;
+    return { myCount, updateCount };
+  }}
+  components={() => {
+    const Count = DOMY.createComponent({
+      html: `
+    <div>
+      <p>Counter: {{ $props.count }}</p>
+      <button d-if="$props.updateCount" @click="$props.updateCount">+</button>
+    </div>
+  `,
+      props: ['!count', 'updateCount']
+    });
+    return { Count };
+  }}
+/>
+
+---
+
+## Get component childrens
+
+You can access the childrens of the component after they are render by the parent.
+
+### Example
+
+```html
+<component>
+  <p>{{ message }}</p>
+</component>
+```
+
+```js
+const Component = DOMY.createComponent({
+  html: `
+    <div :style="{ color: 'red' }">
+      <template d-insert="$childrens[0]"></template>
+    </div>
+  `
+});
+
+DOMY.createApp(() => {
+  return { message: 'Hello World!' };
+})
+  .components({ Components })
+  .mount();
+```
+
+<Demo
+  code={`
+    <component>
+  <p>{{ message }}</p>
+</component>
+    `}
+  domy={() => {
+    return { message: 'Hello World!' };
+  }}
+  components={() => {
+    const Component = DOMY.createComponent({
+      html: `
+    <div :style="{ color: 'red' }">
+      <template d-insert="$childrens[0]"></template>
+    </div>
+  `
+    });
+    return { Component };
+  }}
+/>
+
+---
+
+## Lifecycle Hooks in Components
+
+Components support **lifecycle hooks** for setup and cleanup operations.
+
+### Example: Using `onMounted` in a Component
+
+```js
+const { onMounted } = DOMY;
+
+const Timer = DOMY.createComponent({
+  html: `<p>Time: {{ time }}</p>`,
+  app: () => {
+    const time = signal(0);
+    let interval;
+
+    onMounted(() => {
+      interval = setInterval(() => time.value++, 1000);
+    });
+
+    onBeforeUnmount(() => {
+      clearInterval(interval);
+    });
+
+    return { time };
+  }
+});
+```
+
+🚀 **This component updates every second and cleans up before unmounting!**

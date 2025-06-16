@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/anchor",
+  "unpkg": "./dist/index.js",
   "version": "1.0.0",
   "buildName": "anchor",
   "description": "Domyjs anchor plugin",

@@ -1,0 +1,33 @@
+import Demo from '@site/src/components/Demo';
+
+# $el
+
+The `$el` special helper provides access to the current element associated with the directive or component. This is useful when performing direct DOM manipulations or needing a reference to the element within a scoped function.
+
+## Syntax
+
+```js
+console.log($el);
+```
+
+## Behavior
+
+- `$el` returns the element that the directive or component is bound to.
+- If the element is a text node, it returns its parent node instead.
+- Helps in scenarios where direct element interaction is required.
+
+## Example
+
+```html
+<div d-scope="{element: $el}">
+  <button @click="alert(element.tagName)">Log Element</button>
+</div>
+```
+
+<Demo
+  code={`
+<div d-scope="{element: $el}">
+  <button @click="alert(element.tagName)">Log Element</button>
+</div>
+`}
+/>

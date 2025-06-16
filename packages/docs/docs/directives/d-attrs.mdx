@@ -1,0 +1,32 @@
+# d-attrs
+
+The `d-attrs` directive in DOMY allows you to dynamically set multiple HTML attributes on an element using a JavaScript object.
+It is reactive, meaning that any change to the object will automatically update the element’s attributes in the DOM.
+
+## Syntax
+
+```HTML
+<div d-attrs="{ title: 'Hello', 'data-info': info }"></div>
+```
+
+Will produce:
+
+```HTML
+<div title="Hello" data-info="value of info"></div>
+```
+
+If `info` changes, `data-info` will update accordingly.
+
+## Modifiers
+
+- `render`: When this modifier is used, DOMY will re-parse and re-render any DOMY-specific attributes (like `d-if`, `d-on`, etc.) that were dynamically added by `d-attrs`.
+
+```HTML
+<div d-attrs.render="{ 'd-if': shouldShow }"></div>
+```
+
+Will render as follow and then render the `d-if` directive:
+
+```HTML
+<div d-if="shouldShow"></div>
+```

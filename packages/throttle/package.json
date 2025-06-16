@@ -1,5 +1,6 @@
 {
   "name": "@domyjs/throttle",
+  "unpkg": "./dist/index.js",
   "version": "1.0.0",
   "description": "Domyjs throttle plugin",
   "main": "./dist/index.js",

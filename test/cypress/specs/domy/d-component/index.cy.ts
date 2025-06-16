@@ -13,17 +13,28 @@ describe('d-component test', () => {
   });
 
   it('should render the Home component initially', () => {
+    cy.get('button').click();
+    cy.get('button').click();
+    cy.get('button').click();
+
     cy.get('#home').should('exist');
     cy.get('#home').should('contain', 'Page: Home');
   });
 
   it('should switch to the About component when About is clicked', () => {
+    cy.get('button').click();
+    cy.get('button').click();
+    cy.get('button').click();
+
     cy.get('ul > li').contains('About').click();
     cy.get('#home').should('not.exist');
     cy.get('#about').should('exist').and('contain', 'Page: About');
   });
 
   it('should not render any component when Not Exist is clicked', () => {
+    cy.get('button').click();
+    cy.get('button').click();
+    cy.get('button').click();
     cy.get('ul > li').contains('Not Exist').click();
     cy.get('#home').should('not.exist');
     cy.get('#about').should('not.exist');

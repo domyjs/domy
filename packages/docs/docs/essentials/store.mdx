@@ -1,0 +1,88 @@
+import Demo from '@site/src/components/Demo';
+
+# Store
+
+A **store** in DOMY is a shared reactive state that multiple components can access. It allows for **state management** across different parts of an application.
+
+## Defining a Store
+
+To create a store, use the `signal` function inside your hook. Then you just need to instancify your hook `globaly` instead of being declared into DOMY instance.
+
+```js
+const { signal } = DOMY;
+
+function useCount() {
+  const count = signal(0);
+  return { count };
+}
+
+const counterStore = useCount();
+
+DOMY.createApp(() => {
+  // ...
+}).mount();
+```
+
+## Example
+
+```html
+<count></count> <br />
+<count></count>
+```
+
+```js
+const { signal } = DOMY;
+
+function useCount() {
+  const count = signal(0);
+  return { count };
+}
+
+const counterStore = useCount();
+
+const Count = DOMY.createComponent({
+  html: `
+    <div>
+      <p>{{ count }}</p>
+      <button @click="count++">+</button>
+      <button @click="count--">-</button>
+    </div>
+  `,
+  app: () => {
+    return { count: counterStore.count };
+  }
+});
+
+DOMY.createApp().components({ Count }).mount();
+```
+
+<Demo code={`
+<count></count> <br />
+<count></count>
+`}
+components={() => {
+    const { signal } = DOMY;
+
+    function useCount() {
+        const count = signal(0);
+        return { count };
+    }
+
+    const counterStore = useCount();
+
+    const Count = DOMY.createComponent({
+
+html: `     <div>
+      <p>{{ count }}</p>
+      <button @click="count++">+</button>
+      <button @click="count--">-</button>
+    </div>
+  `,
+app: () => {
+return { count: counterStore.count };
+}
+});
+
+return {Count}
+}}
+/>

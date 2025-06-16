@@ -1,0 +1,35 @@
+import Demo from '@site/src/components/Demo';
+
+# $refs
+
+The `$refs` special helper allows access to registered reference elements within a component. This is useful for interacting directly with elements assigned a `d-ref` identifier.
+
+## Syntax
+
+```html
+<p d-ref="text">Hello!</p>
+```
+
+Inside the component:
+
+```js
+console.log($refs.text.textContent); // "Hello!"
+```
+
+## Example
+
+```html
+<div>
+  <input d-ref="inputBox" type="text" placeholder="Type here..." />
+  <button @click="$refs.inputBox.focus()">Focus Input</button>
+</div>
+```
+
+<Demo
+  code={`
+  <div>
+    <input d-ref="inputBox" type="text" placeholder="Type here..." />
+    <button @click="$refs.inputBox.focus()">Focus Input</button>
+  </div>
+  `}
+/>

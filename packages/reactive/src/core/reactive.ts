@@ -22,11 +22,9 @@ export function reactive<T>(obj: T): T {
   // We attach the global listener
   function createGlobalListener<T extends Listener['type']>(type: T): GetListenerByType<T>['fn'] {
     return (props: any) => {
-      const globalListenerByType = globalListenersList.filter(
-        curr => curr.type === type
-      ) as GetListenerByType<T>[];
+      for (const globalListener of globalListenersList) {
+        if (globalListener.type !== type) continue;
 
-      for (const globalListener of globalListenerByType) {
         try {
           globalListener.fn(props);
         } catch (err) {

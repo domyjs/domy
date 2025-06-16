@@ -1,0 +1,68 @@
+import Demo from '@site/src/components/Demo';
+
+# useChildrens
+
+The `useChildrens` hook allows a component to access the elements passed inside its tag. This is useful for handling slots or dynamically rendering child elements within a component.
+
+## Syntax
+
+```html
+<ErrorMessage>
+  <p>Hello</p>
+</ErrorMessage>
+```
+
+Inside `ErrorMessage`, `useChildrens()` will return:
+
+```js
+const childrens = useChildrens();
+console.log(childrens); // [<p>Hello</p>]
+```
+
+## Example
+
+### Injecting Child Elements
+
+```html
+<component>
+  <p>This element is injected into the component.</p>
+</component>
+```
+
+```js
+const { useChildrens } = DOMY;
+
+const Component = DOMY.createComponent({
+  html: `<template d-insert="childrens[0]"></template>`,
+  app: () => {
+    const childrens = useChildrens();
+    return {
+      childrens
+    };
+  }
+});
+```
+
+<Demo
+  code={`
+  <component>
+    <p>This element is injected into the component.</p>
+  </component>
+  `}
+  components={() => {
+    const { useChildrens } = DOMY;
+
+    const Component = DOMY.createComponent({
+      html: `<template d-insert="childrens[0]"></template>`,
+      app: () => {
+        const childrens = useChildrens();
+        return {
+          childrens
+        };
+      }
+    });
+
+    return { Component };
+
+}}
+/>

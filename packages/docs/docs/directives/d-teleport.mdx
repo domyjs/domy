@@ -1,0 +1,47 @@
+import Demo from '@site/src/components/Demo';
+
+# d-teleport
+
+The `d-teleport` directive allows you to move template content to a specific location in the DOM. This is particularly useful for elements like modals that need to be rendered at the top level of the document.
+
+## Syntax
+
+```html
+<template d-teleport="#target">
+  <div class="modal">This content is teleported</div>
+</template>
+
+<div id="target"></div>
+```
+
+<Demo code={`
+<template d-teleport="#target">
+  <div class="modal">This content is teleported</div>
+</template>
+
+<div id="target"></div>
+`} />
+
+When the directive is processed, the template's content is moved to the specified target in the DOM.
+
+## Use Case
+
+`d-teleport` is ideal for scenarios like:
+
+- Modals
+- Tooltips
+- Floating UI components
+
+## Modifiers
+
+- `.defer`: modifier ensures that teleportation only occurs once the application has fully mounted. This is useful for cases where the target element may not exist in the DOM immediately.
+
+#### Example
+
+```html
+<template d-teleport.defer="$refs.target">
+  <div class="notification">This will be teleported after mount.</div>
+</template>
+
+<div d-ref="target"></div>
+```

@@ -2,13 +2,12 @@
 export type Listener = OnGetListener | OnSetListener;
 export type OnGetListener = {
   type: 'onGet';
-  fn: (props: { reactiveVariable: ReactiveVariable; obj: any; path: string }) => void;
+  fn: (props: { reactiveVariable: ReactiveVariable; path: string }) => void;
 };
 export type OnSetListener = {
   type: 'onSet';
   fn: (props: {
     reactiveVariable: ReactiveVariable;
-    obj: any;
     path: string;
     prevValue: any;
     newValue: any;
@@ -27,11 +26,8 @@ export class ReactiveVariable {
   public name = '';
   private proxy: any = null;
 
-  private onSetListeners: OnSetListener['fn'][] = [];
-  private onGetListeners: OnGetListener['fn'][] = [];
-
-  private proxyQueue: (() => void)[] = [];
-  private queued = false;
+  private onSetListeners = new Set<OnSetListener['fn']>();
+  private onGetListeners = new Set<OnGetListener['fn']>();
 
   public static IS_GLOBAL_LOCK = false;
 
@@ -60,25 +56,29 @@ export class ReactiveVariable {
     return target?.[isSignalSymbol] && 'value' in target;
   }
 
-  public getInitialObj() {
-    return this.target;
+  /**
+   * Check we should skip the reactivity on the current element
+   * @param target
+   * @returns
+   */
+  public static shouldBeSkip(target: any): boolean {
+    return target?.[skipReactivitySymbol];
   }
 
   public clearListeners() {
-    this.onGetListeners = [];
-    this.onSetListeners = [];
+    this.onGetListeners.clear();
+    this.onSetListeners.clear();
   }
 
   public attachListener(l: Listener) {
     const listeners = l.type === 'onGet' ? this.onGetListeners : this.onSetListeners;
-    listeners.push(l.fn);
+    listeners.add(l.fn);
     return () => this.removeListener(l);
   }
 
   public removeListener(l: Listener) {
     const listeners = l.type === 'onGet' ? this.onGetListeners : this.onSetListeners;
-    const index = listeners.indexOf(l.fn);
-    if (index !== -1) listeners.splice(index, 1);
+    listeners.delete(l.fn);
   }
 
   private canAttachProxy(target: any) {
@@ -86,7 +86,7 @@ export class ReactiveVariable {
       target !== null &&
       typeof target === 'object' &&
       !ReactiveVariable.isReactive(target) &&
-      !target?.[skipReactivitySymbol]
+      !ReactiveVariable.shouldBeSkip(target)
     );
   }
 
@@ -172,147 +172,108 @@ export class ReactiveVariable {
 
   private createHandler(path: string[]) {
     const ctx = this;
+
     const handler: ProxyHandler<any> = {
       get(target, p, receiver) {
-        if (typeof p === 'symbol') {
-          return Reflect.get(target, p, receiver);
+        if (typeof p === 'symbol') return Reflect.get(target, p, receiver);
+
+        let value = Reflect.get(target, p, receiver);
+        const fullPath = [...path, p as string];
+
+        // Ensure the needed variable is reactive
+        if (!ReactiveVariable.isReactive(value)) {
+          value = ctx.createProxy(value, fullPath);
+          Reflect.set(target, p, value);
         }
 
-        ctx.callOnGetListeners([...path, p as string]);
-        return Reflect.get(target, p, receiver);
+        ctx.callOnGetListeners(fullPath);
+        return value;
       },
 
       set(target, p, newValue, receiver) {
-        if (typeof p === 'symbol') {
-          return Reflect.set(target, p, newValue, receiver);
-        }
+        if (typeof p === 'symbol') return Reflect.set(target, p, newValue, receiver);
 
         const prevValue = Reflect.get(target, p, receiver);
         const fullPath = [...path, p as string];
-
-        // If the new value is not a proxy we declare a proxy for it
-        const isNewObj = !ReactiveVariable.isReactive(newValue);
-        if (isNewObj) {
-          newValue = ctx.createProxy(newValue, fullPath);
-        }
-
         const result = Reflect.set(target, p, newValue, receiver);
+
         const isSameValue = prevValue === newValue;
-        if (result && !isSameValue) {
-          ctx.callOnSetListeners(fullPath, prevValue, newValue);
-        }
+        if (result && !isSameValue) ctx.callOnSetListeners(fullPath, prevValue, newValue);
 
         return result;
       },
+
       deleteProperty(target, p) {
-        if (typeof p === 'symbol') {
-          return Reflect.deleteProperty(target, p);
-        }
+        if (typeof p === 'symbol') return Reflect.deleteProperty(target, p);
 
         const prevValue = target[p];
         const fullPath = [...path, p as string];
 
         const result = Reflect.deleteProperty(target, p);
-        if (result) {
-          ctx.callOnSetListeners(fullPath, prevValue, undefined);
-        }
+        if (result) ctx.callOnSetListeners(fullPath, prevValue, undefined);
 
         return result;
       },
+
       has(target, p) {
         const exists = Reflect.has(target, p);
-
         const fullPath = [...path, p as string];
         ctx.callOnGetListeners(fullPath);
-
         return exists;
       },
+
       ownKeys(target) {
         const keys = Reflect.ownKeys(target);
-
         ctx.callOnGetListeners([...path]);
-
         return keys;
       }
     };
     return handler;
   }
 
-  private proxyQueueAction(action: () => void) {
-    this.proxyQueue.push(action);
-
-    if (!this.queued) {
-      this.queued = true;
-
-      for (const job of this.proxyQueue) {
-        job(); // Errors are already handled in createProxy method
-      }
-
-      this.proxyQueue.length = 0;
-      this.queued = false;
-    }
-  }
-
   private createProxy(target: any, path: string[] = []): any {
     if (!this.canAttachProxy(target)) return target;
 
-    try {
-      for (const key in target) {
-        if (this.canAttachProxy(target[key])) {
-          this.proxyQueueAction(
-            () => (target[key] = this.createProxy(target[key], [...path, key]))
-          );
-        }
-      }
+    const isCollection = this.isCollection(target);
 
-      const isCollection = this.isCollection(target);
+    Object.defineProperty(target, isProxySymbol, {
+      enumerable: false,
+      writable: true,
+      value: true,
+      configurable: true
+    });
 
-      Object.defineProperty(target, isProxySymbol, {
-        enumerable: false,
-        writable: true,
-        value: true,
-        configurable: true
-      });
-
-      const prox = new Proxy(
-        target,
-        isCollection ? this.createCollectionHandler(path) : this.createHandler(path)
-      );
-
-      return prox;
-    } catch {
-      return target;
-    }
+    return new Proxy(
+      target,
+      isCollection ? this.createCollectionHandler(path) : this.createHandler(path)
+    );
   }
 
   private callOnGetListeners(path: string[]) {
-    if (!ReactiveVariable.IS_GLOBAL_LOCK) {
-      const params = {
-        path: this.name + path.join('.'),
-        obj: this.getProxy(),
-        reactiveVariable: this
-      };
+    if (ReactiveVariable.IS_GLOBAL_LOCK) return;
 
-      for (const listener of this.onGetListeners) {
-        listener(params);
-      }
+    const params = {
+      path: this.name + path.join('.'),
+      reactiveVariable: this
+    };
+
+    for (const listener of [...this.onGetListeners]) {
+      listener(params);
     }
   }
 
   private callOnSetListeners(path: string[], prevValue: any, newValue: any) {
-    if (!ReactiveVariable.IS_GLOBAL_LOCK) {
-      const obj = this.getProxy();
-      const params = {
-        path: this.name + path.join('.'),
-        prevValue,
-        newValue,
-        obj,
-        reactiveVariable: this
-      };
+    if (ReactiveVariable.IS_GLOBAL_LOCK) return;
 
-      for (const listener of this.onSetListeners) {
-        listener(params);
-      }
+    const params = {
+      path: this.name + path.join('.'),
+      prevValue,
+      newValue,
+      reactiveVariable: this
+    };
+
+    for (const listener of [...this.onSetListeners]) {
+      listener(params);
     }
   }
 }

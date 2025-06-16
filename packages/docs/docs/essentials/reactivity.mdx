@@ -1,0 +1,199 @@
+import Demo from '@site/src/components/Demo';
+
+# Reactivity
+
+DOMY provides a **reactive system** that allows components to manage state dynamically. This system includes `signal`, `watch`, `watchEffect`, `globalWatch`, `computed`, `matchPath`, and `skipReactive` to facilitate efficient state management.
+
+## signal
+
+The `signal` function creates a **reactive state** that updates when its value changes.
+
+### Example:
+
+```js
+const { signal } = DOMY;
+const count = signal(0);
+
+console.log(count.value); // 0
+count.value++;
+console.log(count.value); // 1
+```
+
+### Usage in a Component:
+
+```html
+<p>Compteur: {{ count }}</p>
+<button @click="count++">+</button>
+```
+
+```js
+const count = signal(0);
+```
+
+<Demo
+  code={`
+  <p>Count: {{ count }}</p>
+  <button @click="count++">+</button>
+  `}
+  domy={() => {
+    const { signal } = DOMY;
+    const count = signal(0);
+    return { count };
+  }}
+/>
+
+---
+
+## watch
+
+The `watch` function observes a **specific signal** and runs a callback when its value changes.
+
+### Example:
+
+```js
+const { signal, watch } = DOMY;
+
+const count = signal(0);
+
+watch(
+  ({ prevValue, newValue }) => {
+    console.log(`Count changed from ${prevValue} to ${newValue}`);
+  },
+  () => count
+);
+```
+
+---
+
+## watchEffect
+
+The `watchEffect` function automatically tracks **reactive dependencies** and runs a callback when any of them change.
+
+### Example:
+
+```js
+const { signal, watchEffect } = DOMY;
+
+const count = signal(0);
+
+watchEffect(() => {
+  console.log(`Count updated: ${count.value}`);
+});
+
+count.value++; // Logs "Count updated: 1"
+```
+
+---
+
+## globalWatch
+
+The `globalWatch` function works **like watch**, but listens all signals. It's really usefull for debugging.
+
+### Example:
+
+```js
+const { globalWatch } = DOMY;
+
+globalWatch(({ prevValue, newValue }) => {
+  console.log(`Something changed from ${prevValue} to ${newValue}`);
+});
+```
+
+---
+
+## computed
+
+The `computed` function creates a **derived reactive value** that updates automatically when its dependencies change.
+
+### Example:
+
+```js
+const { signal, computed } = DOMY;
+
+const count = signal(0);
+const doubleCount = computed(() => count.value * 2);
+
+console.log(doubleCount.value); // 0
+count.value++;
+console.log(doubleCount.value); // 2
+```
+
+You can also define a setter for this computed:
+
+```js
+const { signal, computed } = DOMY;
+
+const count = signal(0);
+const doubleCount = computed(
+  () => count.value * 2,
+  newValue => (count.value = newValue / 2)
+);
+
+console.log(count.value); // 0
+doubleCount.value = 2;
+console.log(doubleCount.value); // 2
+console.log(count.value); // 1
+```
+
+---
+
+## matchPath
+
+When managing reactive state, monitoring every change in a complex object can be inefficient.
+`matchPath` helps filter updates dynamically, executing logic only when relevant parts of the state are modified.
+
+### Example:
+
+```js
+const { signal, watch, matchPath } = DOMY;
+
+const state = signal({
+  todos: [{ isComplete: false }, { isComplete: true }]
+});
+
+// Watching for changes in todos using matchPath
+watch(
+  ({ prevValue, newValue, path }) => {
+    if (matchPath('todos.*.isComplete', path).isMatching) {
+      console.log(`Updated path: ${path}, New Value: ${newValue}`);
+    }
+  },
+  () => state
+);
+```
+
+It also allow to get the params from a path:
+
+```js
+const { signal, watch, matchPath } = DOMY;
+
+const state = signal({
+  todos: [{ isComplete: false }, { isComplete: true }]
+});
+
+// Watching for changes in todos using matchPath
+watch(
+  ({ prevValue, newValue, path }) => {
+    const matcher = matchPath('todos.{index}.isComplete', path);
+    if (matcher.isMatching) {
+      console.log(`Updated path: ${path}, New Value: ${newValue}, Index: ${matcher.params.index}`);
+    }
+  },
+  () => state
+);
+```
+
+---
+
+## skipReactive
+
+The `skipReactive` function allows you to **skip tracking reactive properties**, preventing unnecessary updates.
+
+### Example:
+
+```js
+const { signal, skipReactive } = DOMY;
+
+// In the example below, DOMY won't listen to any change make on roles
+const user = signal({ name: 'Alice', roles: skipReactive(['admin']) });
+```

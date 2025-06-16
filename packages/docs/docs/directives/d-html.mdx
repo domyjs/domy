@@ -1,0 +1,40 @@
+# `d-html`
+
+The `d-html` directive in DOMY.js dynamically sets the `innerHTML` of an element based on a reactive expression. This allows you to inject raw HTML content directly into an element when the evaluated expression changes.
+
+> ⚠️ **Warning:** This directive injects raw HTML and should **not** be used with untrusted content to avoid XSS vulnerabilities.
+
+## Syntax
+
+```html
+<div d-html="expression"></div>
+```
+
+- `expression`: A JavaScript expression evaluated within the component’s scope that returns a string of HTML.
+
+## Behavior
+
+- The content inside the element is **completely replaced** whenever the expression changes.
+- You can use it to insert custom markup, including other HTML tags, from a reactive value.
+- Unlike `d-text`, it does not escape HTML.
+
+## Example
+
+```html
+<div d-html="content"></div>
+```
+
+```js
+const content = signal('<strong>Hello World!</strong>');
+```
+
+This will render:
+
+```html
+<div><strong>Hello World!</strong></div>
+```
+
+## Usage Notes
+
+- Make sure the data you inject is **safe and sanitized** if it originates from user input.
+- It is recommended to use `d-text` if you do **not** want to inject raw HTML.

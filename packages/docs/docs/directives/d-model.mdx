@@ -1,0 +1,67 @@
+import Demo from '@site/src/components/Demo';
+
+# d-model
+
+The `d-model` directive in DOMY provides **two-way data binding** for form elements such as `<input>`, `<textarea>`, and `<select>`.  
+It automatically keeps the element’s value in sync with the state and updates the state when the user changes the input.
+
+## Syntax
+
+```html
+<input type="text" d-model="myValue" />
+<select d-model="selectedItems" multiple></select>
+<input type="checkbox" d-model="isChecked" />
+```
+
+- The expression should point to the state property to bind to.
+- Supports various input types including text, number, checkbox, radio, and select (single or multiple).
+
+## Modifiers
+
+- `lazy`: Updates the state only on the `change` event instead of on every input event.
+
+```html
+<input type="text" d-model.lazy="username" />
+```
+
+- `number`: Tell the value of the input is a number.
+
+## Example
+
+```html
+<div
+  d-scope="{ 
+  username: 'John', 
+  isChecked: true, 
+  selectedItems: ['apple', 'banana'] 
+}"
+>
+  <input type="text" d-model="username" /><br />
+  <input type="checkbox" d-model="isChecked" /><br />
+  <select d-model="selectedItems" multiple>
+    <option value="apple">Apple</option>
+    <option value="banana">Banana</option>
+    <option value="orange">Orange</option>
+  </select>
+</div>
+```
+
+Will give:
+
+<Demo
+  code={`
+    <div d-scope="{ 
+      username: 'John', 
+      isChecked: true, 
+      selectedItems: ['apple', 'banana'] 
+    }">
+      <input type="text" d-model="username" /><br />
+      <input type="checkbox" d-model="isChecked" /><br />
+      <select d-model="selectedItems" multiple>
+        <option value="apple">Apple</option>
+        <option value="banana">Banana</option>
+        <option value="orange">Orange</option>
+      </select>
+    </div>
+  `}
+/>

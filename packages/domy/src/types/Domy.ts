@@ -48,9 +48,9 @@ export type DomyDirectiveHelper = {
   onAppMounted(cb: () => void): void;
   getUniqueQueueId: typeof getUniqueQueueId;
   queueJob: typeof queueJob;
-  effect(cb: () => void): void;
+  effect(cb: () => void): (() => void) | void;
   cleanup(cb: () => void): void;
-  evaluate(code: string): any;
+  evaluate(code: string, scope?: Record<string, any>): any;
   deepRender: ReturnType<typeof createDeepRenderFn>;
   addScopeToNode(obj: Record<string, any>): void;
   removeScopeToNode(obj: Record<string, any>): void;

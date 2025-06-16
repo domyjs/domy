@@ -1,0 +1,90 @@
+import Demo from '@site/src/components/Demo';
+
+# d-transition
+
+The `d-transition` directive allows you to define a transition name for an element, making it easy to animate components when they appear and disappear. It works seamlessly with directives such as `d-show`, `d-if`, `d-else-if`, `d-else`, and `d-insert`.
+
+## Syntax
+
+```css
+.fade-enter {
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.fade-enter-to {
+  opacity: 1;
+}
+
+.fade-out {
+  transition: all 0.3s ease;
+  opacity: 1;
+}
+
+.fade-out-to {
+  opacity: 0;
+}
+```
+
+```html
+<div d-transition="fade" d-if="isVisible">Fading content</div>
+```
+
+When `isVisible` changes, the element enters with the `fade-enter` + `fade-enter-to` class and exits with `fade-out` + `fade-out-to`.
+
+<Demo
+  code={`
+<style>
+    .fade-enter {
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .fade-enter-to {
+      opacity: 1;
+    }
+
+    .fade-out {
+      transition: all 0.3s ease;
+      opacity: 1;
+    }
+
+    .fade-out-to {
+      opacity: 0;
+    }
+
+</style>
+<div d-scope="{isVisible: true}">
+  <button @click="isVisible = !isVisible">Toggle</button>
+  <div d-transition="fade" d-if="isVisible">Fading content</div>
+</div>
+`}
+/>
+
+## Behavior
+
+- The `d-transition` directive applies `-enter` and `-out` classes based on the provided transition name.
+- After the `-enter` or `-out` class is applied the directive wait for the DOM to repaint before adding `-enter-to` or `-out-to`.
+- If the transition name is updated dynamically, it will reactively adjust.
+- Works well with elements that appear/disappear based on conditions.
+
+## Modifiers
+
+- `.dynamic`: modifier allows transitions to be dynamically updated based on a reactive expression.
+
+#### Example
+
+```html
+<div d-scope="{transitionName: 'fade'}">
+  <div d-transition.dynamic="transitionName" d-if="isVisible">Animated content</div>
+  <button @click="transitionName = 'slide'">Change transition</button>
+</div>
+```
+
+- `.init`: modifier ensures that the transition is applied during the initial render.
+
+#### Example
+
+```html
+<div d-transition.init="fade">This element has an initial transition</div>
+```

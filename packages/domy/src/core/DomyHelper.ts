@@ -144,6 +144,7 @@ export class DomyHelper {
         dontQueueOnFirstExecution: !this.appState.isMounted
       });
       this.clearEffectList.push(uneffect);
+      return uneffect;
     } else {
       fixedFn();
     }
@@ -153,14 +154,14 @@ export class DomyHelper {
     this.cleanupFn = cb;
   }
 
-  evaluate(code: string) {
+  evaluate(code: string, scope?: Record<string, any>) {
     const evaluator = this.config.CSP ? cspEvaluate : evaluate;
 
     const context = getContext({
       domyHelperId: this.domyHelperId,
       el: this.block.el,
       state: this.state,
-      scopedNodeData: this.scopedNodeData,
+      scopedNodeData: scope ? [...this.scopedNodeData, scope] : this.scopedNodeData,
       config: this.config,
       pluginHelper: this.pluginHelper
     });

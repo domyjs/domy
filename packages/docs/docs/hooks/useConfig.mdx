@@ -1,0 +1,45 @@
+import Demo from '@site/src/components/Demo';
+
+# useConfig
+
+The `useConfig` hook allows you to retrieve the current framework configuration dynamically within a component.
+
+## Syntax
+
+```js
+const config = useConfig();
+console.log(config);
+```
+
+## Example
+
+NOTE: We are using `this.config` instead of `config` because `avoidDeprecatedWith` is set to `true`.
+
+```html
+<p>{{ JSON.stringify(this.config) }}</p>
+```
+
+```js
+const { useConfig } = DOMY;
+
+DOMY.createApp(() => {
+  const config = useConfig();
+  return {
+    config
+  };
+})
+  .configure({ avoidDeprecatedWith: true })
+  .mount();
+```
+
+<Demo
+  code={`<p>{{ JSON.stringify(this.config) }}</p>`}
+  domy={() => {
+    const { useConfig } = DOMY;
+    const config = useConfig();
+    return {
+      config
+    };
+  }}
+  config={{ avoidDeprecatedWith: true }}
+/>
