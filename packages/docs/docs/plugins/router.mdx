@@ -1,0 +1,137 @@
+import RouterExample from '@site/src/components/RouterExample';
+
+# Router
+
+DOMY Router enables declarative navigation and component rendering based on the current URL. It supports static, dynamic, optional, wildcard routes and catch-all fallback logic.
+
+## Installation
+
+Include the DOMY Router plugin via CDN:
+
+```html
+<script src="https://unpkg.com/@domyjs/router@1.x.x"></script>
+```
+
+---
+
+## Basic Setup
+
+Define your routes by associating a route, name, and component.
+
+```js
+function r(route, name) {
+  return {
+    route,
+    name,
+    component: DOMY.createComponent({
+      html: `<div><h1>${name}</h1></div>`
+    })
+  };
+}
+
+const routes = [r('/', 'Home'), r('/about', 'About')];
+
+const { router, RouterView, RouterLink, useRouter } = createRouter({
+  hashMode: true,
+  routes
+});
+
+DOMY.createApp(() => {
+  return { routes };
+})
+  .plugins([router])
+  .components({ RouterView, RouterLink })
+  .mount();
+```
+
+---
+
+## `<router-link>`
+
+Render links to routes with optional styling for the active one. You can also pass `params` and `query-params`;
+
+```html
+<router-link to="/about" active-class="active-link">Go to About</router-link>
+```
+
+---
+
+## `<router-view>`
+
+Render the component for the current route dynamically.
+
+```html
+<router-view transition="fade"></router-view>
+```
+
+---
+
+## Accessing Router Info
+
+Within any template or component:
+
+```html
+<p>Current Path: {{ $router.path }}</p>
+<p>Params: {{ JSON.stringify($router.params) }}</p>
+```
+
+Or with the hook:
+
+```js
+const { router, RouterView, RouterLink, useRouter } = createRouter({
+  hashMode: true,
+  routes
+});
+
+// Example
+const route = useRouter();
+route.navigate({ name: 'Home' });
+```
+
+---
+
+## Route Patterns
+
+DOMY Router supports expressive route types to match paths precisely:
+
+- **Literal** (`/home`)  
+  Matches `/home` exactly. Does not match `/home/page` or `/homepage`.
+
+- **Named Parameter** (`/:name`)  
+  Matches `/john` or `/123`. Does not match `/john/doe` or `/`.
+
+- **Optional Parameter** (`/:tab?`)  
+  Matches `/profile` or `/profile/settings`. Does not match `/profile/settings/details`.
+
+- **Rest Segment** (`/users/:path+`)  
+  Matches `/users/john`, `/users/john/settings`. Requires at least one segment after `/users`.
+
+- **Wildcard** (`/docs/:slug*`)  
+  Matches `/docs`, `/docs/intro`, `/docs/a/b/c`. Supports zero or more segments.
+
+- **Regex Constraint** (`/order/:id(\\d+)`)  
+  Matches `/order/42` but not `/order/abc`. Useful for numeric IDs.
+
+- **Catch-All (404 Fallback)** (`/:path*`)  
+  Matches any unmatched path. Should be declared last to handle unknown routes.
+
+---
+
+## Full Example
+
+```html
+<nav>
+  <router-link to="/">Home</router-link>
+  <router-link to="/about">About</router-link>
+  <router-link to="/user/42">User</router-link>
+</nav>
+
+<router-view></router-view>
+
+<footer>
+  Current route: {{ $router.path }}<br />
+  Parameters: {{ JSON.stringify($router.params) }}
+</footer>
+```
+
+<RouterExample />
