@@ -5,6 +5,6 @@
 - onError
 - $anchor
 
-- Plublish doc / make repo public
+- Finish docs/test/router for before/after and also implement beforeEach/afterEach
 - Auto release ...
 - Remove NOTE in README

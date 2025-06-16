@@ -17,22 +17,20 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install dependencies for DOMY
         run: npm install
 
       - name: Build DOMY
         run: npm run fast-build
 
-      - name: Install dependencies for the website
+      - name: Install dependencies and build the website
         run: |
           cd ./packages/docs
           npm install
-
-      - name: Build site
-        run: npm run build
+          npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: ./packages/docs/build
