@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[9693],{5665:e=>{e.exports=JSON.parse('{"title":"Hooks","description":"Domy hooks","slug":"/category/hooks","permalink":"/docs/category/hooks","navigation":{"previous":{"title":"Store","permalink":"/docs/essentials/store"},"next":{"title":"nextTick","permalink":"/docs/hooks/nextTick"}}}')}}]);

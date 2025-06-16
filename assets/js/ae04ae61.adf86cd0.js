@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[7392],{8569:s=>{s.exports=JSON.parse('{"title":"Plugins","description":"Add plugins to Domy.","slug":"/category/plugins","permalink":"/docs/category/plugins","navigation":{"previous":{"title":"$root","permalink":"/docs/helpers/$root"},"next":{"title":"Anchor","permalink":"/docs/plugins/anchor"}}}')}}]);
