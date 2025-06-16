@@ -50,7 +50,6 @@ export class Router {
   constructor(settings: Settings) {
     for (const route of settings.routes) {
       const fixedName = toKebabCase(route.name);
-      route.name = fixedName;
       this.routes.set(fixedName, route);
     }
     this.hashMode = settings.hashMode;
