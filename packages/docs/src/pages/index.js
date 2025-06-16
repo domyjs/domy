@@ -141,11 +141,6 @@ export default function Home() {
 </script>`}
               </CodeBlock>
             </div>
-            <p>
-              <Link to="/docs/get-started" className="button button--primary">
-                Learn more →
-              </Link>
-            </p>
           </div>
         </section>
       </main>
