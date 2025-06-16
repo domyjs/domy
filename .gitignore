@@ -132,3 +132,6 @@ dist
 # cypress
 cypress/downloads
 cypress/screenshots
+
+# other
+packages/domy/demo/*
