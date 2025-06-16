@@ -62,7 +62,7 @@ const features = [
   {
     title: 'Directive-Based Syntax',
     description:
-      'Build your UI declaratively using familiar directives like d-if, d-for, and d-watch.'
+      'Build your UI declaratively using familiar directives like d-if, d-for, and d-scope.'
   },
   {
     title: 'Zero Dependencies',
