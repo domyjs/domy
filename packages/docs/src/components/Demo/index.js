@@ -1,21 +1,38 @@
-import { useEffect, useRef } from 'react';
-import DOMY from '../../../../domy/dist';
+import { useEffect, useRef, useState } from 'react';
 import styles from './styles.module.css';
-
-if (!window.DOMY) window.DOMY = DOMY;
 
 const Demo = ({ code, domy, components, config, plugins }) => {
   const ref = useRef(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!ref.current) return;
-    ref.current.innerHTML = code;
-    DOMY.createApp(domy)
-      .configure(config ?? {})
-      .plugins(plugins?.() ?? [])
-      .components(components?.())
-      .mount(ref.current);
+    let mounted = true;
+    setIsClient(true);
+
+    const load = async () => {
+      if (!ref.current || typeof window === 'undefined') return;
+
+      const { default: DOMY } = await import('../../../../domy/dist');
+
+      if (!window.DOMY) window.DOMY = DOMY;
+
+      ref.current.innerHTML = code;
+      DOMY.createApp(domy)
+        .configure(config ?? {})
+        .plugins((await plugins?.()) ?? [])
+        .components(components?.())
+        .mount(ref.current);
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  // Return empty container if not on client
+  if (!isClient) return <div className={styles.demo} />;
 
   return <div className={styles.demo} ref={ref} />;
 };

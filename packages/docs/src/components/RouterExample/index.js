@@ -1,25 +1,40 @@
-import createRouter from '../../../../router';
-import DOMY from '@domyjs/core';
+import { useEffect, useState } from 'react';
 import Demo from '../Demo';
 
-function r(path, name) {
-  return {
-    route: path,
-    name,
-    component: DOMY.createComponent({
-      html: `<div><h1>${name}</h1></div>`
-    })
-  };
-}
-
-const routes = [r('/', 'Home'), r('/about', 'About'), r('/user/:id', 'User')];
-
-const { router, RouterView, RouterLink } = createRouter({
-  hashMode: true,
-  routes
-});
-
 export default function RouterExample() {
+  const [routerDeps, setRouterDeps] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      const [{ default: DOMY }, createRouter] = await Promise.all([
+        import('@domyjs/core'),
+        import('../../../../router')
+      ]);
+
+      function r(path, name) {
+        return {
+          route: path,
+          name,
+          component: DOMY.createComponent({
+            html: `<div><h1>${name}</h1></div>`
+          })
+        };
+      }
+
+      const routes = [r('/', 'Home'), r('/about', 'About'), r('/user/:id', 'User')];
+      const { router, RouterView, RouterLink } = createRouter({
+        hashMode: true,
+        routes
+      });
+
+      setRouterDeps({ router, RouterView, RouterLink });
+    };
+
+    load();
+  }, []);
+
+  if (!routerDeps) return <div>Loading DOMY router…</div>;
+
   return (
     <Demo
       code={`
@@ -37,10 +52,10 @@ export default function RouterExample() {
 </footer>
 `}
       components={() => ({
-        RouterLink,
-        RouterView
+        RouterView: routerDeps.RouterView,
+        RouterLink: routerDeps.RouterLink
       })}
-      plugins={() => [router]}
+      plugins={() => [routerDeps.router]}
     />
   );
 }
