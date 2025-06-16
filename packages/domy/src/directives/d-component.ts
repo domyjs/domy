@@ -26,7 +26,7 @@ export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirecti
 
     if (!componentName) return null;
 
-    const componentElement = document.createElement(domy.utils.kebabToCamelCase(componentName));
+    const componentElement = document.createElement(domy.utils.toKebabCase(componentName));
     for (const attr of attrs) {
       componentElement.setAttribute(domy.utils.fixeAttrName(attr.name), attr.value);
     }

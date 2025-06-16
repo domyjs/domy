@@ -85,7 +85,6 @@ export class ReactiveVariable {
     return (
       target !== null &&
       typeof target === 'object' &&
-      ['Array', 'Object'].includes(target.constructor.name) &&
       !ReactiveVariable.isReactive(target) &&
       !ReactiveVariable.shouldBeSkip(target)
     );
