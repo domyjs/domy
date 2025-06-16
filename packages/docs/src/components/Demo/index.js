@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import DOMY from '@site/static/index.js';
+import DOMY from '../../../../domy/dist';
 import styles from './styles.module.css';
 
 if (!window.DOMY) window.DOMY = DOMY;
