@@ -6,7 +6,7 @@ export default function RouterExample() {
 
   useEffect(() => {
     const load = async () => {
-      const [{ default: DOMY }, createRouter] = await Promise.all([
+      const [{ default: DOMY }, { default: createRouter }] = await Promise.all([
         import('@domyjs/core'),
         import('../../../../router')
       ]);
@@ -31,7 +31,7 @@ export default function RouterExample() {
     };
 
     load();
-  }, []);
+  }, [routerDeps]);
 
   if (!routerDeps) return <div>Loading DOMY router…</div>;
 

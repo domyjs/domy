@@ -10,18 +10,26 @@ const Demo = ({ code, domy, components, config, plugins }) => {
     setIsClient(true);
 
     const load = async () => {
-      if (!ref.current || typeof window === 'undefined') return;
+      try {
+        if (!ref.current || typeof window === 'undefined') return;
 
-      const { default: DOMY } = await import('../../../../domy/dist');
+        const { default: DOMY } = await import('../../../../domy/dist');
 
-      if (!window.DOMY) window.DOMY = DOMY;
+        if (!window.DOMY) window.DOMY = DOMY;
 
-      ref.current.innerHTML = code;
-      DOMY.createApp(domy)
-        .configure(config ?? {})
-        .plugins((await plugins?.()) ?? [])
-        .components(components?.())
-        .mount(ref.current);
+        console.log('DOMY');
+        ref.current.innerHTML = code;
+
+        const loadedPlugins = plugins ? await plugins() : [];
+
+        DOMY.createApp(domy)
+          .configure(config ?? {})
+          .plugins(loadedPlugins)
+          .components(components?.())
+          .mount(ref.current);
+      } catch (err) {
+        console.error('[Demo] Load error:', err);
+      }
     };
 
     load();
@@ -29,10 +37,10 @@ const Demo = ({ code, domy, components, config, plugins }) => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [isClient]);
 
   // Return empty container if not on client
-  if (!isClient) return <div className={styles.demo} />;
+  if (!isClient) return <div className={styles.demo}>Loading...</div>;
 
   return <div className={styles.demo} ref={ref} />;
 };
