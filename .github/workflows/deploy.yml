@@ -21,11 +21,11 @@ jobs:
         run: npm install
 
       - name: Build DOMY
-        run: npm run build
+        run: npm run fast-build
 
       - name: Install dependencies for the website
         run: |
-          cd ./packges/docs
+          cd ./packages/docs
           npm install
 
       - name: Build site
