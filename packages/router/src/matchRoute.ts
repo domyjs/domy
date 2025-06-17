@@ -27,7 +27,7 @@ export function matchRoute(route: string, path: string) {
   let pattern = route.replace(/\/+$/, '') || '/';
 
   pattern = pattern.replace(
-    /:([a-zA-Z0-9_]+)(\(.+?\))?([?*+])?(?:\/|$)/g,
+    /:([a-zA-Z0-9_]+)(\([^)]+\))?([?*+])?(?:\/|$)/g,
     function (_, paramName, regex, wildCard) {
       const matchingRegex = regex ?? '[^/]+';
       switch (wildCard) {

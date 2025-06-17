@@ -14,7 +14,7 @@ export function generateRoute(
   const query = new URLSearchParams(queryParams).toString();
   return (
     path.replace(
-      /:([a-zA-Z0-9_]+)(\(.+?\))?([?*+])?(?:\/|$)/g,
+      /:([a-zA-Z0-9_]+)(\([^)]+\))?([?*+])?(?:\/|$)/g,
       function (_, paramName: string, _regex: string, wildCard: string, offset: number, full) {
         const value = params[paramName];
 
