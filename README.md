@@ -35,16 +35,23 @@ or with the cdn
 Here’s a quick example to get you started:
 
 ```html
-<div d-scope="{ count: 0 }">
-  <p>Count: {{ count }}</p>
-  <button @click="count++">Increment</button>
-</div>
-```
+<html>
+  <head>
+    <title>My Counter!</title>
+    <script src="https://unpkg.com/@domyjs/core@1.x.x"></script>
+  </head>
 
-```html
-<script>
-  DOMY.createApp().mount();
-</script>
+  <body>
+    <div d-scope="{ count: 0 }">
+      <p>Count: {{ count }}</p>
+      <button @click="count++">Increment</button>
+    </div>
+  </body>
+
+  <script>
+    DOMY.createApp().mount();
+  </script>
+</html>
 ```
 
 # 📄 Changelog
