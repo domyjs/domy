@@ -121,12 +121,12 @@ DOMY Router supports expressive route types to match paths precisely:
 
 ```html
 <nav>
-  <router-link to="/">Home</router-link>
-  <router-link to="/about">About</router-link>
-  <router-link to="/user/42">User</router-link>
+  <router-link to="/" active-class="underline">Home</router-link>
+  <router-link to="/about" active-class="underline">About</router-link>
+  <router-link to="/user/42" active-class="underline">User</router-link>
 </nav>
 
-<router-view></router-view>
+<router-view transition="fade"></router-view>
 
 <footer>
   Current route: {{ $router.path }}<br />

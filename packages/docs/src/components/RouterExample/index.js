@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import Demo from '../Demo';
+import createRouter from '../../../../router';
+import DOMY from '../../../../domy/dist';
 
 export default function RouterExample() {
   const [routerDeps, setRouterDeps] = useState(null);
 
   useEffect(() => {
-    const load = async () => {
-      const [{ default: DOMY }, { default: createRouter }] = await Promise.all([
-        import('@domyjs/core'),
-        import('../../../../router')
-      ]);
+    if (routerDeps) return;
+
+    const load = () => {
+      if (!window.DOMY) window.DOMY = DOMY;
 
       function r(path, name) {
         return {
@@ -38,13 +39,36 @@ export default function RouterExample() {
   return (
     <Demo
       code={`
+<style>
+.underline{
+  text-decoration: underline;
+}
+
+    .fade-enter {
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .fade-enter-to {
+      opacity: 1;
+    }
+
+    .fade-out {
+      transition: all 0.3s ease;
+      opacity: 1;
+    }
+
+    .fade-out-to {
+      opacity: 0;
+    }
+</style>
 <nav>
-  <router-link to="/">Home</router-link>
-  <router-link to="/about">About</router-link>
-  <router-link to="/user/42">User</router-link>
+  <router-link to="/" active-class="underline">Home</router-link>
+  <router-link to="/about" active-class="underline">About</router-link>
+  <router-link to="/user/42" active-class="underline">User</router-link>
 </nav>
 
-<router-view></router-view>
+<router-view transition="fade"></router-view>
 
 <footer>
   Current route: {{ $router.path }}<br />
