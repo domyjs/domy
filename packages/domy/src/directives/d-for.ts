@@ -176,8 +176,9 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
       }
     }
 
-    // Render new elements
-    for (const renderFn of renderFns) {
+    // Render new elements from bottom to top
+    for (let i = renderFns.length - 1; i >= 0; --i) {
+      const renderFn = renderFns[i];
       renderFn();
     }
   });

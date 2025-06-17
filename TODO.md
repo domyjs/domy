@@ -5,7 +5,7 @@
 - onError
 - $anchor
 
-- createComponentChild
+- Render Function
 - Finish docs/test/router for before/after and also implement beforeEach/afterEach fixe transition on d-component
 - Auto release ...
 - Remove NOTE in README
