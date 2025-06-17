@@ -7,7 +7,13 @@ import { getPreviousConditionsElements } from './getPreviousConditionsElements';
 import { getReactiveHandler } from './getReactiveHandler';
 import { handleClass } from './handleClass';
 import { handleStyle } from './handleStyle';
-import { isBindAttr, isDomyAttr, isEventAttr, isNormalAttr } from './isSpecialAttribute';
+import {
+  isBindAttr,
+  isDNameAttr,
+  isDomyAttr,
+  isEventAttr,
+  isNormalAttr
+} from './isSpecialAttribute';
 import { kebabToCamelCase } from './kebabToCamelCase';
 import { error, warn } from './logs';
 import { mergeToNegativeCondition } from './mergeToNegativeCondition';
@@ -33,6 +39,7 @@ export const helpersUtils = {
   isNormalAttr,
   isEventAttr,
   isBindAttr,
+  isDNameAttr,
   warn,
   error
 };

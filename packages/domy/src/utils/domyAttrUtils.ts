@@ -1,3 +1,5 @@
+import { kebabToCamelCase } from './kebabToCamelCase';
+
 /**
  * Fixe an attribute name to avoid setAttribute throwing error
  * @param attrName
@@ -6,7 +8,12 @@
  * @author yoannchb-pro
  */
 export function fixeAttrName(attrName: string) {
-  return attrName.replace(/^@/, 'd-on:').replace(/^:/, 'd-bind:');
+  return attrName
+    .replace(/^@/, 'd-on:')
+    .replace(/^:/, 'd-bind:')
+    .replace(/#(\S+)/, function (_, name) {
+      return `d-name="${kebabToCamelCase(name)}"`;
+    });
 }
 
 /**

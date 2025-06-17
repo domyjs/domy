@@ -9,13 +9,19 @@ This directive is particularly useful inside components that need to access or i
 ## Syntax
 
 ```html
-<div d-name="MyName"></div>
+<div d-name="header"></div>
+```
+
+Or with the shortcut:
+
+```html
+<div #header></div>
 ```
 
 You can then access the named element in the component via:
 
 ```js
-$names['MyName'];
+$names['header'];
 ```
 
 ## Example

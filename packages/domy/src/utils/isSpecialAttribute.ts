@@ -22,6 +22,10 @@ export function isEventAttr(attr: string) {
   return attr.startsWith('@') || attr.startsWith('d-on:');
 }
 
+export function isDNameAttr(attr: string) {
+  return attr.startsWith('#');
+}
+
 /**
  * Check if the current attribute is a domy attribute
  * It could be a prefix like d-on:click
@@ -53,5 +57,7 @@ export function isDomyAttr(PLUGINS: Plugins, attr: string) {
  * @author yoannchb-pro
  */
 export function isNormalAttr(PLUGINS: Plugins, attr: string) {
-  return !isBindAttr(attr) && !isDomyAttr(PLUGINS, attr) && !isEventAttr(attr);
+  return (
+    !isBindAttr(attr) && !isDomyAttr(PLUGINS, attr) && !isEventAttr(attr) && !isDNameAttr(attr)
+  );
 }

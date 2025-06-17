@@ -37,6 +37,10 @@ export class Block {
     this.pluginsData.set(pluginId, data);
   }
 
+  cleanTransition() {
+    if (this.cleanupTransition) this.cleanupTransition();
+  }
+
   get el(): Element {
     return this.element instanceof Block ? this.element.el : this.element;
   }
