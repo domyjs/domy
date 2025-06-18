@@ -1,5 +1,5 @@
-import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/core';
-import DOMY from '@domyjs/core';
+import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/domy';
+import DOMY from '@domyjs/domy';
 
 declare global {
   interface Window {

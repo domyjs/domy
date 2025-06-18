@@ -21,13 +21,13 @@ Check out the [official documentation](https://domyjs.github.io/domy/) for detai
 # Installation
 
 ```
-$ npm install @domyjs/core
+$ npm install @domyjs/domy
 ```
 
 or with the cdn
 
 ```html
-<script src="https://unpkg.com/@domyjs/core@1.x.x"></script>
+<script src="https://unpkg.com/@domyjs/domy@1.x.x"></script>
 ```
 
 # 📝 Usage
@@ -38,7 +38,7 @@ Here’s a quick example to get you started:
 <html>
   <head>
     <title>My Counter!</title>
-    <script src="https://unpkg.com/@domyjs/core@1.x.x"></script>
+    <script src="https://unpkg.com/@domyjs/domy@1.x.x"></script>
   </head>
 
   <body>

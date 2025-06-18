@@ -1,4 +1,4 @@
-import type { DomyDirectiveHelper, DomyPlugin } from '@domyjs/core';
+import type { DomyDirectiveHelper, DomyPlugin } from '@domyjs/domy';
 
 enum POSITION {
   BOTTOM = 'b',

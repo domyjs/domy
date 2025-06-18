@@ -1,5 +1,5 @@
 {
-  "name": "@domyjs/core",
+  "name": "@domyjs/domy",
   "unpkg": "./dist/index.js",
   "buildName": "DOMY",
   "version": "1.0.0",

@@ -1,4 +1,4 @@
-import type { DomyPluginDefinition } from '@domyjs/core';
+import type { DomyPluginDefinition } from '@domyjs/domy';
 import { Router, Settings } from './Router';
 
 /**

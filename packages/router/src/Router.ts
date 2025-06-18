@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/no-this-alias: "off" */
-import DOMY, { Component } from '@domyjs/core';
+import DOMY, { Component } from '@domyjs/domy';
 import { toKebabCase } from './toKebabCase';
 import { matchRoute } from './matchRoute';
 import { generateRoute } from './generateRoute';

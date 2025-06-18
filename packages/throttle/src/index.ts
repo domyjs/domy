@@ -1,4 +1,4 @@
-import type { DomyPlugin, DomySpecialHelper } from '@domyjs/core';
+import type { DomyPlugin, DomySpecialHelper } from '@domyjs/domy';
 
 /**
  * Throttle utility implementation
