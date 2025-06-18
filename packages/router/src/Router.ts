@@ -4,11 +4,7 @@ import { toKebabCase } from './toKebabCase';
 import { matchRoute } from './matchRoute';
 import { generateRoute } from './generateRoute';
 
-declare global {
-  interface Window {
-    DOMY: typeof DOMY;
-  }
-}
+const _DOMY = (window as any).DOMY as typeof DOMY;
 
 type BeforeAfterParams = {
   from: FullRouteInfos;
@@ -35,7 +31,6 @@ type FullRouteInfos = {
 
 export type Settings = {
   hashMode: boolean;
-  DOMY: typeof DOMY;
   routes: Route[];
 };
 
@@ -52,7 +47,7 @@ export class Router {
     }
     this.hashMode = settings.hashMode;
 
-    this.currentRoute = window.DOMY.signal({ path: '' }).value;
+    this.currentRoute = _DOMY.signal({ path: '' }).value;
 
     this.init();
   }
@@ -212,7 +207,7 @@ export class Router {
   }
 
   public createRouterLink(): Component {
-    return window.DOMY.createComponent({
+    return _DOMY.createComponent({
       props: ['!to', 'activeClass', 'params', 'queryParams'],
       html: `
           <a :href="getRoute()" @click.prevent="navigate" d-attrs="$attrs" :class="className">
@@ -220,9 +215,9 @@ export class Router {
           </a>
         `,
       app: () => {
-        const props = window.DOMY.useProps()!;
+        const props = _DOMY.useProps()!;
 
-        const className = window.DOMY.computed(() => {
+        const className = _DOMY.computed(() => {
           const isActive = props.to.startsWith('/')
             ? props.to === this.currentRoute.path
             : props.to === this.currentRoute.route?.name;
@@ -254,12 +249,12 @@ export class Router {
       {}
     );
 
-    return window.DOMY.createComponent({
+    return _DOMY.createComponent({
       props: ['transition'],
       html: `<template d-transition.dynamic="$props.transition" d-component="componentName"></template>`,
       components,
       app: () => {
-        const componentName = window.DOMY.computed(() => {
+        const componentName = _DOMY.computed(() => {
           return this.currentRoute.route?.name ?? null;
         });
         return { componentName };

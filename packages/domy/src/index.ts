@@ -17,6 +17,7 @@ const DOMY = {
 };
 
 export default DOMY;
+
 export type * from './types/App';
 export type * from './types/Component';
 export type * from './types/Config';
