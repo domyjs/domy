@@ -14,9 +14,54 @@ Include the DOMY Router plugin via CDN:
 
 ---
 
+## Route Patterns
+
+DOMY Router supports expressive route types to match paths precisely:
+
+- **Literal** (`/home`)  
+  Matches `/home` exactly. Does not match `/home/page` or `/homepage`.
+
+- **Named Parameter** (`/:name`)  
+  Matches `/john` or `/123`. Does not match `/john/doe` or `/`.
+
+- **Optional Parameter** (`/:tab?`)  
+  Matches `/profile` or `/profile/settings`. Does not match `/profile/settings/details`.
+
+- **Rest Segment** (`/users/:path+`)  
+  Matches `/users/john`, `/users/john/settings`. Requires at least one segment after `/users`.
+
+- **Wildcard** (`/docs/:slug*`)  
+  Matches `/docs`, `/docs/intro`, `/docs/a/b/c`. Supports zero or more segments.
+
+- **Regex Constraint** (`/order/:id(\\d+)`)  
+  Matches `/order/42` but not `/order/abc`. Useful for numeric IDs.
+
+- **Catch-All (404 Fallback)** (`/:path*`)  
+  Matches any unmatched path. Should be declared last to handle unknown routes.
+
+---
+
 ## Basic Setup
 
 Define your routes by associating a route, name, and component.
+
+### Route Example
+
+```typescript
+{
+  name: 'user-profile',      // Route name
+  route: '/user/:id',        // Path pattern
+  component: UserComponent,  // Component to render
+  before({ to, from }) {     // Per-route guard
+    return fetchUser(to.params.id) ? undefined : false
+  },
+  after({ to, from }) {      // Per-route post-hook
+    logNavigation(to.path)
+  }
+}
+```
+
+### Full Setup Example
 
 ```js
 function r(route, name) {
@@ -88,103 +133,6 @@ const route = useRouter();
 route.navigate({ name: 'Home' });
 ```
 
----
-
-## Route Patterns
-
-DOMY Router supports expressive route types to match paths precisely:
-
-- **Literal** (`/home`)  
-  Matches `/home` exactly. Does not match `/home/page` or `/homepage`.
-
-- **Named Parameter** (`/:name`)  
-  Matches `/john` or `/123`. Does not match `/john/doe` or `/`.
-
-- **Optional Parameter** (`/:tab?`)  
-  Matches `/profile` or `/profile/settings`. Does not match `/profile/settings/details`.
-
-- **Rest Segment** (`/users/:path+`)  
-  Matches `/users/john`, `/users/john/settings`. Requires at least one segment after `/users`.
-
-- **Wildcard** (`/docs/:slug*`)  
-  Matches `/docs`, `/docs/intro`, `/docs/a/b/c`. Supports zero or more segments.
-
-- **Regex Constraint** (`/order/:id(\\d+)`)  
-  Matches `/order/42` but not `/order/abc`. Useful for numeric IDs.
-
-- **Catch-All (404 Fallback)** (`/:path*`)  
-  Matches any unmatched path. Should be declared last to handle unknown routes.
-
----
-
-## Navigation Hooks
-
-### `beforeEach(fn: BeforeAfterFn)`
-
-Global before hook that executes before each navigation. Can cancel or redirect the navigation.
-
-```typescript
-router.beforeEach(({ to, from }) => {
-  // Return types:
-  // - undefined/void: continue navigation
-  // - false: cancel navigation
-  // - RouteInfos: redirect to new location
-  if (!isAuthenticated() && to.name !== 'login') {
-    return { name: 'login' }; // Redirect to login
-  }
-});
-```
-
-**Return values:**
-
-- `void`: Continue navigation
-- `false`: Cancel navigation
-- `RouteInfos`: Redirect to new location
-
----
-
-### `afterEach(fn: BeforeAfterFn)`
-
-Global after hook that executes after each successful navigation.
-
-```typescript
-router.afterEach(({ to, from }) => {
-  trackPageView(to.path); // Analytics tracking
-});
-```
-
-**Note:** Cannot modify navigation, only observes.
-
----
-
-## Route Configuration
-
-### Route Object
-
-```typescript
-{
-  name: 'user-profile',      // Route name
-  route: '/user/:id',        // Path pattern
-  component: UserComponent,  // Component to render
-  before({ to, from }) {     // Per-route guard
-    return fetchUser(to.params.id) ? undefined : false
-  },
-  after({ to, from }) {      // Per-route post-hook
-    logNavigation(to.path)
-  }
-}
-```
-
----
-
-## useRouter
-
-Access router functionality in components:
-
-```typescript
-const router = useRouter(); // or router.getHelper()
-```
-
 ### Properties
 
 | Property      | Type   | Description                       |
@@ -196,7 +144,7 @@ const router = useRouter(); // or router.getHelper()
 
 ### Methods
 
-#### `navigate(routeInfos: RouteInfos)`
+#### `navigate(routeInfos)`
 
 Programmatically navigate:
 
@@ -208,7 +156,7 @@ router.navigate({
 });
 ```
 
-#### `replace(routeInfos: RouteInfos)`
+#### `replace(routeInfos)`
 
 Same as navigate but replaces current history entry.
 
@@ -221,6 +169,38 @@ Go back in history.
 Go forward in history.
 
 ---
+
+## Navigation Hooks
+
+### `beforeEach(fn)`
+
+Global before hook that executes before each navigation. Can cancel or redirect the navigation.
+
+```typescript
+router.beforeEach(({ to, from }) => {
+  if (!isAuthenticated() && to.name !== 'login') return { name: 'login' }; // Redirect to login
+});
+```
+
+**Return values:**
+
+- `void`: Continue navigation
+- `false`: Cancel navigation
+- `RouteInfos`: Redirect to new location
+
+---
+
+### `afterEach(fn)`
+
+Global after hook that executes after each successful navigation.
+
+```typescript
+router.afterEach(({ to, from }) => {
+  trackPageView(to.path); // Analytics tracking
+});
+```
+
+**Note:** Cannot modify navigation, only observes.
 
 ## Full Example
 

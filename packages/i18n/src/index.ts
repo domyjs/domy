@@ -11,13 +11,13 @@ type Settings = {
   defaultCallbackLangage: string;
 };
 
-const _DOMY = (window as any).DOMY as typeof DOMY;
+const _DOMY = () => (window as any).DOMY as typeof DOMY;
 
 class I18NHelper {
   public langage: { value: { lang: string } };
 
   constructor(public settings: Settings) {
-    this.langage = _DOMY.signal({
+    this.langage = _DOMY().signal({
       lang: this.settings.currentLangage
     });
   }
@@ -107,7 +107,7 @@ function i18n(options: Settings) {
 
   return {
     useI18n: () => {
-      const helperToHook = _DOMY.helperToHookRegistrer.getHook;
+      const helperToHook = _DOMY().helperToHookRegistrer.getHook;
       const hook = {
         t: helperToHook(i18nInstance.messageHandler.bind(i18nInstance) as any)() as ReturnType<
           I18NHelper['messageHandler']
