@@ -10,6 +10,26 @@ describe('Router test', () => {
     cy.get('footer').should('contain.text', '/');
   });
 
+  it('should execute before and cancel navigation', () => {
+    cy.get('#About').click();
+    cy.get('h1').contains('About');
+    cy.get('footer').should('contain.text', '/about');
+
+    cy.get('#CantGo').click();
+    cy.get('h1').contains('About');
+    cy.get('footer').should('contain.text', '/about');
+  });
+
+  it('should execute before and redirect to about', () => {
+    cy.get('#Params').click();
+    cy.get('h1').contains('Params');
+    cy.get('footer').should('contain.text', '5');
+
+    cy.get('#RedirectAbout').click();
+    cy.get('h1').contains('About');
+    cy.get('footer').should('contain.text', '/about');
+  });
+
   it('should navigate to About route', () => {
     cy.get('#About').click();
     cy.get('h1').contains('About');

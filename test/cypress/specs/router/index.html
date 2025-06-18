@@ -51,6 +51,8 @@
       r('/', 'Home'),
       r('/about', 'About'),
       r('/params/:id', 'Params'),
+      r('/cant-go', 'CantGo'),
+      r('/redirect-about', 'RedirectAbout'),
       r('/order/:id(\\d+)', 'Order', true),
       r('/rest/:test+', 'Rest', true),
       r('/optional/:name?', 'Optional', true),
@@ -58,9 +60,14 @@
       r('/:p*', 'NotFound', true) // catch-all
     ];
 
-    const { router, RouterView, RouterLink, useRouter } = createRouter({
+    const { router, RouterView, RouterLink, useRouter, beforeEach } = createRouter({
       hashMode: true,
       routes: registeredRoutes
+    });
+
+    beforeEach(({ from, to }) => {
+      if (to.name === 'CantGo') return false;
+      if (to.name === 'RedirectAbout') return { name: 'About' };
     });
 
     window.DIR = { router: useRouter() };

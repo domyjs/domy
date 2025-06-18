@@ -117,6 +117,111 @@ DOMY Router supports expressive route types to match paths precisely:
 
 ---
 
+## Navigation Hooks
+
+### `beforeEach(fn: BeforeAfterFn)`
+
+Global before hook that executes before each navigation. Can cancel or redirect the navigation.
+
+```typescript
+router.beforeEach(({ to, from }) => {
+  // Return types:
+  // - undefined/void: continue navigation
+  // - false: cancel navigation
+  // - RouteInfos: redirect to new location
+  if (!isAuthenticated() && to.name !== 'login') {
+    return { name: 'login' }; // Redirect to login
+  }
+});
+```
+
+**Return values:**
+
+- `void`: Continue navigation
+- `false`: Cancel navigation
+- `RouteInfos`: Redirect to new location
+
+---
+
+### `afterEach(fn: BeforeAfterFn)`
+
+Global after hook that executes after each successful navigation.
+
+```typescript
+router.afterEach(({ to, from }) => {
+  trackPageView(to.path); // Analytics tracking
+});
+```
+
+**Note:** Cannot modify navigation, only observes.
+
+---
+
+## Route Configuration
+
+### Route Object
+
+```typescript
+{
+  name: 'user-profile',      // Route name
+  route: '/user/:id',        // Path pattern
+  component: UserComponent,  // Component to render
+  before({ to, from }) {     // Per-route guard
+    return fetchUser(to.params.id) ? undefined : false
+  },
+  after({ to, from }) {      // Per-route post-hook
+    logNavigation(to.path)
+  }
+}
+```
+
+---
+
+## useRouter
+
+Access router functionality in components:
+
+```typescript
+const router = useRouter(); // or router.getHelper()
+```
+
+### Properties
+
+| Property      | Type   | Description                       |
+| ------------- | ------ | --------------------------------- |
+| `path`        | string | Current path (without query/hash) |
+| `fullPath`    | string | Full path with query/hash         |
+| `params`      | object | Current route parameters          |
+| `queryParams` | object | Parsed query parameters           |
+
+### Methods
+
+#### `navigate(routeInfos: RouteInfos)`
+
+Programmatically navigate:
+
+```typescript
+router.navigate({
+  name: 'user-profile', // or path: '/user-profile' instead of name
+  params: { id: 123 },
+  queryParams: { tab: 'settings' }
+});
+```
+
+#### `replace(routeInfos: RouteInfos)`
+
+Same as navigate but replaces current history entry.
+
+#### `goBack()`
+
+Go back in history.
+
+#### `goForward()`
+
+Go forward in history.
+
+---
+
 ## Full Example
 
 ```html

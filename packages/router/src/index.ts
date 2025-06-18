@@ -12,6 +12,9 @@ function createRouter(options: Settings) {
   const router = new Router(options);
 
   return {
+    beforeEach: router.beforeEach.bind(router),
+    afterEach: router.afterEach.bind(router),
+
     RouterView: router.createRouterView(),
     RouterLink: router.createRouterLink(),
 

@@ -11,12 +11,21 @@ type BeforeAfterParams = {
   to: FullRouteInfos;
 };
 
+export type BeforeAfterFn = (routeInfos: BeforeAfterParams) => void | RouteInfos | false;
+
+type RouteInfos = {
+  name?: string;
+  path?: string;
+  params?: Params;
+  queryParams?: QueryParams;
+};
+
 type Route = {
   name: string;
   route: string;
   component: Component;
-  before?: (routeInfos: BeforeAfterParams) => void | FullRouteInfos;
-  after?: (routeInfos: BeforeAfterParams) => void | FullRouteInfos;
+  before?: BeforeAfterFn;
+  after?: BeforeAfterFn;
 } & Record<string, any>;
 
 type Params = Record<string, string>;
@@ -57,6 +66,27 @@ export class Router {
     if (this.hashMode) window.addEventListener('hashchange', () => this.handleRouteChange());
 
     this.handleRouteChange(); // Initial route setup
+  }
+
+  private wrapBeforeAfter(name: 'before' | 'after', fn: BeforeAfterFn) {
+    for (const route of this.routes.values()) {
+      if (!route[name]) route[name] = fn;
+      else {
+        const originalFn = route[name];
+        route[name] = (...params) => {
+          originalFn(...params);
+          fn(...params);
+        };
+      }
+    }
+  }
+
+  public beforeEach(fn: BeforeAfterFn) {
+    this.wrapBeforeAfter('before', fn);
+  }
+
+  public afterEach(fn: BeforeAfterFn) {
+    this.wrapBeforeAfter('after', fn);
   }
 
   private handleRouteChange() {
@@ -111,7 +141,9 @@ export class Router {
       queryParams
     };
 
-    route?.before?.({ from, to });
+    const newDest = route?.before?.({ from, to });
+    if (newDest === false) return this.replace(this.currentRoute);
+    if (newDest) return this.replace(newDest);
 
     this.currentRoute.path = path;
     this.currentRoute.route = route;
@@ -121,12 +153,7 @@ export class Router {
     oldRoute?.after?.({ from, to });
   }
 
-  public replace(routeInfos: {
-    name?: string;
-    path?: string;
-    params?: Params;
-    queryParams?: QueryParams;
-  }) {
+  public replace(routeInfos: RouteInfos) {
     const path = routeInfos.name
       ? this.routes.get(toKebabCase(routeInfos.name))?.route
       : routeInfos.path;
@@ -147,12 +174,7 @@ export class Router {
     }
   }
 
-  public navigate(routeInfos: {
-    name?: string;
-    path?: string;
-    params?: Params;
-    queryParams?: QueryParams;
-  }) {
+  public navigate(routeInfos: RouteInfos) {
     const path = routeInfos.name
       ? this.routes.get(toKebabCase(routeInfos.name))?.route
       : routeInfos.path;
