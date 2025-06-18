@@ -1,9 +1,5 @@
-import type {
-  DomyDirectiveHelper,
-  DomyDirectiveReturn,
-  DomyPlugin
-} from '@domyjs/core/src/types/Domy';
-import type { Block } from '@domyjs/core/src/core/Block';
+import type { DomyDirectiveHelper, DomyDirectiveReturn, DomyPlugin } from '@domyjs/core';
+import type { Block } from '@domyjs/core';
 
 /**
  * Handler for the IntersectionObserver

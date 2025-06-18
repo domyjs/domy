@@ -1,8 +1,4 @@
-import type {
-  DomyDirectiveHelper,
-  DomyDirectiveReturn,
-  DomyPlugin
-} from '@domyjs/core/src/types/Domy';
+import type { DomyDirectiveHelper, DomyDirectiveReturn, DomyPlugin } from '@domyjs/core';
 
 type CollapseSettings = {
   defaultHeight?: number;

@@ -1,4 +1,4 @@
-import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/core/src/types/Domy';
+import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/core';
 import DOMY from '@domyjs/core';
 
 declare global {

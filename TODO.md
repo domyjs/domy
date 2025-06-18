@@ -6,6 +6,7 @@
 - $anchor
 
 - Render Function
-- Finish docs/test/router for before/after and also implement beforeEach/afterEach fixe transition on d-component
+- Fixe transition on d-component/d-inset.render
+- Finish docs/test/router for before/after and also implement beforeEach/afterEach
 - Auto release ...
 - Remove NOTE in README

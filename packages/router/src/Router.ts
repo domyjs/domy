@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/no-this-alias: "off" */
-import DOMY from '@domyjs/core';
+import DOMY, { Component } from '@domyjs/core';
 import { toKebabCase } from './toKebabCase';
 import { matchRoute } from './matchRoute';
 import { generateRoute } from './generateRoute';
@@ -38,8 +38,6 @@ export type Settings = {
   DOMY: typeof DOMY;
   routes: Route[];
 };
-
-type Component = ReturnType<(typeof DOMY)['createComponent']>;
 
 export class Router {
   private routes = new Map<string, Route>();

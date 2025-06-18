@@ -17,3 +17,10 @@ const DOMY = {
 };
 
 export default DOMY;
+export type * from './types/App';
+export type * from './types/Component';
+export type * from './types/Config';
+export type * from './types/Domy';
+export type * from './types/Helpers';
+export type * from './types/State';
+export type { Block } from './core/Block';
