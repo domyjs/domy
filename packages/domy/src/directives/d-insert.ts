@@ -45,7 +45,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     // Handle remove transition and unmount the last render
     if (lastRenders.length > 0) {
       // Ensure we have a max of two elements (the one entering and the one leaving) as same time
-      while (lastRenders.length > 1) lastRenders.shift()!.getEl().remove();
+      while (lastRenders.length > 1) lastRenders[0].cleanTransition();
 
       // We unmount the current lastRender not the current block otherwise this effect will be unmount too
       const lastRender = lastRenders[lastRenders.length - 1];
