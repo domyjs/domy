@@ -6,5 +6,4 @@
 - $anchor
 - Render Function
 
-- Fixe transition on d-component/d-inset.render
 - Auto release ...
