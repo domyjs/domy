@@ -15,7 +15,7 @@ class CollapsePlugin {
    * @author yoannchb-pro
    */
   collapseSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-    if (!domy.block.el.getAttribute('d-collapse'))
+    if (!domy.block.getEl().getAttribute('d-collapse'))
       throw new Error(
         `(Collapse) The "d-collapse" directive as to be placed after "d-collapse-settings" directive (and not before).`
       );
@@ -33,7 +33,7 @@ class CollapsePlugin {
    * @author yoannchb-pro
    */
   collapsePlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-    const el = domy.block.el as HTMLElement;
+    const el = domy.block.getEl() as HTMLElement;
     const settings: CollapseSettings = domy.block.getDataForPluginId('collapse-settings') ?? {};
     const heightAutoEvent = () => (el.style.height = 'auto');
 

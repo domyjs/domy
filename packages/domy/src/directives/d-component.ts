@@ -11,7 +11,7 @@ export function dComponentImplementation(domy: DomyDirectiveHelper): DomyDirecti
   if (!domy.block.isTemplate())
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
 
-  const el = domy.block.el as HTMLTemplateElement;
+  const el = domy.block.getEl() as HTMLTemplateElement;
   const childs = Array.from(el.content.childNodes);
   const attrs = el.attributes;
 

@@ -127,7 +127,7 @@ function anchorPlugin(domy: DomyDirectiveHelper) {
       );
     }
 
-    const target = domy.block.el as HTMLElement;
+    const target = domy.block.getEl() as HTMLElement;
     const position = (domy.modifiers[0] as POSITION) || POSITION.BOTTOM;
 
     target.style.display = 'none';

@@ -23,7 +23,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
 
   const shouldBeRender = domy.modifiers.includes('render');
-  const originalEl = domy.block.el;
+  const originalEl = domy.block.getEl();
 
   const tracePositionComment = new Comment('d-insert position tracking, do not remove');
   originalEl.before(tracePositionComment);

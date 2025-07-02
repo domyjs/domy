@@ -14,7 +14,7 @@ import { handleStyle } from '../utils/handleStyle';
  * @author yoannchb-pro
  */
 export function binding(domy: DomyDirectiveHelper) {
-  const el = domy.block.el as HTMLElement;
+  const el = domy.block.getEl() as HTMLElement;
   const attrName = domy.attrName;
   const isStyle = attrName === 'style';
   const isClass = attrName === 'class';

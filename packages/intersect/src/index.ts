@@ -37,7 +37,7 @@ class IntersectionHandler {
   }
 
   observe(block: Block, action: (isIntersecting: boolean) => void) {
-    let pastEl = block.el;
+    let pastEl = block.getEl();
     block.onElementChange(newEl => {
       const pastInfos = this.elements.get(pastEl)!;
       this.elements.delete(pastEl);
@@ -52,8 +52,8 @@ class IntersectionHandler {
   }
 
   unobserve(block: Block) {
-    this.elements.delete(block.el);
-    this.obs.unobserve(block.el);
+    this.elements.delete(block.getEl());
+    this.obs.unobserve(block.getEl());
   }
 
   disconnect() {
@@ -74,7 +74,10 @@ class IntersectPlugin {
   }
 
   intersectSettingsPlugin(domy: DomyDirectiveHelper): DomyDirectiveReturn {
-    if (!domy.block.el.getAttribute('d-intersect') && !domy.block.el.getAttribute('d-unintersect'))
+    if (
+      !domy.block.getEl().getAttribute('d-intersect') &&
+      !domy.block.getEl().getAttribute('d-unintersect')
+    )
       throw new Error(
         `(Intersect) The "d-intersect" or "d-unintersect" directive as to be placed after "d-intersect-settings" directive (and not before).`
       );
@@ -109,7 +112,7 @@ class IntersectPlugin {
 
         uneffect =
           domy.effect(() => {
-            const el = domy.block.el as HTMLElement;
+            const el = domy.block.getEl() as HTMLElement;
 
             const executedValue = domy.evaluate(domy.attr.value);
 

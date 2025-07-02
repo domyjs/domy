@@ -159,7 +159,7 @@ export class DomyHelper {
 
     const context = getContext({
       domyHelperId: this.domyHelperId,
-      el: this.block.el,
+      el: this.block.getEl(),
       state: this.state,
       scopedNodeData: scope ? [...this.scopedNodeData, scope] : this.scopedNodeData,
       config: this.config,

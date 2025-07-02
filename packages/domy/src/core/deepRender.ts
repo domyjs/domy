@@ -43,7 +43,7 @@ export function createDeepRenderFn(
   // Deep render function for a specific block/element
   return function deepRender(props: Props) {
     const rootBlock = props.element instanceof Block ? props.element : new Block(props.element);
-    const rootElement = rootBlock.el;
+    const rootElement = rootBlock.getEl();
 
     const toRenderList: (Elem | (() => void))[] = [
       {
@@ -81,15 +81,15 @@ export function createDeepRenderFn(
       } else {
         // If the element doesn't have a next sibling then on the next render we want to ensure the mounted event on this element is dispatched
         toRenderList.push(() =>
-          block.el.dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted))
+          block.getEl().dispatchEvent(new CustomEvent(DOMY_EVENTS.Element.Mounted))
         );
       }
 
       const safeDeepRender = (args: Props) => {
         const render = deepRender(args);
 
-        const argElement = args.element instanceof Block ? args.element.el : args.element;
-        const isCurrentElement = argElement === block.el;
+        const argElement = args.element instanceof Block ? args.element.getEl() : args.element;
+        const isCurrentElement = argElement === block.getEl();
         if (isCurrentElement) {
           // If deep render is called on the current element we skip the current rendering to avoid errors
           skipChildRendering = true;
@@ -127,7 +127,7 @@ export function createDeepRenderFn(
       const attrs = Array.from(element.attributes ?? []);
 
       for (const attr of attrs) {
-        if (!block.el.hasAttribute(attr.name)) continue;
+        if (!block.getEl().hasAttribute(attr.name)) continue;
 
         const shouldByPassAttribute =
           props.byPassAttributes && props.byPassAttributes.includes(attr.name);

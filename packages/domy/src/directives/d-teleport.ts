@@ -13,7 +13,7 @@ export function dTeleportImplementation(domy: DomyDirectiveHelper): DomyDirectiv
     throw Error(`The directive "${domy.directive}" should only be use on template element.`);
 
   function teleport() {
-    const el = domy.block.el as HTMLTemplateElement;
+    const el = domy.block.getEl() as HTMLTemplateElement;
 
     const childs = Array.from(el.content.childNodes);
     const target = document.querySelector(domy.attr.value);

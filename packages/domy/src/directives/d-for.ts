@@ -44,7 +44,7 @@ function moveToIndexBetweenComments(
 export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   let currentLoopId = 0;
 
-  const originalEl = domy.block.el;
+  const originalEl = domy.block.getEl();
   const rawKey = originalEl.getAttribute('d-key');
 
   const traceStartPositionComment = new Comment('d-for start position tracking, do not remove');
@@ -113,7 +113,7 @@ export function dForImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
         if (oldRender) {
           canUseTemplate = false;
 
-          const oldRenderEl = oldRender.render.el;
+          const oldRenderEl = oldRender.render.getEl();
           const oldRenderIndex = oldRender.reactiveIndex.value;
 
           // Update the index if needed
