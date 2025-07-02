@@ -40,25 +40,30 @@ export default function RouterExample() {
     <Demo
       code={`
 <style>
-.underline{
-  text-decoration: underline;
-}
+    .underline{
+      text-decoration: underline;
+    }
 
-    .fade-enter {
-      transition: all 0.3s ease;
+    .slide-enter {
+      position: absolute;
+      transition: all 0.5s ease;
+      transform: translateX(5rem);
       opacity: 0;
     }
 
-    .fade-enter-to {
+    .slide-enter-to {
+      transform: translateX(0rem);
       opacity: 1;
     }
 
-    .fade-out {
-      transition: all 0.3s ease;
+    .slide-out {
+      position: absolute;
+      transition: all 0.5s ease;
       opacity: 1;
     }
 
-    .fade-out-to {
+    .slide-out-to {
+      transform: translateX(-5rem);
       opacity: 0;
     }
 </style>
@@ -68,7 +73,9 @@ export default function RouterExample() {
   <router-link to="/user/42" active-class="underline">User</router-link>
 </nav>
 
-<router-view transition="fade"></router-view>
+<div style="height: 4rem; position: relative; overflow: hidden">
+  <router-view transition="slide"></router-view>
+</div>
 
 <footer>
   Current route: {{ $router.path }}<br />
