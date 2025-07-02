@@ -53,7 +53,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
       lastRender.applyTransition('outTransition', () => {
         lastRender.getEl().remove();
         const index = lastRenders.indexOf(lastRender);
-        lastRenders.splice(index, 1);
+        if (index !== -1) lastRenders.splice(index, 1);
       });
       lastRender.unmount();
     }
@@ -80,7 +80,7 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
     }
 
     // Handle enter transition
-    if (!isInit || domy.block.transition?.init) {
+    if (isInit || domy.block.transition?.init) {
       const lastRender = lastRenders[lastRenders.length - 1];
       lastRender.transition = domy.block.transition;
       lastRender.applyTransition('enterTransition');
