@@ -119,6 +119,17 @@ export class Router {
     return null;
   }
 
+  private isEqual(from: FullRouteInfos, to: FullRouteInfos): boolean {
+    const isSameName = from.name === to.name;
+    const isSamePath = from.route?.route === to.route?.route;
+
+    const isSameParams = JSON.stringify(from.params ?? {}) === JSON.stringify(to.params ?? {});
+    const isSameQuery =
+      JSON.stringify(from.queryParams ?? {}) === JSON.stringify(to.queryParams ?? {});
+
+    return isSameName && isSamePath && isSameParams && isSameQuery;
+  }
+
   private push(
     path: string,
     route?: Route,
@@ -140,6 +151,8 @@ export class Router {
       params,
       queryParams
     };
+
+    if (this.isEqual(from, to)) return;
 
     const newDest = route?.before?.({ from, to });
     if (newDest === false) return this.replace(this.currentRoute);
