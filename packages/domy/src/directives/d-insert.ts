@@ -22,14 +22,15 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
   if (!domy.block.isTemplate())
     throw new Error(`The directive "${domy.directive}" sould only be use on template element.`);
 
+  let isInit = false;
   const shouldBeRender = domy.modifiers.includes('render');
-  const originalEl = domy.block.el;
+  const originalEl = domy.block.getEl();
 
   const tracePositionComment = new Comment('d-insert position tracking, do not remove');
   originalEl.before(tracePositionComment);
   originalEl.remove();
 
-  let lastRender: Block | null = null;
+  const lastRenders: Block[] = [];
 
   domy.cleanup(() => {
     tracePositionComment.remove();
@@ -42,36 +43,50 @@ export function dInsertImplementation(domy: DomyDirectiveHelper): DomyDirectiveR
       throw new Error(`The directive "${domy.directive}" only support one element as parameter.`);
 
     // Handle remove transition and unmount the last render
-    if (lastRender) {
+    if (lastRenders.length > 0) {
+      // Ensure we have a max of two elements (the one entering and the one leaving) as same time
+      while (lastRenders.length > 1) lastRenders[0].cleanTransition();
+
       // We unmount the current lastRender not the current block otherwise this effect will be unmount too
+      const lastRender = lastRenders[lastRenders.length - 1];
       lastRender.transition = domy.block.transition;
-      lastRender.remove();
+      lastRender.applyTransition('outTransition', () => {
+        lastRender.getEl().remove();
+        const index = lastRenders.indexOf(lastRender);
+        if (index !== -1) lastRenders.splice(index, 1);
+      });
       lastRender.unmount();
     }
 
     // Handle the case we don't have any element to render
-    if (!elementToRender) {
-      return (lastRender = null);
-    }
+    if (!elementToRender) return;
 
     // We restore the element to his original position
     tracePositionComment.after(elementToRender);
 
     // Render the element
     if (shouldBeRender) {
-      lastRender = domy.deepRender({
+      const newRender = domy.deepRender({
         element: elementToRender,
         scopedNodeData: domy.scopedNodeData
       });
 
-      domy.block.setEl(lastRender);
+      lastRenders.push(newRender);
+      domy.block.setEl(newRender);
     } else {
       domy.block.setEl(elementToRender);
-      lastRender = domy.block.createNewElementBlock(); // avoid unmounting the template
+      const newBlock = domy.block.createNewElementBlock(); // avoid unmounting the template
+      lastRenders.push(newBlock);
     }
 
     // Handle enter transition
-    domy.block.applyTransition('enterTransition');
+    if (isInit || domy.block.transition?.init) {
+      const lastRender = lastRenders[lastRenders.length - 1];
+      lastRender.transition = domy.block.transition;
+      lastRender.applyTransition('enterTransition');
+    }
+
+    isInit = true;
   });
 
   return {

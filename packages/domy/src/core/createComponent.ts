@@ -180,7 +180,7 @@ export function createComponent(
 
           domy.lockWatchers();
           // Insert initial render
-          let childEl: Element | undefined = domy.skipReactive(childBlock.el);
+          let childEl: Element | undefined = domy.skipReactive(childBlock.getEl());
           childEl = childEl.parentNode ? childEl : undefined;
           childrensCache.push(childEl);
           if (childBlock.name) names[childBlock.name] = childEl;

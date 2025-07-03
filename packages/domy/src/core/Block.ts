@@ -37,8 +37,8 @@ export class Block {
     this.pluginsData.set(pluginId, data);
   }
 
-  get el(): Element {
-    return this.element instanceof Block ? this.element.el : this.element;
+  cleanTransition() {
+    if (this.cleanupTransition) this.cleanupTransition();
   }
 
   private callCbForElementChange(newEl: Element) {
@@ -48,7 +48,7 @@ export class Block {
   }
 
   createNewElementBlock() {
-    return new Block(this.el);
+    return new Block(this.getEl());
   }
 
   attachListener(
@@ -56,9 +56,9 @@ export class Block {
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ) {
-    let backEl = this.el;
+    let backEl = this.getEl();
 
-    this.el.addEventListener(type, listener, options);
+    backEl.addEventListener(type, listener, options);
 
     this.onElementChange(newEl => {
       backEl.removeEventListener(type, listener, options);
@@ -73,23 +73,28 @@ export class Block {
 
   setEl(newEl: Element | Block) {
     this.element = newEl;
-    this.callCbForElementChange(this.el);
+    this.callCbForElementChange(this.getEl());
+  }
+
+  getEl(): Element {
+    return this.element instanceof Block ? this.element.getEl() : this.element;
   }
 
   applyTransition(transitionType: TransitionType, action?: () => void) {
     if (this.cleanupTransition) this.cleanupTransition();
     if (!this.transition) return action && action();
 
+    const currentEl = this.getEl();
     const transitionName = this.transition[transitionType];
-    this.el.classList.add(transitionName);
+    currentEl.classList.add(transitionName);
 
     requestAnimationFrame(() => {
       const transitionNameTo = this.transition![`${transitionType}To`];
-      this.el.classList.add(transitionNameTo);
+      currentEl.classList.add(transitionNameTo);
 
-      this.cleanupTransition = executeActionAfterAnimation(this.el, () => {
-        this.el.classList.remove(transitionName);
-        this.el.classList.remove(transitionNameTo);
+      this.cleanupTransition = executeActionAfterAnimation(currentEl, () => {
+        currentEl.classList.remove(transitionName);
+        currentEl.classList.remove(transitionNameTo);
         if (action) action();
         this.cleanupTransition = null;
       });
@@ -97,26 +102,27 @@ export class Block {
   }
 
   replaceWith(newEl: Element | Block) {
-    const oldEl = this.el;
+    const oldEl = this.getEl();
     this.setEl(newEl);
-    oldEl.replaceWith(this.el);
+    oldEl.replaceWith(this.getEl());
   }
 
   remove() {
-    this.applyTransition('outTransition', () => this.el.remove());
+    const currentEl = this.getEl();
+    this.applyTransition('outTransition', () => currentEl.remove());
   }
 
   isTemplate() {
-    return this.el.tagName.toLowerCase() === 'template';
+    return this.getEl().tagName.toLowerCase() === 'template';
+  }
+
+  isTextNode() {
+    return this.getEl().nodeType === Node.TEXT_NODE;
   }
 
   addCleanup(cleanup: () => void) {
     this.cleanups.push(cleanup);
     if (this.parentBlock) this.parentBlock.addCleanup(cleanup);
-  }
-
-  isTextNode() {
-    return this.el.nodeType === Node.TEXT_NODE;
   }
 
   unmount() {

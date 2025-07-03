@@ -1,4 +1,4 @@
-import type { DomyPlugin, DomySpecialHelper } from '@domyjs/core/src/types/Domy';
+import type { DomyPlugin, DomySpecialHelper } from '@domyjs/domy';
 
 /**
  * Debounce utility implementation

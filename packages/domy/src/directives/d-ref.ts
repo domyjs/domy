@@ -22,7 +22,7 @@ export function dRefImplementation(domy: DomyDirectiveHelper): DomyDirectiveRetu
   }
   function updateRef() {
     isFirstRefInit = false;
-    domy.state.refs[refName] = domy.skipReactive(domy.block.el);
+    domy.state.refs[refName] = domy.skipReactive(domy.block.getEl());
   }
 
   if (isDynamic) {

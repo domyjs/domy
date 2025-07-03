@@ -11,10 +11,10 @@ import { DomyDirectiveHelper } from '../types/Domy';
  * @author yoannchb-pro
  */
 export function renderText(domy: DomyDirectiveHelper) {
-  const originalTextContent = domy.block.el.textContent ?? '';
+  const originalTextContent = domy.block.getEl().textContent ?? '';
 
   domy.effect(() => {
-    domy.block.el.textContent = originalTextContent.replace(
+    domy.block.getEl().textContent = originalTextContent.replace(
       /\{\{\s*(?<org>.+?)\s*\}\}/g,
       function (_, code) {
         return domy.evaluate(code);

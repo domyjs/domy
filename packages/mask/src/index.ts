@@ -1,8 +1,4 @@
-import type {
-  DomyDirectiveHelper,
-  DomyDirectiveReturn,
-  DomyPluginDefinition
-} from '@domyjs/core/src/types/Domy';
+import type { DomyDirectiveHelper, DomyDirectiveReturn, DomyPluginDefinition } from '@domyjs/domy';
 
 const WILDCARDS = {
   '9': /\d/,
@@ -126,7 +122,7 @@ function staticMaskDirective(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const maskPattern = domy.attr.value;
   if (!maskPattern) return;
 
-  const el = domy.block.el as HTMLInputElement;
+  const el = domy.block.getEl() as HTMLInputElement;
 
   const inputHandler = () => {
     const oldValue = el.value;
@@ -161,7 +157,7 @@ function staticMaskDirective(domy: DomyDirectiveHelper): DomyDirectiveReturn {
  */
 function dynamicMaskDirective(domy: DomyDirectiveHelper): DomyDirectiveReturn {
   const getMask = domy.evaluate(domy.attr.value);
-  const el = domy.block.el as HTMLInputElement;
+  const el = domy.block.getEl() as HTMLInputElement;
 
   const resolveMask = (input: string): string | null => {
     if (typeof getMask === 'function') return getMask(input);

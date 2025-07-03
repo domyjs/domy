@@ -1,11 +1,5 @@
-import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/core/src/types/Domy';
-import DOMY from '@domyjs/core';
-
-declare global {
-  interface Window {
-    DOMY: typeof DOMY;
-  }
-}
+import type { DomyPluginDefinition, DomySpecialHelper } from '@domyjs/domy';
+import DOMY from '@domyjs/domy';
 
 type Dict = {
   [key: string]: string | Dict;
@@ -17,11 +11,15 @@ type Settings = {
   defaultCallbackLangage: string;
 };
 
+const _DOMY = () => (window as any).DOMY as typeof DOMY;
+
 class I18NHelper {
   public langage: { value: { lang: string } };
 
   constructor(public settings: Settings) {
-    this.langage = window.DOMY.signal({ lang: this.settings.currentLangage });
+    this.langage = _DOMY().signal({
+      lang: this.settings.currentLangage
+    });
   }
 
   getHook() {
@@ -109,7 +107,7 @@ function i18n(options: Settings) {
 
   return {
     useI18n: () => {
-      const helperToHook = window.DOMY.helperToHookRegistrer.getHook;
+      const helperToHook = _DOMY().helperToHookRegistrer.getHook;
       const hook = {
         t: helperToHook(i18nInstance.messageHandler.bind(i18nInstance) as any)() as ReturnType<
           I18NHelper['messageHandler']

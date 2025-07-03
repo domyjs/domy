@@ -15,7 +15,7 @@ type Props = {
  */
 export function getElementVisibilityHandler(props: Props) {
   const domy = props.domy;
-  const originalEl = domy.block.el;
+  const originalEl = domy.block.getEl();
 
   const tracePositionComment = new Comment('d-if position tracking, do not remove');
   originalEl.before(tracePositionComment);
@@ -32,7 +32,7 @@ export function getElementVisibilityHandler(props: Props) {
    * @author yoannchb-pro
    */
   function handleVisibility() {
-    const isConnected = !!lastRender.el.parentNode;
+    const isConnected = !!lastRender.getEl().parentNode;
     const shouldBeDisplay = props.shouldBeDisplay();
 
     if (isConnected && !shouldBeDisplay) {

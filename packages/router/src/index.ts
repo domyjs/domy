@@ -1,4 +1,4 @@
-import type { DomyPluginDefinition } from '@domyjs/core/src/types/Domy';
+import type { DomyPluginDefinition } from '@domyjs/domy';
 import { Router, Settings } from './Router';
 
 /**
@@ -12,12 +12,16 @@ function createRouter(options: Settings) {
   const router = new Router(options);
 
   return {
+    beforeEach: router.beforeEach.bind(router),
+    afterEach: router.afterEach.bind(router),
+
     RouterView: router.createRouterView(),
     RouterLink: router.createRouterLink(),
 
     useRouter: router.getHelper.bind(router),
 
     router(domyPluginSetter: DomyPluginDefinition): void {
+      router.init();
       domyPluginSetter.helper('router', () => router.getHelper());
     }
   };

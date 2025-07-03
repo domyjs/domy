@@ -98,7 +98,7 @@ export default function Home() {
             <p>This is a simple counter example with DOMY.js:</p>
             <div className={styles.codeBlock}>
               <CodeBlock language="html">
-                {`<script src="https://unpkg.com/@domyjs/core@1.x.x"></script>
+                {`<script src="https://unpkg.com/@domyjs/domy@1.x.x"></script>
 
 <p>Count: {{ count }}</p>
 <button @click="count++">Increment</button>
@@ -128,7 +128,7 @@ export default function Home() {
             </p>
             <div className={styles.codeBlock}>
               <CodeBlock language="html">
-                {`<script src="https://unpkg.com/@domyjs/core@1.x.x"></script>
+                {`<script src="https://unpkg.com/@domyjs/domy@1.x.x"></script>
 
 <div d-scope="{ count: 0 }">
   <p>Count: {{ count }}</p>

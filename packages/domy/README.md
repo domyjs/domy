@@ -51,19 +51,3 @@ Here’s a quick example to get you started:
   </script>
 </html>
 ```
-
-# 🤝 Contributing
-
-We welcome contributions of all kinds! Check out our [Contributing Guide](./CONTRIBUTE.md) for details on how to get started.
-
-# 👮‍♂️ Code of conduct
-
-Check out our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) for details.
-
-# 💎 Contact
-
-If you have any questions or feedback, feel free to open an issue.
-
-# 💜 License
-
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.

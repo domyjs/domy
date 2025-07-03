@@ -7,7 +7,7 @@
   "types": "./dist/index.d.ts",
   "buildName": "debounce",
   "files": [
-    "/dist",
+    "./dist",
     "package.json",
     "README.md"
   ],
@@ -26,5 +26,5 @@
   "bugs": {
     "url": "https://github.com/yoannchb-pro/domy/issues"
   },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme"
+  "homepage": "https://domyjs.github.io/domy/docs/plugins/debounce"
 }

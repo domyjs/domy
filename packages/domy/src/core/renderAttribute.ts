@@ -1,3 +1,4 @@
+import { dNameImplementation } from '../directives/d-name';
 import { DomyDirectiveHelper, DomyDirectiveReturn } from '../types/Domy';
 import { binding } from './binding';
 import { events } from './events';
@@ -26,6 +27,12 @@ export function renderAttribute(domy: DomyDirectiveHelper): DomyDirectiveReturn 
   // Handle event attribute like @click
   if (domy.utils.isEventAttr(domy.attr.name)) {
     return events(domy);
+  }
+
+  // Handle d-name shortcut like #
+  if (domy.utils.isDNameAttr(domy.attr.name)) {
+    domy.attr.value = domy.utils.kebabToCamelCase(domy.attr.name.replace(/^#/, ''));
+    return dNameImplementation(domy);
   }
 
   // Handle domy attribute like d-for, d-if, ...

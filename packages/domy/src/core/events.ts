@@ -13,7 +13,7 @@ import on from '../utils/on';
 export function events(domy: DomyDirectiveHelper) {
   const queueId = domy.getUniqueQueueId();
   const eventName = domy.attrName;
-  let el = domy.block.el;
+  let el = domy.block.getEl();
 
   let removeEventListener: (() => void) | null = null;
 

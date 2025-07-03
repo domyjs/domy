@@ -9,6 +9,6 @@ import { DomyDirectiveHelper } from '../types/Domy';
  */
 export function dHtmlImplementation(domy: DomyDirectiveHelper) {
   domy.effect(() => {
-    domy.block.el.innerHTML = domy.evaluate(domy.attr.value);
+    domy.block.getEl().innerHTML = domy.evaluate(domy.attr.value);
   });
 }

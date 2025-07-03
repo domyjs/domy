@@ -14,9 +14,54 @@ Include the DOMY Router plugin via CDN:
 
 ---
 
+## Route Patterns
+
+DOMY Router supports expressive route types to match paths precisely:
+
+- **Literal** (`/home`)  
+  Matches `/home` exactly. Does not match `/home/page` or `/homepage`.
+
+- **Named Parameter** (`/:name`)  
+  Matches `/john` or `/123`. Does not match `/john/doe` or `/`.
+
+- **Optional Parameter** (`/:tab?`)  
+  Matches `/profile` or `/profile/settings`. Does not match `/profile/settings/details`.
+
+- **Rest Segment** (`/users/:path+`)  
+  Matches `/users/john`, `/users/john/settings`. Requires at least one segment after `/users`.
+
+- **Wildcard** (`/docs/:slug*`)  
+  Matches `/docs`, `/docs/intro`, `/docs/a/b/c`. Supports zero or more segments.
+
+- **Regex Constraint** (`/order/:id(\\d+)`)  
+  Matches `/order/42` but not `/order/abc`. Useful for numeric IDs.
+
+- **Catch-All (404 Fallback)** (`/:path*`)  
+  Matches any unmatched path. Should be declared last to handle unknown routes.
+
+---
+
 ## Basic Setup
 
 Define your routes by associating a route, name, and component.
+
+### Route Example
+
+```typescript
+{
+  name: 'user-profile',      // Route name
+  route: '/user/:id',        // Path pattern
+  component: UserComponent,  // Component to render
+  before({ to, from }) {     // Per-route guard
+    return fetchUser(to.params.id) ? undefined : false
+  },
+  after({ to, from }) {      // Per-route post-hook
+    logNavigation(to.path)
+  }
+}
+```
+
+### Full Setup Example
 
 ```js
 function r(route, name) {
@@ -88,34 +133,82 @@ const route = useRouter();
 route.navigate({ name: 'Home' });
 ```
 
+### Properties
+
+| Property      | Type   | Description                       |
+| ------------- | ------ | --------------------------------- |
+| `path`        | string | Current path (without query/hash) |
+| `fullPath`    | string | Full path with query/hash         |
+| `params`      | object | Current route parameters          |
+| `queryParams` | object | Parsed query parameters           |
+
+### Methods
+
+#### `navigate(routeInfos)`
+
+Programmatically navigate:
+
+```typescript
+router.navigate({
+  name: 'user-profile', // or path: '/user/:id' instead of name
+  params: { id: 123 },
+  queryParams: { tab: 'settings' }
+});
+```
+
+#### `replace(routeInfos)`
+
+Same as navigate but replaces current history entry.
+
+#### `go(delta)`
+
+Like the `window.history.go()` method.
+
+#### `goBack()`
+
+Go back in history.
+
+#### `goForward()`
+
+Go forward in history.
+
+#### `destroy()`
+
+Remove the popstate/hashchange listener.
+
 ---
 
-## Route Patterns
+## Navigation Hooks
 
-DOMY Router supports expressive route types to match paths precisely:
+### `beforeEach(fn)`
 
-- **Literal** (`/home`)  
-  Matches `/home` exactly. Does not match `/home/page` or `/homepage`.
+Global before hook that executes before each navigation. Can cancel or redirect the navigation.
 
-- **Named Parameter** (`/:name`)  
-  Matches `/john` or `/123`. Does not match `/john/doe` or `/`.
+```typescript
+router.beforeEach(({ to, from }) => {
+  if (!isAuthenticated() && to.name !== 'login') return { name: 'login' }; // Redirect to login
+});
+```
 
-- **Optional Parameter** (`/:tab?`)  
-  Matches `/profile` or `/profile/settings`. Does not match `/profile/settings/details`.
+**Return values:**
 
-- **Rest Segment** (`/users/:path+`)  
-  Matches `/users/john`, `/users/john/settings`. Requires at least one segment after `/users`.
-
-- **Wildcard** (`/docs/:slug*`)  
-  Matches `/docs`, `/docs/intro`, `/docs/a/b/c`. Supports zero or more segments.
-
-- **Regex Constraint** (`/order/:id(\\d+)`)  
-  Matches `/order/42` but not `/order/abc`. Useful for numeric IDs.
-
-- **Catch-All (404 Fallback)** (`/:path*`)  
-  Matches any unmatched path. Should be declared last to handle unknown routes.
+- `void`: Continue navigation
+- `false`: Cancel navigation
+- `RouteInfos`: Redirect to new location
 
 ---
+
+### `afterEach(fn)`
+
+Global after hook that executes after each successful navigation.
+
+```typescript
+router.afterEach(({ to, from }) => {
+  trackPageView(to.path); // Analytics tracking
+});
+```
+
+**Note:** Cannot modify navigation, only observes.
 
 ## Full Example
 
@@ -126,7 +219,7 @@ DOMY Router supports expressive route types to match paths precisely:
   <router-link to="/user/42" active-class="underline">User</router-link>
 </nav>
 
-<router-view transition="fade"></router-view>
+<router-view transition="slide"></router-view>
 
 <footer>
   Current route: {{ $router.path }}<br />

@@ -28,18 +28,18 @@
           });
 
           domyPluginSetter.directive('after', domy => {
-            domy.block.el.textContent = msg;
+            domy.block.getEl().textContent = msg;
           });
 
           domyPluginSetter.directive('uppercase', domy => {
-            domy.block.el.textContent = domy.block.el.textContent.toUpperCase();
+            domy.block.getEl().textContent = domy.block.getEl().textContent.toUpperCase();
           });
 
           domyPluginSetter.helper('sayHello', () => 'Hello World!');
 
           domyPluginSetter.prefix('click', domy => {
-            domy.block.el.addEventListener('click', () => {
-              domy.block.el.setAttribute(domy.attrName, domy.attr.value);
+            domy.block.getEl().addEventListener('click', () => {
+              domy.block.getEl().setAttribute(domy.attrName, domy.attr.value);
             });
           });
         }
