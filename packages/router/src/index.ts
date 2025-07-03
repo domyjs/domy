@@ -21,6 +21,7 @@ function createRouter(options: Settings) {
     useRouter: router.getHelper.bind(router),
 
     router(domyPluginSetter: DomyPluginDefinition): void {
+      router.init();
       domyPluginSetter.helper('router', () => router.getHelper());
     }
   };

@@ -46,6 +46,7 @@ export type Settings = {
 export class Router {
   private routes = new Map<string, Route>();
   private hashMode: boolean;
+  private isNavigation = false;
 
   private handleRouteChangeListener = () => this.handleRouteChange();
 
@@ -59,11 +60,9 @@ export class Router {
 
     this.hashMode = settings.hashMode;
     this.currentRoute = _DOMY().signal({ path: '' }).value;
-
-    this.init();
   }
 
-  private init() {
+  public init() {
     if (this.hashMode) window.addEventListener('hashchange', this.handleRouteChangeListener);
     else window.addEventListener('popstate', this.handleRouteChangeListener);
     this.handleRouteChange(); // Initial route setup
@@ -96,6 +95,8 @@ export class Router {
   }
 
   private handleRouteChange() {
+    if (this.isNavigation) return;
+
     const path = this.getPath();
     const queryParams = this.getQueryParams();
     const { matchedRoute, params } = this.matchRoute(path) || {};
@@ -136,7 +137,25 @@ export class Router {
     return isSameName && isSamePath && isSameParams && isSameQuery;
   }
 
-  private push(path: string, route?: Route, params?: Params, queryParams?: QueryParams) {
+  private pushFromNavigation(
+    path: string,
+    route?: Route,
+    params?: Params,
+    queryParams?: QueryParams,
+    replace?: boolean
+  ) {
+    this.isNavigation = true;
+    this.push(path, route, params, queryParams, replace);
+    this.isNavigation = false;
+  }
+
+  private push(
+    path: string,
+    route?: Route,
+    params?: Params,
+    queryParams?: QueryParams,
+    replace?: boolean
+  ) {
     const oldRoute = this.currentRoute.route;
 
     const from: FullRouteInfos = {
@@ -153,11 +172,27 @@ export class Router {
       queryParams
     };
 
-    if (this.isEqual(from, to)) return;
-
     const newDest = route?.before?.({ from, to });
-    if (newDest === false) return this.replace(from);
-    if (newDest) return this.replace(newDest);
+    if (newDest === false && !this.isNavigation) {
+      const fallbackPath = generateRoute(
+        this.currentRoute.path,
+        this.currentRoute.params,
+        this.currentRoute.queryParams
+      );
+      this.changePath(fallbackPath, true);
+      return;
+    }
+    if (newDest === false) return;
+    if (newDest) {
+      const { path, matchedRoute } = this.getPathAndRouteFromRouteInfos(newDest);
+      this.push(path, matchedRoute, newDest.params, newDest.queryParams, true);
+      return;
+    }
+
+    const fullRoute = generateRoute(path, params, queryParams);
+
+    // If we navigating we need to change the location
+    if (this.isNavigation || replace) this.changePath(fullRoute, replace);
 
     this.currentRoute.path = path;
     this.currentRoute.route = route;
@@ -167,50 +202,35 @@ export class Router {
     oldRoute?.after?.({ from, to });
   }
 
-  public replace(routeInfos: RouteInfos) {
-    if (this.isEqual(routeInfos, this.currentRoute)) return;
-
-    const path = routeInfos.name
-      ? this.routes.get(toKebabCase(routeInfos.name))?.route
-      : routeInfos.path;
-
-    if (!path) throw new Error(`(Router) Route not found: ${routeInfos.name ?? path}`);
-
-    const { matchedRoute } = this.matchRoute(path) ?? {};
-
-    if (!matchedRoute) throw new Error(`(Router) Route not found for: "${routeInfos.path}".`);
-
-    const fullRoute = generateRoute(path, routeInfos.params, routeInfos.queryParams);
-
-    if (this.hashMode) {
-      window.location.replace('#' + fullRoute);
+  private changePath(fullRoute: string, replace?: boolean) {
+    if (replace) {
+      if (this.hashMode) window.location.replace('#' + fullRoute);
+      else window.history.replaceState({}, '', fullRoute);
     } else {
-      window.history.replaceState({}, '', fullRoute);
-      this.push(path, matchedRoute, routeInfos.params, routeInfos.queryParams);
+      if (this.hashMode) window.location.hash = fullRoute;
+      else window.history.pushState({}, '', fullRoute);
     }
   }
 
-  public navigate(routeInfos: RouteInfos) {
-    if (this.isEqual(routeInfos, this.currentRoute)) return;
-
+  private getPathAndRouteFromRouteInfos(routeInfos: RouteInfos) {
     const path = routeInfos.name
       ? this.routes.get(toKebabCase(routeInfos.name))?.route
       : routeInfos.path;
-
     if (!path) throw new Error(`(Router) Route not found: ${routeInfos.name ?? path}`);
 
     const { matchedRoute } = this.matchRoute(path) ?? {};
-
     if (!matchedRoute) throw new Error(`(Router) Route not found for: "${routeInfos.path}".`);
+    return { matchedRoute, path };
+  }
 
-    const fullRoute = generateRoute(path, routeInfos.params, routeInfos.queryParams);
+  public replace(routeInfos: RouteInfos) {
+    this.navigate(routeInfos, true);
+  }
 
-    if (this.hashMode) {
-      window.location.hash = fullRoute;
-    } else {
-      window.history.pushState({}, '', fullRoute);
-      this.push(path, matchedRoute, routeInfos.params, routeInfos.queryParams);
-    }
+  public navigate(routeInfos: RouteInfos, replace?: boolean) {
+    if (this.isEqual(routeInfos, this.currentRoute)) return;
+    const { path, matchedRoute } = this.getPathAndRouteFromRouteInfos(routeInfos);
+    this.pushFromNavigation(path, matchedRoute, routeInfos.params, routeInfos.queryParams, replace);
   }
 
   public go(delta?: number) {
