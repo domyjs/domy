@@ -5,5 +5,3 @@
 - onError
 - $anchor
 - Render Function
-
-- Auto release ...

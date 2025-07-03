@@ -37,11 +37,9 @@ async function main() {
     type: 'multiselect',
     name: 'selectedPackages',
     message: 'Which package(s) do you want to update ?',
-    choices: [{ title: '[ALL]', value: '__ALL__' }, ...packageChoices],
+    choices: [...packageChoices],
     min: 1
   });
-
-  const actualPackages = selectedPackages.includes('__ALL__') ? packageDirs : selectedPackages;
 
   const updates: {
     name: string;
@@ -51,7 +49,7 @@ async function main() {
     path: string;
   }[] = [];
 
-  for (const pkg of actualPackages) {
+  for (const pkg of selectedPackages) {
     const pkgData = await readPackage(pkg);
     const { name, version } = pkgData.json;
 
