@@ -47,6 +47,9 @@ export class Router {
   private routes = new Map<string, Route>();
   private hashMode: boolean;
 
+  private handlePopstate = () => this.handleRouteChange();
+  private handleHashchange = () => this.handleRouteChange();
+
   private currentRoute: { path: string; params?: Params; queryParams?: QueryParams; route?: Route };
 
   constructor(settings: Settings) {
@@ -62,10 +65,19 @@ export class Router {
   }
 
   private init() {
-    window.addEventListener('popstate', () => this.handleRouteChange());
-    if (this.hashMode) window.addEventListener('hashchange', () => this.handleRouteChange());
+    window.addEventListener('popstate', this.handlePopstate);
+    if (this.hashMode) {
+      window.addEventListener('hashchange', this.handleHashchange);
+    }
 
     this.handleRouteChange(); // Initial route setup
+  }
+
+  public destroy() {
+    window.removeEventListener('popstate', this.handlePopstate);
+    if (this.hashMode) {
+      window.removeEventListener('hashchange', this.handleHashchange);
+    }
   }
 
   private wrapBeforeAfter(name: 'before' | 'after', fn: BeforeAfterFn) {
@@ -162,6 +174,8 @@ export class Router {
   }
 
   public replace(routeInfos: RouteInfos) {
+    if (this.isEqual(routeInfos, this.currentRoute)) return;
+
     const path = routeInfos.name
       ? this.routes.get(toKebabCase(routeInfos.name))?.route
       : routeInfos.path;
@@ -183,6 +197,8 @@ export class Router {
   }
 
   public navigate(routeInfos: RouteInfos) {
+    if (this.isEqual(routeInfos, this.currentRoute)) return;
+
     const path = routeInfos.name
       ? this.routes.get(toKebabCase(routeInfos.name))?.route
       : routeInfos.path;
@@ -230,6 +246,7 @@ export class Router {
       get params() {
         return ctx.currentRoute.params;
       },
+      destroy: this.destroy.bind(this),
       navigate: this.navigate.bind(this),
       goBack: this.goBack.bind(this),
       goForward: this.goForward.bind(this)
