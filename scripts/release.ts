@@ -131,4 +131,5 @@ async function main() {
   }
 }
 
+console.clear();
 main();
