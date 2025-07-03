@@ -1,5 +1,5 @@
 {
-  "name": "@domyjs/store",
+  "name": "@domyjs/router",
   "unpkg": "./dist/index.js",
   "buildName": "createRouter",
   "version": "1.0.0",
