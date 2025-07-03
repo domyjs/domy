@@ -7,7 +7,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "/dist",
+    "./dist",
     "package.json",
     "README.md"
   ],
@@ -26,5 +26,5 @@
   "bugs": {
     "url": "https://github.com/yoannchb-pro/domy/issues"
   },
-  "homepage": "https://github.com/yoannchb-pro/domy#readme"
+  "homepage": "https://domyjs.github.io/domy/docs/plugins/router"
 }
