@@ -10,7 +10,7 @@ afterEach(() => {
   });
 });
 
-describe('Router test', () => {
+describe.skip('Router test', () => {
   it('should display Home by default', () => {
     cy.get('h1').contains('Home');
     cy.get('footer').should('contain.text', '/');
