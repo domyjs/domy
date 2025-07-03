@@ -4,6 +4,12 @@ beforeEach(() => {
   cy.visit(path.join(__dirname, 'index.html'));
 });
 
+afterEach(() => {
+  cy.window().then((win: any) => {
+    win.DIR?.router?.destroy?.();
+  });
+});
+
 describe('Router test', () => {
   it('should display Home by default', () => {
     cy.get('h1').contains('Home');

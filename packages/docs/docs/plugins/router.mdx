@@ -160,6 +160,10 @@ router.navigate({
 
 Same as navigate but replaces current history entry.
 
+#### `go(delta)`
+
+Like the `window.history.go()` method.
+
 #### `goBack()`
 
 Go back in history.
@@ -170,7 +174,7 @@ Go forward in history.
 
 #### `destroy()`
 
-Remove the history/hash listener(s) from the dom.
+Remove the popstate/hashchange listener.
 
 ---
 

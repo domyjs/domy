@@ -47,8 +47,7 @@ export class Router {
   private routes = new Map<string, Route>();
   private hashMode: boolean;
 
-  private handlePopstate = () => this.handleRouteChange();
-  private handleHashchange = () => this.handleRouteChange();
+  private handleRouteChangeListener = () => this.handleRouteChange();
 
   private currentRoute: { path: string; params?: Params; queryParams?: QueryParams; route?: Route };
 
@@ -57,27 +56,22 @@ export class Router {
       const fixedName = toKebabCase(route.name);
       this.routes.set(fixedName, route);
     }
-    this.hashMode = settings.hashMode;
 
+    this.hashMode = settings.hashMode;
     this.currentRoute = _DOMY().signal({ path: '' }).value;
 
     this.init();
   }
 
   private init() {
-    window.addEventListener('popstate', this.handlePopstate);
-    if (this.hashMode) {
-      window.addEventListener('hashchange', this.handleHashchange);
-    }
-
+    if (this.hashMode) window.addEventListener('hashchange', this.handleRouteChangeListener);
+    else window.addEventListener('popstate', this.handleRouteChangeListener);
     this.handleRouteChange(); // Initial route setup
   }
 
   public destroy() {
-    window.removeEventListener('popstate', this.handlePopstate);
-    if (this.hashMode) {
-      window.removeEventListener('hashchange', this.handleHashchange);
-    }
+    if (this.hashMode) window.removeEventListener('hashchange', this.handleRouteChangeListener);
+    else window.removeEventListener('popstate', this.handleRouteChangeListener);
   }
 
   private wrapBeforeAfter(name: 'before' | 'after', fn: BeforeAfterFn) {
@@ -148,8 +142,8 @@ export class Router {
     const from: FullRouteInfos = {
       name: oldRoute?.name,
       route: oldRoute,
-      params: oldRoute?.params,
-      queryParams: oldRoute?.queryParams
+      params: this.currentRoute.params,
+      queryParams: this.currentRoute.queryParams
     };
 
     const to: FullRouteInfos = {
@@ -162,7 +156,7 @@ export class Router {
     if (this.isEqual(from, to)) return;
 
     const newDest = route?.before?.({ from, to });
-    if (newDest === false) return this.replace(this.currentRoute);
+    if (newDest === false) return this.replace(from);
     if (newDest) return this.replace(newDest);
 
     this.currentRoute.path = path;
@@ -180,7 +174,7 @@ export class Router {
       ? this.routes.get(toKebabCase(routeInfos.name))?.route
       : routeInfos.path;
 
-    if (!path) throw new Error(`(Router) Router not found: ${routeInfos.name ?? path}`);
+    if (!path) throw new Error(`(Router) Route not found: ${routeInfos.name ?? path}`);
 
     const { matchedRoute } = this.matchRoute(path) ?? {};
 
@@ -203,7 +197,7 @@ export class Router {
       ? this.routes.get(toKebabCase(routeInfos.name))?.route
       : routeInfos.path;
 
-    if (!path) throw new Error(`(Router) Router not found: ${routeInfos.name ?? path}`);
+    if (!path) throw new Error(`(Router) Route not found: ${routeInfos.name ?? path}`);
 
     const { matchedRoute } = this.matchRoute(path) ?? {};
 
@@ -217,6 +211,10 @@ export class Router {
       window.history.pushState({}, '', fullRoute);
       this.push(path, matchedRoute, routeInfos.params, routeInfos.queryParams);
     }
+  }
+
+  public go(delta?: number) {
+    window.history.go(delta);
   }
 
   public goBack() {
@@ -248,6 +246,7 @@ export class Router {
       },
       destroy: this.destroy.bind(this),
       navigate: this.navigate.bind(this),
+      go: this.go.bind(this),
       goBack: this.goBack.bind(this),
       goForward: this.goForward.bind(this)
     };
