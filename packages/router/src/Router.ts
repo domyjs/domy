@@ -130,19 +130,14 @@ export class Router {
     return isSameName && isSamePath && isSameParams && isSameQuery;
   }
 
-  private push(
-    path: string,
-    route?: Route,
-    params?: Record<string, string>,
-    queryParams?: QueryParams
-  ) {
+  private push(path: string, route?: Route, params?: Params, queryParams?: QueryParams) {
     const oldRoute = this.currentRoute.route;
 
     const from: FullRouteInfos = {
       name: oldRoute?.name,
       route: oldRoute,
-      params: this.currentRoute.params,
-      queryParams: this.currentRoute.queryParams
+      params: oldRoute?.params,
+      queryParams: oldRoute?.queryParams
     };
 
     const to: FullRouteInfos = {
