@@ -1,103 +1,136 @@
-// import fs from 'fs';
-// import path from 'path';
-// import { execSync } from 'child_process';
-// import prompts from 'prompts';
-// import semver from 'semver';
+import path from 'path';
+import fs from 'fs/promises';
+import prompts from 'prompts';
+import fg from 'fast-glob';
+import semver from 'semver';
+import { execa } from 'execa';
 
-// const rootVersion = '1.0.0';
-// const packagesDir = './packages';
+const PACKAGES_DIR = path.resolve(__dirname, '../packages');
 
-// async function main() {
-//   const response = await prompts({
-//     type: 'select',
-//     name: 'releaseType',
-//     message: `Current version is ${rootVersion}. Choose release type:`,
-//     choices: ['patch', 'minor', 'major'].map(type => ({
-//       title: type,
-//       value: type
-//     }))
-//   });
+async function findPackages(): Promise<string[]> {
+  const dirs = await fg('*/package.json', {
+    cwd: PACKAGES_DIR,
+    ignore: ['docs/**']
+  });
+  return dirs.map(file => path.dirname(file));
+}
 
-//   const nextVersion = semver.inc(rootVersion, response.releaseType);
-//   if (!nextVersion) throw new Error('Invalid version bump');
+async function readPackage(pkgDir: string) {
+  const pkgPath = path.join(PACKAGES_DIR, pkgDir, 'package.json');
+  const content = await fs.readFile(pkgPath, 'utf-8');
+  return {
+    path: pkgPath,
+    dir: path.join(PACKAGES_DIR, pkgDir),
+    json: JSON.parse(content)
+  };
+}
 
-//   const confirm = await prompts({
-//     type: 'confirm',
-//     name: 'value',
-//     message: `Release version ${nextVersion}?`,
-//     initial: true
-//   });
+async function main() {
+  const packageDirs = await findPackages();
 
-//   if (!confirm.value) {
-//     console.log('Cancelled');
-//     process.exit(0);
-//   }
+  const packageChoices = packageDirs.map(name => ({
+    title: name,
+    value: name
+  }));
 
-//   // Update root package.json
-//   const rootPkgPath = './package.json';
-//   const rootPkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf-8'));
-//   rootPkg.version = nextVersion;
-//   fs.writeFileSync(rootPkgPath, JSON.stringify(rootPkg, null, 2) + '\n');
+  const { selectedPackages } = await prompts({
+    type: 'multiselect',
+    name: 'selectedPackages',
+    message: 'Which package(s) do you want to update ?',
+    choices: [{ title: '[ALL]', value: '__ALL__' }, ...packageChoices],
+    min: 1
+  });
 
-//   // Update each package.json version
-//   const packages = fs
-//     .readdirSync(packagesDir)
-//     .filter(dir => fs.statSync(path.join(packagesDir, dir)).isDirectory());
+  const actualPackages = selectedPackages.includes('__ALL__') ? packageDirs : selectedPackages;
 
-//   for (const pkgName of packages) {
-//     const pkgPath = path.join(packagesDir, pkgName, 'package.json');
-//     const pkgJson = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+  const updates: {
+    name: string;
+    oldVersion: string;
+    newVersion: string;
+    dir: string;
+    path: string;
+  }[] = [];
 
-//     pkgJson.version = nextVersion;
+  for (const pkg of actualPackages) {
+    const pkgData = await readPackage(pkg);
+    const { name, version } = pkgData.json;
 
-//     // Optional: also update internal dependencies (within your monorepo)
-//     for (const depType of ['dependencies', 'peerDependencies']) {
-//       const deps = pkgJson[depType];
-//       if (deps) {
-//         for (const dep in deps) {
-//           if (packages.includes(dep) && deps[dep].startsWith('^')) {
-//             deps[dep] = `^${nextVersion}`;
-//           }
-//         }
-//       }
-//     }
+    const { bumpType } = await prompts({
+      type: 'select',
+      name: 'bumpType',
+      message: `What kind of update ${name}@${version} ?`,
+      choices: [
+        { title: 'first release', value: 'first' },
+        { title: 'patch', value: 'patch' },
+        { title: 'minor', value: 'minor' },
+        { title: 'major', value: 'major' }
+      ]
+    });
 
-//     fs.writeFileSync(pkgPath, JSON.stringify(pkgJson, null, 2) + '\n');
-//     console.log(`[UPDATED] ${pkgName}@${nextVersion}`);
-//   }
+    let newVersion = version;
+    if (bumpType !== 'first') {
+      newVersion = semver.inc(version, bumpType as semver.ReleaseType)!;
+    }
 
-//   // Run build
-//   console.log('\n🔧 Building packages...');
-//   execSync('ts-node scripts/build.ts', { stdio: 'inherit' });
+    if (newVersion !== version) {
+      const { confirm } = await prompts({
+        type: 'confirm',
+        name: 'confirm',
+        message: `Confirm ${name}: ${version} → ${newVersion} ?`
+      });
 
-//   // Git commit and tag
-//   execSync('git add .', { stdio: 'inherit' });
-//   execSync(`git commit -m "release: v${nextVersion}"`, { stdio: 'inherit' });
-//   execSync(`git tag v${nextVersion}`, { stdio: 'inherit' });
+      if (!confirm) continue;
 
-//   // Optional: publish to npm
-//   const publishConfirm = await prompts({
-//     type: 'confirm',
-//     name: 'value',
-//     message: `Publish all packages to npm?`,
-//     initial: false
-//   });
+      pkgData.json.version = newVersion;
+      await fs.writeFile(pkgData.path, JSON.stringify(pkgData.json, null, 2));
+    }
 
-//   if (publishConfirm.value) {
-//     for (const pkgName of packages) {
-//       const pkgPath = path.join(packagesDir, pkgName);
-//       console.log(`📦 Publishing ${pkgName}...`);
-//       execSync('npm publish --access public', {
-//         cwd: pkgPath,
-//         stdio: 'inherit'
-//       });
-//     }
-//   }
+    updates.push({
+      name,
+      oldVersion: version,
+      newVersion,
+      dir: pkgData.dir,
+      path: pkgData.path
+    });
+  }
 
-//   console.log(`✅ Release ${nextVersion} complete.`);
-// }
+  if (updates.length === 0) {
+    console.log('\nNo update made.');
+    return;
+  }
 
-// main().catch(err => {
-//   console.error(err);
-//   process.exit(1);
-// });
+  console.log('\n Summary of changes :');
+  updates.forEach(({ name, oldVersion, newVersion }) => {
+    console.log(`- ${name}: ${oldVersion} → ${newVersion}`);
+  });
+
+  const { confirmPublish } = await prompts({
+    type: 'confirm',
+    name: 'confirmPublish',
+    message: 'Do you want to publish the updated packages ?'
+  });
+
+  if (!confirmPublish) return;
+
+  try {
+    console.log('\n🛠️ Running build...');
+    await execa('npm', ['run', 'build'], { stdio: 'inherit' });
+
+    console.log('\n🧪 Running tests...');
+    await execa('npm', ['test'], { stdio: 'inherit' });
+
+    for (const { dir, name, newVersion } of updates) {
+      console.log(`\n📦 Publication of ${name}@${newVersion}...`);
+      await execa('npm', ['publish', '--access', 'public'], {
+        cwd: dir,
+        stdio: 'inherit'
+      });
+    }
+
+    console.log('\n✅ Publication finish.');
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+main();
